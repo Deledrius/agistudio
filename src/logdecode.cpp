@@ -272,7 +272,6 @@ void Logic::AddArg(byte Arg, byte ArgType)
 {
   int NumCharsToDisplay;
   string ThisMessage;
-
   if(ShowArgTypes){
     switch(ArgType){
     case atMsg:
@@ -283,26 +282,28 @@ void Logic::AddArg(byte Arg, byte ArgType)
             NumCharsToDisplay = maxcol - ThisLine.length();
             do{
               NumCharsToDisplay--;
-            }while(!(NumCharsToDisplay == 0 || ThisMessage[NumCharsToDisplay]==' '));
-            if (NumCharsToDisplay <= 0)NumCharsToDisplay = maxcol-ThisLine.length();
+            }while(!(NumCharsToDisplay <= 0 || ThisMessage[NumCharsToDisplay]==' '));
+            if (NumCharsToDisplay <= 0)
+              NumCharsToDisplay = maxcol-ThisLine.length();
+            if (NumCharsToDisplay <= 0)
+                NumCharsToDisplay = ThisMessage.length();
             ThisLine += "\"" + ThisMessage.substr(0,NumCharsToDisplay) + "\"";
             if(NumCharsToDisplay < (int)ThisMessage.length()){
-              ThisMessage = ThisMessage.substr(NumCharsToDisplay+1);
-              OutputText.append(ThisLine+"\n");
+                ThisMessage = ThisMessage.substr(NumCharsToDisplay+1);
+                OutputText.append(ThisLine+"\n");
             }
             else{
-              ThisMessage = "";
-              OutputText.append(ThisLine);
+                ThisMessage = "";
+                OutputText.append(ThisLine);
             }
             if (ArgsStart >= maxcol - 20)ArgsStart = maxcol - 20;
-            ThisLine = MultStr(" ",ArgsStart);                  
+            ThisLine = MultStr(" ",ArgsStart);
           }
           else{
             ThisLine +=  "\"" + ThisMessage +  "\"" ;
             ThisMessage = "";
           }
-        
-        }while(ThisMessage.length()>0);        
+        }while(ThisMessage.length()>0);
       }        
       else if(ShowNonExistingValues){
         ThisLine += ArgTypePrefix[atMsg] + IntToStr(Arg);
@@ -523,9 +524,9 @@ void Logic::ReadIfs(void)
             if (CurArg < TestCommand[ThisCommand].NumArgs-1)ThisLine += ',';
           }
         } // if ThisCommand != 14
-        ThisLine += ')';       
+        ThisLine += ')';
       }
-      FirstCommand = false;           
+      FirstCommand = false;
     }//if (CurByte > 0) && (CurByte <= NumTestCommands)
     else if (CurByte == 0xff){
       ThisLine += ") {";
