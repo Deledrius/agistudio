@@ -1,0 +1,73 @@
+// ****************************************************************************
+//
+// Logic 94: Death handler
+// This logic is run when the player dies.
+// The death message displayed depends on the value of death_type.
+//
+// ****************************************************************************
+
+#include "defines.txt"
+
+if (death_type != 255) {   // if death_type = 255, the death message has
+                           // already been displayed
+  accept.input();
+  cancel.line();
+  program.control();
+  clear.lines(23, 24, 0);
+  thankyou_timer = 12;
+
+  if (death_type == 1) { 
+    print("You are now dead.");
+  }
+
+  // add messages for other death types here
+
+  death_type = 255;  // set death_type to 255 so this logic does not display
+                     // the death message again
+}
+
+thankyou_timer--;
+
+if (thankyou_timer == 1) { 
+  print("Thank you for playing this game. Better luck next time!");
+}
+
+if (controller(key_activiate_menu)) { 
+  menu.input();
+}
+
+if ((controller(menu_help) || 
+     said("help"))) { 
+  call(92);
+}
+
+if ((controller(menu_restore) || 
+     said("restore", "game") ||
+     said("restore"))) { 
+  restore.game();
+}
+
+if ((controller(menu_restart) || 
+     said("restart", "game") ||
+     said("restart"))) { 
+  restart.game();
+}
+
+if ((controller(menu_inventory) ||
+     said("inventory"))) { 
+  status();
+}
+
+if ((controller(menu_quit) || 
+     said("quit"))) { 
+  stop.sound();
+  quit(0);
+}
+
+if (input_recieved && 
+    !input_parsed) { 
+  print("You are dead! You can only restore, restart, quit the game"
+        " or view your inventory.");
+}
+
+return();

@@ -1,0 +1,66 @@
+<HTML>
+<HEAD>
+<TITLE>View editor</TITLE></HEAD>
+<BODY>
+<h1>View editor</h1>
+The view editor supports all features of view resources. You can have up to 16 loops, 32 cels (in each loop), any width/height and a description.<p>
+For more information on view resources, <a href="view_descr.html">click here</a>.<p>
+To use the view editor, simply double-click on a view resource in the main window or select 'View Editor' from the 'Tools' menu or toolbar. You can have several view editor windows up at a time.<p>
+The view editor looks like this:<p>
+<img src="view-editor.png" alt = "" ><p>
+<h2>Components of the view editor window</h2>
+<B>Drawing area</B><p>
+This is pretty self explanatory. You can draw in either selected colour using the left or right mouse button.<p>
+<B>Colour Palette</B><p>
+This allows you to select drawing colours. You can assign colours to the left or right mouse button by clicking that button on the appropriate colour.<p>
+<B>Loop/cel change</B><p>
+The current loop and cel are displayed here. Click the left/right buttons to change loops/cels.<p>
+<B>Width/height change</B><p>
+This is the width and height of the current cel. Note that the image is 2*width pixels wide on the screen as each AGI pixel is two normal pixels wide. To change the width or height, click on the 
+appropriate buttons or type in a new value. 
+<p>
+The maximum cel size is 160x168 (the size of the AGI playing screen).<p>
+<B>Zoom in/out</B><p>
+You can zoom in or out of the view to a maximum of 10x. The default zoom is 2x.<p>
+<B>Tool selection</B><p>
+This allows you to select the tool you want to use in the drawing area.<p>
+<B>Shift cel</B><p>
+You can shift the cel up, down, left or right using these buttons.<p>
+<B>Mirroring</B><p>
+To mirror a loop, just select the number of the loop you want to mirror. Note that when you do this, you lose the current loop and it is replaced with the mirror of the other loop. Always make sure 
+that you change to the "target" loop before doing this. 
+<p>
+When loops are mirrored, any change you make to either loop will be replicated in the other. When you select "No other loop", the cels in both loops remain the same but you can now modify them 
+independently. 
+<p>
+<B>Transparency</B><p>
+Clicking the "set" button will change the transparent colour of this cel to the colour that is assigned to the left mouse button.<p>
+<B>Description</B><p>
+If you want a description, check the description check box and click the 'Edit' button to edit or change it. Note that lines are separated by "\n". The description editor looks like this:<p>
+<img src="view-description.png" alt = "" ><p>
+<b>Shortcut Keys</b><p>
+These keys can be used with the view editor:
+<p>
+<pre>
+Q       previous loop
+W       next loop
+A       previous cel
+S       next cel
+Z       zoom out
+X       zoom in
+T       set transparent colour
+D       select draw tool
+F       select fill tool
+I       shift cel up
+K       shift cel down
+J       shift cel left
+L       shift cel right
+CTRL-C  copy cel
+CTRL-V  paste cel
+</pre>
+<h2>A couple of notes</h2>
+At present, the undo feature is available only for clearing, pasting and filling a cel. There is no multiple undo.
+<p>Importing view images from other programs using 'copy'/'paste' is not available. The 'copy' and 'paste' functions work only to copy and paste cels between different loops or view editor windows.
+<p>
+<a href="index.html">Back to contents</a><p>
+</BODY></HTML>

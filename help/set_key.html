@@ -1,0 +1,66 @@
+<HTML>
+<HEAD>
+<TITLE>set.key</TITLE></HEAD>
+<BODY>
+<h1>set.key</h1>
+<B>Category</B><p>
+<a href="menu_commands.html">Menu/Key commands</a><p>
+<B>Syntax</B><p>
+<p>
+set.key(nCODE1,CODE2,cA);<p>
+<B>Description</B><p>
+<p>
+The key determined by the combination of nCODE1 and nCODE2 is assigned to controller cA. You can assign multiple menu items and keys to the one controller, for example most game functions like save, 
+restore, quit etc. usually have both a menu item and a key. 
+<p>
+To assign a key by it's ASCII code, set nCODE1 to the ASCII code you need (these can be obtained from an ASCII chart) and leave nCODE2 as 0. There are a few special codes:<p>
+<pre>
+nCODE1  Key
+ 1-26   CTRL-A-Z
+ 8      Backspace (CTRL-H)
+ 9      Tab (CTRL-I)
+ 13     Enter (CTRL-M)
+ 27     Esc
+ 32     Space
+</pre>
+However, there are some keys and key combinations which use extended codes. For these, nCODE1 should be 0 and nCODE2 should be one of the values listed below (these are all standard PC-Keyboard 
+codes, taken from the Epson GW-BASIC 3.20 manual.) 
+<p>
+<pre>
+nCODE2   Key
+ 3       CTRL-@
+ 15      SHIFT-TAB
+ 16-25   ALT-Q W E R T Y U I O P
+ 30-38   ALT-A S D F G H J K L
+ 44-50   ALT-Z X C V B N M
+ 59-68   F1-F10
+ 71      HOME*
+ 72      UP*
+ 73      PAGE UP*
+ 75      LEFT*
+ 77      RIGHT*
+ 79      END*
+ 80      DOWN*
+ 81      PAGE DOWN*
+ 82      INS
+ 83      DEL
+ 84-93   SHIFT-F1-F10
+ 94-103  CTRL-F1-F10
+ 104-113 ALT-F1-F10
+ 115     CTRL-LEFT
+ 116     CTRL-RIGHT
+ 117     CTRL-END
+ 118     CTRL-PAGE DOWN
+ 119     CTRL-HOME
+ 120-131 ALT-1 2 3 4 5 6 7 8 9 - =
+ 132     CTRL-PAGE UP
+ 133-134 F11 F12**
+ 135-136 SHIFT-F11 F12**
+ 137-138 CTRL-F11 F12**
+ 139-140 ALT-F11 F12**
+</pre>
+* - These codes can not actually be assigned as they are used for moving ego around, but were listed here for completeness.<p>
+** - I was not able to get these codes to work.<p>
+<B>See also</B><p>
+<a href="setting_up_menus_and_keys.html">Setting up menus and keys</a><p>
+</BODY></HTML>

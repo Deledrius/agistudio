@@ -1,0 +1,20 @@
+<HTML>
+<HEAD>
+<TITLE>Files used by AGI</TITLE></HEAD>
+<BODY>
+<h1>Files used by AGI</h1>
+These are the files that contain the actual data for the game.<p>
+Vol files (VOL.*): These files contain the resources. They are stored one after the other in the file, with a small header at the start of each resource identifying its size.<p>
+Directory files (LOGDIR, PICDIR, VIEWDIR, SNDDIR): These store the locations of each resource in the VOL files.<p>
+OBJECT and WORDS.TOK: See <a href="data_used.html">data used by AGI</a> section<p>
+In version 3, the VOL files have the game ID in front of them (e.g. KQ4VOL.0) and all the directory files are combined into one file (e.g. KQ4DIR)<p>
+If you want to know the format of these files, check out AGI Specs.<p>
+These are the files used by Sierra's original DOS interpreter. Other interpreters will use different files.<p>
+<ul>
+<li>AGI: The interpreter itself
+<li>AGIDATA.OVL: Data used by the interpreter
+<li>Other .OVL files: Graphics drivers
+<li>SIERRA.COM: The loader file. Sometimes named after the game (e.g. SQ.COM). This loads the AGI file into memory, decrypts it, and then runs it.
+</ul><p>
+<a href="data_used.html">Back to data used by AGI</a><p>
+</BODY></HTML>

@@ -1,0 +1,47 @@
+<HTML>
+<HEAD>
+<TITLE>Priorities</TITLE></HEAD>
+<BODY>
+<h1>Priorities</h1>
+The AGI screen is divided vertically into 12 priority bands (4-15). Objects with a higher priority are displayed on top of objects with a lower priority. Different parts of a picture can also be 
+given different priorities. So something in the far distance would have a priority of 4 (everything else would go on top of this) and something right at the front of the screen would have a priority 
+of 15 (nothing will go on top of this except objects with a priority of 15). 
+<p>
+This is best explained graphically:<p>
+<img src="pridemo-1.png" alt = "" > <img src="pridemo-2.png" alt = "" ><p>
+Here you can see both the visual and priority screens. As you can see, ego has a priority of 13 (magenta) but the bottom part of ego is on a part of the screen with a priority of 15 (white). Thus, 
+that part of ego is not drawn. The floor and some of the walls have a priority of 4 (red) because nothing needs to be drawn behind them. 
+<p>
+If the priority of an object and the part of the screen it is on are the same, the object goes on top. If two objects that have the same priority overlap, the object with the higher number goes on 
+top. 
+<p>
+Normally, the priority of an object is determined by its vertical position on screen:<p>
+<pre>
+Priority Y Range
+-----------------
+4        0-47
+5        48-59
+6        60-71
+7        72-83
+8        84-95
+9        96-107
+10       108-119
+11       120-131
+12       132-143
+13       144-155
+14       156-167
+15       -
+</pre>
+(note that 167 is the max. Y value an object can have)<p>
+To set an object's priority so it will remain constant wherever the object is on screen, use the <a href="set_priority.html">set.priority</a> or <a href="set_priority_v.html">set.priority.v</a> commands. To change it back so the 
+priority is dependent on the object's position, use the <a href="release_priority.html">release.priority</a> command. 
+<p>
+An object's priority can be determined using the <a href="get_priority.html">get.priority</a> command.<p>
+<B>See also</B><p>
+<p>
+<a href="set_priority.html">set.priority</a><p>
+<a href="set_priority_v.html">set.priority.v</a><p>
+<a href="release_priority.html">release.priority</a><p>
+<a href="get_priority.html">get.priority</a><p>
+<a href="objects.html">Objects</a><p>
+</BODY></HTML>

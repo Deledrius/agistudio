@@ -1,0 +1,24 @@
+<HTML>
+<HEAD>
+<TITLE>Picture resources</TITLE></HEAD>
+<BODY>
+<h1>Picture resources</h1>
+<B>Picture</B> resources are full-screen images, usually used for backgrounds. They are vector-based rather than bitmaps, which means they are drawn using drawing commands such as lines and 
+brushes, rather than by plotting pixels. 
+<p>
+Each picture has two images (screens) - the visual screen and the priority screen. The visual screen is what the player sees when playing the game. <a href="view_descr.html">Views</a> are placed on top of 
+the pictures during the game and can be moved around the screen. The priority screen is what makes the game appear to be 3-dimensional. On the AGI screen, there are 12 priority bands in which objects 
+can be placed. The priority given to different parts of the picture (i.e. the colour of the pixels on the priority screen) determines where in 3-dimensional space objects appear. For example, a tree 
+placed right at the front of the screen would be given a priority of 15 (the highest priority). A wall which is far away in the background would be given a priority of 4 (the lowest priority). If an 
+object with a priority of 12 is displayed on the screen, it would be behind the tree but in front of the wall. The priority of a view is usually determined by its y-position. 
+<p>
+Colours 0, 1, 2 and 3 on the priority screen are used for "control lines" which determine where the ego (the object controlled by the player) can walk.<p>
+
+Partial AGI picture tutorials can be found at the following sites 
+(note that these links may become unavailable in the future):
+<p>
+<p><a href="http://weremoose.tripod.com/Tutorials.html">http://weremoose.tripod.com/Tutorials.html</a>
+<p><a href="http://www.helsinki.fi/~terho/agi.html">http://www.helsinki.fi/~terho/agi.html</a>
+<p>
+<a href="data_used.html">Back to data used by AGI</a><p>
+</BODY></HTML>

@@ -1,0 +1,38 @@
+// ****************************************************************************
+//
+// Logic 92: Help screen
+//
+// ****************************************************************************
+
+#include "defines.txt"
+
+prevent.input();
+status.line.off();
+text.screen();
+key_pressed = 0;
+reset(input_parsed);
+display(3, 0, "               AGI Help");
+
+display(6, 0,"      F1 displays this message.");
+display(7, 0,"      F2 turns the sound off and on.");
+display(8, 0,"      F3 retypes the last line typed.");
+display(9, 0,"      F5 saves your current game.");
+display(10,0,"      F7 restores a saved game.");
+display(11,0,"      F9 restarts the game.");
+display(12,0,"   ALT-Z quits the game.");
+display(13,0,"     TAB shows the inventory screen.");
+display(14,0,"     ESC pops up menus.");
+display(15,0,"  Ctrl-J sets up your joystick.");
+display(16,0,"      +  Increases volume.");
+display(17,0,"      -  Decreases volume.");
+
+WaitForKey:
+if (!have.key()) { 
+  goto(WaitForKey);
+}
+
+accept.input();
+status.line.on();
+graphics();
+set(input_parsed);
+return();

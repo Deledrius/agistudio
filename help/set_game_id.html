@@ -1,0 +1,20 @@
+<HTML>
+<HEAD>
+<TITLE>set.game.id</TITLE></HEAD>
+<BODY>
+<h1>set.game.id</h1>
+<B>Category</B><p>
+<a href="system_commands.html">System commands</a><p>
+<B>Syntax</B><p>
+<p>
+set.game.id(mID);<p>
+<B>Description</B><p>
+<p>
+Sets the game ID to mID. This is a short name, up to 6 characters, that identifies the game, such as KQ2, SQ2, GR, MG etc. When the game ID is set like this, the interpreter checks it agains it's own 
+internal game ID and if they don't match, it quits. This was to make sure games weren't run with the wrong interpreter. Once the game ID is set, saved games include it in their filenames (e.g. SQSG.1). 
+<p>
+There is a simple way around the game ID checking problem - simply don't use this command, and the interpreter won't find the wrong one and quit. This is especially important with new games, so that 
+they can be run using interpreters from different games, which of course will have different IDs (although they must be the right interpreter version). Saved games will just be called SG.1, SG.2 etc. 
+but that is not a real problem. 
+<p>
+</BODY></HTML>

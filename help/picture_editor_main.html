@@ -1,0 +1,230 @@
+<HTML>
+<HEAD>
+<TITLE>Picture editor</TITLE></HEAD>
+<BODY>
+<h1>Picture editor</h1>
+<i>Note: this help is an updated conversion from the help text of the original (MSDOS) Picedit developed by Lance Ewing. Therefore, the word "I" in this text refers to Lance Ewing.</i>
+
+<p>
+
+<a href="picture_descr.html">more information on picture resources</a>
+
+<p>
+To use the picture editor, simply double-click on a picture resource in the main window or select 'Picture Editor' from the 'Tools' menu or toolbar. You can have several picture editor windows up at a time.<p>
+The picture editor looks like this: (the picture part of the screenshot is cut to reduce the image size)<p>
+
+<img src="picture-editor.png" alt = "" ><p>
+<h2>Components of the picture editor window</h2>
+
+<h3>Status line</h3>
+
+The status line shows current X position of mouse cursor, current Y position of mouse cursor and priority band that corresponds to the current Y position. The small color box on the right shows priority color that would masks an objects if it were located where the mouse cursor currently is.
+
+<h3>Drawing area</h3><p>
+
+This is pretty self explanatory. See the tool selection below.
+
+<h3>Tool selection</h3><p>
+
+<b>The tool buttons</b>
+<p>
+<b>Line:</b> This line tool is what has been called the absolute line in the AGI
+picture documentation. It draws a line from one point to any other point
+on the screen. Once you click on the picture surface, a virtual line
+follows the mouse cursor until you click on the next point. This is very
+much how most graphics packages work. The virtual line will continue this
+behaviour until you press the right hand mouse button on the picture
+surface. The tool remains "chosen" and you can continue
+drawing lines without re-selecting the tool until you click the secondary
+mouse button.  The same applies to all the tools.
+<p>The AGI picture code used is 0xF6.
+<p>
+<b>Pen:</b> The pen tool is what has been called the relative line in the AGI
+picture documentation. I called it pen firstly because its nice and short,
+and secondly because when you think about it, the relative line is used for
+finer details, which is what I associate with pen drawing. The pen tool
+operates very much like the line tool except that it has a restriction on
+the length of the line which is reflected by the fact that the virtual line
+will only follow the cursor to its boundary. Right clicking turns the tool
+off as was mentioned for line above. The AGI picture code used is 0xF7.
+<p>
+<b>Step:</b> A strange name for a strange tool. This tool is what I called the
+x-corner and y-corner in the AGI picture documentation for want of a better
+name. I called it step because the nature of this tool makes it very easy
+to draw 'steps'. The behaviour of this tool is a bit different from the
+previously mentioned tools in that the destination point must lie on a
+certain line. The virtual line once again reflects this and will only let
+you draw a line to an acceptable destination. I have combined both the
+0xF4 and the 0xF5 picture codes into this one tool. The codes used depends
+of the direction taken by the first line. This means that initially you
+have a choice of going vertical OR horizontal, but once that first click
+is made, the program restrict you to one plane from then on. Right clicking
+once again turns the tool off.
+<p>
+<b>Fill:</b> This needs no explanation. Choose a colour, click on a white spot and
+it fills it in for you. Right clicking on the picture surface once again
+turns the tool off. The AGI picture code used is 0xF8.
+<p>
+If you click on non-white spot, the area will be re-filled with the new
+color. This option is somewhat buggy. <b><i>Remember: save early, save often.</i></b>
+<p>
+<b>Brush:</b> This tool is the most involved tool. It corresponds with codes 0xF9
+and 0xFA. An artist will set up the desired brush characteristics with the
+brush state interface, select the brush tool, and then start using it. It
+doesn't necessarily have to be done in this order, the program is quite
+robust in this respect. You can even change the brush characteristics half
+way through using the brush tool and every thing will be taken care of. Once
+again, right clicking on the picture surface disables the tool. AGI picture
+code 0xF9 is used to say what characteristics to give the brush, and code
+0xFA gives the positions and pattern if it is needed.
+<p>
+
+<h3>The palette buttons</h3>
+
+The palette buttons are used to change the colour of the visual colour and
+the priority colour. Left clicking on the palette bar changes the visual
+colour. Right clicking on the palette bar changes the priority colour. The
+AGI picture codes used are 0xF0 for visual colour, and 0xF2 for priority
+colour.
+<p>
+The 'off' button is directly related to the palette buttons. It turns off
+visual or priority drawing depending on which mouse button is pressed. The
+left mouse button disabled visual drawing, the right mouse button disables
+priority drawing. It is important to realise that even though both the
+visual and priority colours may be turned off, the buffer still accepts
+drawing actions and places them in the buffer, they just won't be able to
+be seen on the picture surface or in AGI when you final incorporate it
+into an AGI program. Usually the off button is used to turn off one of
+the colours so that work can be done on only one of the screens. The AGI
+picture codes used are 0xF1 for disabling the visual colour and 0xF3 for
+disabling the priority colour.
+
+<h3>The brush state interface</h3>
+
+ This was briefly mentioned in the brush tool section. What it does is allow
+you to set the size of the brush (with the up and down arrows), set the
+shape of the brush (either square or circle), and set whether it is solid
+or like a spray. The brush state interface lies between the off button and
+the navigation buttons. When the brush tool is used, the state shown by this
+interface is what is used.
+
+<h3>The navigation buttons and buffer position edit field</h3>
+
+
+The navigation buttons allow the artist to navigate backwards and forwards
+through the picture code action by action. You cannot end up in the middle
+of the data for a drawing action because this could potentially cause all
+sorts of problems. The four navigation buttons operate as follows:
+<p>
+<ul>
+ <li><b>Home (&lt;&lt;):</b> This button takes you to the start of the picture code buffer.
+ <li><b>Left (&lt;) :</b> This button takes you back to the start of the previous drawing
+            action.
+ <li><b>Right (&gt;):</b> This button take you to the start of the next drawing action.
+ <li><b>End (&gt;&gt;) :</b> This button takes you to the end of the picture code.
+</ul>
+<p>
+ As the navigation buttons are used, the value in the buffer position edit
+field will change. This field gives the offset in bytes from the start of
+the picture code. You can click on this field and enter a value to go
+directly to this position in the buffer. This means that you don't have to
+waste time using the navigation buttons. Of course, the value you enter might
+be in the middle of a drawing action. For this reason, the program searches
+backwards from the position entered until it finds the start of the drawing
+action that includes the entered position as part of its data. It would not
+do to allow data to be added to the picture code in the middle of an existing
+drawing action.
+<p>
+ The navigation buttons and buffer position edit field allow you to go back
+and make changes to existing data or insert something that you forgot to
+draw. As we shall see by the next section, in combination with the delete
+button, these features can be very powerful.
+<p>
+
+<h3>The Delete button</h3>
+
+ We all make mistakes and this button is provided because of that fact. If
+you make a mistake and want to remove it, all you have to do is go back to
+that point in the picture code and push the delete button. Warning!! This
+will delete the whole action. This means that if the mistake is only in
+part of the action, you will have to redraw the whole action to fix it up.
+It is probably a good idea to split big actions up into smaller segments
+because of this. Most actions are reasonably short anyway. This editor is
+very much drawing action based as you have probably gathered by now.
+<p>
+ The power of using this button is that you can experiment with various
+things such as the colour of an object like a table top. All you would do is
+navigate to the 0xF0 code that sets the colour of the table top, push the
+delete button, and the push the desired new colour on the palette bar. To see
+the change, move back to the end of the picture.
+<p>
+
+<h3>The Wipe button</h3>
+
+Wipes everything starting from the current position up to the end of the picture.
+
+<h3>The buffer contents display field</h3>
+You are probably asking how you are supposed to know what action you are
+currently at when you are navigating through the picture code buffer. The
+purpose of the buffer contents display field is to make this known to you.
+Of course, the picture surface also reflects where you are since it only
+draws up to the point that you are at in the buffer. However, knowing exactly
+where you are requires a look at the actual data itself which is what this
+field displays. The drawing action that you are currently at is the one that
+starts at the left hand side of the buffer contents display field. The field
+shows six bytes. For this reason, it is sometimes possible to see the start
+of the next action. This is why I've made the distinction that the current
+drawing action is the one that starts at the left hand side. You can also
+use the 'View Data' option in the 'Utilities' menu to look at the data currently
+in the picture code buffer.
+
+<h3>View Data</h3>
+
+The 'View Data' option is quite useful. It allows you to browse through the
+data contained in the picture code buffer. You can use this option to get
+a better idea of where abouts you currently are in the picture code.
+You can turn on comments to see what drawing actions correspond to hex codes.
+
+<h3>The background tracing option</h3>
+
+ This option has the potential to save artists a lot of time, and can make
+artists out of laymen. You can specify a BMP file (or any other file format
+supported by QT) to use as the background
+in order to trace various details on it when drawing a picture. This facility
+treats the white visual colour and red priority colour as a transparent
+colour. All other colours are drawn on top of this image. Initially you start
+with the whole image being displayed on both the visual and priority screens.
+As you draw the trace the background image, it will gradually disappear until
+only the white parts of your final picture will be showing the background
+image.
+<p>
+The background image should have a width of 320 pixels and height of 168 pixels. It can be bigger, but the rest of the image will be cut off.
+<p>
+When you load the background image, the checkbutton 'Background' is automatically switched on. At any stage you can switch back to normal to see the white parts of the screen as they should be.
+
+<h3>The priority lines</h3>
+
+This option allows to turn on/off the priority lines.
+
+<h3>Zoom in/out</h3><p>
+You can zoom in or out of the picture to a maximum of 4x. The default zoom is 2x.<p>
+
+<h3>Keyboard shortcuts</h3>
+<p>
+<pre>
+ L, l, F1: Line tool
+ P, p, F2: Pen tool
+ S, s, F3: Step tool
+ F, f, F4: Fill tool
+ B, b, F5: Brush tool
+
+ Home, Left, Right, and End keys:  Same as the navigation buttons.
+
+ Del key: Same as the delete button
+
+ F10: Toggle the background picture
+
+ TAB: switch between visual and priority screens
+</pre>
+<p><a href="index.html">Back to contents</a><p>
+</BODY></HTML>

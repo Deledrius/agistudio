@@ -1,0 +1,35 @@
+// ****************************************************************************
+//
+// Logic *: new room
+//
+// ****************************************************************************
+#include "defines.txt"
+if (new_room) {
+  load.pic(room_no);
+  draw.pic(room_no);
+  discard.pic(room_no);
+  set.horizon(50);
+// Check what room the player came from and position them on the
+// screen accordingly here, e.g:
+// if (prev_room_no == 5) {
+//   position(ego,12,140);
+// }
+  draw(ego);
+  show.pic();
+}
+if (said("look")) {
+  print("This is an empty room.");
+}
+if (ego_edge_code == horizon_edge) {  // ego touching horizon
+  new.room(2);
+}
+if (ego_edge_code == right_edge) {    // ego touching right edge of screen
+  new.room(2);
+}
+if (ego_edge_code == bottom_edge) {   // ego touching bottom edge of screen
+  new.room(2);
+}
+if (ego_edge_code == left_edge) {     // ego touching left edge of screen
+  new.room(2);
+}
+return();

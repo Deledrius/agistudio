@@ -1,0 +1,27 @@
+<HTML>
+<HEAD>
+<TITLE>reposition</TITLE></HEAD>
+<BODY>
+<h1>reposition</h1>
+<B>Category</B><p>
+<a href="object_commands.html">Object/view commands</a><p>
+<B>Syntax</B><p>
+<p>
+reposition(oA,vDX,vDY);<p>
+<B>Description</B><p>
+<p>
+Object oA is repositioned relative to its current co-ordinates. Its new co-ordinates are X+vDX,Y+vDY where X,Y is its current position. If vDX or vDY are greater than 127, they are treated as a 
+negative number (vDX-256 or vDY-256). 
+<p>
+For example:<p>
+v254 = 5;<p>
+v255 = 252;<p>
+reposition(o1,v254,v255)<p>
+would reposition object 1 to X+5,Y-4.<p>
+<B>See also</B><p>
+<a href="reposition_to.html">reposition.to</a><p>
+<a href="reposition_to_v.html">reposition.to.v</a><p>
+<a href="position.html">position</a><p>
+<a href="position.html">position.v</a><p>
+<a href="positioning_objects.html">Positioning objects</a><p>
+</BODY></HTML>

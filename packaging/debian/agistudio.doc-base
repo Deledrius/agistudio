@@ -1,0 +1,10 @@
+Document: agistudio
+Title: QT AGI Studio User's Manual
+Author: Peter Kelly, Helen Zommer
+Abstract: This manual describes the user interface
+ of QT AGI Studio, an adventure game IDE.
+Section: Apps/Programming
+
+Format: HTML
+Index: /usr/share/agistudio/help/index.html
+Files: /usr/share/agistudio/help/*.html

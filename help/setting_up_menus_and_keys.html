@@ -1,0 +1,37 @@
+<HTML>
+<HEAD>
+<TITLE>Setting up menus and keys</TITLE></HEAD>
+<BODY>
+<h1>Setting up menus and keys</h1>
+For a list of menu/key related commands, <a href="menu_commands.html">click here</a>.<p>
+<B>About controllers</B><p>
+<p>
+A controller is an event that has occured due to the user selecting a menu item or pressing a key. There are 50 controllers available (numbered from 0-49), and menu items and keys are assigned to 
+them. To test whether the event has occured, use the <a href="controller.html">controller</a> test command, like this: 
+<p>
+<pre>
+if (controller(c2)) {
+  quit(0);
+}
+</pre><p>
+The above example tests for controller 2 (which could be assigned to "quit" on the menu), and if it has occured, it quits the game.<p>
+<B>Setting up menus</B><p>
+First use the <a href="set_menu.html">set.menu</a> command to create a menu. Then use the <a href="set_menu_item.html">set.menu.item</a> command to add items to it. Repeat this process until all the menus have been set up, and then 
+use the <a href="submit_menu.html">submit.menu</a> command to initialize it, making it available for use. Here is an example of creating a menu: 
+<p>
+<pre>
+set.menu("File");
+set.menu.item("Restart",c1);
+set.menu.item("Quit",c2);
+set.menu("Help");
+set.menu.item("About");
+submit.menu();
+</pre><p>
+The second parameter of the <a href="set_menu_item.html">set.menu.item</a> command is the controller that the menu item is being assigned to. You can assign multiple menu items and keys to the one controller, for 
+example most game functions like save, restore, quit etc. usually have both a menu item and a key. 
+<p>
+The menu can be brought up using the <a href="menu_input.html">menu.input</a> command.<p>
+<B>Setting up keys</B><p>
+<p>
+Use the <a href="set_key.html">set.key</a> command.<p>
+</BODY></HTML>

@@ -1,0 +1,316 @@
+// ****************************************************************************
+//
+// Logic 0: Main logic
+//
+// ****************************************************************************
+
+
+#include "defines.txt"
+
+if (error_code > 0) { 
+  call(98);     // error handler - IMPORTANT
+}
+
+if (room_no == 0) { 
+  call(91);    // initialization
+
+  if (game_restarted) {
+    disable.item(menu_fileseparator);
+    set(menu_enabled);
+    reset(disable_game_functions);
+    new.room(2);     // go to first room here
+  }
+  else { 
+    set.menu("AGI");
+    set.menu.item("About      ", menu_about);
+    set.menu.item("Help   <F1>", menu_help);
+    set.menu("File");
+    set.menu.item("Save     <F5>", menu_save);
+    set.menu.item("Restore  <F7>", menu_restore);
+    set.menu.item("-------------", menu_fileseparator);
+    set.menu.item("Restart  <F9>", menu_restart);
+    set.menu.item("Quit  <Alt-Z>", menu_quit);
+    set.menu("Action");
+    set.menu.item("See Object  <F4>", menu_seeobject);
+    set.menu.item("Inventory  <Tab>", menu_inventory);
+    set.menu("Special");
+    set.menu.item("Sound On/Off      <F2>", menu_soundonoff);
+    set.menu.item("Clock On/Off      <F6>", menu_clock);
+    set.menu.item("Joystick      <Ctrl J>", menu_joystick);
+    set.menu.item("Pause            <Esc>", menu_pause);
+    set.menu("Speed");
+    set.menu.item("Normal ", menu_normalspeed);
+    set.menu.item("Slow   ", menu_slowspeed);
+    set.menu.item("Fast   ", menu_fastspeed);
+    set.menu.item("Fastest", menu_fastestspeed);
+    submit.menu();
+    disable.item(menu_fileseparator);
+    set(disable_game_functions);
+    new.room(1);    // intro/opening screen
+  }
+}
+
+if (new_room) {          // First interpreter cycle in a new room
+                         // Note: Everything other than logic 0 is discarded
+                         // from memory when new.room is executed
+  load.logics(90);  // Load game specific functions logic into memory
+  reset(debug_active);  // If you remove this command to have debug
+                        // mode STAY on, remember to load the debug
+                        // logic here.
+  clear.lines(24,24,0);  // clear bottom line of screen (remove ego's coords if shown)
+  animate.obj(ego);
+  load.view.v(ego_view_no);
+  set.view.v(ego, ego_view_no);
+  observe.objs(ego);
+  old_clock_seconds = 255;   // make sure clock gets updated this cycle
+                             // on this cycle (if turned on)
+}
+
+if (death_type > 0) {    // player is dead
+  if (death_type != 255) {    // first cycle since player died. disable
+                              // some menu items and load logic 94 into
+                              // memory as it will be called from now on.
+    disable.item(menu_about);
+    disable.item(menu_help);
+    disable.item(menu_save);
+    disable.item(menu_pause);
+    disable.item(menu_soundonoff);
+    disable.item(menu_seeobject);
+    disable.item(menu_joystick);
+    disable.item(menu_normalspeed);
+    disable.item(menu_fastestspeed);
+    disable.item(menu_fastspeed);
+    disable.item(menu_slowspeed);
+    load.logics(94);
+  }
+  call(94);    // death handler
+  goto(End);
+}
+
+if (!disable_game_functions) {
+  if (controller(key_activiate_menu)) { 
+    menu.input();
+  }
+}
+
+if (controller(menu_about)) { 
+  print(game_about_message);
+}
+
+if ((controller(menu_fastestspeed) ||
+     said("fastest") ||
+     said("fastest", "speed"))) {
+  cycle_delay = 0;    // no delay between interpreter cycles
+}
+
+if ((controller(menu_fastspeed) ||
+     said("fast") ||
+     said("fast", "speed"))) { 
+  cycle_delay = 1;    // 1/20th of a second delay between interpreter cycles
+}
+
+if ((controller(menu_normalspeed) ||
+     said("normal") ||
+     said("normal", "speed"))) { 
+  cycle_delay = 2;    // 2/20ths of a second delay between interpreter cycles
+}
+
+if ((controller(menu_slowspeed) ||
+     said("slow") ||
+     said("slow", "speed"))) { 
+  cycle_delay = 4;    // 4/20ths of a second delay between interpreter cycles
+}
+
+if (controller(key_decreasevolume)) {
+  sound_volume--;  // decrease volume
+}
+
+if (controller(key_increasevolume) && sound_volume < 15) { 
+  sound_volume++;  // increase volume
+}
+
+if (controller(menu_soundonoff)) { 
+  toggle(sound_on);
+}
+
+if (!disable_game_functions) {
+
+  if (!debug_active) { 
+    if (controller(key_debug)) { 
+      set(debug_active);
+      print(game_version_message);
+      version();
+      load.logics(99);    // load debug logic into memory
+    }
+  }
+
+  if ((controller(menu_save) || 
+       said("save", "game") ||
+       said("save"))) { 
+    stop.sound();
+    save.game();
+  }
+
+  if ((controller(menu_restore) || 
+       said("restore", "game") ||
+       said("restore"))) { 
+    stop.sound();
+    restore.game();
+  }
+
+  if ((controller(menu_restart) || 
+       said("restart", "game") ||
+       said("restart"))) { 
+    restart.game();
+  }
+
+  if ((controller(menu_help) || 
+       said("help"))) {
+    call(92);
+  }
+
+  if (controller(key_echoline)) { 
+    echo.line();
+  }
+
+  if (controller(key_clearinputline)) { 
+    cancel.line();
+  }
+
+  if (controller(menu_joystick)) { 
+    init.joy();
+  }
+
+  if ((controller(menu_pause) || 
+       said("pause", "game") ||
+       said("pause"))) { 
+    pause();
+  }
+
+  if ((controller(menu_inventory) ||
+       said("inventory"))) { 
+    status();
+  }
+
+  if ((controller(menu_seeobject) || 
+       controller(key_seeobject))) { 
+    set(inventory_select_enabled);    // enable choice of inventory item in inventory screen
+    status();   // show inventory screen - player selects an inventory item
+    if (selected_inventory_item > 0 &&
+        selected_inventory_item != 255) {       // note: selected_inventory_item is set to 255
+                                                // if ESC is pressed in the inventory screen.
+      // player has chosen an object (value of selected_inventory_item). We now display this object.
+
+      if (selected_inventory_item == 1) {       // test object
+        show.obj(220);
+      }
+
+      // NOTE: If you have several objects, it is easier to give them
+      // consecutive view numbers. Then you can do the following (view
+      // numbers start at 220 for this example):
+      //   v255 = selected_inventory_item; v255 += 219; 
+      //   show.obj.v(v255);
+      // If you this, you don't have to have separate statements for each
+      // object.
+
+      reset(inventory_select_enabled);   // disable choice of inventory item in inventory screen
+    }
+  }
+
+  if ((controller(menu_quit) || 
+       said("quit", "game") ||
+       said("quit"))) { 
+    stop.sound();
+    quit(0);
+  }
+}
+
+get.posn(ego, new_ego_x, new_ego_y);       // get ego's current position
+
+if (ego_dir == old_ego_dir &&
+    new_ego_x == old_ego_x &&
+    new_ego_y == old_ego_y) {
+  // ego hasn't moved or changed direction since last cycle
+  stop.cycling(ego);
+}
+else { 
+  if (!never_animate_ego) {
+    start.cycling(ego);
+  }
+}
+
+old_ego_x = new_ego_x;
+old_ego_y = new_ego_y;
+old_ego_dir = ego_dir;
+
+if (always_animate_ego) { 
+  start.cycling(ego);
+}
+else { 
+  if ((ego_dir == stopped || never_animate_ego)) { 
+    stop.cycling(ego);
+  }
+}
+
+if ((said("clock") || controller(menu_clock))) {
+  toggle(clock_active);
+  if (!clock_active) {
+    status.line.on();         // remove clock text from status line
+  }
+  else {
+    old_clock_seconds = 255;  // make sure clock gets updated this cycle
+  }
+}
+
+if (clock_active && !disable_game_functions) {
+  if (old_clock_seconds != clock_seconds) {
+    set.text.attribute(0,15);
+    display(0, 18, " %v13:%v12|2:%v11|2 ");     // update clock
+    set.text.attribute(15,0);
+    old_clock_seconds = clock_seconds;
+  }
+}
+
+
+if (isset(game_restored)) {    // first cycle since restore game executed
+  clear.lines(23, 24, 0);
+  reset(debug_active);
+  disable.item(menu_fileseparator);
+}
+
+call.v(room_no);    // IMPORTANT: This calls the logic for the current room - this
+                    // is not done automatically by the interpreter so it has to be
+                    // called manually by logic 0. Logic 0 cycles round and on each
+                    // cycle the current room's logic is called, so it is also
+                    // executed with each cycle.
+
+if (debug_active) { 
+  call(99);    // debug logic
+}
+
+call(90);      // game specific functions
+
+if (input_recieved && 
+    unknown_word_no > 0) { 
+  reset(input_recieved);
+  if (unknown_word_no == 1) { 
+    print("I don't understand \"%w1\"");
+  }
+  if (unknown_word_no == 2) { 
+    print("I don't understand \"%w2\"");
+  }
+  if (unknown_word_no == 3) { 
+    print("I don't understand \"%w3\"");
+  }
+}
+
+if (input_recieved &&
+    !input_parsed) {     // no command has been recognised
+  print("I don't understand your request.");
+  reset(input_recieved);
+}
+
+reset(input_parsed);
+
+End:
+return();

@@ -1,0 +1,26 @@
+/* XPM */
+static char *home[] = {
+/* columns rows colors chars-per-pixel */
+"16 16 4 1",
+"  c black",
+". c #C0C0C0C0C0C0",
+"X c gray100",
+"o c None",
+/* pixels */
+"oooooooooooooooo",
+"ooooooo  ooooooo",
+"oo ooo    oooooo",
+"oo oo XX.. ooooo",
+"oo o XXXX.. oooo",
+"oo  XXXXXX.. ooo",
+"oo XXXXXXXX.. oo",
+"o XXXXXXXXX... o",
+"   XXXXXXXX..   ",
+"oo XXXXXXXX.. oo",
+"oo XXX   XX.. oo",
+"oo XXX o XX.. oo",
+"oo XXX o XX.. oo",
+"oo XXX o XX.. oo",
+"oo XXX o XX.. oo",
+"oo     o      oo"
+};

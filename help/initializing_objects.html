@@ -1,0 +1,28 @@
+<HTML>
+<HEAD>
+<TITLE>Initializing objects</TITLE></HEAD>
+<BODY>
+<h1>Initializing objects</h1>
+In order to initialize a screen object you must follow these steps:<p>
+<B>1. Animate the object.</B> This is done using the <a href="animate_obj.html">animate.obj</a> command. This tells the interpreter that you want to use this object. There are a limited number of objects that the 
+interpreter can use at any one time. This is set by a certain byte in the OBJECT file. There is currently no program that will edit this, but the template game allows for up to 16 objects (0-15) 
+which should be enough. Also, the more objects you use the slower the interpreter will run, but it is not really noticeable on today's machines. 
+<p>
+<B>2. Assign a view to the object.</B> This is done using the <a href="set_view.html">set.view</a> command. Each object must have a view assigned to it, and this is the view that is displayed on the screen wherever 
+the object is. One view can be assigned to multiple screen objects. You must have the view loaded in memory before you assign it. This can be done with the <a href="load_view.html">load.view</a> command. 
+<p>
+<B>3. Position the object on screen.</B> This is done using the <a href="position.html">position</a> command.</B><p>
+<B>4. Draw the object.</B> This is done using the <a href="draw.html">draw</a> command. If you do not do this the object will not be visible on screen.</B><p>
+Here is an example:<p>
+<pre>
+animate.obj(o2);
+load.view(4);
+set.view(o2,4);
+position(o2,80,120);
+draw(o2);
+</pre><p>
+This will result in an animation of view 4 being displayed at 80,120.<p>
+<B>See also</B><p>
+<p>
+<a href="objects.html">Objects</a><p>
+</BODY></HTML>

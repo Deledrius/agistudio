@@ -1,0 +1,35 @@
+<HTML>
+<HEAD>
+<TITLE>Moving objects</TITLE></HEAD>
+<BODY>
+<h1>Moving objects</h1>
+Each object on screen has a direction it is moving in. This is a numerical value from 0 to 8:<p>
+<img src="logic_diag-directions.png" alt = "" ><p>
+When an object is moving normally (and has a direction greater than 0), it will continue moving until it is told to stop, move in another direction, or runs into an <a href="controlling_obstacles.html">obstacle</a> 
+(such as a control line, a block, or another object). 
+<p>
+An object's direction can be changed using the <a href="set_dir.html">set.dir</a> command. The <a href="get_dir.html">get.dir</a> command will allow you to find out what its current direction is. The direction of ego (object 0) is 
+always stored in v6. To stop an object's movement, use <a href="stop_motion.html">stop.motion</a>. 
+<p>
+There are several commands which will make an object move in different ways:<p>
+<a href="move_obj.html">move.obj</a>/<a href="move_obj_v.html">move.obj.v</a><p>
+<a href="wander.html">wander</a><p>
+<a href="follow_ego.html">follow.ego</a><p>
+The <a href="normal_motion.html">normal.motion</a> command will make the object to move in the way described above after it has been moving from one of these three commands.<p>
+An object's step size (the number of pixels moved each step) and step time (the number of interpreter cycles between steps) can be set with the <a href="step_size.html">step.size</a> and <a href="step_time.html">step.time</a> 
+commands. 
+<p>
+<B>See also</B><p>
+<a href="set_dir.html">set.dir</a><p>
+<a href="get_dir.html">get.dir</a><p>
+<a href="stop_motion.html">stop.motion</a><p>
+<a href="start_motion.html">start.motion</a><p>
+<a href="move_obj.html">move.obj</a><p>
+<a href="move_obj_v.html">move.obj.v</a><p>
+<a href="wander.html">wander</a><p>
+<a href="follow_ego.html">follow.ego</a><p>
+<a href="normal_motion.html">normal.motion</a><p>
+<a href="step_size.html">step.size</a><p>
+<a href="step_time.html">step.time</a><p>
+<a href="objects.html">Objects</a><p>
+</BODY></HTML>

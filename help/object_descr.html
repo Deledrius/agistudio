@@ -1,0 +1,19 @@
+<HTML>
+<HEAD>
+<TITLE>The OBJECT file</TITLE></HEAD>
+<BODY>
+<h1>The OBJECT file</h1>
+The OBJECT file contains a list of inventory items (objects) that the player may possess during the game. Each item is numbered, and has a room number assigned to it. This room number is the room in 
+which the object can be found. 
+<p>
+It is not necessary to use these room numbers - it is up to the programmer to decide, but if they are used then the obj.in.room command can be used to find out if the object is in the current room 
+when the player tries to get it. 
+<p>
+Room 255 is the player's inventory, so any inventory items the player is to have at the start of the game should have their room number set to this.<p>
+Note: Do not confuse <B>inventory objects</B> with <B>screen objects</B>. These are two completely different things. Inventory objects (or "inventory items") are things that the player carries 
+round with them during the game. Screen objects are <a href="view_descr.html">views</a> that are displayed on screen and represent things like characters and props. All the commands in the logic programming language 
+that are called (something).obj refer to screen objects, except for show.obj and show.obj.v. Usually when the word "object" is used in the logic programming documentation it means screen object. 
+<p>
+You can edit the OBJECT file with the <a href="object_editor_main.html">Object editor</a><p>
+<a href="data_used.html">Back to data used by AGI</a><p>
+</BODY></HTML>

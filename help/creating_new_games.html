@@ -1,0 +1,23 @@
+<HTML>
+<HEAD>
+<TITLE>Creating new games</TITLE></HEAD>
+<BODY>
+<h1>Creating new games</h1>
+To create a new game, select "New" from the game menu. You can choose whether you want to create a completely "empty" game, or a game based on the template. Once you have done this, select the directory 
+you want the game to be in (if this directory already contains an AGI game, the program will ask if you want to erase it).
+<p>
+The template game is a game with only one room, and all the menus, keys etc. already set up for you, along with names for most variables used and comments here and there. It is recommended you choose 
+this option, as you can jump straight in and start programming your first room from here. For more information on the template game, see the readme.txt file in the template directory. 
+<p>
+When you create a game, only the data files (and source code, if based on the template game) are placed in the directory you chose. 
+There is no interpreter there. To run the game, you will need to install an AGI interpreter and specify the interpreter command line in the "Settings" menu. You don't have to install it in the same directory with your game - enough that it will be accessible by PATH, or just specify the full path in the "Settings". The interpreter must be version 2.915 or higher (but not version 3). You can usually find out the version number of an interpreter when 
+you enter debug mode in a game.
+<p>
+See the <a href="files_used.html">files used by AGI</a> section to see what files you need to copy into the game directory. If you copy the files into the template directory, then whenever you create a new game from
+the template these will be copied also.
+<p>
+Note: If you are using a newly written AGI interpreter, then the version number will probably be different but new interpreters should
+support this format. The files you have to copy over will also be different.
+<p>
+<a href="index.html">Back to contents</a><p>
+</BODY></HTML>

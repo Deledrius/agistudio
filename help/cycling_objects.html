@@ -1,0 +1,59 @@
+<HTML>
+<HEAD>
+<TITLE>Cycling objects</TITLE></HEAD>
+<BODY>
+<h1>Cycling objects</h1>
+The animation of an object is called "cycling". This is the successive display of several cels from the same loop in order. When you initialize an object, it cycles the cels in the first loop (loop 0) 
+by default. To change the loop number, use the <a href="set_loop.html">set.loop</a> command. To change the speed of cycling, use the <a href="cycle_time.html">cycle.time</a> command. If you want to display a single cel without 
+animation, set the loop number and cel number you want to display using the <a href="set_loop.html">set.loop</a> and <a href="set_cel.html">set.cel</a> commands and then use the <a href="stop_cycling.html">stop.cycling</a> command (you can start 
+cycling again by using the <a href="start_cycling.html">start.cycling</a> command). 
+<p>
+Here is an example of initializing an object that displays cel 2 of loop 1 without animating:<p>
+<pre>
+animate.obj(o2);
+load.view(4);
+set.view(o2,4);
+position(o2,80,120);
+set.loop(o2,1);
+set.cel(o2,2);
+draw(o2);
+stop.cycling(o2);
+</pre>
+<p>
+The objects aren't updated on screen until the start of the next cycle (or until the <a href="force_update.html">force.update</a> command is issued), so whatever changes you make to an object's position or appearance 
+do not take affect till then. 
+<p>
+Normally when an object is moving around, it's loop number is determined by it's direction:<p>
+<pre>
+Direction       Loop no
+---------------------------
+0 (not moving)  not changed
+1 (up)          3 (if loop 2 and 3 exist) otherwise not changed
+2 (up-right)    0
+3 (right)       0
+4 (down-right)  0
+5 (down)        2 (if loop 2 and 3 exist) otherwise not changed
+6 (down-left)   1 (if loop 1 exists) otherwise 0
+7 (left)        1 (if loop 1 exists) otherwise 0
+8 (up-left)     1 (if loop 1 exists) otherwise 0
+</pre>
+<p>
+The direction is only chosen automatically if there are less than 5 loops in the view assigned to the object.<p>
+To stop the interpreter from chosing a loop number based on the object's direction, use the <a href="fix_loop.html">fix.loop</a> command. To let it chose the loop number, use the <a href="release_loop.html">release.loop</a> command.<p>
+To play the animation in reverse, use the <a href="reverse_cycle.html">reverse.cycle</a> command. To play it forwards again, use the <a href="normal_cycle.html">normal.cycle</a> command.<p>
+To play the animation once and then stop cycling, use the <a href="end_of_loop.html">end.of.loop</a> or <a href="reverse_loop.html">reverse.loop</a> commands.<p>
+<B>See also</B><p>
+<a href="set_loop.html">set.loop</a><p>
+<a href="set_loop_v.html">set.loop.v</a><p>
+<a href="set_cel.html">set.cel</a><p>
+<a href="set_cel_v.html">set.cel.v</a><p>
+<a href="cycle_time.html">cycle.time</a><p>
+<a href="start_cycling.html">start.cycling</a><p>
+<a href="stop_cycling.html">stop.cycling</a><p>
+<a href="force_update.html">force.update</a><p>
+<a href="normal_cycle.html">normal.cycle</a><p>
+<a href="reverse_cycle.html">reverse.cycle</a><p>
+<a href="end_of_loop.html">end.of.loop</a><p>
+<a href="reverse_loop.html">reverse.loop</a><p>
+<a href="objects.html">Objects</a><p>
+</BODY></HTML>

@@ -1,0 +1,47 @@
+// ****************************************************************************
+//
+// Logic 93: Debug mode help screen
+//
+// ****************************************************************************
+
+#include "defines.txt"
+
+prevent.input();
+status.line.off();
+text.screen();
+key_pressed = 0;
+reset(input_parsed);
+display(1, 1, "           DEBUG MODE HELP             ");
+
+display( 3,0,"trace on    - enables tracing          ");
+display( 4,0,"              (SCROLL LOCK to activate)");
+display( 5,0,"show mem    - display memory stats     ");
+display( 6,0,"tp          - teleport                 ");
+display( 7,0,"pos         - change ego's position    ");
+display( 8,0,"show var    - display value of a var   ");
+display( 9,0,"set var     - change value of a var    ");
+display(10,0,"show flag   - display status of a flag ");
+display(11,0,"set flag    - set a flag               ");
+display(12,0,"reset flag  - reset (clear) a flag     ");
+display(13,0,"object      - display information about");
+display(14,0,"              a screen object          ");
+display(15,0,"show pri    - display priority screen  ");
+display(16,0,"get object  - get any inventory object ");
+display(17,0,"gimme gimme - get all inventory objects");
+display(18,0,"object room - display room number of   ");
+display(19,0,"              an inventory object      ");
+display(20,0,"set pri     - set ego's priority       ");
+display(21,0,"release pri - release ego's priority   ");
+display(22,0,"coords      - ego's coordinates on/off ");
+
+
+WaitForKey:
+if (!have.key()) { 
+  goto(WaitForKey);
+}
+
+accept.input();
+status.line.on();
+graphics();
+set(input_parsed);
+return();

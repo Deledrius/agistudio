@@ -1,0 +1,93 @@
+<HTML>
+<HEAD>
+<TITLE>Special variables</TITLE></HEAD>
+<BODY>
+<h1>Special variables</h1>
+Some variables have special meaning to the interpreter:<p>
+<pre>
+Var Define name in template game Description
+-------------------------------------------------------------------
+ 0  room_no                      Number of the current room
+
+ 1  prev_room_no                 Number of the previous room
+
+ 2  ego_edge_code                Which edge of the screen ego is touching
+                                 0: not touching edge
+                                 1: horizon
+                                 2: right edge
+                                 3: bottom edge
+                                 4: left edge
+
+ 3  score                        Current score
+
+ 4  object_touching_edge         Number of an object other than ego that is
+                                 touching the edge.
+
+ 5  object_edge_code             See ego_edge_code
+
+ 6  ego_dir                      Direction of ego's motion (see "Moving
+                                 Objects" for a list of directions).
+
+ 7  max_score                    Maxmimum score
+
+ 8  free_memory                  The number of 256-byte lots of free memory
+                                 available for resources.
+
+                                 If the player has entered an unknown word,
+ 9  unknown_word_no              this is set to the number of that word
+                                 (i.e. 2 if it's the second word entered).
+                                 Otherwise, this is 0.
+
+ 10 cycle_delay                  Delay between interpreter cycles (*1/20
+                                 second)
+
+                                 Number of seconds on the interpreter's
+ 11 clock_seconds                clock (the clock is reset when the game
+                                 starts).
+
+ 12 clock_minutes                Number of minutes on the interpreter's
+                                 clock
+
+ 13 clock_hours                  Number of hours on the interpreter's clock
+
+ 14 clock_days                   Number of days on the interpreter's clock
+
+ 15 joystick_sensitivity         Sensitivity of the joystick
+
+ 16 ego_view_no                  Number of the view assigned to ego
+
+ 17 error_code                   What type of error has occured
+
+ 18 error_information            Extra information about the error
+
+ 19 key_pressed                  The ASCII code of the key that has just
+                                 been pressed, if any
+
+ 20 computer_type                Type of computer (0=PC)
+
+                                 Number of half-seconds to wait before
+ 21 window_close_time            closing a window (if 0, the window remains
+                                 on screen until the user presses a key).
+
+ 22 sound_type                   Sound generator type. (PC=1,Tandy=3)
+
+ 23 sound_volume                 Volume of the sound
+
+ 24 (unknown)                    Always seems to be set to 41
+
+                                 If the player has selected an inventory
+ 25 selected_inventory_item      item from the inventory screen, this is
+                                 set to the number of that item (or 255 if
+                                 ESC was pressed).
+
+                                 Video mode:
+                                 0: CGA (black-cyan-magenta-white CGA
+                                 palette)
+ 26 video_mode                   1: RGB (blue-yellow-red-green CGA palette)
+                                 2: Hercules
+                                 3: EGA
+                                 4: VGA
+</pre>
+<B>See also</B><p>
+<a href="special_flags.html">Special flags</a><p>
+</BODY></HTML>

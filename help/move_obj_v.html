@@ -1,0 +1,25 @@
+<HTML>
+<HEAD>
+<TITLE>move.obj.v</TITLE></HEAD>
+<BODY>
+<h1>move.obj.v</h1>
+<B>Category</B><p>
+<a href="object_commands.html">Object/view commands</a><p>
+<B>Syntax</B><p>
+<p>
+move.obj.v(oA,vX,vY,STEPSIZE,fDONEFLAG);<p>
+<B>Description</B><p>
+<p>
+Object oA moves from its current location to vX,vY by STEPSIZE pixels every step. fDONEFLAG is reset when the command is issued, and set when the object reaches its destination. If STEPSIZE is 0, the 
+current step size of object oA is used. If object oA is ego (object 0), the interpreter executes the <a href="program_control.html">program.control</a> command. 
+<p>
+Warning: If your program is relying on the flag fDONEFLAG to be set before continuing with something, such as going to the next part of a cutscene, make sure that the object will always be able to 
+reach its destination. It is possible that it could get caught behind a barrier or something, and not be able to get where it needs to go, in which case the game might sit there forever doing 
+nothing. This is more of a problem when the object being moved is ego - it might work fine from where you test it, but it may be possible for the player to move ego into such a position where they 
+will get stuck when being moved. 
+<p>
+<B>See also</B><p>
+<a href="move_obj.html">move.obj</a><p>
+<a href="step_size.html">step.size</a><p>
+<a href="moving_objects.html">Moving objects</a><p>
+</BODY></HTML>

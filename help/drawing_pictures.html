@@ -1,0 +1,35 @@
+<HTML>
+<HEAD>
+<TITLE>Drawing pictures</TITLE></HEAD>
+<BODY>
+<h1>Drawing pictures</h1>
+In order to draw a picture on the screen, you should use the following commands in the correct order:<p>
+<pre>
+load.pic(vA);
+draw.pic(vA);
+discard.pic(vA);
+..
+show.pic();
+</pre><p>
+The interpreter stores two different screens in memory - the visual screen and the priority screen. When you use the first three commands above, you are updating both of these screens in memory. 
+However, you are not updating what is displayed on the actual screen that the player sees. This is only done when the show.pic command is used. You should do this directly after the first three 
+commands, unless you need to also set up some screen objects in between. 
+<p>
+The reason the first parameter of load.pic, draw.pic and discard.pic is a variable is because most times these commands are used, the parameter given is v0 (the current room number). Most rooms you 
+see will have the following at the start: 
+<p>
+<pre>
+load.pic(v0);
+draw.pic(v0);
+discard.pic(v0);
+</pre>
+<p>
+If you want to load a picture other than the current room number, you will need to set the value of a variable to that number and then give the variable as the parameter.<p>
+<B>See also</B><p>
+<p>
+<a href="load_pic.html">load.pic</a><p>
+<a href="draw_pic.html">draw.pic</a><p>
+<a href="overlay_pic.html">overlay.pic</a><p>
+<a href="discard_pic.html">discard.pic</a><p>
+<a href="show_pic.html">show.pic</a><p>
+</BODY></HTML>

@@ -1,0 +1,63 @@
+<HTML>
+<HEAD>
+<TITLE>Controlling obstacles</TITLE></HEAD>
+<BODY>
+<h1>Controlling obstacles</h1>
+There are five main ways an object's movement around the screen can be limited:<p>
+<ul>
+<li>Control lines on the priority screen
+<li>Blocks
+<li>Land/water
+<li>The horizon
+<li>Other objects
+</ul>
+<p>
+For any of these, no part of the object's baseline (the bottom row of pixels of the object) can be on a part of the screen the object is not allowed on.<p>
+<B>Control lines on the priority screen</B><p>
+<p>
+On the priority screen, the first four colours (0-3) have special meaning. Colour 0 (black) is an unconditional barrier. No object is ever allowed to be on parts of the screen with a pixel of this 
+colour in the priority screen. 
+<p>
+Colour 1 (dark blue) is a conditional barrier. Objects are not normally allowed to be on a conditional barrier, unless the <a href="ignore_blocks.html">ignore.blocks</a> command is used to allow them to do so.<p>
+Colour 2 (dark green) is a signal barrier. This can be used to test if ego is walking into a certain place. Whenever ego is touching a signal barrier, flag 3 is set.<p>
+Colour 3(dark cyan) signifies water. This is explained shortly.<p>
+<B>Blocks</B><p>
+<p>
+You can set up an invisible rectangular block on the screen using the <a href="block.html">block</a> command. The interpreter will not allow objects to cross the borders of the block (unless they are told to ignore 
+blocks). You can remove the block using the <a href="unblock.html">unblock</a> command. Objects can be told to ignore blocks using the <a href="ignore_blocks.html">ignore.blocks</a> command and be told to observe blocks by using 
+the <a href="observe_blocks.html">objserve.blocks</a> command. 
+<p>
+<B>Land/water</B><p>
+<p>
+Parts of the priority screen which are colour 3 (dark cyan) are considered to be "water". If you look at the priority screen of rooms that have lakes or rivers in them, you will usually see this. Parts 
+of the priority screen which are not colour 3 are considered to be "land". You do not have to use colour 3 to represent water - it could also represent some other surface such as ice, lava, sand, a 
+slippery floor, or whatever you need for that particular room. 
+<p>
+Objects can be allowed only on water, only on land or on both. This is set be the <a href="object_on_water.html">object.on.water</a>, <a href="object_on_land.html">object.on.land</a> and <a href="object_on_anything.html">object.on.anything</a> 
+commands. 
+<p>
+Whenever ego's baseline is completely on water, flag 0 is set.<p>
+<B>The horizon</B><p>
+<p>
+The horizon is an invisible horizontal line, usually near the top of the screen. Its position is set using the <a href="set_horizon.html">set.horizon</a> command.<p>
+Normally, objects can not go above the horizon. This can be changed using the <a href="ignore_horizon.html">ignore.horizon</a> and <a href="observe_horizon.html">observe.horizon</a> commands.<p>
+<B>Other objects</B><p>
+<p>
+Objects are normally blocked by other objects on screen - that is, the baselines of objects are not allowed to touch each other. This can be changed, however, with the <a href="ignore_objs.html">ignore.objs</a> and 
+<a href="observe_objs.html">observe.objs</a> commands. 
+<p>
+<B>See also</B><p>
+<a href="block.html">block</a><p>
+<a href="unblock.html">unblock</a><p>
+<a href="ignore_blocks.html">ignore.blocks</a><p>
+<a href="observe_blocks.html">objserve.blocks</a><p>
+<a href="object_on_water.html">object.on.water</a><p>
+<a href="object_on_land.html">object.on.land</a><p>
+<a href="object_on_anything.html">object.on.anything</a><p>
+<a href="set_horizon.html">set.horizon</a><p>
+<a href="ignore_horizon.html">ignore.horizon</a><p>
+<a href="observe_horizon.html">observe.horizon</a><p>
+<a href="ignore_objs.html">ignore.objs</a><p>
+<a href="observe_objs.html">observe.objs</a><p>
+<a href="objects.html">Objects</a><p>
+</BODY></HTML>

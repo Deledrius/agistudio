@@ -1,0 +1,25 @@
+<HTML>
+<HEAD>
+<TITLE>Object editor</TITLE></HEAD>
+<BODY>
+<h1>Object editor</h1>
+The Object editor allows you to create and edit the <b>object</b> file, which is used to store the names of inventory items available to the player during the game. For more information on the <b>object</b> file, 
+<a href="object_descr.html">click here</a>. 
+<p>
+To load the Object editor, select the option from the "Tools" menu or the toolbar. When you do this, it will load the <b>object</b> file of the current game (if a game is open). You can then open a different 
+file if you wish. 
+<p>
+<img src="object-editor.png" alt = "" ><p>
+Most of the editing is pretty self-explanatory. There are a few things, however than need explanation:<p>
+All objects MUST have a name. The default name for an object that does not have a proper name is '?'. When you delete an object and it is not the last one in the list, it will be replaced with '?'. This 
+is because moving the other objects up in the list would require re-compilation of all logics that refer to those objects, so it is better to leave the other object numbers as they are. 
+<p>
+The <b>object</b> file must contain at least one object. A new <b>object</b> file will just contain the object '?'.<p>
+<h2>Encryption</h2>
+In early versions of the interpreter (those before 2.411), the <b>object</b> file was not encrypted. The editor allows you to specify whether or not you want to encrypt the file. Just select 'Encrypted file' 
+from the 'Options' menu. When opening a file, the editor automatically detects whether or not the file is encrypted. 
+<p>
+<h2>Saving</h2>
+Note: When saving a file, it does not necessarily have to be called <b>object</b>. It must have this name, however, for the interpreter to use it.<p>
+<a href="index.html">Back to contents</a><p>
+</BODY></HTML>

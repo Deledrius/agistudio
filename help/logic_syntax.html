@@ -1,0 +1,189 @@
+<HTML>
+<HEAD>
+<TITLE>Logic syntax</TITLE></HEAD>
+<BODY>
+<h1>Logic syntax</h1>
+<B>Action Commands</B><p>
+<p>
+Normal action commands are specified by the command name followed by brackets which contain the arguments, separated by commas. A semicolon is placed after the brackets. The brackets are required 
+even if there are no arguments. The arguments given must have the correct prefix for that type of argument as explained later in this document (this is to make sure the programmer does not use a var, 
+for example, when they think they are using a flag). 
+<p>
+assign.v(v50,0);<p>
+program.control();<p>
+Multiple commands may be placed on the one line: <p>
+reset(f6); reset(f7);<p>
+Substitutions for the following action commands are available:<p>
+<pre>
+increment(v30); 	v30++;
+decrement(v30); 	v30--;
+assignn(v30,4); 	v30 = 4;
+assignv(v30,v32); 	v30 = v32;
+addn(v30,4); 	v30 = v30 + 4; 	or 	v30 += 4;
+addv(v30,v32); 	v30 = v30 + v32; 	or 	v30 += v32;
+subn(v30,4); 	v30 = v30 - 4; 	or 	v30 -= 4;
+subv(v30,v32); 	v30 = v30 - v32; 	or 	v30 -= v32;
+mul.n(v30,4); 	v30 = v30 * 4; 	or 	v30 *= 4;
+mul.v(v30,v32); 	v30 = v30 * v32; 	or 	v30 *= v32;
+div.n(v30,4); 	v30 = v30 / 4; 	or 	v30 /= 4;
+div.v(v30,v32); 	v30 = v30 / v32; 	or 	v30 /= v32;
+lindirectn(v30,4); 	*v30 = 4;
+lindirectv(v30,v32); 	*v30 = v32;
+rindirect(v30,v32); 	v30 = *v32;
+</pre><p>
+<B>IF structures and test commands</B><p>
+An if structure looks like this:<p>
+<pre>
+if (&lt;test commands&gt;) {
+  &lt;action commands&gt;
+}
+</pre><p>
+or like this :<p>
+<pre>
+if (&lt;test commands&gt;) {
+  &lt;action commands&gt;
+}
+else {
+  &lt;more action commands&gt;
+}
+</pre><p>
+Carriage returns are not necessary:<p>
+if (&lt;test commands&gt;) { &lt;action Commands&gt; } else { &lt;more action commands&gt; }<p>
+Test commands are coded like action commands except there is no semicolon. They are separated by && or || for AND or OR.<p>
+if (isset(f5) &&<p>
+    greatern(v5,6)) { ......<p>
+Again, carriage returns are not necessary within the if statement:<p>
+if (lessn(v5,6) && (greatern(v5,2)) { .......<p>
+if (isset(f90) && equalv(v32,v34)<p>
+    && greatern(v34,20)) { .......<p>
+A ! placed in front of a command signifies a NOT.<p>
+if (!isset(f7)) {<p>
+  ......<p>
+Boolean expressions are not necessarily simplified so they must follow the rules set down by the file format. If test commands are to be ORred together, they must be placed in brackets.<p>
+if ((isset(f1) || isset(f2)) {<p>
+  ......<p>
+if (isset(f1) && (isset(f2) || isset(f3))) {<p>
+  ......<p>
+if (isset(1) || (isset(2) && isset(3))) {    is NOT legal<p>
+Depending on the compiler, simplification of boolean expressions may be supported, so the above may not apply in all cases (although if these are rules are followed then the logic will work with all 
+compilers). 
+<p>
+Substitutions for the following test commands are available:<p>
+<pre>
+equaln(v30,4) 	v30 == 4
+equalv(v30,v32) 	v30 == v32
+greatern(v30,4) 	v30 &gt; 4
+greaterv(v30,v32) 	v30 &gt; v32
+lessn(v30,4) 	v30 &lt; 4
+lessv(v30,v32) 	v30 &lt; v32
+!equaln(v30,4) 	v30 != 4
+!equalv(v30,v32) 	v30 != v32
+!greatern(v30,4) 	v30 &lt;= 4
+!greaterv(v30,v32) 	v30 &lt;= v32
+!lessn(v30,4) 	v30 &gt;= 4
+!lessv(v30,v32) 	v30 &gt;= v32
+</pre><p>
+Also, flags can be tested for by just using the name of the flag:<p>
+if (f6) { .....<p>
+if (v7 &gt; 0 && !f6) { .....<p>
+Argument types<p>
+There are 9 different types of arguments that commands use: <p>
+<pre>
+Number 	(no prefix)
+Var 	(prefix "v")
+Flag 	(prefix "f")
+Message 	(prefix "m")
+Object 	(prefix "o")
+Inventory Item 	(prefix "i")
+String 	(prefix "s")
+Word 	(prefix "w")
+Controller 	(prefix "c")
+</pre><p>
+The said test command uses it's own special arguments which will be described later.<p>
+Each of these types of arguments is given by the prefix and then a number from 0-255, e.g. v5, f6, m27, o2.<p>
+The word type is words that the player has typed in, not words that are stored in the WORDS.TOK file. Strings are the temporary string variables stored in memory, not to be confused with messages 
+(that are stored in the logic resources). Controllers are menu items and keys. 
+<p>
+Compilers can enforce type checking, so that the programmer must use the correct prefix for an argument so that they know they are using the right type. Decoders should display arguments with the 
+right type. 
+<p>
+move.obj(so4,80,120,2,f66);<p>
+if (obj.in.box(so2,30,60,120,40)) { .....<p>
+A complete list of the commands and their argument types is available as part of AGI Specs.<p>
+Messages and inventory items may be given in either numerical text format:<p>
+print("He's not here.");<p>
+print(m12);<p>
+if (has("Jetpack")) { .....<p>
+if (has(io9)) { .....<p>
+Messages can also be split over multiple lines:<p>
+<pre>
+print("This message is split "
+      "over multiple lines.");
+</pre><p>
+Quote marks must be used around messages and object names. This is important because some messages or object names may contain brackets or commas, which could confuse the compiler. This is also the 
+case for the said command which will be described shortly. 
+<p>
+<pre>
+if (has("Buckazoid(s)")) { .....   // no ambiguity here about where
+                                   // the argument ends
+</pre><p>
+If quote marks are part of the message or inventory object, a \ should be placed in front of these. To use a \, \\ should be used. \n can also be used for a new line.<p>
+The said test command uses different parameters to all the other commands. Where as the others use 8 bit arguments (0-255), said takes 16 bit arguments (0-65535). Also, the number of arguments in a 
+said command can vary. The numbers given in the arguments are the word group numbers from the WORDS.TOK file. 
+<p>
+if (said(4,80)) { .....<p>
+Words can also be given in place of the numbers:<p>
+if (said("look")) { .....<p>
+if (said("open","door")) { .....<p>
+Quote marks must also be used around the words.<p>
+<B>Labels and the goto command</B><p>
+Labels are given like this:<p>
+Label1:<p>
+The label name can contain letters, numbers, and the characters "_" and ".". No spaces are allowed.<p>
+The goto command takes one parameter, the name of a label.<p>
+goto(Label1);<p>
+<B>Comments</B><p>
+There are three ways that comments can be used.<p>
+// - rest of line is ignored<p>
+[ - rest of line is ignored<p>
+/* Text between these are ignored */<p>
+The /*...*/ can be nested:<p>
+<pre>
+/* comment start
+  print("Hello");    // won't be run
+  /*                 // a new comment start (will be ignored!)
+    v32 = 15;        // won't be run
+  */                 // uncomments the most inner comment
+  print("Hey!");     // won't be run, still inside comments
+*/                   // uncomments
+</pre><p>
+<B>Defines</B><p>
+To give vars, flags etc. proper names the #define command is used. The name of the define is given followed by the define value:<p>
+#define ego o0<p>
+#define room_descr "This is a large hall with tall pillars down each side."<p>
+Then the define name can be used in place of the define value:<p>
+draw(ego);<p>
+print(room_descr);<p>
+Define names can only be used in arguments of commands (including gotos and the v0 == 3 type syntax), although some compilers may allow you to use them anywhere.<p>
+Defines must be defined in the file before they are used.<p>
+The define name can contain letters, numbers, and the characters "_" and ".". No spaces are allowed.<p>
+<B>Including files</B><p>
+You can include another file in your logic source code by using the #include command:<p>
+#include "file.txt"<p>
+When the compiler encounters the above line, it will replace it with the contents of file.txt.<p>
+It is a good idea to have all the defines that you need for multiple logics in an #include file, so if you need to change the define value you only have to do it once (although you will need to 
+recompile all logics that use that define). 
+<p>
+<B>More on messages</B><p>
+In some cases you may want to assign a specific number to a message so you can refer to it in other places. This is done by using the #message command, followed by the number of the message then the 
+message itself: 
+<p>
+#message 4 "You can't do that now."<p>
+Then you can give the message number as the parameter in commands:<p>
+print(m4);<p>
+Or embed the message in commands as normal and the number you assigned to it before will be used:<p>
+print("You can't do that now.");<p>
+#message can be used anywhere in the file, so you do not have to set the message before you use it.<p>
+<B>The return command</B><p>
+The return command is just a normal action command (number 0), with no arguments. This must be the last command in every logic.<p>
+</BODY></HTML>

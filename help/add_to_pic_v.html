@@ -1,0 +1,20 @@
+<HTML>
+<HEAD>
+<TITLE>add.to.pic.v</TITLE></HEAD>
+<BODY>
+<h1>add.to.pic.v</h1>
+<B>Category</B><p>
+<a href="object_commands.html">Object/view commands</a><p>
+<B>Syntax</B><p>
+<p>
+add.to.pic.v(vVIEWNO,vLOOPNO,vCELNO,vX,vY,vPRI,vMARGIN);<p>
+<B>Description</B><p>
+<p>
+This command allows you to add a view to the visual picture screen in memory. Cel vCELNO of loop vLOOPNO of view vVIEWNO is drawn on the picture at vX,vY with a priority of vPRI. If vMARGIN is 0, 1, 
+2 or 3, the base line of the object (the bottom row of pixels of the cel) is given a priority of vMARGIN. Since priority is taken into account, so you can use add.to.pic.v to add views behind other 
+parts of the picture. 
+<p>
+Note that the view must be loaded before you use it with add.to.pic.v. This can be done with the <a href="load_view.html">load.view</a> command.<p>
+<B>See also</B><p>
+<a href="add_to_pic.html">add.to.pic</a><p>
+</BODY></HTML>

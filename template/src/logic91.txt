@@ -1,0 +1,60 @@
+// ****************************************************************************
+//
+// Logic 91: Initialization
+//
+// ****************************************************************************
+
+#include "defines.txt"
+
+// Key settings with set.key are as follows:
+// First number:
+//   1-26        CTRL-A - CTRL-Z
+//   8 - Backspace
+//   9 - Tab
+//   59-68       F1-F10
+//
+//  There are other keys in the 1-26 range that can be assigned
+//  Both the CTRL-Letter and that key will be assigned if you do this
+//  eg. most AGI games use both TAB and CTRL-I for inventory.
+//
+// Second number:
+//   16-25       ALT: Q W E R T Y U I O P
+//   30-38       ALT: A S D F G H J K L
+//   44-50       ALT: Z X C V B N M
+
+if (new_room) { 
+  trace.info(95, 3, 10);
+  set.key(0, 59, menu_help);           // F1 - Help
+  set.key(0, 60, menu_soundonoff);     // F2 - Sound on/off
+  set.key(19, 0, menu_soundonoff);     // CTRL-S - Sound on/off
+  set.key(0, 61, key_echoline);        // F3 - Echo line
+  set.key(5,  0, key_echoline);        // CTRL-E - Echo line
+  set.key(0, 62, key_seeobject);       // F4 - See object
+  set.key(0, 63, menu_save);           // F5 - Save game
+  set.key(0, 64, menu_clock);          // F6 - Clock on/off
+  set.key(0, 65, menu_restore);        // F7 - Restore game
+  set.key(0, 67, menu_restart);        // F9 - Restart game
+  set.key(9,  0, menu_inventory);      // CTRL-I/TAB - inventory
+  set.key(0, 32, key_debug);           // ALT-D - Enter debug mode
+  set.key(10, 0, menu_joystick);       // CTRL-J - Configure joystick
+  set.key(3,  0, key_clearinputline);  // CTRL-C - Clear input line
+  set.key(0, 44, menu_quit);           // ALT-Z - quit game
+  set.key(45, 0, key_decreasevolume);  // - - decrease volume
+  set.key(43, 0, key_increasevolume);  // + - increase volume
+  set.key(27, 0, key_activiate_menu);  // ESC - activate menu
+
+  set(joystick_sensitivity_set);
+  joystick_sensitivity = 3;
+  sound_volume = 15;   // full volume
+
+//set.game.id("AGI");    // We don't actually need to set the game ID. It's
+                         // best not to, then the game can run on any
+                         // interpreter (provided it's the right version).
+  configure.screen(1, 22, 0);
+  set.string(prompt_char, ">");
+  set.cursor.char("_");
+  max_score = 0;
+  cycle_delay = 2;  // set speed to normal (delay=2/20ths of a second)
+}
+
+return();

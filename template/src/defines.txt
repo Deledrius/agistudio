@@ -1,0 +1,156 @@
+// **********************************
+// Interpreter variables, flags, etc.
+// **********************************
+
+// vars
+#define room_no                  v0
+#define prev_room_no             v1
+#define ego_edge_code            v2
+#define score                    v3
+#define object_touching_edge     v4
+#define object_edge_code         v5
+#define ego_dir                  v6
+#define max_score                v7
+#define free_memory              v8
+#define unknown_word_no          v9
+#define cycle_delay              v10
+#define clock_seconds            v11
+#define clock_minutes            v12
+#define clock_hours              v13
+#define clock_days               v14
+#define joystick_sensitivity     v15
+#define ego_view_no              v16
+#define error_code               v17
+#define error_information        v18
+#define key_pressed              v19
+#define computer_type            v20
+#define window_close_time        v21
+#define sound_type               v22
+#define sound_volume             v23
+// not sure what v24 is
+#define selected_inventory_item  v25
+#define video_mode               v26
+
+// flags
+#define ego_on_water             f0
+#define ego_hidden               f1
+#define input_recieved           f2
+#define ego_touching_signal_line f3
+#define input_parsed             f4
+#define new_room                 f5
+#define game_restarted           f6
+#define script_buffer_blocked    f7
+#define joystick_sensitivity_set f8
+#define sound_on                 f9
+#define trace_enabled            f10
+#define first_logic0_cycle       f11
+#define game_restored            f12
+#define inventory_select_enabled f13
+#define menu_enabled             f14
+#define windows_remain           f15
+
+// strings
+#define prompt_char              s0
+
+// edge codes
+#define no_edge                  0
+#define horizon_edge             1
+#define right_edge               2
+#define bottom_edge              3
+#define left_edge                4
+
+// directions
+#define stopped                  0
+#define up                       1
+#define upright                  2
+#define right                    3
+#define downright                4
+#define down                     5
+#define downleft                 6
+#define left                     7
+#define upleft                   8
+
+// video modes
+#define CGA                      0
+#define RGB                      1
+#define Hercules                 2
+#define EGA                      3
+#define VGA                      4
+
+
+// ***********
+// Controllers
+// ***********
+
+// AGI menu
+#define menu_about c21
+#define menu_help c2
+// File menu
+#define menu_save c3
+#define menu_restore c5
+#define menu_fileseparator c20
+#define menu_restart c7
+#define menu_quit c1
+// Action menu
+#define menu_seeobject c22
+#define menu_inventory c10
+// Special menu
+#define menu_soundonoff c16
+#define menu_clock c12
+#define menu_joystick c15
+#define menu_pause c18
+// Speed menu
+#define menu_normalspeed c24
+#define menu_slowspeed c25
+#define menu_fastspeed c23
+#define menu_fastestspeed c28
+
+// Keys
+#define key_activiate_menu c19
+#define key_decreasevolume c26
+#define key_increasevolume c27
+#define key_clearinputline c17
+#define key_echoline c9
+#define key_seeobject c4
+#define key_debug c14
+
+// *************************
+// Other variables/flags/etc
+// *************************
+
+#define debug_active f32
+
+#define clock_active f34
+#define old_clock_seconds v37
+
+#define ego o0
+#define new_ego_x v30
+#define new_ego_y v31
+#define old_ego_x v32
+#define old_ego_y v33
+#define old_ego_dir v34
+#define never_animate_ego f30
+#define always_animate_ego f31
+
+#define death_type v35
+#define thankyou_timer v36
+
+#define coords_shown f35
+
+#define num_invobjects 1
+// This is the number of inventory objects in game. It is used by the debug
+// mode when the player types "gimme gimme". Remember to change this when you
+// add more objects.
+
+#define disable_game_functions f33
+// Set the flag disable_game_functions to stop the player from using things
+// like the menu, inventory and saving/restoring games. This is useful in
+// places like the introduction when you don't want these things done. Scenes
+// like this could test for have.key (i.e. when the user has pressed a key) to
+// be bypassed.
+// NOTE: disable_game_functions is currently set before the intro is run.
+// Remember to make sure it is reset after the intro (this should be done before
+// entering the first room).
+
+#define game_version_message "(game version)"
+#define game_about_message "(about message)"

@@ -1,0 +1,30 @@
+// ****************************************************************************
+//
+// Logic 1: Opening/intro
+//
+// ****************************************************************************
+
+#include "defines.txt"
+
+if (new_room) {
+  load.pic(room_no);
+  draw.pic(room_no);
+  discard.pic(room_no);
+  set.horizon(50);
+  status.line.off();
+  prevent.input();
+  program.control();
+  show.pic();
+  display(23,1,"         Intro/Opening screen");
+}
+
+if (have.key()) {
+  set(menu_enabled);
+  clear.lines(22, 24, 0);
+  stop.motion(ego);
+  reset(disable_game_functions);
+  new.room(2);
+}
+
+return();
+

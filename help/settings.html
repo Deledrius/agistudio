@@ -1,0 +1,49 @@
+<HTML>
+<HEAD>
+<TITLE>Settings</TITLE></HEAD>
+<BODY>
+<p>
+<h1>Settings</h1>
+
+The 'Settings' menu (in the 'Game' menu) allow to configure various aspects
+of the program.
+
+<h2>General</h2>
+
+<p><b>Default resource type :</b> the default resource type when the resource window is opened.
+
+<p><b>GUI style:</b> the general "look-and-feel" of the program GUI
+(currently only the standard QT GUI styles are available)
+
+<p><b>Picedit style:</b> allows to split the Picture Editor window in two windows
+(tools and picture separately) in case if one big window doesn't fit the screen.
+
+<p><b>Extract logic as:</b> how to extract logic files when the option "Extract resource" is used.
+
+
+<h2>Directories</h2>
+
+<p><b>Logic source directory :</b> the place for the logic sources (also the default starting directory for "read file" and "save file" options for various resources)
+<ul>
+<li>When "Game_dir" is selected, the source directory is a subdirectory of the game directory
+<li>When "Full path" is selected, the source directory can be anywhere
+</ul>
+
+<p><b>Template: </b> the directory which contains the template game.
+
+<p><b>Help: </b> the directory which contains the help files.
+
+<h2>Logic editor</h2>
+
+Settings which affect the way the decompiled logic is displayed.
+
+<h2>Interpreter</h2>
+
+The AGI interpreter command line. Either the interpreter command must be in your PATH,
+or specify the full path for it. The interpreter will be invoked with the current directory
+same as your game directory, so there is no need to specify the game directory.
+
+<hr>
+The settings are saved in a file ~/.agistudio (in your home directory) in the plain text format so you can edit this file if you feel like it.
+
+</BODY></HTML>

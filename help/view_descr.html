@@ -1,0 +1,23 @@
+<HTML>
+<HEAD>
+<TITLE>View resources</TITLE></HEAD>
+<BODY>
+<h1>View resources</h1>
+<B>View</B> resources contain some of the graphics for the game. Unlike the picture resources which are full-screen background images, view resources are smaller 'sprites' used in the game, such as 
+animations. They are also stored as bitmaps, whereas pictures are stored in vector format. 
+<p>
+Each view resource consists of one or more "loops". Each loop in the resource consists of one or more "cels" (frames). Thus several animations can be stored in one view, or a view can just be used for a 
+single image. The maximum number of loops supported by the interpreter is 255 (0-254) and the maximum number of cels in each is loop 255 (0-254). 
+<p>
+Views have a number of useful features:<p>
+<B>Transparency: </B>Each cel has a transparent colour. When the view is shown on the screen, pixels of this colour will show to the background.<p>
+<B>Mirroring: </B>You can set one loop to be a "mirror" of another, which means that all the cels in that loop will be mirror images of the corresponding cels in the other loop. This is handy if you 
+have drawn an animation of a character walking right, and also want to have an animation of it walking left - you only have to do half the work (and the view takes up less memory). 
+<p>
+<B>Description: </B>This is used when a view is a picture of an inventory item. When the view is displayed using the show.obj command (i.e. when the player "examines" an object), the first cel of the 
+first loop is displayed on screen along with the description. 
+<p>
+AGI Studio supports up to 16 loops (0-15) and 32 cels in each loop (0-31).<p>
+You can edit Views with the <a href="view_editor_main.html">view editor</a>.<p>
+<a href="data_used.html">Back to data used by AGI</a><p>
+</BODY></HTML>

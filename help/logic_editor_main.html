@@ -1,0 +1,36 @@
+<HTML>
+<HEAD>
+<TITLE>Logic editor</TITLE></HEAD>
+<BODY>
+<h1>Logic editor</h1>
+The logic editor allows you to compile and decompile <a href="LOGIC_DESCR.html">logic</a> resources. To open an existing logic, double-click on it in the resources window, or to create a new one select 'Logic editor'
+from the 'Tools' menu or the toolbar (you will be prompted for the logic number when you save or compile it).
+<p>
+It is designed to be easier to use than its DOS counterparts in that you can save your source code, compile your logic, add it to the game and run the game all with the press of one key, eliminating
+the several steps and switching between applications previously required. It will also indicate any errors in the source code it encounters when compiling, so you can find them easily.
+<p>
+Previously, the syntax used for programming AGI logics has varied very slightly between compilers and has not been properly documented. Peter Kelly and other AGI developers have decided on a proper
+syntax which will be supported by all logic compilers/decompilers. This syntax is documented in AGI specs. AGI Studio fully supports the syntax.
+<p>
+<img src="logic-editor.png">
+<h2>Editing</h2>
+If you double-click on a logic in the resources window, the editor will be brought up. If the logic.X file exists in the source directory, this will be loaded. Otherwise it will try to load logicX.txt (the name convention used in the Windows AGI studio), if it also doesn't exist, then it will decompile the resource that is already in the game.
+<p>
+When the cursor is located in the middle of a highlighted AGI command, you can hit F1 (or choose the option from the help menu) to read an on-line help page that describes it.
+
+<h2>Compiling</h2>
+To compile a logic, simply select compile from the file menu or press F9. Pressing F10 does the same thing except it runs the game after the logic has compiled successfully. Whenever you compile the logic, the source code and any open text files that are included with the #include command are saved.
+<p>
+When you compile the logic in AGI Studio, it is automatically added to the game. The source code is saved in a text file in the source directory of whatever game you are editing. You can specify in the "Settings" menu the location of the source directory - it can be a subdirectory of the game directory (the default: "src") but it can be also in a completely different place. The name of the file is logic.X where X is the
+number of the logic.
+<p>
+<h2>New room</h2>
+The option "new room" in the File menu allows building the new room template using a GUI
+to specify the most common options. <i>The design of the New Room menu was copied from 
+Joel McCormick's "AGI Base Logic Generator" utility. </i>
+<p>
+----------------------------------------------
+<p>This is basically all you need to know about AGI Studio's logic editor. You will need to know how to program in the language though. Read the <a href="logic_contents.html">logic help</a>. 
+<p>
+<a href="index.html">Back to contents</a><p>
+</BODY></HTML>

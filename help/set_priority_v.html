@@ -1,0 +1,22 @@
+<HTML>
+<HEAD>
+<TITLE>set.priority.v</TITLE></HEAD>
+<BODY>
+<h1>set.priority.v</h1>
+<B>Category</B><p>
+<a href="object_commands.html">Object/view commands</a><p>
+<B>Syntax</B><p>
+<p>
+set.priority.v(oA,vPRI);<p>
+<B>Description</B><p>
+<p>
+Object oA's priority is set to vPRI. The object keeps this priority wherever it goes on the screen.<p>
+To change it back so the priority is dependent on the object's position, use the <a href="release_priority.html">release.priority</a> command.<p>
+Note: If the object's priority is 15, it ignores all control lines and blocks, and thus can move anywhere on the screen below the horizon. If the object is ego (object 0), then flags 0 and 3 are no 
+longer set according to whether ego is on a control line of colour 3 or 2. After this, if the object's priority is released or set to something lower than 15, it returns to its normal behaviour. 
+<p>
+<B>See also</B><p>
+<a href="set_priority.html">set.priority</a><p>
+<a href="release_priority.html">release.priority</a><p>
+<a href="priorities.html">Priorities</a><p>
+</BODY></HTML>

@@ -1,0 +1,67 @@
+<HTML>
+<HEAD>
+<TITLE>Special flags</TITLE></HEAD>
+<BODY>
+<h1>Special flags</h1>
+Some flags have special meaning to the interpreter:<p>
+<pre>
+Flag Define name in template game Meaning (when set)
+---------------------------------------------------------------------------
+                                  This indicates that ego's baseline (the
+ 0   ego_on_water                 bottom row of pixels) is completely on
+                                  water (pixels with a priority of 3)
+
+ 1   ego_hidden                   Ego is completely hidden by something
+                                  else on screen
+
+ 2   input_received               Input has been received from the player
+
+                                  All or part of ego's baseline (the bottom
+ 3   ego_touching_signal_line     row of pixels) is touching a signal line
+                                  (pixels with a priority of 2)
+
+                                  The input received from the player has
+ 4   input_parsed                 been parsed (the said command has
+                                  returned true at some point)
+
+ 5   new_room                     This is the the first cycle in a new room
+
+ 6   game_restarted               This is the first cycle since the game
+                                  has been restarted
+
+ 7   script_buffer_blocked        Prevents the interpreter from writing to
+                                  the script buffer
+
+ 8   joystick_sensitivity_set     Indicates that v15 specifies the joystick
+                                  sensitivity
+
+ 9   sound_on                     The sound is on
+
+ 10  trace_enabled                Trace mode is enabled
+
+ 11  first_logic0_cycle           This is the first time logic 0 has been
+                                  executed
+
+ 12  game_restored                This is the first cycle since a game has
+                                  been restored
+
+                                  The player is allowed to select an
+                                  inventory item in the inventory screen.
+ 13  inventory_select_enabled     When the item has been selected, v25
+                                  (selected_inventory_item) is set to the
+                                  number of the item selected (or 255 if
+                                  ESC is pressed).
+
+ 14  menu_enabled                 The menu is enabled
+
+                                  Windows created by print and similar
+                                  commands remain on screen until the
+                                  close.window command is used. If this
+ 15  windows_remain               flag is not set, the windows remain on
+                                  screen until the user presses a key or
+                                  for the time specified by v21
+                                  (window_close_time).
+</pre>
+<B>See also</B><p>
+<a href="special_variables.html">Special variables</a><p>
+</BODY></HTML>

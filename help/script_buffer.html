@@ -1,0 +1,21 @@
+<HTML>
+<HEAD>
+<TITLE>The script buffer</TITLE></HEAD>
+<BODY>
+<h1>The script buffer</h1>
+I am not completely sure exactly what the script buffer does or how it works. I believe it holds code that is stored in a saved game and then executed when the game is restored in order to put the 
+interpreter in the same state of execution as it was when the game was saved. I suppose it would contain things like what resources have to be loaded, etc. 
+<p>
+When you use certain commands, such as load.view and add.to.pic, they increase the current script size. This means that when you save the game, information about commands that have been used to set 
+up the screen and other aspects of the game can be re-executed when the game is loaded. So if you use some of these commands repeatedly, they can exceed the maximum script buffer size and crash the 
+interpreter. Therefore, it is important to keep an eye on the script size (this can be done with the <a href="show_mem.html">show.mem</a> command). 
+<p>
+For example, I was working on a part of a game where the player walks through a door and a small room appears on the side of the screen. I was originally using overlay.pic to draw the room (and erase 
+it again afterwards when the player walked out of it), but I noticed that if the player walked in and out of the room a few times the game would crash (with a "script buffer overflow" error). It turned 
+out that every time the load.pic, overlay.pic and discard.pic commands were executed, the script size was increased and it eventually got too big. Instead, I decided to simply use a view for the room 
+instead of overlaying a picture. 
+<p>
+So the script buffer is something to watch out for and can be the cause of many problems if you are not aware of it. The maximum script size can be changed using the <a href="script_size.html">script.size</a> 
+command (the default size being 50), but this will not completely solve problems where the script size can be increased by certain command being used repeatedly. 
+<p>
+</BODY></HTML>

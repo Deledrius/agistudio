@@ -1,0 +1,23 @@
+<HTML>
+<HEAD>
+<TITLE>configure.screen</TITLE></HEAD>
+<BODY>
+<h1>configure.screen</h1>
+<B>Category</B><p>
+<a href="display_commands.html">Display commands</a><p>
+<B>Syntax</B><p>
+<p>
+configure.screen(PLAYTOP,INPUTLINE,STATUSLINE);<p>
+<B>Description</B><p>
+<p>
+Sets the location of certain items on screen:<p>
+PLAYTOP is the top line of the playing area. This is normally set to 1. It should always be set to something between 0 and 3, since the playing area is 168 pixels high (21 lines) and should not go 
+off the screen. 
+<p>
+INPUTLINE is the line on which the player is prompted for input. This is normally set to 22.<p>
+STATUSLINE is the line on which the current score and sound on/off status are displayed. This is normally set to 0.<p>
+Note that the menu always appears on line 0.<p>
+<B>See also</B><p>
+<a href="status_line_on.html">status.line.on</a><p>
+<a href="status_line_off.html">status.line.off</a><p>
+</BODY></HTML>

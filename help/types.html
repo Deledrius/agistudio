@@ -1,0 +1,74 @@
+<HTML>
+<HEAD>
+<TITLE>Types</TITLE></HEAD>
+<BODY>
+<h1>Types</h1>
+There are 9 different types are accepted by AGI commands. Each argument in a command is of a certain type. For example, the first argument of the <a href="addn.html">addn</a> command is a variable and the second 
+argument is a number. 
+<p>
+When using an argument, you must give the prefix for the type before the actual number, e.g. v3 for variable 3. This is to make sure you know what type you are using.<p>
+<B>Numbers</B>
+(no prefix)<p>
+These are integer values which can have a value from 0 to 255.<p>
+<B>Variables </B>(also known as "vars") 
+(Prefix: v)<p>
+Each of these can contain an integer value from 0 to 255, thus being the AGI equivalent of a byte (or unsigned char). There are 256 variables (numbered from 0 to 255) available. Variables 0-26 have 
+special meaning to the interpreter (<a href="special_variables.html">click here</a> for more info). 
+<p>
+See also: <a href="math_commands.html">Mathematical commands</a><p>
+<B>Flags</B>
+(Prefix: f)<p>
+These can either be set or not set (some documentation refers to them of having a value of 0 or 1, 0 meaning not set and 1 meaning set). They are the AGI equivalent of a boolean type. There are 256 
+flags (numbered from 0 to 255) available. Flags 0-15 have special meaning to the interpreter (<a href="special_flags.html">click here</a> for more info). 
+<p>
+See also: <a href="flag_commands.html">Flag commads</a><p>
+<B>Messages</B>
+(Prefix: m)</B><p>
+Each logic can contain up to 255 messages, which are text that is used by commands like <a href="print.html">print</a> to give the user information. Each message is numbered (starting from 1) and can be as long as 
+you like. When you give a message as a parameter for a command, you can either use a specific message number or give the message surrounded by quote marks (and let the compiler give the message a 
+number), e.g.: 
+<p>
+print("He's not here."); 	- giving the actual message<p>
+print(m2); 	- giving the message number<p>
+If you use the message number as in the second example, you must tell the compiler what that message will actually be. This is done using the message command:<p>
+#message 2 "He's not here."<p>
+You're probably wondering why you would want to give a message a specific number. This is because you can refer to this in other message by using %m and then the message number, e.g:<p>
+print("%m2 But he'll be back soon.");<p>
+The message is stored like this in the logic resource, but when the interpreter displays it it will replace %m2 with message 2, so the text "He's not here. But he'll be back soon." will be displayed. 
+Also, commands like <a href="print_v.html">print.v</a> use a message number determined by the value of a variable, so when using these command you sometimes need to know the numbers of certain messages. 
+<p>
+You can also include other things in messages:<p>
+%vN 	Value of var N<p>
+%wN 	Nth word that the player typed in<p>
+%sN 	String N<p>
+%gN 	Message N from logic 0<p>
+When using %v, you can place a | after the number and then another number which determines the minimum number of digits for the var. For example, if you use %v40|2 and the value of v40 is 8, then 
+the %v40|2 will be replaced with 08. If the value of v40 was 100 or more, all three digits would be displayed. 
+<p>
+These inclusions can also be used in the descriptions in view resources.<p>
+<B>Objects</B>
+(Prefix: o)<p>
+For a description of objects, <a href="objects.html">click here</a>.<p>
+See also: <a href="object_commands.html">Object/view commands</a><p>
+<B>Inventory items</B>
+(Prefix: i)<p>
+Inventory items are things that the player can carry around with them. Their names are stored in the OBJECT file. A game contain up to 256 objects (numbered from 0-255). Each object used by the game 
+must be present in the OBJECT file. 
+<p>
+Every object has a room number which is a value from 0-255. If the room number is 255, it is in the player's inventory.<p>
+See also: <a href="inventory_commands.html">Inventory item commands</a><p>
+<B>Strings</B>
+(Prefix: s)<p>
+Up to 12 different strings can be used by the game. These can be up to 40 characters long. The first character of string 0 is used as the prompt character ("&gt" or "]" in most games).<p>
+See also: <a href="string_commands.html">String commands</a><p>
+<B> Words</B>
+(Prefix: w)<p>
+These are the words that the player has typed in, starting from 1. This list of words does not include words that are in group 0 (usually things like "the", "this", "with" etc.). So if the player types 
+"unlock the door with the key" then word 1 will be "unlock", word 2 will be "door" and word 3 will be "key" (assuming "the" and "with" are in group 0). Words can be converted to strings with the 
+<a href="word_to_string.html">word.to.string</a> command. 
+<p>
+<B>Controllers</B>
+(Prefix: c)<p>
+These are menu and key events. You can assign a menu item or key to a controller and then test to see when that item was selected or that key was pressed.<p>
+See also: <a href="setting_up_menus_and_keys.html">Setting up menus and keys</a><p>
+</BODY></HTML>

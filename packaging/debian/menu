@@ -1,0 +1,4 @@
+?package(agistudio):needs=X11 section=Apps/Programming \
+  title="Agistudio" \
+  icon="/usr/X11R6/include/X11/pixmaps/agistudio.xpm" \
+  command="/usr/bin/agistudio"

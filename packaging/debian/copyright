@@ -1,0 +1,13 @@
+QT AGI Studio was debianized by Jarno Elonen <elonen@iki.fi>
+from the sources downloaded from http://agistudio.sourceforge.net/
+
+Upstream authors: Helen Zommer <helen@cc.huji.ac.il>,
+                  Jarno Elonen <elonen@iki.fi>
+                  Peter Kelly <ptrkelly@ozemail.com.au>
+
+QT AGI Studio is distritubed under the terms of the
+GNU General Public License, version 2 with a special exception allowing
+linking with the GPL incompatible non-commercial Windows version of QT.
+
+On Debian GNU/Linux system you can find a copy of GPL in
+/usr/share/common-licenses/GPL'

@@ -1,0 +1,51 @@
+agistudio (1.1-1) unstable; urgency=low
+
+  * New upstream version.
+
+  * Previous patches merged to upstream.
+
+ -- Jarno Elonen <elonen@iki.fi>  Sun,  6 Apr 2003 21:05:39 +0300
+
+agistudio (1.0-3) unstable; urgency=low
+
+  * Added context sensitive help on AGI commands
+    to the logic editor
+
+  * Added syntax highlight with command detection
+
+  * Text search now selects found text
+
+  * Enhanced logic parser (comment removal, whitespace handling)
+
+ -- Jarno Elonen <elonen@iki.fi>  Fri, 28 Mar 2003 23:02:51 +0200
+
+agistudio (1.0-2) unstable; urgency=low
+
+  * Added review for logics
+
+  * Embedded the preview window into the
+    resource window to remove annoying popups
+
+  * Nonpropotional font for text editor, too,
+    not just logics
+
+  * Added a priority mask color display to
+    the picture editor
+
+  * Some smaller usability fixes
+
+ -- Jarno Elonen <elonen@iki.fi>  Sun, 23 Mar 2003 18:55:59 +0200
+
+agistudio (1.0-1) unstable; urgency=low
+
+  * Initial Release.
+
+  * Ported upstream source to QT 3.1
+
+  * changed editor font to non-propotional
+
+  * changed default interpreter to Nagi
+    (more AGI compatibile than Sarien)
+
+ -- Jarno Elonen <elonen@iki.fi>  Sat,  1 Mar 2003 11:00:43 +0200
+

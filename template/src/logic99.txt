@@ -1,0 +1,134 @@
+// ****************************************************************************
+//
+// Logic 99: Debug mode
+//
+// ****************************************************************************
+
+#include "defines.txt"
+
+if (said("debug", "help")) {
+  call(93);
+}
+
+if (said("trace", "on")) {
+  set(trace_enabled);
+}
+
+if (said("show", "mem")) {
+  show.mem();
+}
+
+if (said("tp")) { 
+  get.num("new room: ", v255);
+  new.room.v(v255);
+}
+
+if (said("pos")) { 
+  get.num("x: ", v254);
+  get.num("y: ", v255);
+  erase(ego);
+  reposition.to.v(ego, v254, v255);
+  draw(ego);
+}
+
+if (said("show", "var")) { 
+  get.num("var number: ", v255);
+  v254 = *v255;
+  print("var %v255: %v254");
+}
+
+if (said("set", "var")) { 
+  get.num("var number: ", v254);
+  get.num("var value: ", v255);
+  *v254 = v255;
+}
+
+if (said("show", "flag")) { 
+  get.num("flag number: ", v255);
+  if (issetv(v255)) { 
+    print("flag %v255 is set");
+  }
+  else { 
+    print("flag %v255 is not set");
+  }
+}
+
+if (said("set", "flag")) { 
+  get.num("flag number: ", v255);
+  set.v(v255);
+}
+
+if (said("reset", "flag")) { 
+  get.num("flag number: ", v255);
+  reset.v(v255);
+}
+
+if (said("object")) {
+  get.num("object #: ", v255);
+  obj.status.v(v255);
+}
+
+if (said("show", "pri")) { 
+  show.pri.screen();
+}
+
+if (said("get", "object")) { 
+  get.num("object number: ", v255);
+  if (v255 > num_invobjects) {
+    print("Invalid object number!");
+  }
+  else {
+    get.v(v255);
+  }
+}
+
+if (said("gimme", "gimme")) {
+  print("You gottum!");
+  v255 = 0;
+GetNextObject:
+  get.v(v255);
+  if (v255 < num_invobjects) {
+    v255++;
+    goto(GetNextObject);
+  }    
+}
+
+if (said("object", "room")) {
+  get.num("Object number: ", v255);
+  if (v255 > num_invobjects) {
+    print("Invalid object number!");
+  }
+  else {
+    get.room.v(v255,v254);
+    if (v254 == 255) {
+      print("Object %v255 is in your inventory.");
+    }
+    else {
+      print("Object %v255 is in room %v254.");
+    }
+  }
+}
+
+if (said("set", "pri")) {
+  get.num("New priority: ",v255);
+  set.priority.v(ego,v255);
+}
+
+if (said("release", "pri")) {
+  release.priority(ego);
+}
+
+if (said("coords")) {
+  toggle(coords_shown);
+  if (!coords_shown) {
+    clear.lines(24,24,0);
+  }
+}
+
+if (coords_shown) {
+  get.posn(ego, v253, v254);
+  get.priority(ego,v255);
+  display(24,15,"Rm %v0|3 Pri %v255|2 x:%v253|3 y:%v254|3");
+}
+
+return();

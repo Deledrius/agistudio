@@ -1,0 +1,21 @@
+<HTML>
+<HEAD>
+<TITLE>The WORDS.TOK file</TITLE></HEAD>
+<BODY>
+<h1>The WORDS.TOK file</h1>
+The <b>words.tok</b> file contains a list of all the words that the game accepts. These words are sorted into groups of synonyms, and each group has a number. It is generally best to have several synonyms 
+in each group, as this can reduce the "type 'till you bleed" frustration that is typical in many parser-based games by making the input more flexible. 
+<p>
+There are three groups that have special meaning:<p>
+<B>Group 0:</B> Words in this group are ignored. Examples of these sorts of words are "a", "the", "with", "my" etc. When the player types in "poke the bush with the stick", it is the same as typing in "poke 
+bush stick". 
+<p>
+<B>Group 1:</B> This group should contain only one word, "anyword". It can be used to respond to general statements such as "kill anyword", e.g. if the player types "kill alligator", "kill girl" or "kill 
+plant" then the statement said("kill","anyword") will be TRUE. 
+<p>
+<B>Group 9999:</B> This group should contain only one word, "rol". rol means rest of line, e.g. if the player types "fight", "fight beast" or "fight beast with sword" then the statement said("fight","rol") 
+will be TRUE. 
+<p>
+You can edit the <b>words.tok</b> file with the <a href="wordstok_editor_main.html">WORDS.TOK editor</a><p>
+<a href="data_used.html">Back to data used by AGI</a><p>
+</BODY></HTML>

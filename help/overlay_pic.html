@@ -1,0 +1,23 @@
+<HTML>
+<HEAD>
+<TITLE>overlay.pic</TITLE></HEAD>
+<BODY>
+<h1>overlay.pic</h1>
+<B>Category</B><p>
+<a href="picture_commands.html">Picture commands</a><p>
+<B>Syntax</B><p>
+<p>
+overlay.pic(vA);<p>
+<B>Description</B><p>
+<p>
+overlay.pic does the same thing as <a href="draw_pic.html">draw.pic</a>, except that the visual and priority screens are not cleared. This means that picture vA is drawn on top of the existing picture. Note that 
+because fills only work on white surfaces, fills in picture vA which are not on a white part of the existing picture wont work. It's generally best not to use fills in pictures that you intend to 
+overlay. 
+<p>
+Remember to use <a href="show_pic.html">show.pic</a> to update the screen once the picture has been overlayed.<p>
+Make sure the picture is loaded into memory before overlaying it.<p>
+<B>See also</B><p>
+<a href="draw_pic.html">draw.pic</a><p>
+<a href="load_pic.html">load.pic</a><p>
+<a href="drawing_pictures.html">Drawing pictures</a><p>
+</BODY></HTML>

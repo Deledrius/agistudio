@@ -1,0 +1,65 @@
+// ****************************************************************************
+//
+// Logic 90: Game-specific functions
+//
+// You should use this logic to perform any game specific functions, such as
+// counting down timers, etc and processing player input related to the game
+// (such as examining/using inventory items) and any other things that are
+// required in several rooms that you don't want to duplicate in each room.
+//
+// This logic is called from logic 0, on every cycle.
+// If you like, you could only make it called only when disable_game_functions
+// is not set.
+//
+// Sierra did not use a separate logic for all this - they just did it all
+// from logic 0. I find it is neater this way, as you can keep your game
+// specific processing separate from other system-related things (although
+// these may require some modification for your game). Also, this makes logic 0
+// easier to manage.
+//
+// ****************************************************************************
+
+#include "defines.txt"
+
+// put all non-input-reponse game functions here
+
+if (input_recieved &&
+    unknown_word_no == 0 &&
+    !input_parsed) {
+
+// put various input responses here
+  
+  if (said("die")) {     // this one should not be in your game - it is
+    load.view(1);        // only to demostrate the death handler (logic 94)
+    set.view(ego,1);
+    program.control();
+    stop.motion(ego);
+    death_type = 1;
+  }
+
+  if (said("look", "test object")) {
+    if (has("test object")) {
+      show.obj(220);
+    }
+    else {
+      print("You don't have it.");
+    }
+  }
+  
+  if ((said("look", "anyword") ||
+       said("look", "anyword", "anyword"))) {
+    print("What? Where?");
+  }
+  
+  if ((said("get", "anyword") ||
+       said("get", "anyword", "anyword"))) {
+    print("You can't get that here!");
+  }
+  
+  if ((said("use", "anyword") ||
+       said("use", "anyword", "anyword"))) {
+    print("What do you want me to do with it?");
+  }
+}
+
+return();

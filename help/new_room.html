@@ -1,0 +1,36 @@
+<HTML>
+<HEAD>
+<TITLE>new.room</TITLE></HEAD>
+<BODY>
+<h1>new.room</h1>
+<B>Category</B><p>
+<a href="control_commands.html">Control flow commands</a><p>
+<B>Syntax</B><p>
+<p>
+new.room(ROOMNO);<p>
+<B>Description</B><p>
+<p>
+Switches to a new room, ROOMNO.<p>
+The following things automatically happen when this command is used:<p>
+<ul>
+<li>All objects are unanimated
+<li>All resources except logic 0 are discarded<
+<li>player.control command is executed
+<li>unblock command is executed
+<li>horizon is set to 36
+<li>v1 (prev_room_no) is set to the value of v0 (room_no)
+<li>v0 (room_no) is assigned to the new room number
+<li>v16 (ego_view_no) is set to the view number assigned to ego
+<li>The logic for the new room is loaded (logic ROOMNO)
+<li>If ego was touching an edge of the screen, it is placed on the opposite side
+<li>Flag 5 (new_room) is set (this is reset after the first cycle in the new room)
+<li>Execution jumps to the start of logic 0
+</ul>
+<B>See also</B><p>
+<a href="new_room_v.html">new.room.v</a><p>
+<a href="player_control.html">player.control</a><p>
+<a href="unblock.html">unblock</a><p>
+<a href="set_horizon.html">set.horizon</a><p>
+<a href="special_variables.html">Special variables</a><p>
+<a href="special_flags.html">Special flags</a><p>
+</BODY></HTML>

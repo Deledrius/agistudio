@@ -1,0 +1,36 @@
+<HTML>
+<HEAD>
+<TITLE>said</TITLE></HEAD>
+<BODY>
+<h1>said</h1>
+<B>Category</B><p>
+<a href="test_commands.html">Test commands</a><p>
+<p>
+<B>Syntax</B><p>
+<p>
+if (said("word1","word2"...."wordn")) { .....<p>
+<B>Description</B><p>
+<p>
+The said test command is different to all other commands in the language in that it accepts a special type of parameter and can have any number of parameters. It is used to test if the player has 
+entered certain words. 
+<p>
+First, the process of parsing player input needs to be explained. When the player enters a command, the interpreter does the following things with it:<p>
+<ul>
+<li>Removes certain punctuation characters
+<li>Assigns each word entered a number starting from 1. When doing this, it tries to find the longest sequence of characters that match a word in the WORDS.TOK file (so for example if the words "door", 
+"knob" and "door knob" were in the WORDS.TOK file and the player entered "turn door knob" then the words would be "turn" and "door knob" instead of "turn", "door" and "knob"). Words in group 0 (usually things like 
+"a", "my", "the") are skipped (not assigned numbers). 
+<li>If one or more words that are not in the WORDS.TOK file are found, it will set v9 (unknown_word_no in the template game) to the first unknown word.<p>
+Note: The above is based purely on observation. I am not sure if the interpreter does exactly this, or in this order.<p>
+Once the player input has been received, flag 2 (input_recieved in the template game) is set and flag 4 (input_parsed in the template game) is reset.<p>
+When the said test command is used, it goes through each word given as a parameter and compares it with the corresponding word entered by the player. If they are the same (or are in the same word 
+group), then it continues onto the next word. The comparison is not case sensitive. If all the words are the same, and there are no entered words left over, then the said command returns true and 
+sets flag 4. 
+<p>
+There are a couple of special word groups:<p>
+Word group 1: "anyword" - if this word is given as a parameter, then any word will do. So if you test for said("eat","anyword") then the result will be true if the player enters "eat cake", "eat chocolate", 
+"eat worm", "eat sword", etc. 
+<p>
+Word group 9999: "rol" (rest of line) - this means the rest of the line. If you test for said("kill","rol") then the result will be true if the player enters "kill lion", "kill lion with sword", etc.<p>
+
+</BODY></HTML>
