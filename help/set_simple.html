@@ -1,0 +1,32 @@
+<HTML>
+<HEAD>
+<TITLE>set.simple</TITLE></HEAD>
+<BODY>
+<h1>set.simple</h1>
+<B>Category</B><p>
+<a href="extra_commands.html">Extra commands</a><p>
+<B>Syntax</B><p>
+set.simple(A);<p>
+
+<B>Description</B><p>
+<p>
+This command modifies the behavior of the commands restore.game() and save.game().<p>
+
+After calling set.simple(n), where n is a string number (ie: if n == 2 then s2) restore.game() will automatically (without any prompt) restore a savegame with the name stored in string number n and save.game() will automatically save a savegame with the name of string number n.<p>
+
+Note: make sure that at least one savegame is present when you call restore.game() or save.game() (that is, when saving a game too).<p>
+
+Example:<p>
+
+<code>
+set.string(s1,"test");<br>
+set.simple(1);
+</code><p>
+
+This will automatically load the savegame named "test".<p>
+
+<B>See also</B><p>
+<a href="restore_game.html">restore.game</a><p>
+<a href="save_game.html">save.game</a><p>
+
+</BODY></HTML>

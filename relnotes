@@ -1,12 +1,15 @@
 Release notes for QT AGI Studio version x.y (zzz 200x)
 
 - new features:
- * logic editor: line number display
+ * logic editor: show line numbers
+ * documented the previously unknown commands
 
 - bug fixes:
  * compiler: support for new AGI commands and empty blocks
-   to make LSL1 (de)compilable
+   to make LSL1 decompilable (thanks to Andreas J. Bathe
+   for reporting this)
+ * logic editor: fixed occasional crash with decompiled logics
 
 - other:
- * printable picture template for drafting AGI pictures
-   with a pencil
+ * Included a printable picture template for drafting AGI
+   pictures with a pencil
