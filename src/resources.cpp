@@ -24,6 +24,7 @@
 #include "viewedit.h"
 #include "preview.h"
 #include "menu.h"
+#include "midi.h"
 
 #include <qwidgetstack.h>
 
@@ -459,6 +460,26 @@ void ResourcesWin::add_resource()
   }
 
 
+}
+
+//**********************************************
+void ResourcesWin::export_resource()
+{
+  int k = list->currentItem();  
+  if(k<0) return;
+  int i = ResourceIndex[k];
+  
+  switch(selected) {
+  case SOUND:
+    if(game->ReadResource(SOUND,i))
+      menu->errmes("Couldn't read sound resource ! ");
+    else
+      showSaveAsMidi( this, ResourceData.Data );
+    break;
+  default:
+    qWarning("BUG in code. Export not supported for this resource type!");
+    break;
+  } 
 }
 
 //**********************************************

@@ -98,6 +98,7 @@ public slots:
     void showlooppar();
     void showcelpar();
     void save_pic();
+    void export_resource();
     void animate_cb();
  protected:
     QComboBox *formats;

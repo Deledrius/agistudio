@@ -67,13 +67,20 @@ Preview::Preview( QWidget* parent, const char*  name ,ResourcesWin *res ):
   w_sound = new QWidget (this);
   w_sound->setMinimumSize(340,280);
 
-  QBoxLayout *d1 =  new QVBoxLayout(w_sound,20);
+  QBoxLayout *d1 =  new QVBoxLayout(w_sound, 5);
   QLabel *l1 = new QLabel("Preview is not available !\nDouble-click to listen.\nOr click the 'Listen' button.",w_sound,0);
   d1->addWidget(l1);
+  
   QPushButton *listen = new QPushButton("Listen",w_sound);
-  listen->setMaximumSize(80,60);
+  listen->setMaximumSize(120,60);
   connect(listen,SIGNAL(clicked()),SLOT(double_click()));
   d1->addWidget(listen);
+  
+  QPushButton *save_as_midi = new QPushButton("Save as MIDI",w_sound);
+  save_as_midi->setMaximumSize(120,60);
+  connect(save_as_midi,SIGNAL(clicked()),SLOT(export_resource()));
+  d1->addWidget(save_as_midi);
+  
   d1->addStretch();
 
   // Picture
@@ -381,6 +388,11 @@ void Preview::save_pic()
     }    
   }  
 
+}
+//******************************************************
+void Preview::export_resource()
+{
+  resources_win->export_resource();
 }
 //*****************************************
 void Preview::deinit()

@@ -81,6 +81,7 @@ public slots:
     void delete_resource(void);
     void renumber_resource(void);
     void new_resource_window(void);
+    void export_resource(void);
  protected:
     bool first;
     QLabel *msg;
