@@ -1,3 +1,12 @@
+agistudio (1.2.1-1) unstable; urgency=low
+
+  * New upstream release.
+    - Midi export
+
+  * Fixed Build-Depends and upgraded Standards-Version
+
+ -- Jarno Elonen <elonen@iki.fi>  Fri,  8 Aug 2003 10:07:44 +0300
+
 agistudio (1.2-1) unstable; urgency=low
 
   * New upstream release.
