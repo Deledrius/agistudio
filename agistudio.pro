@@ -1,0 +1,56 @@
+TEMPLATE = app
+#CONFIG	 = qt warn_on release
+CONFIG  = qt warn_on  debug
+DEFINES += QT_DLL QT_THREAD_SUPPORT
+HEADERS	 = agicommands.h \
+		dir.h \
+		game.h \
+		global.h \
+		helpwindow.h \
+		linklist.h \
+		logedit.h \
+		logic.h \
+		menu.h \
+		object.h \
+		objedit.h \
+		options.h \
+		picedit.h \
+		picture.h \
+		preview.h \
+		resources.h \
+		roomgen.h \
+		util.h \
+		view.h \
+		viewedit.h \
+		words.h \
+		wordsedit.h \
+		wutil.h 
+SOURCES  = agicommands.cpp \
+                agiplay.cpp \
+		bpicture.cpp \
+		dir.cpp \
+		game.cpp \
+		helpwindow.cpp \
+		linklist.cpp \
+		logcompile.cpp \
+		logdecode.cpp \
+		logedit.cpp \
+		logic.cpp \
+		main.cpp \
+		menu.cpp \
+		object.cpp \
+		objedit.cpp \
+		options.cpp \
+		picedit.cpp \
+		picture.cpp \
+		preview.cpp \
+		resources.cpp \
+		roomgen.cpp \
+		util.cpp \
+		view.cpp \
+		viewedit.cpp \
+		words.cpp \
+		wordsedit.cpp \
+		wutil.cpp 
+TARGET   = agistudio
+

@@ -1,0 +1,59 @@
+Changes between Linux AGI Studio v1.0 and Windows Linux AGI Studio v1.0
+(original code by Helen Zommer, ported to Windows by Nat Budin)
+
+Key to changes:
+  (x) Changed such-and-such feature. [file]
+
+  where x is one of:
+    W = only affects Windows version
+    L = only affects Linux version
+    B = affects both versions
+
+Note: Windows-specific changes are effected using #ifdef _WIN32...#endif.
+
+(B) Added exception to GPL involving linking with non-GPLed Qt library. 
+    [all files]
+(W) #ifndefed out various headers that were causing compilation problems. 
+    [agiplay.cpp, bpicture.cpp, logedit.cpp, objedit.cpp, roomgen.cpp,
+    view.cpp, viewedit.cpp, words.cpp, wordsedit.cpp]
+(B) Added "b" to all fopen modes, because Windows distinguishes between
+    binary and text modes. [agiplay.cpp, game.cpp, logedit.cpp,
+    object.cpp, picture.cpp, resources.cpp, view.cpp, words.cpp]
+(W) Use _findfirst and _findnext instead of globs. [dir.cpp, game.cpp]
+(B) In Dir::ok_cb, added int game_exists for structural clarity. [dir.cpp]
+(B) When scanning for files, added a new variable called cfilename for
+    clarity. [game.cpp]
+(B) In file-scanning loops, added checks for . and .. because stupid Win32
+    find functions return those. [game.cpp]
+(W) Ugly kludge: redefined TEXT because windows.h defines it. [game.cpp]
+(W) Use _mkdir instead of mkdir. [game.cpp]
+(W) Use _unlink instead of unlink. [game.cpp]
+(B) Couldn't figure out why, but variable i in Game::newgame had a name
+    conflict.  Changed it to _i. [game.cpp]
+(W) In Game::defaults, autofind AGI Studio directory and set templatedir
+    and helpdir relative to that. [game.cpp]
+(W) Set default GUI style to Windows. [game.cpp]
+(W) .agistudio file gets saved in Windows directory (for example,
+    C:\WINDOWS\.agistudio). [game.cpp]
+(W) Use _strnicmp instead of strncasecmp. [logcompile.cpp]
+(B) Added a temporary str2 variable in Logic::ReadArgValue.  Apparently,
+    VC++ was destroying the string somewhere.  This keeps it from doing
+    so. [logic.cpp]
+(B) Temporary string variable in ViewData::read (see Logic::ReadArgValue
+    for explanation) [picedit.cpp]
+(B) Temporary string variable in WordsEdit::select_group (see 
+    Logic::ReadArgValue for explanation) [picedit.cpp]
+(B) Set the default logic editor font to courier 10. [logedit.cpp]
+(W) Set the window caption to "Windows Linux AGI Studio 1.0". [menu.cpp]
+(W) Use _chdir instead of chdir. [menu.cpp]
+(W) Use Win32 API to create a new process when the user hits "Run Game"
+    instead of forking. [menu.cpp]
+(B) Added myself to about box. ;) [menu.cpp]
+(B) Added some initialization stuff to Picture::Picture. [picture.cpp]
+(W) Used a macro to sidestep the strncasecmp issue. [resources.cpp]
+(B) VC++ doesn't like const declarations in a class.  I made inc not a
+    const and initialized it in the TStringList constructor. [util.h, 
+    util.cpp]
+(B) Ugly kludge: added #include <vector> so that VC++ doesn't complain
+    about the nonexistence of the std namespace. [wutil.h]
+
