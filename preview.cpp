@@ -34,6 +34,7 @@
 #include <qpixmap.h>
 #include <qimage.h> 
 #include <qfiledialog.h>
+#include <qpainter.h>
 
 #include "right_x.xpm"
 #include "left_x.xpm"

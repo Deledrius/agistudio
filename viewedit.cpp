@@ -44,7 +44,7 @@
 #include <qstringlist.h> 
 #include <qlayout.h>
 #include <qpixmap.h>
-
+#include <qpainter.h>
 
 #include "zoom_minus_x.xpm"
 #include "zoom_plus_x.xpm"

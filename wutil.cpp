@@ -22,6 +22,7 @@
  */
 
 #include <stdio.h>
+#include <qpainter.h>
 
 #include "wutil.h"
 

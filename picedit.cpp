@@ -29,6 +29,7 @@
 
 #include <qspinbox.h>
 #include <qapplication.h>
+#include <qpainter.h>
 
 #include "left1_x.xpm"
 #include "left2_x.xpm"
