@@ -54,8 +54,10 @@ public:
 public slots:
       void find_first_cb();
       void find_next_cb();
-      void cancel_cb(); 
+      void cancel_cb();
 };
+
+class LogicSyntaxHL;
 
 //Logic editor
 class LogEdit : public QWidget
@@ -69,6 +71,7 @@ public:
     QStatusBar *status;
     RoomGen *roomgen;
     Logic *logic;
+    LogicSyntaxHL *syntax_hl;
     string filename;
     unsigned int maxcol;
     int open();

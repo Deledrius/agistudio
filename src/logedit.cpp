@@ -219,7 +219,6 @@ public:
 LogEdit::LogEdit( QWidget *parent, const char *name, int win_num, ResourcesWin *res, bool readonly)
     : QWidget( parent, name, WDestructiveClose )
 {
-
   setCaption("Logic editor");
 
   logic = new Logic();
@@ -236,7 +235,7 @@ LogEdit::LogEdit( QWidget *parent, const char *name, int win_num, ResourcesWin *
   editor->setSizePolicy( QSizePolicy(
     QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding ));
   editor->setWordWrap( QTextEdit::NoWrap );
-  new LogicSyntaxHL( editor ); // TODO add a smart pointer
+  syntax_hl = new LogicSyntaxHL( editor );
 
   if ( readonly )
   {
@@ -244,8 +243,8 @@ LogEdit::LogEdit( QWidget *parent, const char *name, int win_num, ResourcesWin *
   }
   else
   {
-    editor->setMinimumSize(380,380);
-    setMinimumSize(400,400);
+    editor->setMinimumSize(430,380);
+    setMinimumSize(450,400);
   }
 
   setSizePolicy( QSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding ));
@@ -328,6 +327,10 @@ void LogEdit::deinit()
     roomgen=NULL;
   }
   delete logic;
+  logic = 0;
+  delete syntax_hl;
+  syntax_hl = 0;
+
   winlist[winnum].type=-1;
   if(window_list && window_list->isVisible())window_list->draw();
 
@@ -388,7 +391,7 @@ void LogEdit::closeEvent( QCloseEvent *e )
     default: // cancel
       e->ignore();
       break;
-    }    
+    }
     
   }
   else{
@@ -528,7 +531,7 @@ void LogEdit::save_logic()
     sprintf(tmp,"File %s",ptr);
     setCaption(tmp);
   }
-  else{        
+  else{
     sprintf(tmp,"%s/logic.%03d",game->srcdir.c_str(),LogicNum);
     save(tmp);
     sprintf(tmp,"Logic %d (file)",LogicNum);
@@ -668,7 +671,7 @@ int LogEdit::compile_logic()
               ptr1=strchr(ptr,'\n');
               *ptr1=0;
               winlist[i].w.t->status->message(ptr);
-              break;              
+              break;
             }
           }
         }
@@ -874,10 +877,9 @@ void LogEdit::getmaxcol()
   //get maximum number of columns on screen (approx.)
   //(for formatting the 'print' messages)
 {
-
-  QFontMetrics f = fontMetrics();
-  maxcol = editor->width()/f.width('a');
-
+  // QFontMetrics f = fontMetrics();
+  // maxcol = editor->width()/f.width('a');
+  maxcol = 50;
 }
 
 //***********************************************
@@ -1100,7 +1102,7 @@ void TextEdit::open()
 
   QFileDialog *f = new QFileDialog(0,"Open",true);  
   const char *filters[] = {"All files (*)",NULL};
-  
+
   f->setFilters(filters);
   f->setCaption("Open");
   f->setMode(QFileDialog::ExistingFile);
@@ -1408,7 +1410,7 @@ void FindEdit::find_next_cb()
       return;      
     }
   }
-  menu->errmes("Find","'%s' not found !",word); 
+  menu->errmes("Find","'%s' not found !",word);
   status->clear();
 
 }
