@@ -1,5 +1,7 @@
 /****************************************************************************
-** $Id$
+**
+** This help window was modified from an example code by QT.
+** Original license:
 **
 ** Copyright (C) 1992-1999 Troll Tech AS.  All rights reserved.
 **
