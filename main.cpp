@@ -24,19 +24,13 @@
 #include <stdio.h>
 
 #include <qapplication.h>
-#include <qmainwindow.h> 
-#include <qwindowsstyle.h>
-#include <qplatinumstyle.h>
-#include <qmotifstyle.h>
-#include <qcdestyle.h>
+#include <qmainwindow.h>
 
 #include "menu.h"
 #include "game.h"
 
 QApplication *app;
 char tmp[MAX_TMP]; //global temporary buffer
-
-extern void set_style(int style);
 
 static char help[]=
 "Linux AGI Studio v1.0.\n\
@@ -68,14 +62,13 @@ int main( int argc, char **argv )
       }
     }
   }
-  
+
   app = new QApplication(argc,argv);
   menu = new Menu(NULL,NULL);
   app->setMainWidget( menu );
 
   game = new Game();
-  set_style(game->style);
-  
+
   menu->show();
   
   if(gamedir){

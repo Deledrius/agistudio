@@ -30,6 +30,7 @@
 
 #include <string>
 #include <qwidget.h>
+#include <qwidgetstack.h>
 #include <qlabel.h>
 #include <qlayout.h>
 #include <qradiobutton.h>
@@ -77,18 +78,17 @@ public:
 };
 
 class ResourcesWin;
+class LogEdit;
 
 //****************************************************
-class Preview : public QWidget
+class Preview : public QWidgetStack
 {
     Q_OBJECT
 public:
-    Preview( QWidget* parent = 0, const char*  name=0, ResourcesWin *res=0, int winnum=0);
+    Preview( QWidget* parent = 0, const char*  name=0, ResourcesWin *res=0);
     QMultiLineEdit *description;
     ResourcesWin *resources_win;
-    int winnum;
     void open(int i,int type);
-    void clear();
 public slots:
     void double_click();
     void change_mode(int);
@@ -106,6 +106,8 @@ public slots:
     QComboBox *formats;
     QWidget *w_logic,*w_sound;
     QWidget *w_picture;
+
+    LogEdit *p_logic;
     PreviewPicture *p_picture;
     QRadioButton *visual,*priority;
     QPushButton *save;

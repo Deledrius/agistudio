@@ -28,14 +28,8 @@
 
 #include <qapplication.h>
 #include <qfiledialog.h>
-#include <qwindowsstyle.h>
-#include <qplatinumstyle.h>
-#include <qmotifstyle.h>
-#include <qcdestyle.h>
 
 Options *options;
-
-void set_style(int style);
 
 //***********************************************
 Options::Options( QWidget *parent, const char *name)
@@ -74,18 +68,6 @@ void Options::set_general()
   type->insertItem( "PICTURE" );
   type->insertItem( "VIEW" );
   type->insertItem( "SOUND" );
-
-
-  QLabel *l1 = new QLabel("GUI style",b1);
-  l1->setText("GUI style");  //to avoid compilation warning
-
-  style = new QComboBox(false,b1,"style");
-  style->insertItem( "Platinum" );
-  style->insertItem( "Motif" );
-  style->insertItem( "CDE" );
-  style->insertItem( "Windows" );
-  connect( style, SIGNAL(activated(int)), this, SLOT(set_gui_style(int)) );
-
 
   QLabel *l2 = new QLabel("Picedit style",b1);
   l2->setText("Picedit style");  //to avoid compilation warning
@@ -216,9 +198,8 @@ void Options::apply()
   }
   game->templatedir=string((char *)templatedir->text().latin1());
   game->helpdir=string((char *)helpdir->text().latin1());
-  game->style=style->currentItem();
   game->picstyle=picstyle->currentItem();
-  game->save_settings();  
+  game->save_settings();
   hide();
 
 }
@@ -254,15 +235,13 @@ void Options::set_settings()
   }      
   templatedir->setText(game->templatedir.c_str());
   helpdir->setText(game->helpdir.c_str());
-  style->setCurrentItem(game->style);
-  set_style(game->style);
   picstyle->setCurrentItem(game->picstyle);
 }
 
 //***********************************************
 void Options::browse_abs()
 {
-  
+
   QString s (QFileDialog::getExistingDirectory ());
   if(s.isNull())return;
   absname->setText(s);
@@ -282,7 +261,7 @@ void Options::browse_template()
 //***********************************************
 void Options::browse_help()
 {
-  
+
   QString s (QFileDialog::getExistingDirectory ());
   if(s.isNull())return;
   helpdir->setText(s);
@@ -313,31 +292,4 @@ void Options::set_absdir()
 
 }
 
-//***********************************************
-void Options::set_gui_style(int style)
-{
-
-  set_style(style);
-
-}
-
-//***********************************************
-void set_style(int style)
-{
-
-  switch(style){
-  case G_PLATINUM:
-    qApp->setStyle( new QPlatinumStyle );
-    break;
-  case G_MOTIF:
-    qApp->setStyle( new QMotifStyle );
-    break;
-  case G_CDE:
-    qApp->setStyle( new QCDEStyle );
-    break;
-  case G_WINDOWS:
-    qApp->setStyle( new QWindowsStyle );
-    break;
-  }
-}
 //***********************************************

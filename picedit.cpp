@@ -30,6 +30,7 @@
 #include <qspinbox.h>
 #include <qapplication.h>
 #include <qpainter.h>
+#include <qtooltip.h>
 
 #include "left1_x.xpm"
 #include "left2_x.xpm"
@@ -107,7 +108,7 @@ PicEdit::PicEdit( QWidget *parent, const char *name,int win_num,ResourcesWin *re
   util->insertItem("View data", this, SLOT(view_data()) );
   util->insertItem("Background", this, SLOT(background()) );
   
-  QMenuBar *menu = new QMenuBar(this);  
+  QMenuBar *menu = new QMenuBar(this);
   CHECK_PTR( menu );
   menu->insertItem( "File", file );
   menu->insertItem( "Utilities", util );
@@ -254,13 +255,19 @@ PicEdit::PicEdit( QWidget *parent, const char *name,int win_num,ResourcesWin *re
   status = new QStatusBar(this);
   QLabel *msg = new QLabel( status, "message" );
   status->addWidget( msg, 4 );
+  pricolor = new QFrame( status );
+  pricolor->setMinimumSize( 8,8 );
+  pricolor->setMaximumSize( 8,8 );
+  QToolTip::add( pricolor, "Priority 'color' required to mask an EGO on this priority level" );
+  status->addWidget( pricolor, 0, true );
+  status->setSizeGripEnabled( false );
   leftb->addWidget(status);
 
   if(game->picstyle==P_TWO){
-    canvas = new PCanvas(0,0,this);    
+    canvas = new PCanvas(0,0,this);
     canvas->setMinimumSize(canvas->pixsize*MAX_W+canvas->x0+10,canvas->pixsize*MAX_HH+canvas->x0+10);
     canvas->resizeContents(canvas->pixsize*MAX_W+canvas->x0,canvas->pixsize*MAX_HH+canvas->x0);
-    canvas->resize(canvas->pixsize*MAX_W+canvas->x0,canvas->pixsize*MAX_HH+canvas->x0);    
+    canvas->resize(canvas->pixsize*MAX_W+canvas->x0,canvas->pixsize*MAX_HH+canvas->x0);
     //canvas->setFocusPolicy(ClickFocus);
     
   }
@@ -638,7 +645,7 @@ void PicEdit::change_drawmode(int mode)
       picture->bg_on=false;
     break;
   case 3: //priority lines
-    canvas->pri_lines=prilines->isChecked();    
+    canvas->pri_lines=prilines->isChecked();
     break;
   }
   canvas->linedraw=false;
@@ -884,7 +891,7 @@ void PCanvas::setPixsize(int s)
   cur_w=MAX_W*pixsize;
   cur_h=MAX_HH*pixsize;
   pixmap.resize(cur_w,cur_h);
-  QPainter p(&pixmap); 
+  QPainter p(&pixmap);
   p.eraseRect(0,0,cur_w,cur_h);
   update();
 
@@ -955,8 +962,10 @@ void PCanvas::viewportMouseMoveEvent(QMouseEvent* event)
     line(true);
 
   if(x>=0&&y>=0){
-    sprintf(tmp,"X=%d  Y=%d  Pri=%d",x/2,y,y/12+1);
+    int pri = y/12+1;
+    sprintf(tmp,"X=%d  Y=%d  Pri=%d",x/2,y,pri);
     picedit->status->message(tmp);
+    picedit->pricolor->setPaletteBackgroundColor( egacolor[pri+1] );
   }
 
 }
@@ -964,28 +973,28 @@ void PCanvas::viewportMouseMoveEvent(QMouseEvent* event)
 //*********************************************
 void PCanvas::drawContents(QPainter* p,int ,int ,int ,int )
 {
- 
+
   if(cur_w==0 ||cur_h==0)return;
 
   p->drawPixmap( x0, y0, pixmap );
-  
-}      
+
+}
 
 //*********************************************
 void PCanvas::update()
 {
 
-  QPainter p(&pixmap);   
+  QPainter p(&pixmap);
   int x,y;
   byte c;
-  byte *data;  
-  
+  byte *data;
+
   data = (picedit->pri_mode)?picture->priority:picture->picture;
   if(bg_loaded && bg_on){  //if must draw background
     bool pic = !picedit->pri_mode;
     for(y=0;y<MAX_HH;y++){
       for(x=0;x<MAX_W;x+=2){
-        c=data[y*MAX_W+x];        
+        c=data[y*MAX_W+x];
         if((pic&&c==15)||(!pic&&c==4)){  //draw background instead of "empty" areas
           p.fillRect(x*pixsize,y*pixsize,pixsize,pixsize,QColor(bgpix.pixel(x,y)));
           p.fillRect((x+1)*pixsize,y*pixsize,pixsize,pixsize,QColor(bgpix.pixel(x+1,y)));
@@ -994,7 +1003,7 @@ void PCanvas::update()
           p.fillRect(x*pixsize,y*pixsize,pixsize*2,pixsize,egacolor[c]);
         }
       }
-    }    
+    }
   }
   else{
     for(y=0;y<MAX_HH;y++){
@@ -1281,7 +1290,7 @@ void Palette1::paintEvent( QPaintEvent * )
 
     for(y=0,i=0;y<h;y+=dy){
       for(x=0;x<w-dx;x+=dx,i++){
-        p.fillRect(x,y,dx,dy,egacolor[i]);      
+        p.fillRect(x,y,dx,dy,egacolor[i]);
         if(i==left){          
           p.setPen(i<10?egacolor[15]:egacolor[0]);
           p.drawText(x+dx/4,y+dy/2+2,"V");

@@ -351,8 +351,8 @@ int Game::from_template(string name)
   } while (_findnext(hFile, &c_file) == 0);
   _findclose(hFile);
 #else
-  }
-  globfree(&globbuf);
+    }
+  globfree(&globbuf);  
 #endif
 
   return open(name);
@@ -437,7 +437,7 @@ string Game::FindAGIV3GameID(const char *name)
   //it is a V3 game
 {
   string ID1;
-  char *ptr;
+  char *ptr;  
   char *cfilename;
 
   ID1 = "V2";  //default for V2 games
@@ -500,7 +500,7 @@ string Game::FindAGIV3GameID(const char *name)
 #else
   globfree(&globbuf);
 #endif  
-
+  
   if ((strcmp(volString, dirString) == 0) && (volString != NULL))
     ID1=volString;
   
@@ -1360,7 +1360,7 @@ int Game::ReadV3Resource(char ResourceType1,int ResourceID1)
   }
   else if(CompressedResource.Size != ResourceData.Size){
     initLZW();
-    resetLZW();  
+    resetLZW();
     expand(CompressedResource.Data,ResourceData.Data,ResourceData.Size);
     if (ResourceType1 == LOGIC) convertLOG( ResourceData.Data,ResourceData.Size);
   }
@@ -1382,9 +1382,9 @@ void Game::defaults()
   show_all_messages=true;
   show_special_syntax=true;
   reldir=true;
-  command="sarien ./";
   srcdirname="src";
 #ifdef _WIN32
+  command="sarien ./";
   char abspath[256];  // absolute path to the program file
   _fullpath(abspath,_pgmptr,255);
   char *mydir = (char *)(malloc(strlen(abspath)+1));  // will store the program's directory
@@ -1392,7 +1392,7 @@ void Game::defaults()
   char *lastslash = 0;
   lastslash = strrchr(mydir,'\\');
   if (!lastslash)
-	  lastslash = strrchr(mydir,'/');
+    lastslash = strrchr(mydir,'/');
   *lastslash = '\0';
   char templatedir_c[256];
   char helpdir_c[256];
@@ -1400,11 +1400,10 @@ void Game::defaults()
   sprintf(helpdir_c,"%s/help",mydir);
   templatedir = templatedir_c;
   helpdir = helpdir_c;
-  style=G_WINDOWS;
 #else
-  templatedir="/usr/local/agistudio/template";
-  helpdir="/usr/local/agistudio/help";
-  style=G_PLATINUM;
+  command="nagi ./ || sarien ./";
+  templatedir="/usr/share/agistudio/template";
+  helpdir="/usr/share/agistudio/help";
 #endif
   picstyle=P_ONE;
 }
@@ -1468,11 +1467,8 @@ void Game::read_settings()
     else if(!strncmp(tmp,"help=",5)){
       helpdir=string(tmp+5);
     }
-    else if(!strncmp(tmp,"style=",6)){
-      style=atoi(tmp+6);      
-    }
     else if(!strncmp(tmp,"picstyle=",9)){
-      picstyle=atoi(tmp+9);      
+      picstyle=atoi(tmp+9);
     }
   }
 
@@ -1516,7 +1512,6 @@ void Game::save_settings()
   fprintf(fptr,"srcdirname=%s\n",srcdirname.c_str());
   fprintf(fptr,"template=%s\n",templatedir.c_str());
   fprintf(fptr,"help=%s\n",helpdir.c_str());
-  fprintf(fptr,"style=%d\n",style);
   fprintf(fptr,"picstyle=%d\n",picstyle);
   fclose(fptr);
 

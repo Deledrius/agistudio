@@ -27,6 +27,8 @@
 #include <stdio.h>
 #include "global.h"
 
+using namespace std;
+
 typedef struct {
   char Filename[12];    //[*]vol.* 
   long Loc;             //location in vol file
@@ -72,7 +74,6 @@ class Game
   //defaults; some GUI defauts are part of GAME object because it is the 
   //only object which is guaranteed to exist at the beginning of the program
   int res_default;  //default resource type in resources window
-  int style;        //QT GUI style 
   int picstyle;     //Picedit style
   bool save_logic_as_text;  //default for 'extract' function
   bool show_all_messages;   //logic decompile - show all messages at end 
@@ -121,12 +122,6 @@ extern char tmp[];
 #define RESOURCES 7
 #define PREVIEW   8
 #define HELPWIN   9
-
-//QT GUI styles
-#define G_PLATINUM 0
-#define G_MOTIF    1
-#define G_CDE      2
-#define G_WINDOWS  3
 
 //Picedit styles (tools and picture in one window or in separate windows (for small displays))
 #define P_ONE  0

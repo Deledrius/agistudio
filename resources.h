@@ -88,6 +88,7 @@ public slots:
     bool first;
     QLabel *msg;
     QComboBox *type;
+    QWidget *previewPane;
     AddResource *addmenu;
     int winnum;
     void closeEvent( QCloseEvent *e );

@@ -65,7 +65,7 @@ class LogEdit : public QWidget
 {
     Q_OBJECT
 public:
-    LogEdit( QWidget *parent=0, const char *name=0,int winnum=0,ResourcesWin *res=0);
+    LogEdit( QWidget *parent=0, const char *name=0,int winnum=0,ResourcesWin *res=0, bool readonly=false );
     QMultiLineEdit *editor;
     FindEdit *findedit;
     ResourcesWin *resources_win;
@@ -90,6 +90,8 @@ public slots:
     void find_cb();
     void find_again();
     void goto_cb();
+    void context_help();
+    void command_help();
  protected:
     int LogicNum;
     int winnum;

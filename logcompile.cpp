@@ -1,9 +1,9 @@
 /*
  *  Linux AGI Studio :: Copyright (C) 2000 Helen Zommer
  *
- *  Almost all of this code was adapted from the Windows AGI Studio 
+ *  Almost all of this code was adapted from the Windows AGI Studio
  *  developed by Peter Kelly.
- * 
+ *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation; either version 2 of the License, or
@@ -32,8 +32,7 @@
 #include <stdlib.h>
 #include <limits.h>
 
-
-extern TStringList InputLines;  //temporary - 
+extern TStringList InputLines;  //temporary -
 //input text from the editor window or file
 
 static bool UseTypeChecking = true;
@@ -55,7 +54,7 @@ static TLogicLabel Labels[MaxLabels+1];
 static int NumLabels;
 
 static bool ErrorOccured;
-static int CurLine,CurChar;
+static int CurLine;
 static string LowerCaseLine,ArgText,LowerCaseArgText;
 static unsigned int LinePos,LineLength,ArgTextLength,ArgTextPos;
 static bool FinishedReading;
@@ -141,76 +140,42 @@ string Logic::ReadString(unsigned int *pos,string str)
     return "";
   }
 
-  return str.substr(pos1+1,pos2-pos1-1);  
+  return str.substr(pos1+1,pos2-pos1-1);
 }
 //***************************************************
 int Logic::RemoveComments(TStringList Lines)
 {
-  string ThisLine;
-  bool InQuotes;
-  int CommentDepth,CommentStart,RestOfLineIgnoredFrom;
-  int CurLine;
-  int len;
-
-  CommentDepth = 0;
-  if(Lines.num==0)return 0;
+  int CommentDepth = 0;
   for(CurLine=0;CurLine<Lines.num;CurLine++){
-    ThisLine = Lines.at(CurLine);
-    len=ThisLine.length();
-    if(len==0)continue;
-    InQuotes = false;
-    CurChar = -1;
-    CommentStart = 0;
-    RestOfLineIgnoredFrom = -1;
-    do{
-      CurChar++;
-      if(ThisLine[CurChar]=='\"' && (CurChar==0 || ThisLine[CurChar-1] != '\\'))
-        InQuotes = !InQuotes;
-      if(InQuotes)continue;
-      if(CurChar<len-1){
-        if((ThisLine.substr(CurChar,2) == "//" || ThisLine[CurChar]=='[')&&(RestOfLineIgnoredFrom==-1)){
-          RestOfLineIgnoredFrom = CurChar;
-        }
-      }
-      else{
-        if((ThisLine[CurChar]=='[')&&(RestOfLineIgnoredFrom==-1)){
-          RestOfLineIgnoredFrom = CurChar;
-        }
-      }
-      if(CurChar<len-1 && ThisLine.substr(CurChar,2) == "/*"){
-        if(CommentDepth==0)CommentStart=CurChar;
-        CommentDepth++;
-      }
-      else if(CurChar<len-1 && ThisLine.substr(CurChar,2) == "*/"){
-        if(CommentDepth==0){
-          CommentDepth=1;
-          CommentStart=CurChar;
-        }
-        CommentDepth--;
-        if(CommentDepth==0){
-          if(RestOfLineIgnoredFrom >= 0){
-            RestOfLineIgnoredFrom -= (CurChar-CommentStart+2);
+    string Line = Lines.at(CurLine);
+    string NewLine;
+    bool InQuotes = false;
+    for ( unsigned i=0; i<Line.size(); ++i ){
+      if ( !InQuotes ){
+        if (CommentDepth==0 && Line[i] == '[')
+          break;
+        if (i<Line.size()-1){
+          if (CommentDepth==0 && Line.substr(i,2) == "//")
+            break;
+          else if ( Line.substr(i,2) == "/*"){
+            ++CommentDepth;
+            ++i;
+            continue;
           }
-          if(CommentStart==0)
-            ThisLine = ThisLine.substr(CurChar+2);
-          else
-            ThisLine = ThisLine.substr(0,CommentStart-1)+ThisLine.substr(CurChar+2);
-          CurChar = CommentStart;
         }
-      }       
-    }while(CurChar<len-1);    
-    if (RestOfLineIgnoredFrom >= 1)
-      ThisLine = ThisLine.substr(0,RestOfLineIgnoredFrom-1);
-    else if(RestOfLineIgnoredFrom ==0)
-      ThisLine = "";
-    if(CommentDepth>0){
-      if(CommentStart==0)
-        ThisLine = "";
-      else
-        ThisLine = ThisLine.substr(0,CommentStart-1);
+        else if (CommentDepth>0 && Line.substr(i,2) == "*/" ){
+          --CommentDepth;
+          ++i;
+          continue;
+        }
+      }
+      if ( CommentDepth == 0 ){
+        if(Line[i]=='\"' && (i==0 || Line[i-1] != '\\'))
+          InQuotes = !InQuotes;
+        NewLine += Line[i];
+      }
     }
-    if(ThisLine != Lines.at(CurLine))
-      Lines.replace(CurLine,ThisLine);
+    Lines.replace(CurLine,NewLine);
   }
   return 0;
 }
@@ -462,8 +427,8 @@ int Logic::ReadPredefinedMessages()
       continue;
     }
     Messages[MessageNum]=ReadString(&pos1,str);
-    if(ErrorOccured)continue;    
-    if(int pos2 = Messages[MessageNum].find_first_not_of(" ",pos1) != string::npos){
+    if(ErrorOccured)continue;
+    if(Messages[MessageNum].find_first_not_of(" ",pos1) != string::npos){
       sprintf(tmp,"Nothing allowed on line after message. ");
       ShowError(CurLine,tmp);
       err=1;
@@ -471,7 +436,7 @@ int Logic::ReadPredefinedMessages()
     }
     MessageExists[MessageNum] =true;
     EditLines.replace(CurLine,"");
-  }  
+  }
 
   return err;
 
@@ -488,7 +453,7 @@ int Logic::ReadLabels()
   for(CurLine = 0;CurLine<EditLines.num;CurLine++){
     string str = EditLines.at(CurLine);
     toLower(&str);
-    pos1 = str.find_first_not_of(" ");    
+    pos1 = str.find_first_not_of(" ");
     if(pos1 == string::npos)continue;
     pos2 = str.find_first_not_of("qwertyuiopasdfghjklzxcvbnm1234567890._",pos1);
     if(pos2 == string::npos)continue;
@@ -552,7 +517,7 @@ void Logic::NextLine()
 //***************************************************
 void Logic::SkipSpaces()
 {
-  
+
   LinePos=LowerCaseLine.find_first_not_of(" ",LinePos);
   if(LinePos==string::npos)NextLine();
 
@@ -584,9 +549,16 @@ byte Logic::AddMessage(string TheMessage)
 
 }
 //***************************************************
+static string TrimEndWhitespaces( const string& str )
+{
+  int i=str.length();
+  while( i>0 && (str[i-1]==' ' || str[i-1]=='\t'))
+    --i;
+  return str.substr(0,i);
+}
+//***************************************************
 string Logic::ReplaceDefine(string InText)
 {
-
   string str=InText;
   toLower(&str);
   for(int i=0;i<NumDefines;i++){
@@ -604,7 +576,7 @@ void Logic::ReadArgText()
 
   SkipSpaces();
   pos1 = pos2 = LinePos;
-  
+
   if(LowerCaseLine[pos1]=='"'){
     ArgText = "\""+ReadString(&pos2,LowerCaseLine)+"\"";
     pos2 = LowerCaseLine.find_first_of(",)",pos2);
@@ -613,18 +585,20 @@ void Logic::ReadArgText()
     pos2 = LowerCaseLine.find_first_of(",)",pos1);
   }
   if(pos2==string::npos){
-    LinePos=LineLength;    
-    ArgText = ReplaceDefine(EditLines.at(CurLine).substr(pos1));
+    LinePos=LineLength;
+    ArgText = ReplaceDefine(TrimEndWhitespaces(
+      EditLines.at(CurLine).substr(pos1)));
   }
   else{
-    LinePos=pos2;    
-    ArgText = ReplaceDefine(EditLines.at(CurLine).substr(pos1,pos2-pos1));
+    LinePos=pos2;
+    ArgText = ReplaceDefine(TrimEndWhitespaces(
+      EditLines.at(CurLine).substr(pos1,pos2-pos1)));
   }
+
   LowerCaseArgText = ArgText;
   toLower(&LowerCaseArgText);
   ArgTextLength = ArgText.length();
   ArgTextPos=0;
-  
 }
 //***************************************************
 int Logic::ReadArgValue()
@@ -801,17 +775,18 @@ void Logic::ReadArgs(bool CommandIsIf, byte CmdNum)
       }//normal argument
       if (CurArg < ThisCommand.NumArgs-1){
         if (ArgTextPos < ArgTextLength)
-          ShowError(CurLine,"',' expected after argument "+IntToStr(CurArg)+".");        
+          ShowError(CurLine,"',' expected after argument "+IntToStr(CurArg)+".");
         else if(LinePos >= LineLength || LowerCaseLine[LinePos] != ',')
-          ShowError(CurLine,"',' expected after argument "+IntToStr(CurArg)+".");        
+          ShowError(CurLine,"',' expected after argument "+IntToStr(CurArg)+".");
         else 
           LinePos++;        
       }
       else if (ArgTextPos < ArgTextLength){
-          ShowError(CurLine,"(1) ')' expected after argument "+IntToStr(CurArg)+".");        
+          ShowError(CurLine,"(1) ')' expected after argument "+IntToStr(CurArg)+".");
           printf("Line %s argtextpos=%d arglen=%d\n",LowerCaseLine.c_str(),ArgTextPos,ArgTextLength);
       }
     }
+    SkipSpaces();
     if (LinePos >= LineLength || LowerCaseLine[LinePos] != ')'){
 
       if (ThisCommand.NumArgs > 0){
@@ -1508,7 +1483,7 @@ int Logic::compile()
     tmp[j]=0;
     objlist->ItemNames.replace(i,tmp);
    }
-   
+
    ResourceData.Size = MaxResourceSize; 
    LogicSize = 0;
    ResPos = 2;

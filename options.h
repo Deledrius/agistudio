@@ -32,7 +32,7 @@
 #include <qmessagebox.h>
 #include <qlineedit.h> 
 #include <qradiobutton.h> 
-#include <qbuttongroup.h> 
+#include <qbuttongroup.h>
 #include <qcheckbox.h> 
 #include <qmultilineedit.h> 
 #include <qpixmap.h>
@@ -53,7 +53,7 @@ class Options : public QTabDialog
     Q_OBJECT
 public:
     Options( QWidget *parent=0, const char *name=0);
-    QComboBox *type,*style,*picstyle;
+    QComboBox *type,/* *style,*/ *picstyle;
     QCheckBox *messages,*elses,*special;
     QRadioButton *text,*binary;
     QLineEdit *relname,*absname;
@@ -77,8 +77,6 @@ public slots:
 
     void set_reldir();
     void set_absdir();
-
-    void set_gui_style(int);
 };
 
 

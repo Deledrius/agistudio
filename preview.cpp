@@ -28,11 +28,13 @@
 #include "wutil.h"
 #include "menu.h"
 
+#include "logedit.h"
+
 #include <stdio.h>
 
 #include <qbuttongroup.h>
 #include <qpixmap.h>
-#include <qimage.h> 
+#include <qimage.h>
 #include <qfiledialog.h>
 #include <qpainter.h>
 
@@ -41,43 +43,49 @@
 
 
 //*****************************************
-Preview::Preview(  QWidget* parent, const char*  name ,ResourcesWin *res , int win_num):
-  QWidget(parent,name,WDestructiveClose)
+Preview::Preview( QWidget* parent, const char*  name ,ResourcesWin *res ):
+  QWidgetStack(parent,name)
 {
 
   setCaption("Preview");
   make_egacolors();
 
-  winnum = win_num;
   resources_win = res;
+
+  // Logic
 
   w_logic = new QWidget (this);
   w_logic->setMinimumSize(340,280);
 
-  QBoxLayout *d =  new QVBoxLayout(w_logic,20);  
-  QLabel *l = new QLabel("Preview is not available !\nDouble-click to edit.\nOr click the 'Edit' button.",w_logic);
-  d->addWidget(l);
+  QBoxLayout *d =  new QVBoxLayout(w_logic,5);
+  p_logic = new LogEdit( w_logic,0,0,res,true );
+  d->addWidget(p_logic);
   QPushButton *edit = new QPushButton("Edit",w_logic);
   edit->setMaximumSize(80,60);
   connect(edit,SIGNAL(clicked()),SLOT(double_click()));
   d->addWidget(edit);
 
+  // Sound
+
   w_sound = new QWidget (this);
   w_sound->setMinimumSize(340,280);
 
-  QBoxLayout *d1 =  new QVBoxLayout(w_sound,20);  
+  QBoxLayout *d1 =  new QVBoxLayout(w_sound,20);
   QLabel *l1 = new QLabel("Preview is not available !\nDouble-click to listen.\nOr click the 'Listen' button.",w_sound,0);
   d1->addWidget(l1);
   QPushButton *listen = new QPushButton("Listen",w_sound);
   listen->setMaximumSize(80,60);
   connect(listen,SIGNAL(clicked()),SLOT(double_click()));
   d1->addWidget(listen);
+  d1->addStretch();
+
+  // Picture
 
   w_picture = new QWidget (this,0);
   w_picture->setMinimumSize(340,280);
 
   QBoxLayout *pbox =  new QVBoxLayout(w_picture,10);
-    
+
   p_picture = new PreviewPicture(w_picture,0,this);
   p_picture->setFixedSize(MAX_W,MAX_HH);
   pbox->addWidget(p_picture);
@@ -94,7 +102,7 @@ Preview::Preview(  QWidget* parent, const char*  name ,ResourcesWin *res , int w
 
   p_picture->drawing_mode=0;
 
-  QButtonGroup *bg = new QButtonGroup(w_picture);  
+  QButtonGroup *bg = new QButtonGroup(w_picture);
   bg->hide();
   bg->insert(visual,0);
   bg->insert(priority,1);
@@ -118,6 +126,9 @@ Preview::Preview(  QWidget* parent, const char*  name ,ResourcesWin *res , int w
     formats->insertItem(out.at(k));
   }
   pbox2->addWidget(formats);
+  pbox->addStretch();
+
+  // View
 
   w_view = new QWidget (this,0);
   w_view->setMinimumSize(340,240);
@@ -125,8 +136,8 @@ Preview::Preview(  QWidget* parent, const char*  name ,ResourcesWin *res , int w
   QBoxLayout *vbox = new QVBoxLayout(w_view,10);
 
   int maxrow1=2,maxcol1=5;
-  QGridLayout *grid1 = new QGridLayout( vbox, maxrow1,maxcol1, 1 );  
-  
+  QGridLayout *grid1 = new QGridLayout( vbox, maxrow1,maxcol1, 1 );
+
   int i;
   for(i=0;i<maxcol1;i++){
     grid1->setColStretch(i,1);
@@ -138,7 +149,7 @@ Preview::Preview(  QWidget* parent, const char*  name ,ResourcesWin *res , int w
     grid1->addRowSpacing(i,2);
   }
 
-  
+
   int row=0;int col=0;
   QPixmap pright=QPixmap(right_x);
   QPixmap pleft=QPixmap(left_x);
@@ -162,7 +173,7 @@ Preview::Preview(  QWidget* parent, const char*  name ,ResourcesWin *res , int w
   QPushButton *vedit = new QPushButton("Edit",w_view);
   vedit->setMaximumWidth(100);
   connect(vedit,SIGNAL(clicked()),SLOT(double_click()));
-  grid1->addWidget(vedit,row,col,AlignCenter); col++;  
+  grid1->addWidget(vedit,row,col,AlignCenter); col++;
 
   row++;col=0;
 
@@ -181,81 +192,59 @@ Preview::Preview(  QWidget* parent, const char*  name ,ResourcesWin *res , int w
   celright->setPixmap(pright);
   connect( celright, SIGNAL(clicked()), SLOT(next_cel()) );
   grid1->addWidget(celright,row,col,AlignLeft); col++;
-  
 
   QPushButton *anim = new QPushButton("Animate",w_view);
   connect(anim,SIGNAL(clicked()),SLOT(animate_cb()));
-  grid1->addWidget(anim,row,col,AlignCenter); col++;  
-
+  grid1->addWidget(anim,row,col,AlignCenter); col++;
 
   p_view = new PreviewView(w_view,0,this);
-  p_view->setMinimumSize(320,180);
+  p_view->setMinimumSize(64,64);
+  p_view->setSizePolicy( QSizePolicy( QSizePolicy::Minimum, QSizePolicy::Minimum ));
   vbox->addWidget(p_view);
 
   description = new QMultiLineEdit(w_view);
   description->setReadOnly(true);
+  description->setSizePolicy( QSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding ));
+  vbox->addWidget(description);
+  vbox->addStretch();
 
-  adjustSize();  
-  clear();
+  // Build the widget stack
 
+  addWidget( w_picture );
+  addWidget( w_view );
+  addWidget( w_sound );
+  addWidget( w_logic );
+
+  setSizePolicy( QSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding ));
+  adjustSize();
   animate=NULL;
-
-}
-
-//*****************************************
-void Preview::clear()
-{
-    w_picture->hide();
-    w_view->hide();
-    w_logic->hide();
-    w_sound->hide();
 }
 
 //*****************************************
 void Preview::open(int ResNum,int type)
 {
-
-
   switch(type){
   case LOGIC:
     if(animate){ animate->closeall(); animate=NULL; }
-    w_picture->hide();
-    w_view->hide();
-    w_sound->hide();
-    w_logic->show();
-    setCaption("Preview");
+    raiseWidget( w_logic );
+    p_logic->open(ResNum);
     break;
   case VIEW:
-    w_sound->hide();
-    w_logic->hide();
-    w_picture->hide();
-    w_view->show();
+    raiseWidget( w_view );
     p_view->draw(ResNum);
-    sprintf(tmp,"Preview - view.%03d",ResNum);
-    setCaption(tmp);
     break;
   case PICTURE:
     if(animate){ animate->closeall(); animate=NULL; }
-    w_sound->hide();
-    w_logic->hide();
-    w_view->hide();
-    w_picture->show();
+    raiseWidget( w_picture );
     p_picture->draw(ResNum);
-    sprintf(tmp,"Preview - picture.%03d",ResNum);
-    setCaption(tmp);
     break;
   case SOUND:
     if(animate){ animate->closeall(); animate=NULL; }
-    w_picture->hide();
-    w_view->hide();
-    w_logic->hide();
-    w_sound->show();
-    setCaption("Preview");
+    raiseWidget( w_sound );
     break;
   }
 
   show();
-
 }
 
 //*****************************************
@@ -382,7 +371,7 @@ void Preview::save_pic()
   sprintf(tmp,"*.%s",format);
   toLower(tmp);
   const char *filters[] = {tmp,"All files (*)",NULL};
-  
+
   f->setFilters(filters);
   f->setCaption("Save view");
   f->setMode(QFileDialog::AnyFile);
@@ -405,7 +394,6 @@ void Preview::deinit()
     animate=NULL;
   }
   resources_win->preview=NULL;
-  winlist[winnum].type=-1;
   if(window_list && window_list->isVisible())window_list->draw();
 }
 

@@ -28,6 +28,8 @@
 #include "preview.h"
 #include "menu.h"
 
+#include <qwidgetstack.h>
+
 #include <stdio.h>
 #ifdef _WIN32
 #define strncasecmp(a, b, l) _stricmp(a, b)
@@ -42,7 +44,7 @@
 ResourcesWin::ResourcesWin(  QWidget* parent, const char*  name, int win_num ):
   QWidget(parent,name,WDestructiveClose)
 {
-
+  setSizePolicy( QSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed ));
   setCaption("resources");
   winnum = win_num;
 
@@ -68,37 +70,47 @@ ResourcesWin::ResourcesWin(  QWidget* parent, const char*  name, int win_num ):
   menubar->setSeparator( QMenuBar::InWindowsStyle );
 
 
-  QBoxLayout *box =  new QVBoxLayout(this,10);
-  box->setMenuBar(menubar);
+  QBoxLayout *hbox =  new QHBoxLayout( this, 10 );
+  hbox->setMenuBar(menubar);
+
+  QBoxLayout *resbox =  new QVBoxLayout( hbox, 10 );
 
   type = new QComboBox(FALSE, this, "type");
-  
+
   type->insertItem( "LOGIC" );
   type->insertItem( "PICTURE" );
   type->insertItem( "VIEW" );
   type->insertItem( "SOUND" );
   connect( type, SIGNAL(activated(int)), SLOT(select_resource_type(int)) );
-  box->addWidget(type);
+  type->setSizePolicy( QSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed ));
+  resbox->addWidget(type);
 
   list = new QListBox(this,"list");
   list->setColumnMode (1);
   list->setMinimumSize(200,300);
   connect( list, SIGNAL(highlighted(int)), SLOT(highlight_resource(int)) );
   connect( list, SIGNAL(selected(int)), SLOT(select_resource(int)) );
+  list->setSizePolicy( QSizePolicy( QSizePolicy::Fixed, QSizePolicy::Minimum ));
 
   selected = game->res_default;
-  
-  box->addWidget(list);
+  resbox->addWidget(list);
 
   msg = new QLabel( this, "message" );
   msg->setAlignment( AlignLeft );
-  box->addWidget(msg);
-  
-  adjustSize();  
+  resbox->addWidget(msg);
 
   addmenu = NULL;
   preview = NULL;
   closing = false;
+
+  QBoxLayout *prevbox =  new QVBoxLayout(hbox,10);
+  QGroupBox* group = new QGroupBox( 1, Qt::Vertical, "Preview", this );
+  group->setMinimumSize(340+10*2,280+10*2);
+  group->setSizePolicy( QSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding ));
+  previewPane = group;
+  prevbox->addWidget(previewPane);
+
+  adjustSize();
 }
 
 //********************************************************
@@ -109,7 +121,7 @@ void ResourcesWin::select_resource_type( int ResType )
 
   type->setCurrentItem(ResType);
   selected = ResType;
-  
+
   list->hide();
   list->clear();
   for(i=0,k=0;i<256;i++){
@@ -122,19 +134,13 @@ void ResourcesWin::select_resource_type( int ResType )
   ResourceNum = k;
   list->show();
   first=true;
-  if(preview){
-    preview->clear();
-    preview->setCaption("Preview");
-  }
-
 }
 
 //********************************************************
 void ResourcesWin::highlight_resource( int k )
 {
-
   /*
-  if(first && (list->currentItem()==0) && (list->count()>1)){  
+  if(first && (list->currentItem()==0) && (list->count()>1)){
 //QT bug ? when nothing is highlighted and then the user highlights an item,
 //this slot is called twice, the 1st time with item 0
     first=false;
@@ -150,17 +156,16 @@ void ResourcesWin::highlight_resource( int k )
   str.sprintf("%d bytes",size);
   msg->setText(str);
 
+  if(preview==NULL)
+    preview = new Preview(previewPane,0,this);
 
-  if(preview==NULL){
-    int n;
-    if((n=get_win())==-1)return;
-    preview = new Preview(0,0,this,n);    
-    winlist[n].type=PREVIEW;
-    winlist[n].w.pr=preview;
-  }
   preview->open(i,selected);
+  preview->show();
 
-  
+  //preview->adjustSize();
+  //previewPane->adjustSize();
+  //repaint();
+  //adjustSize();
 }
 //********************************************************
 void ResourcesWin::select_resource( int k )
@@ -187,7 +192,7 @@ void ResourcesWin::select_resource( int k )
     winlist[n].w.p->open(i);
     break;
   case VIEW:
-    winlist[n].w.v = new ViewEdit(NULL,NULL,n); 
+    winlist[n].w.v = new ViewEdit(NULL,NULL,n);
     winlist[n].type=VIEW;
     winlist[n].w.v->open(i);
     break;
@@ -410,7 +415,7 @@ void ResourcesWin::extract_all_resource()
 void ResourcesWin::add_resource()
 {
 
-  QFileDialog *f = new QFileDialog(0,"Add resource",true);  
+  QFileDialog *f = new QFileDialog(0,"Add resource",true);
 
   static char *types[6] = {"logic*.*","picture*.*","view*.*","sound*.*","All files (*)",NULL};
 
@@ -467,20 +472,20 @@ AddResource::AddResource( QWidget *parent, const char *nam ,ResourcesWin *res )
   resources_win = res;
   setCaption("Add resource");
   QBoxLayout *box = new QVBoxLayout(this,10);
-  
+
   filename = new QLabel("Filename:",this);
   filename->setAutoResize(true);
   box->addWidget(filename);
-  
+
   QBoxLayout *box0 = new QHBoxLayout(box,4);
-  
+
   QLabel *lname = new QLabel("Name of resource:",this);
   box0->addWidget(lname);
-  
+
   name = new QLabel("",this);
   name->setAutoResize(true);
   box0->addWidget(name);
-  
+
   type = new QButtonGroup(4,Horizontal,"Type",this);
   type->setExclusive(true);
   QRadioButton *logic = new QRadioButton(type);
@@ -488,36 +493,36 @@ AddResource::AddResource( QWidget *parent, const char *nam ,ResourcesWin *res )
   logic->setChecked(true);
   restype=0;
   QRadioButton *picture = new QRadioButton(type);
-  picture->setText("PICTURE");    
+  picture->setText("PICTURE");
   QRadioButton *view = new QRadioButton(type);
-  view->setText("VIEW");    
+  view->setText("VIEW");
   QRadioButton *sound = new QRadioButton(type);
-  sound->setText("SOUND");    
-  
+  sound->setText("SOUND");
+
   connect( type, SIGNAL(clicked(int)), SLOT(select_type(int)) );
-  
+
   box->addWidget(type);
-  
+
   QBoxLayout *box1 = new QHBoxLayout(box,10);
-  
+
   QLabel *lnumber = new QLabel("Number: [0-255]",this);
   box1->addWidget(lnumber);
-  
+
   number = new QLineEdit(this);
   number->setMinimumWidth(60);
   connect( number, SIGNAL(textChanged(const QString &)), SLOT(edit_cb(const QString &)) );
   box1->addWidget(number);
-  
-  QBoxLayout *box2 = new QHBoxLayout(box,40);    
-  
+
+  QBoxLayout *box2 = new QHBoxLayout(box,40);
+
   QPushButton *ok = new QPushButton("OK",this);
   connect( ok, SIGNAL(clicked()), SLOT(ok_cb()) );
   box2->addWidget(ok);
-  
+
   QPushButton *cancel = new QPushButton("Cancel",this);
   connect( cancel, SIGNAL(clicked()), SLOT(cancel_cb()) );
   box2->addWidget(cancel);
-  
+
 }
 
 //**********************************************
@@ -527,7 +532,7 @@ void AddResource::open(char *file_name)
 
   file = string(file_name);
   if((ptr = strrchr(file_name,'/'))==NULL)ptr=file_name;
-  else ptr++; 
+  else ptr++;
   sprintf(tmp,"Filename: %s",ptr);
   filename->setText(tmp);
   if(!strncasecmp(ptr,"logic",5)){
@@ -548,7 +553,7 @@ void AddResource::open(char *file_name)
   }
 
   select_type(restype);
-  show(); 
+  show();
 
 }
 
@@ -651,7 +656,7 @@ void AddResource::ok_cb()
       if( resources_win->selected == restype)
         resources_win->select_resource_type(restype);
     }
-  }  
+  }
   hide();
 
 }
@@ -674,6 +679,6 @@ void AddResource::select_type(int type)
 
   sprintf(tmp,"%s.%d",ResTypeName[restype],num);
   name->setText(tmp);
-  
+
 }
 

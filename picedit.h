@@ -125,6 +125,7 @@ public:
     QRadioButton *line,*step,*pen,*fill,*brush;
     QRadioButton *pic,*pri;
     QStatusBar *status;
+    QWidget *pricolor;
     QCheckBox *bg,*prilines;
     ResourcesWin *resources_win;
     bool changed;

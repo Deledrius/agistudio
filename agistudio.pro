@@ -1,7 +1,8 @@
 TEMPLATE = app
-#CONFIG	 = qt warn_on release
-CONFIG  = qt warn_on  debug
-DEFINES += QT_DLL QT_THREAD_SUPPORT
+#CONFIG	 = qt warn_on release thread
+CONFIG  = qt warn_on debug thread
+# DEFINES += QT_DLL QT_THREAD_SUPPORT # win32
+INCLUDEPATH=/usr/include/qt3
 HEADERS	 = agicommands.h \
 		dir.h \
 		game.h \
@@ -26,7 +27,7 @@ HEADERS	 = agicommands.h \
 		wordsedit.h \
 		wutil.h 
 SOURCES  = agicommands.cpp \
-                agiplay.cpp \
+		agiplay.cpp \
 		bpicture.cpp \
 		dir.cpp \
 		game.cpp \

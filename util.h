@@ -25,6 +25,7 @@
 #define UTIL_H
 
 #include <string>
+using namespace std;
 
 #include "global.h"
 

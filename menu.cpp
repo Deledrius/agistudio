@@ -56,7 +56,6 @@
 #ifdef IMGEXT
 #include <qimageio.h>
 #endif
-#include <qwindowsstyle.h>
 #include <qstylesheet.h>
 
 #include "toolbar_open.xpm"
@@ -80,7 +79,6 @@ WinList winlist[MAXWIN];  //list of all open resource editor windows
 Menu::Menu( QWidget *parent, const char *name )
     : QMainWindow( parent, name )
 {
-
   int n=0;
 
 #ifdef _WIN32
@@ -89,7 +87,6 @@ Menu::Menu( QWidget *parent, const char *name )
   setCaption("Linux AGI Studio 1.0");
 #endif
 
-  setFixedSize(400,100);
   QPopupMenu *new_game = new QPopupMenu( this );
   CHECK_PTR( new_game );
 
@@ -213,6 +210,7 @@ Menu::Menu( QWidget *parent, const char *name )
   status = new QStatusBar(this);
   QLabel *msg = new QLabel( status, "message" );
   status->addWidget( msg, 4 );
+  status->setSizeGripEnabled(false);
 
   err = new QMessageBox(NULL, "AGI Studio");
   err->setIcon(QMessageBox::Critical);
@@ -226,6 +224,8 @@ Menu::Menu( QWidget *parent, const char *name )
   disable();
 
   adjustSize();
+  setFixedSize(400,100);
+  setSizePolicy( QSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed ));
 
   for(int i=0;i<MAXWIN;i++){
     winlist[i].type=-1;
@@ -744,24 +744,45 @@ void Menu::sound_player()
 void Menu::help_contents()
   //from QT examples (qbrowser)
 {
-  
   sprintf(tmp,"%s/index.html",game->helpdir.c_str());
   if(helpwindow==NULL){
     int n;
     if((n=get_win())==-1)return;
     helpwindow = new HelpWindow(tmp,".");
     winlist[n].type=HELPWIN;
-    winlist[n].w.h=helpwindow;    
+    winlist[n].w.h=helpwindow;
   }
   else helpwindow->setSource(tmp);
   helpwindow->show();
+}
 
+//**********************************************
+bool Menu::help_topic( const QString& topic )
+{
+  sprintf(tmp,"%s/%s.html",game->helpdir.c_str(),
+    QString(topic).replace(".", "_").latin1());
+
+  if ( QFile( tmp ).exists())
+  {
+    if(helpwindow1==NULL){
+      int n;
+      if((n=get_win())==-1) return true;
+      helpwindow1 = new HelpWindow(tmp,".");
+      winlist[n].type=HELPWIN;
+      winlist[n].w.h=helpwindow1;
+    }
+    else helpwindow1->setSource(tmp);
+    helpwindow1->show();
+    helpwindow1->raise();
+    return true;
+  }
+  else
+    return false;
 }
 
 //**********************************************
 void Menu::help_index()
 {
-
   sprintf(tmp,"%s/indexabc.html",game->helpdir.c_str());
   if(helpwindow1==NULL){
     int n;
@@ -772,12 +793,11 @@ void Menu::help_index()
   }
   else helpwindow1->setSource(tmp);
   helpwindow1->show();
-
 }
 
 //**********************************************
 void Menu::about_it()
-{  
+{
   if(about==NULL)about=new About();
   about->show();
 }

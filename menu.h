@@ -124,6 +124,7 @@ public:
 
       void help_contents(void);
       void help_index(void);
+      bool help_topic( const QString& topic );
       void about_it(void);
       void about_qt(void);
       void closeEvent( QCloseEvent *e );
