@@ -1,22 +1,11 @@
-Release notes for QT AGI Studio v1.1 (Apr 2003)
+Release notes for QT AGI Studio version x.y (zzz 200x)
 
 - new features:
- * logedit: AGI specification compliant syntax highlighting
- * logedit: AGI command detection and context sensitive help with F1
- * logedit: search now selects the text
- * logedit: Ctrl-S (for us neurotic programmers)
- * picedit: priority "color" display for easier mask editing
- * resources: preview for logic code
- * support for QT 3.1
- * support for Win32 (there are currently licensing problems,
-   though, see COPYING for details)
+ * module-name: xyz
 
 - bug fixes:
- * logic compiler: broken comment support
- * logic compiler: broken whitespace support
- * resources: annoying preview popups (now embedded to the
-   resource windows)
- * some smaller usability annoyances
+ * module-name: xyz
 
 - other:
- * changed project name to QT AGI Studio & made a new logo
+ * printable picture template for drafting AGI pictures
+   with a pencil
