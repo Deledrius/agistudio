@@ -49,6 +49,7 @@
 
 #include <qprogressdialog.h>
 #include <qmessagebox.h>
+#include <qdir.h>
 
 const char *ResTypeName[4] = {"logic","picture","view","sound"};
 const char *ResTypeAbbrv[4] = {"log","pic","view","snd"};
@@ -883,7 +884,7 @@ int Game::DeleteResource(int ResType,int ResNum)
 int Game::RebuildVOLfiles()
 {
   int step=0,steps=0;
-  int i,ResType,ResNum,VolFileNum;
+  int ResType,ResNum,VolFileNum;
   byte b=0xff,byte1,byte2,byte3;
   FILE *dirf=NULL,*fptr;
   byte ResHeader[7];
@@ -897,8 +898,6 @@ int Game::RebuildVOLfiles()
 #ifdef _WIN32
   struct _finddata_t c_file;
   long hFile;
-#else
-  glob_t globbuf;
 #endif
   char volname[8]="vol";
 
@@ -1056,55 +1055,22 @@ int Game::RebuildVOLfiles()
     }
   }
 
-  char *tmp2 = (char *)(malloc(256));
+  QDir d( dir.c_str());
 
-  sprintf(tmp,"%s/%s.?",dir.c_str(),volname);
-#ifdef _WIN32
-  if ((hFile = _findfirst(tmp, &c_file)) != -1L) do {
-    sprintf(tmp2,"%s/%s",dir.c_str(),c_file.name);
-    if (_unlink(tmp2)) break;
-  } while (_findnext(hFile, &c_file));
-  _findclose(hFile);
-#else
-  glob(tmp, 0, NULL, &globbuf);
-#endif
-  sprintf(tmp,"%s/%s.??",dir.c_str(),volname);
-#ifdef _WIN32
-  if ((hFile = _findfirst(tmp, &c_file)) != -1L) do {
-    sprintf(tmp2,"%s/%s",dir.c_str(),c_file.name);
-    _unlink(tmp2);
-  } while (_findnext(hFile, &c_file));
-  _findclose(hFile);
-#else
-  glob(tmp, GLOB_APPEND, NULL, &globbuf);
-  for(i=0;i<(int)globbuf.gl_pathc;i++){
-    unlink(globbuf.gl_pathv[i]);
+  // Delete old VOLs...
+  QStringList list = d.entryList(
+    QString(volname) + ".?;" + QString(volname) + ".??" );
+  for ( QStringList::Iterator it = list.begin(); it != list.end(); ++it )
+        d.remove( *it );
+
+  // ...and replace them with the new ones:
+  list = d.entryList( QString(volname) + ".*.new" );
+  for ( QStringList::Iterator it = list.begin(); it != list.end(); ++it )
+  {
+    QString new_name = *it;
+    new_name.replace(".new", "");
+    d.rename( *it, new_name );
   }
-  globfree(&globbuf);
-#endif
-
-  sprintf(tmp,"%s/%s.*.new",dir.c_str(),volname);
-#ifdef _WIN32
-  if ((hFile = _findfirst(tmp, &c_file)) != -1L) do {
-    sprintf(tmp2,"%s/%s",dir.c_str(),c_file.name);
-#else
-  glob(tmp, 0, NULL, &globbuf);
-  for(i=0;i<(int)globbuf.gl_pathc;i++){
-    tmp2 = globbuf.gl_pathv[i];
-#endif
-    strcpy(tmp,tmp2);
-    char *ptr=strstr(tmp,".new");
-    *ptr=0;
-    rename(tmp2,tmp);
-#ifdef _WIN32
-  } while (_findnext(hFile, &c_file) == 0);
-  _findclose(hFile);
-#else
-  }
-  globfree(&globbuf);
-#endif
-
-  free(tmp2);
 
   memcpy(ResourceInfo,NewResourceInfo,sizeof(ResourceInfo));  
   QMessageBox::information( menu, "AGI studio","Rebuilding is complete !");
