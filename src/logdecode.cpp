@@ -184,11 +184,6 @@ int Logic::FindLabels_ReadIfs(void)
       BlockDepth++;
       BlockIsIf[BlockDepth] = true;
       BlockLength[BlockDepth] = ReadLSMSWord();
-      if (BlockLength[BlockDepth] == 0){
-        ErrorList.append("Encountered command block of length 0.\n");
-        ErrorOccured=true;
-        break;
-      } 
       BlockEnd[BlockDepth] = BlockLength[BlockDepth] + ResPos;
       if (BlockEnd[BlockDepth] > BlockEnd[BlockDepth-1]){
         sprintf(tmp,"Block too long (%d bytes longer than rest of previous block)",BlockEnd[BlockDepth]-BlockEnd[BlockDepth-1]);
@@ -210,16 +205,7 @@ void Logic::AddBlockEnds(void)
 {
   for(int CurBlock = BlockDepth;CurBlock>=1;CurBlock--){
     if (BlockEnd[CurBlock] <= ResPos){
-      //printf("BlockLength[%d]=%d\n",CurBlock,BlockLength[CurBlock]);
-      if(BlockLength[CurBlock]==0){  //erase empty else block
-        unsigned int n = OutputText.rfind("else {\n");
-        OutputText.erase(n,7);
-        unsigned int pos = OutputText.find_last_not_of(" ");
-        if(pos+1<OutputText.length())OutputText.erase(pos+1);
-      }
-      else{
         OutputText.append(MultStr("  ",CurBlock-1)+"}\n");
-      }
       BlockDepth--;
     }
   }

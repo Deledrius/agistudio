@@ -223,18 +223,20 @@ CommandStruct AGICommand[182] = {
  { "div.n",  2, { atVar,atNum,0,0,0,0,0 } },
  { "div.v",  2, { atVar,atVar,0,0,0,0,0 } },
  { "close.window",  0, { 0,0,0,0,0,0,0 } },
- { "unknown170",  1, { 0,0,0,0,0,0,0 } },
- { "unknown171",  0, { 0,0,0,0,0,0,0 } },
- { "unknown172",  0, { 0,0,0,0,0,0,0 } },
- { "unknown173",  0, { 0,0,0,0,0,0,0 } },
- { "unknown174",  1, { 0,0,0,0,0,0,0 } },
- { "unknown175",  1, { 0,0,0,0,0,0,0 } },
- { "unknown176",  0, { 0,0,0,0,0,0,0 } },   // 1 arg for 3.002.086
- { "unknown177",  1, { 0,0,0,0,0,0,0 } },
- { "unknown178",  0, { 0,0,0,0,0,0,0 } },
- { "unknown179",  4, { 0,0,0,0,0,0,0 } },
- { "unknown180",  2, { 0,0,0,0,0,0,0 } },
- { "unknown181",  0, { 0,0,0,0,0,0,0 } }
+
+ // The formerly unknown commands
+ { "set.simple", 1, {0,0,0,0,0,0,0 } },    // unknown 170
+ { "push.script", 0, {0,0,0,0,0,0,0 } },   // unknown 171
+ { "pop.script", 0, {0,0,0,0,0,0,0 } },    // unknown 172
+ { "hold.key", 0, {0,0,0,0,0,0,0 } },      // unknown 173
+ { "set.pri.base", 1, {0,0,0,0,0,0,0 } },  // unknown 174
+ { "discard.sound", 1, {0,0,0,0,0,0,0 } }, // unknown 175
+ { "hide.mouse", 0, {0,0,0,0,0,0,0 } },    // unknown 176 - 1 arg for 3.002.086
+ { "allow.menu", 1, {0,0,0,0,0,0,0 } },    // unknown 177
+ { "show.mouse", 0, {0,0,0,0,0,0,0 } },    // unknown 178
+ { "fence.mouse", 4, {0,0,0,0,0,0,0 } },   // unknown 179
+ { "mouse.posn", 2, {0,0,0,0,0,0,0 } },    // unknown 180
+ { "release.key", 0, {0,0,0,0,0,0,0 } }    // unknown 181
 };
 
 

@@ -1,10 +1,11 @@
 Release notes for QT AGI Studio version x.y (zzz 200x)
 
 - new features:
- * module-name: xyz
+ * logic editor: line number display
 
 - bug fixes:
- * module-name: xyz
+ * compiler: support for new AGI commands and empty blocks
+   to make LSL1 (de)compilable
 
 - other:
  * printable picture template for drafting AGI pictures

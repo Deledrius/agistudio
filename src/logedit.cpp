@@ -301,6 +301,9 @@ LogEdit::LogEdit( QWidget *parent, const char *name, int win_num, ResourcesWin *
     QLabel *msg = new QLabel( status, "message" );
     status->addWidget( msg, 4 );
     all->addWidget(status);
+
+    connect( editor, SIGNAL(cursorPositionChanged(int,int)),
+             this, SLOT(update_line_num(int,int)));
   }
 
   getmaxcol();
@@ -910,10 +913,20 @@ void LogEdit::context_help()
     status->message("No help found for '" + word + "'", 2000);
 }
 
+//***********************************************
 void LogEdit::command_help()
 {
   menu->help_topic("commands_by_category");
 }
+
+//***********************************************
+void LogEdit::update_line_num( int para, int pos )
+{
+  QString str;
+  QTextOStream( &str ) << pos << ", " << para;
+  status->message(str);
+}
+
 
 //*******************************************************
 TextEdit::TextEdit( QWidget *parent, const char *name,int win_num)

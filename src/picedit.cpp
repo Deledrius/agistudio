@@ -912,8 +912,9 @@ void PCanvas::viewportMousePressEvent(QMouseEvent* event)
       picedit->show_pos();
   }  
   else if (event->button() & RightButton){    
+    /*
     QRadioButton *b = (QRadioButton *)picedit->tool->selected();
-    /*    if(b!=0)b->setChecked(false);    
+        if(b!=0)b->setChecked(false);
     picture->clear_tools();
     picture->tool = -1;
     */

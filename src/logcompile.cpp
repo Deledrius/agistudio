@@ -1227,8 +1227,8 @@ int Logic::CompileCommands()
         if(BlockDepth==0)
               ShowError(CurLine,"'}' not at end of any command blocks.");
         else{
-          if (ResPos == BlockStartDataLoc[BlockDepth] + 2)
-                ShowError(CurLine,"Command block must contain at least one command.");                      
+//          if (ResPos == BlockStartDataLoc[BlockDepth] + 2)
+//                ShowError(CurLine,"Command block must contain at least one command.");
           BlockLength[BlockDepth] = ResPos-BlockStartDataLoc[BlockDepth]-2;
           WriteByteAtLoc(BlockLength[BlockDepth] & 0xff,BlockStartDataLoc[BlockDepth]);
           WriteByteAtLoc((BlockLength[BlockDepth]>>8)&0xff,BlockStartDataLoc[BlockDepth]+1);
