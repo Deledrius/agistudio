@@ -1,3 +1,25 @@
+agistudio (1.2.1-2) unstable; urgency=low
+
+  * Fixed some bad code that crashed GCC 3.3 on Alpha
+    (Thanks to Riku Voipio for notifying me about the
+    problem and to Falk Hueffner for pointing out the reason)
+
+  * Updated an URL in documentation as requested by Juha Terho
+
+  * Cleaned up some compiler warnings
+
+  * Changed the package format to 'native' since I'm also
+    the upstream author and even maintain the debian/
+    directory in upstream CVS
+
+  * Changed Section to 'devel' - Agistudio is neither a
+    game nor a generic X11 application
+
+  * Changed build options for tmake to generate a
+    release version (-O2, most notably) instead of debug
+
+ -- Jarno Elonen <elonen@iki.fi>  Fri,  5 Sep 2003 22:15:43 +0300
+
 agistudio (1.2.1-1) unstable; urgency=low
 
   * New upstream release.

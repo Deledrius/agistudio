@@ -1,5 +1,5 @@
 Source: agistudio
-Section: x11
+Section: devel
 Priority: optional
 Maintainer: Jarno Elonen <elonen@iki.fi>
 Build-Depends: debhelper (>= 4.0.0), tmake, libqt3-mt-dev
