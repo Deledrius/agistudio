@@ -2,7 +2,7 @@ Source: agistudio
 Section: x11
 Priority: optional
 Maintainer: Jarno Elonen <elonen@iki.fi>
-Build-Depends: debhelper (>> 3.0.0), tmake
+Build-Depends: debhelper (>> 3.0.0), tmake, libqt3-mt-dev
 Standards-Version: 3.5.9
 
 Package: agistudio
