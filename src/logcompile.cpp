@@ -755,9 +755,9 @@ void Logic::ReadArgs(bool CommandIsIf, byte CmdNum)
         }
       }// argument is inventory object and given as string
       else{ //normal argument
-        ThisArgTypePrefix = (char *)ArgTypePrefix[ThisCommand.argTypes[CurArg]];
+        ThisArgTypePrefix = (char *)ArgTypePrefix[(int)ThisCommand.argTypes[CurArg]];
         if(UseTypeChecking && (strcmp(LowerCaseArgText.substr(0,strlen(ThisArgTypePrefix)).c_str(),ThisArgTypePrefix))){
-          ShowError(CurLine,"Invalid or unknown argument type for argument "+IntToStr(CurArg)+" (should be a "+ArgTypeName[ThisCommand.argTypes[CurArg]]+").");
+          ShowError(CurLine,"Invalid or unknown argument type for argument "+IntToStr(CurArg)+" (should be a "+ArgTypeName[(int)ThisCommand.argTypes[CurArg]]+").");
         }
         else{
           if (UseTypeChecking)ArgTextPos+=strlen(ThisArgTypePrefix);

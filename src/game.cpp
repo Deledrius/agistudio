@@ -573,11 +573,12 @@ double Game::GetAGIVersionNumber(void)
 } 
 
 //***************************************
-int Game::GetResourceSize(char ResType,int ResNum)
+int Game::GetResourceSize(char ResType_c,int ResNum)
 {
   byte lsbyte,msbyte;
+  int ResType = ResType_c;
 
-  if(ResourceInfo[ResType][ResNum].Exists){    
+  if(ResourceInfo[ResType][ResNum].Exists){
     sprintf(tmp,"%s/%s",dir.c_str(),ResourceInfo[ResType][ResNum].Filename);
     FILE *fptr=fopen(tmp,"rb");
     if(fptr!=NULL){
@@ -602,16 +603,16 @@ int Game::GetResourceSize(char ResType,int ResNum)
 }
 
 //***************************************
-int Game::ReadResource(char ResType, int ResNum)
+int Game::ReadResource(char ResType_c, int ResNum)
   //read a resource number ResNum from the vol file
 {
-
   byte msbyte,lsbyte;
-  
+  int ResType = (int)ResType_c;
+
   if(isV3){
     return ReadV3Resource(ResType,ResNum);
   }
-  
+
   sprintf(tmp,"%s/%s",dir.c_str(),ResourceInfo[ResType][ResNum].Filename);
   FILE *fptr=fopen(tmp,"rb");
   if(fptr==NULL){
@@ -1275,12 +1276,13 @@ static void DecompressPicture(byte *picBuf,byte *outBuf,int picLen,int *outLen)
   *outLen = int(out - outBuf);
 }
 //***********************************************
-int Game::ReadV3Resource(char ResourceType1,int ResourceID1)
+int Game::ReadV3Resource(char ResourceType1_c, int ResourceID1)
 {
-  
+
   byte msbyte,lsbyte;
   bool ResourceIsPicture;
   byte VolNumByte;
+  int ResourceType1 = (int)ResourceType1_c;
 
   if(CompressedResource.Data==NULL)
     CompressedResource.Data=(byte *)malloc(MaxResourceSize);

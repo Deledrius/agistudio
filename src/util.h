@@ -46,7 +46,7 @@ class TStringList
   void del(int);
   void replace(int n,char *str);
   void replace(int n,string str);
-  string at(int);
+  string at(int) const;
   int num;
   string *data;
   int max;

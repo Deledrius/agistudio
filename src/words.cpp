@@ -480,26 +480,26 @@ int WordList::GroupIndexOfWord(string word)
 
 
 //************************************************************
-void WordList::merge(WordList NewWordList)
+void WordList::merge(const WordList& NewWordList)
 {
   int CurIndex,CurWord,GroupIndex,NumWordsAdded,GroupIndexOfExistingWord;
   string ThisWord;
-  
+
   WhatToDoWithExistingWords = AskUser;
 
   if(NewWordList.NumGroups==0)return;
   NumWordsAdded = 0;
   for (CurIndex = 0;CurIndex<NewWordList.NumGroups;CurIndex++){
-    if (!GroupExists(NewWordList.WordGroup[CurIndex].GroupNum)) 
+    if (!GroupExists(NewWordList.WordGroup[CurIndex].GroupNum))
       InsertWordGroup(NewWordList.WordGroup[CurIndex].GroupNum);
     GroupIndex = GetWordGroupIndex(NewWordList.WordGroup[CurIndex].GroupNum);
     if (GroupIndex >= 0 && NewWordList.WordGroup[CurIndex].Words.num > 0){
       for (CurWord= 0;CurWord<NewWordList.WordGroup[CurIndex].Words.num;CurWord++){
         GroupIndexOfExistingWord = GroupIndexOfWord(NewWordList.WordGroup[CurIndex].Words.at(CurWord));
         if ((GroupIndexOfExistingWord < 0) || ((GroupIndexOfExistingWord >= 0) && (OKToReplaceWord(NewWordList.WordGroup[CurIndex].Words.at(CurWord),WordGroup[GroupIndexOfExistingWord].GroupNum,WordGroup[GroupIndex].GroupNum)))){
-          
+
           delete_word((char *)NewWordList.WordGroup[CurIndex].Words.at(CurWord).c_str(),GroupIndexOfExistingWord);
-          WordGroup[GroupIndex].Words.addsorted(NewWordList.WordGroup[CurIndex].Words.at(CurWord));          
+          WordGroup[GroupIndex].Words.addsorted(NewWordList.WordGroup[CurIndex].Words.at(CurWord));
           NumWordsAdded++;
         }        
       } 

@@ -37,7 +37,7 @@ class WordList
   WordList();
   TWordGroup WordGroup[MaxWordGroups];
   int NumGroups;
-  bool WhatToDoWithExistingWords;
+  char WhatToDoWithExistingWords;
   void clear();  
   int read(char *filename);
   int save(char *filename);
@@ -47,7 +47,7 @@ class WordList
   int change_number(int oldnum, int newnum);
   int GetWordGroupIndex(int GroupNum);
   int GetNew_GroupIndex(int GroupNum);
-  void merge(WordList w);
+  void merge(const WordList& w);
   int GroupIndexOfWord(string word);
   bool OKToReplaceWord(string TheWord,int OldGroupNum, int NewGroupNum);
   bool InsertWordGroup(int GroupNum);
