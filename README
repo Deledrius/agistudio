@@ -9,10 +9,9 @@ Sierra On-Line(tm) to create some of their early games. QT AGI Studio
 view, create and edit AGI games. Basically, it is an enhanced port of
 the Windows AGI Studio developed by Peter Kelly.
 
-It has currently been succesfully compiled on Linux and Win32, but
-contains very little platform specific code so brave ones are
-encouraged to try it on other operating systems that the
-QT library support.
+The program contains very little platform specific code so brave ones
+are encouraged to try it on other operating systems that the QT
+library support
 
 
 Availability
@@ -20,45 +19,45 @@ Availability
 
 QT AGI Studio is available at http://agistudio.sourceforge.net/
 The project is licensed under the GPL, GNU General Public License.
-See COPYING for details. As a special exception, linking with
-the non-commercial Windows version of QT is explicitly permitted
-even though it is not GPL compatible.
+See COPYING for details.
 
 
 System requirements
 ===================
 
 Linux:  GNU make, g++, X Window System, QT library
-Win32: Visual C++ 6.0, QT library free edition
 
 The program is now being developed with QT version 3.1
 
 NAGI or Sarien AGI interpreter is recommended to run games.
 Sarien is available at http://sarien.sourceforge.net/
 and NAGI at http://www.agidev.com/nagi.html
-
 Sarien is more focused on portability and NAGI on compatibility
 with Sierra's original AGI interpreter. Both are free.
+
+WINDOWS NOTE: Since there is currently no GPL compatible
+version of native QT 3 library for Windows (a version which
+requires Cygwin XFree86 port exists), there is no way to
+legally compile the program as a native Windows application
+(the Cygwin XF86 currently traps all X applications inside a
+giant "desktop window"). If we can reach all the people who
+have contributed to the project, we will later make a new release
+with a license that explicitly permits linking with non-free
+versions of QT.
 
 
 Building
 ========
 
-Linux (and other posix compatibles):
+Run "make" in the src subdirectory. If the supplied Makefile doesn't work,
+you can either fix it or use tmake to generate a makefile for your platform:
 
-  Run "make" in the src subdirectory. If the supplied Makefile doesn't work,
-  you can either fix it or use tmake to generate a makefile for your platform:
+ tmake agistudio.pro -o Makefile
 
-  tmake agistudio.pro -o Makefile
+If you don't have tmake, you can download it at http://www.trolltech.com
 
-  If you don't have tmake, you can download it at http://www.trolltech.com
-
-  Make assumes that QT is installed and working (in particular, the QTDIR
-  environment variable is properly set)
-
-Win32:
-
-  Use the Developer Studio project files.
+Make assumes that QT is installed and working (in particular, the QTDIR
+environment variable is properly set)
 
 
 Installation and setup

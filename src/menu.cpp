@@ -16,9 +16,6 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *  A special exception to the GNU General Public License is made for
- *  linking to a non-GPL library, specifically, the Windows version of
- *  Qt.  For more information on Qt, see www.trolltech.com.
  */
 
 #include "menu.h"
@@ -913,12 +910,7 @@ About::About(QWidget *parent, const char *name )
     "redistribute it and/or modify it under "
     "the terms of the GNU General Public "
     "License, version 2 or later, as published "
-    "by the Free Software Foundation."
-    "<br><br>"
-    "An exception to this license is made"
-    "for linking to a non-GPL library,"
-    "specifically the Windows non-commercial"
-    "version of Qt.");
+    "by the Free Software Foundation.");
   all->addWidget(about);
 
   QPushButton *ok = new QPushButton(this);

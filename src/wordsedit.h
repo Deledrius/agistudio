@@ -16,9 +16,6 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *  A special exception to the GNU General Public License is made for
- *  linking to a non-GPL library, specifically, the Windows version of
- *  Qt.  For more information on Qt, see www.trolltech.com.
  */
 
 

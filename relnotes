@@ -7,8 +7,9 @@ Release notes for QT AGI Studio v1.1 (Apr 2003)
  * logedit: Ctrl-S (for us neurotic programmers)
  * picedit: priority "color" display for easier mask editing
  * resources: preview for logic code
- * support for Win32
  * support for QT 3.1
+ * support for Win32 (there are currently licensing problems,
+   though, see COPYING for details)
 
 - bug fixes:
  * logic compiler: broken comment support
@@ -18,7 +19,4 @@ Release notes for QT AGI Studio v1.1 (Apr 2003)
  * some smaller usability annoyances
 
 - other:
- * changed project name to QT AGI Studio
- * new logo
- * explicitly permitted linking with non-commercial Windows QT,
-   even though the license is not GPL compatible
+ * changed project name to QT AGI Studio & made a new logo
