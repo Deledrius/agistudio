@@ -1,11 +1,34 @@
-QT AGI Studio was debianized by Jarno Elonen <elonen@iki.fi>
-from the sources downloaded from http://agistudio.sourceforge.net/
+QT AGI Studio was debianized by Jarno Elonen <elonen@iki.fi> in 2003
+from source files available at
 
-Upstream authors: Helen Zommer <helen@cc.huji.ac.il>,
-                  Jarno Elonen <elonen@iki.fi>
-                  Peter Kelly <ptrkelly@ozemail.com.au>
+  http://agistudio.sourceforge.net/
 
-QT AGI Studio is distritubed under the terms of the
+The packager places his own packaging works into the Public Domain
+and licenses those works that are modifications to existing
+copyrighted works (some packaging scripts, modified upstream
+sources etc.) under the same license as the original ones.
+
+
+Upstream authors:
+  Helen Zommer <helen@cc.huji.ac.il>
+  Jarno Elonen <elonen@iki.fi>
+  Claudio Matsuoka <claudio@helllabs.org>
+  Peter Kelly <ptrkelly@ozemail.com.au> (orig. Agistudio in Pascal)
+  Lance Ewing (the DOS Picedit)
+  Nat Budin <natb@brandeis.edu> (Win32 fixes)
+
+Upstream copyright:
+  2000, 2002, 2003 Helen Zommer
+  2003 Jarno Elonen
+  1999 Claudio Matsuoka
+  2000 Nat Budin
+
+  (Peter Kelly and Lance Ewing are not included in this
+   list since while a great part of the logic and ideas
+   are based on their work, QT Agistudio has been
+   completely rewritten for C++.)
+
+QT AGI Studio is distributed under the terms of the
 GNU General Public License.
 
 On Debian GNU/Linux system you can find a copy of GPL in
