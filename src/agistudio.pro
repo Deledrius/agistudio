@@ -1,6 +1,6 @@
 TEMPLATE = app
-#CONFIG	 = qt warn_on release thread
-CONFIG  = qt warn_on debug thread
+CONFIG	 = qt warn_on release thread
+#CONFIG  = qt warn_on debug thread
 # DEFINES += QT_DLL QT_THREAD_SUPPORT # win32
 INCLUDEPATH=/usr/include/qt3
 HEADERS	 = agicommands.h \

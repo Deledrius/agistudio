@@ -714,7 +714,7 @@ void Picture::save()
 //*************************************************
 void Picture::refill( struct picCodeNode *temp_fill_start, struct picCodeNode *temp_fill_end,int refmode)
 {
-   struct picCodeNode *temp,*picPos0,*temp_pic,*temp_pri;
+   struct picCodeNode *temp,*picPos0,*temp_pic=0,*temp_pri=0;
    int col_pic_orig,col_pri_orig,col_pic_new,col_pri_new;
    bool picDrawEnabled_orig,priDrawEnabled_orig;
    bool picDrawEnabled_new,priDrawEnabled_new;
