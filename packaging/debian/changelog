@@ -1,3 +1,33 @@
+agistudio (1.2.2-1) unstable; urgency=low
+
+  * New upstream release. (Closes: #358291) 
+
+ -- Jarno Elonen <elonen@debian.org>  Thu,  22 Mar 2006 21:53:23 +0300
+
+agistudio (1.2.1-5) unstable; urgency=low
+
+  * QT ABI transition
+
+ -- Jarno Elonen <elonen@debian.org>  Thu,  1 Sep 2005 22:24:15 +0300
+
+agistudio (1.2.1-4) unstable; urgency=low
+
+  * Added a watch file
+
+  * REALLY changed maintainer email address
+
+  * Moved menu pixmap away from /usr/X11
+
+ -- Jarno Elonen <elonen@debian.org>  Sun, 10 Oct 2004 03:01:09 +0300
+
+agistudio (1.2.1-3) unstable; urgency=low
+
+  * Copyrights update
+  * Changed maintainer email address
+  * Updated 'Section' to match the override file
+
+ -- Jarno Elonen <elonen@debian.org>  Fri, 16 Jan 2004 11:01:47 +0200
+
 agistudio (1.2.1-2) unstable; urgency=low
 
   * Fixed some bad code that crashed GCC 3.3 on Alpha
@@ -8,17 +38,13 @@ agistudio (1.2.1-2) unstable; urgency=low
 
   * Cleaned up some compiler warnings
 
-  * Changed the package format to 'native' since I'm also
-    the upstream author and even maintain the debian/
-    directory in upstream CVS
-
   * Changed Section to 'devel' - Agistudio is neither a
     game nor a generic X11 application
 
   * Changed build options for tmake to generate a
     release version (-O2, most notably) instead of debug
 
- -- Jarno Elonen <elonen@iki.fi>  Fri,  5 Sep 2003 22:15:43 +0300
+ -- Jarno Elonen <elonen@iki.fi>  Thu,  11 Sep 2003 19:57:00 +0300
 
 agistudio (1.2.1-1) unstable; urgency=low
 

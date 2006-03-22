@@ -1,9 +1,9 @@
 Source: agistudio
-Section: devel
+Section: x11
 Priority: optional
-Maintainer: Jarno Elonen <elonen@iki.fi>
+Maintainer: Jarno Elonen <elonen@debian.org>
 Build-Depends: debhelper (>= 4.0.0), tmake, libqt3-mt-dev
-Standards-Version: 3.6.0
+Standards-Version: 3.6.1.1
 
 Package: agistudio
 Architecture: any

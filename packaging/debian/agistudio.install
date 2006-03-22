@@ -1,4 +1,4 @@
 src/agistudio		usr/bin
 help			usr/share/agistudio
 template		usr/share/agistudio
-debian/agistudio.xpm	usr/X11R6/include/X11/pixmaps
+debian/agistudio.xpm	usr/share/agistudio

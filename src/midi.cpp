@@ -266,7 +266,7 @@ void showSaveAsMidi( QWidget* parent, const byte* snd )
   class MyFileDialog : public QFileDialog
   {
   public:
-    MyFileDialog::MyFileDialog( QWidget* parent, const char* name ) :
+    MyFileDialog( QWidget* parent, const char* name ) :
         QFileDialog( parent, name )
     {
         QLabel* label = new QLabel( "Channel instruments", this );

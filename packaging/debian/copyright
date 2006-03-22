@@ -3,12 +3,6 @@ from source files available at
 
   http://agistudio.sourceforge.net/
 
-The packager places his own packaging works into the Public Domain
-and licenses those works that are modifications to existing
-copyrighted works (some packaging scripts, modified upstream
-sources etc.) under the same license as the original ones.
-
-
 Upstream authors:
   Helen Zommer <helen@cc.huji.ac.il>
   Jarno Elonen <elonen@iki.fi>
@@ -26,10 +20,16 @@ Upstream copyright:
   (Peter Kelly and Lance Ewing are not included in this
    list since while a great part of the logic and ideas
    are based on their work, QT Agistudio has been
-   completely rewritten for C++.)
+   rewritten in C++.)
 
 QT AGI Studio is distributed under the terms of the
 GNU General Public License.
 
 On Debian GNU/Linux system you can find a copy of GPL in
 /usr/share/common-licenses/GPL'
+
+
+The packager has placed his own packaging works into the Public
+Domain and licenses those works that are modifications to existing
+copyrighted works (some packaging scripts, modified upstream
+sources etc.) under the same license as the original ones.
