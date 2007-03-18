@@ -1,3 +1,9 @@
+agistudio (1.2.3-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Jarno Elonen <elonen@debian.org>  Thu,  18 Mar 2007 02:25:02 +0300
+
 agistudio (1.2.2-1) unstable; urgency=low
 
   * New upstream release. (Closes: #358291) 

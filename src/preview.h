@@ -54,7 +54,7 @@ public:
     void update();
     void show_description();
  protected:
-    void paintEvent(QPaintEvent *);  
+    void paintEvent(QPaintEvent *);
 };
 
 //****************************************************
@@ -66,11 +66,11 @@ public:
     Preview *preview;
     BPicture *ppicture;
     QPixmap pixmap;
-    int drawing_mode;    
+    int drawing_mode;
     void draw(int ResNum);
     void update();
  protected:
-    void paintEvent(QPaintEvent *);  
+    void paintEvent(QPaintEvent *);
 
 };
 
@@ -97,27 +97,29 @@ public slots:
     void next_cel_cycle(void);
     void showlooppar();
     void showcelpar();
+    void save_image( QPixmap& img, const char* format );
     void save_pic();
+    void save_view();
     void export_resource();
     void animate_cb();
  protected:
-    QComboBox *formats;
+    QComboBox *formats_pic, *formats_view;
     QWidget *w_logic,*w_sound;
     QWidget *w_picture;
 
     LogEdit *p_logic;
     PreviewPicture *p_picture;
     QRadioButton *visual,*priority;
-    QPushButton *save;
+    QPushButton *save_pic_butt, *save_view_butt;
     QWidget *w_view;
-    PreviewView *p_view;    
+    PreviewView *p_view;
     QPushButton *loopleft,*loopright,*celleft,*celright;
     QLabel *loopnum,*celnum;
     Animate *animate;
     void deinit();
     void closeEvent( QCloseEvent * );
     void showEvent(  QShowEvent * );
-    void hideEvent(  QHideEvent * );  
+    void hideEvent(  QHideEvent * );
 };
 
 

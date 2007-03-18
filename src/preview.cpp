@@ -70,17 +70,17 @@ Preview::Preview( QWidget* parent, const char*  name ,ResourcesWin *res ):
   QBoxLayout *d1 =  new QVBoxLayout(w_sound, 5);
   QLabel *l1 = new QLabel("Preview is not available !\nDouble-click to listen.\nOr click the 'Listen' button.",w_sound,0);
   d1->addWidget(l1);
-  
+
   QPushButton *listen = new QPushButton("Listen",w_sound);
   listen->setMaximumSize(120,60);
   connect(listen,SIGNAL(clicked()),SLOT(double_click()));
   d1->addWidget(listen);
-  
+
   QPushButton *save_as_midi = new QPushButton("Save as MIDI",w_sound);
   save_as_midi->setMaximumSize(120,60);
   connect(save_as_midi,SIGNAL(clicked()),SLOT(export_resource()));
   d1->addWidget(save_as_midi);
-  
+
   d1->addStretch();
 
   // Picture
@@ -119,17 +119,17 @@ Preview::Preview( QWidget* parent, const char*  name ,ResourcesWin *res ):
   connect(pedit,SIGNAL(clicked()),SLOT(double_click()));
   pbox2->addWidget(pedit,AlignCenter);
 
-  save = new QPushButton("Save as...",w_picture);
-  save->setMaximumWidth(100);
-  connect(save,SIGNAL(clicked()),SLOT(save_pic()));
-  pbox2->addWidget(save,AlignCenter);
+  save_pic_butt = new QPushButton("Save as...",w_picture);
+  save_pic_butt->setMaximumWidth(100);
+  connect(save_pic_butt,SIGNAL(clicked()),SLOT(save_pic()));
+  pbox2->addWidget(save_pic_butt,AlignCenter);
 
-  formats = new QComboBox(w_picture);
+  formats_pic = new QComboBox(w_picture);
   QStrList out =  QImageIO::outputFormats ();
   for (unsigned int k=0;k<out.count();k++ ){
-    formats->insertItem(out.at(k));
+    formats_pic->insertItem(out.at(k));
   }
-  pbox2->addWidget(formats);
+  pbox2->addWidget(formats_pic);
   pbox->addStretch();
 
   // View
@@ -139,7 +139,7 @@ Preview::Preview( QWidget* parent, const char*  name ,ResourcesWin *res ):
 
   QBoxLayout *vbox = new QVBoxLayout(w_view,10);
 
-  int maxrow1=2,maxcol1=5;
+  int maxrow1=3,maxcol1=5;
   QGridLayout *grid1 = new QGridLayout( vbox, maxrow1,maxcol1, 1 );
 
   int i;
@@ -200,6 +200,21 @@ Preview::Preview( QWidget* parent, const char*  name ,ResourcesWin *res ):
   QPushButton *anim = new QPushButton("Animate",w_view);
   connect(anim,SIGNAL(clicked()),SLOT(animate_cb()));
   grid1->addWidget(anim,row,col,AlignCenter); col++;
+
+  row++;col=0;
+
+  save_view_butt = new QPushButton("Save as...",w_view);
+  save_view_butt->setMaximumWidth(100);
+  connect(save_view_butt,SIGNAL(clicked()),SLOT(save_view()));
+  grid1->addWidget(save_view_butt,row,col,AlignCenter);  col++;
+
+  formats_view = new QComboBox(w_view);
+  // QStrList out =  QImageIO::outputFormats ();
+  for (unsigned int k=0;k<out.count();k++ ){
+    formats_view->insertItem(out.at(k));
+  }
+  grid1->addWidget(formats_view,row,col,AlignCenter); // Reference to the same widget used in picture
+
 
   p_view = new PreviewView(w_view,0,this);
   p_view->setMinimumSize(64,64);
@@ -270,7 +285,7 @@ void Preview::double_click()
 //******************************************************
 void Preview::previous_loop()
 {
-  
+
   if(p_view->view->CurLoop>0){
     p_view->view->CurLoop--;
     p_view->view->CurCel=0;
@@ -365,28 +380,39 @@ void Preview::showcelpar()
   celnum->setText(tmp);
 
 }
+
 //******************************************************
+
 void Preview::save_pic()
 {
+  save_image( p_picture->pixmap, formats_pic->currentText().latin1() );
+}
 
-  const char *format = formats->currentText().latin1();
+//******************************************************
 
-  QFileDialog *f = new QFileDialog(0,"Save",true);  
+void Preview::save_view()
+{
+  save_image( p_view->pixmap, formats_view->currentText().latin1() );
+}
+
+//******************************************************
+void Preview::save_image( QPixmap& pixmap, const char* format )
+{
+  QFileDialog *f = new QFileDialog(0,"Save",true);
   sprintf(tmp,"*.%s",format);
   toLower(tmp);
   const char *filters[] = {tmp,"All files (*)",NULL};
 
   f->setFilters(filters);
-  f->setCaption("Save view");
+  f->setCaption("Save as image");
   f->setMode(QFileDialog::AnyFile);
   f->setDir(game->srcdir.c_str());
   if ( f->exec() == QDialog::Accepted ) {
     if ( !f->selectedFile().isEmpty() ){
-      if(!p_picture->pixmap.save((char *)f->selectedFile().latin1(),format))
+      if(!pixmap.save((char *)f->selectedFile().latin1(),format))
         menu->errmes("Couldn't save picture !");
-
-    }    
-  }  
+    }
+  }
 
 }
 //******************************************************
@@ -410,7 +436,7 @@ void Preview::deinit()
 //*********************************************
 void Preview::closeEvent( QCloseEvent *e )
 {
-  
+
   deinit();
   e->accept();
 
@@ -436,11 +462,11 @@ void Preview::showEvent( QShowEvent * )
 PreviewPicture::PreviewPicture(  QWidget* parent, const char*  name, Preview *p ):
   QWidget(parent,name)
 {
-  
+
   preview = p;
   pixmap = QPixmap(MAX_W,MAX_HH);
   ppicture = new BPicture();
-  
+
 }
 
 //*****************************************
@@ -458,7 +484,7 @@ void PreviewPicture::draw(int ResNum)
 //*****************************************
 void PreviewPicture::update()
 {
-  QPainter p(&pixmap); 
+  QPainter p(&pixmap);
   byte **data;
   int x,y;
   byte c0=255,c;
@@ -481,7 +507,7 @@ void PreviewPicture::update()
 void PreviewPicture::paintEvent(QPaintEvent *)
 {
 
-  QPainter p(this);  
+  QPainter p(this);
   p.drawPixmap( 0, 0, pixmap );
 
 }
@@ -489,7 +515,7 @@ void PreviewPicture::paintEvent(QPaintEvent *)
 PreviewView::PreviewView(  QWidget* parent, const char*  name, Preview *p ):
   QWidget(parent,name)
 {
-  
+
   preview = p;
   view = new View();
   pixmap = QPixmap();
@@ -500,9 +526,9 @@ PreviewView::PreviewView(  QWidget* parent, const char*  name, Preview *p ):
 //*****************************************
 void PreviewView::paintEvent(QPaintEvent *)
 {
-  QPainter p(this);  
+  QPainter p(this);
   int W = preview->width();
-  int x = (W-pixsize*cur_w*2)/2;    
+  int x = (W-pixsize*cur_w*2)/2;
   p.drawPixmap( x, 0, pixmap );
 }
 
@@ -512,7 +538,7 @@ void PreviewView::update()
   int x,y;
 
   if(!view->opened)return;
-  
+
   int w = view->loops[view->CurLoop].cels[view->CurCel].width;
   int h = view->loops[view->CurLoop].cels[view->CurCel].height;
   bool mirror = (view->loops[view->CurLoop].mirror!=-1);
@@ -524,18 +550,18 @@ void PreviewView::update()
     cur_h=h;
   }
 
-  QPainter p(&pixmap);   
-  
-  if(mirror){      
+  QPainter p(&pixmap);
+
+  if(mirror){
     for(y=0;y<h;y++){
-      for(x=0;x<w*2;x+=2){		    
+      for(x=0;x<w*2;x+=2){
         p.fillRect(x*pixsize,y*pixsize,pixsize*2,pixsize,egacolor[data[y*w*2+w*2-2-x]]);
       }
-    }     
+    }
   }
   else{
     for(y=0;y<h;y++){
-      for(x=0;x<w*2;x+=2){		
+      for(x=0;x<w*2;x+=2){
         p.fillRect(x*pixsize,y*pixsize,pixsize*2,pixsize,egacolor[data[y*w*2+x]]);
       }
     }
@@ -551,7 +577,7 @@ void PreviewView::draw(int ResNum)
   if(!err){
     preview->showlooppar();
     preview->showcelpar();
-  }  
+  }
   update();
   if(!err && view->Description != ""){
     show_description();
@@ -573,7 +599,7 @@ void PreviewView::show_description()
   w = (view->loops[view->CurLoop].cels[view->CurCel].width)*2*pixsize;
   h = (view->loops[view->CurLoop].cels[view->CurCel].height)*pixsize;
   resize(w,h);
-  
+
   W=preview->width();
   H=preview->height();
   x=this->x();
@@ -592,7 +618,7 @@ void PreviewView::show_description()
       n = maxcol - ThisLine.length();
       do{ n--; }while(!(n == 0 || ThisMessage[n]==' '));
       if (n <= 0)n = maxcol-ThisLine.length();
-      ThisLine += ThisMessage.substr(0,n);      
+      ThisLine += ThisMessage.substr(0,n);
       ThisMessage = (n < (int)ThisMessage.length())?ThisMessage.substr(n+1):"";
       preview->description->insertLine(ThisLine.c_str(),-1);
       ThisLine = "";
@@ -601,12 +627,12 @@ void PreviewView::show_description()
       ThisLine += ThisMessage;
       ThisMessage = "";
     }
-    
-  }while(ThisMessage != "");     
+
+  }while(ThisMessage != "");
 
   if(ThisLine != ""){
     preview->description->insertLine(ThisLine.c_str(),-1);
-  }  
+  }
 
 }
 //*****************************************
