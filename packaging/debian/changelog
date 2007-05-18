@@ -1,4 +1,4 @@
-agistudio (1.2.3-1+svn20070518) unstable; urgency=low
+agistudio (1.2.3+svn20070518-1) unstable; urgency=low
 
   * New upstream release (from SVN).
     - GCC 4.3 build patch (Closes: #417080)
