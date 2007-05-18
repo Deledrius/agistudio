@@ -18,6 +18,7 @@
  *
  */
 
+#include <cstdlib>
 #include <stdio.h>
 
 #include <qapplication.h>

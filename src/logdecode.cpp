@@ -27,6 +27,7 @@
 #include "menu.h"
 #include "agicommands.h"
 
+#include <cstdlib>
 #include <stdio.h>
 
 static int EncryptionStart;

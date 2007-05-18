@@ -24,6 +24,7 @@
 #include "picture.h"
 #include "preview.h"
 
+#include <cstdlib>
 #include <qspinbox.h>
 #include <qapplication.h>
 #include <qpainter.h>
