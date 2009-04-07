@@ -1,5 +1,5 @@
 /* XPM */
-static char *toolbar_textedit[] = {
+static const char *toolbar_textedit[] = {
 /* columns rows colors chars-per-pixel */
 "24 24 86 1",
 "  c black",

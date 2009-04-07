@@ -52,7 +52,7 @@ class WindowList : public QWidget
 
     Q_OBJECT
 public:
-    WindowList( QWidget *parent=0, const char *name=0 );    
+    WindowList( QWidget *parent=0, const char *name=0 );
     QListBox *win;
 public slots:
     void draw();
@@ -77,9 +77,9 @@ public:
     Menu( QWidget *parent=0, const char *name=0);
     QStatusBar *status;
     ResourcesWin *resources_win;
-    void errmes(char *,char *,...);
-    void errmes(char *,...);
-    void warnmes(char *,...);
+    void errmes(const char *, const char *,...);
+    void errmes(const char *,...);
+    void warnmes(const char *,...);
 
     void enable(void);
     void disable(void);
@@ -133,7 +133,7 @@ protected:
     QMenuBar *menubar;
     QMessageBox *err,*warn;
     QPushButton *create;
-    QFileDialog *f;    
+    QFileDialog *f;
     QPushButton *open,*close_,*run,*view,*logic,*text,*obj,*words,*pic;
     Dir *dir_new,*dir_open;
     int num_res;

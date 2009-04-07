@@ -95,7 +95,7 @@ int init_sound ()
 
   if ((audio_fd = open ("/dev/audio", O_WRONLY)) == -1)
     return -1;
-	
+
   i = AFMT_S16_NE;	/* Native endian */
   ioctl (audio_fd, SNDCTL_DSP_SETFMT, &i);
   i = 0;
@@ -160,7 +160,7 @@ void mix_channels (int s)
 
 void dump_buffer (int i)
 {
-  for (i <<= 1; i -= write (audio_fd, buffer, i); );
+  for (i <<= 1; i -= write (audio_fd, buffer, i); ) {}
 }
 
 
@@ -175,21 +175,21 @@ void play_note (int i, int freq, int vol)
   chn[i].freq = freq;
   chn[i].phase = 0;
   chn[i].vol = vol;
-  chn[i].env = 0x10000;                                                  
+  chn[i].env = 0x10000;
 }
 
 
 void play_song (unsigned char *song, int size)
 {
   int i, playing;
-        
+
   /* Initialize channel pointers */
   for (i = 0; i < 4; i++) {
     chn[i].ptr = (struct agi_note *)(song + (song[i << 1] | (song[(i << 1) + 1] << 8)));
     chn[i].timer = 0;
     chn[i].end = 0;
   }
-	
+
   int step=0;
   QProgressDialog progress( "Playing...", "Cancel", (size+16)/5,0, 0, TRUE );
   progress.setMinimumDuration(0);
@@ -199,10 +199,10 @@ void play_song (unsigned char *song, int size)
 
     for (playing = i = 0; i < 4; i++) {
       playing |= !chn[i].end;
-      
+
       if (chn[i].end)
         continue;
-      
+
       if ((--chn[i].timer) <= 0) {
         if (chn[i].ptr >= (struct agi_note *)song + size)
           break;
@@ -221,18 +221,18 @@ void play_song (unsigned char *song, int size)
         }
         chn[i].ptr++;
 
-        progress.setProgress( step++ );          
+        progress.setProgress( step++ );
         if ( progress.wasCancelled() ){
           playing=false;
-          break;   
-        }   
+          break;
+        }
       }
     }
-    
+
     mix_channels (400);
     dump_buffer (400);
   }
-  
+
 }
 #endif
 
@@ -250,7 +250,7 @@ void play_sound(int ResNum)
   if(err)return;
 
   play_song(ResourceData.Data,ResourceData.Size);
-	
+
   close_sound ();
 #else
   menu->errmes("Sound currently works only under Linux !");
@@ -267,7 +267,7 @@ void play_sound(char *filename)
     menu->errmes("Can't initialize sound !");
     return;
   }
-  
+
   FILE *fptr=fopen(filename,"rb");
   if(fptr==NULL){
     menu->errmes("Can't open file %s !",filename);
@@ -277,10 +277,10 @@ void play_sound(char *filename)
   fstat(fileno(fptr),&buf);
   ResourceData.Size=buf.st_size;
   fread(ResourceData.Data,ResourceData.Size,1,fptr);
-  fclose(fptr);    
+  fclose(fptr);
 
   play_song(ResourceData.Data,ResourceData.Size);
-	
+
   close_sound ();
 #else
   menu->errmes("Sound currently works only under Linux !");

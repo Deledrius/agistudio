@@ -1,3 +1,7 @@
+Release notes for QT AGI Studio version 1.2.4 (2009-04-08)
+
+- cleaner compilation ("const char*" fixes etc.)
+
 Release notes for QT AGI Studio version 1.2.3 (2007-03-18)
 
 - new features:

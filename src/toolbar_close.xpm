@@ -1,5 +1,5 @@
 /* XPM */
-static char *toolbar_close[] = {
+static const char *toolbar_close[] = {
 /* columns rows colors chars-per-pixel */
 "24 24 171 2",
 "   c black",

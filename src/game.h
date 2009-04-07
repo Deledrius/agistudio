@@ -27,7 +27,7 @@
 using namespace std;
 
 typedef struct {
-  char Filename[12];    //[*]vol.* 
+  char Filename[12];    //[*]vol.*
   long Loc;             //location in vol file
   bool Exists;
 }TResourceInfo ;
@@ -40,7 +40,7 @@ typedef struct {
 }TResource;
 
 
-class Game 
+class Game
 {
  public:
   Game();
@@ -62,24 +62,24 @@ class Game
   TResourceInfo ResourceInfo[4][256];  //logic, picture, view, sound
   string dir;  //game directory
   string ID;   //game ID for V3 games (always 'V2' for V2 games)
-  string dirname;  //name of the 'directory' file 
+  string dirname;  //name of the 'directory' file
                    //(e.g. picdir, snddir for V2, [ID]dir for V3)
 
   string srcdir;   //dir for saving logic sources
   bool isOpen,isV3;
 
-  //defaults; some GUI defauts are part of GAME object because it is the 
+  //defaults; some GUI defauts are part of GAME object because it is the
   //only object which is guaranteed to exist at the beginning of the program
   int res_default;  //default resource type in resources window
   int picstyle;     //Picedit style
   bool save_logic_as_text;  //default for 'extract' function
-  bool show_all_messages;   //logic decompile - show all messages at end 
+  bool show_all_messages;   //logic decompile - show all messages at end
                             //or just unused ones
   bool show_elses_as_gotos;
   bool show_special_syntax; //v30=4 vs assignn(v30,4)
   bool reldir;  //if the source dir is relative to the game dir or absolute
   string command;  //interpreter command line
-  string srcdirname;  //source dir as entered in options 
+  string srcdirname;  //source dir as entered in options
        //(i.e. either relative or absolute; srcdir is always absolute)
   string templatedir;  //template game directory
   string helpdir;      //help directory
@@ -97,9 +97,9 @@ extern Game *game;
 extern const char *ResTypeName[4];
 extern const char *ResTypeAbbrv[4];
 
-extern TResource ResourceData;  
+extern TResource ResourceData;
 
-extern char EncryptionKey[];
+extern const char EncryptionKey[];
 
 #define MAX_TMP 2048
 extern char tmp[];

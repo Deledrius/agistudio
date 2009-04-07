@@ -34,18 +34,18 @@ class TStringList
 {
  public:
   TStringList();
-  void add(string);
-  void addsorted(char *);
-  void addsorted(string);
-  void copy(TStringList);
+  void add(const string&);
+  void addsorted(const char *);
+  void addsorted(const string&);
+  void copy(const TStringList&);
   void lfree(void);
   void print(int);
   void print(void);
   void toLower(void);
   void toLower(int);
   void del(int);
-  void replace(int n,char *str);
-  void replace(int n,string str);
+  void replace(int n, const char *str);
+  void replace(int n, const string& str);
   string at(int) const;
   int num;
   string *data;
@@ -55,7 +55,7 @@ class TStringList
 };
 
 //*****************************************************
-extern string MultStr(char *str,int NumCopies);
+extern string MultStr(const char *str,int NumCopies);
 extern string IntToStr(int n);
 extern string IntToStr(byte n);
 extern void toLower(string *str);

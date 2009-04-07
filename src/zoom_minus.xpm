@@ -1,5 +1,5 @@
 /* XPM */
-static char *zoom_minus[] = {
+static const char *zoom_minus[] = {
 /* columns rows colors chars-per-pixel */
 "30 30 2 1",
 "  c black",

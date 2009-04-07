@@ -19,7 +19,7 @@
  */
 
 #ifndef AGI_COMMANDS_H
-#define AGI_COMMANDS_H 
+#define AGI_COMMANDS_H
 
 //argument types
 #define atNum  0
@@ -36,7 +36,7 @@ extern const char *ArgTypePrefix[9] ;
 extern const char *ArgTypeName[9] ;
 
 typedef struct {
-  char *Name;
+  const char *Name;
   char NumArgs;
   char argTypes[7];
 }CommandStruct;

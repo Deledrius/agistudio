@@ -1,5 +1,5 @@
 /* XPM */
-static char *toolbar_objedit[] = {
+static const char *toolbar_objedit[] = {
 /* columns rows colors chars-per-pixel */
 "24 24 176 2",
 "   c black",

@@ -37,7 +37,7 @@
 #include "zoom_minus_x.xpm"
 #include "zoom_plus_x.xpm"
 
-static char *comment[]={ 
+static const char *comment[]={
       "pic colour",  //0xf0
       "pic off", //0xf1
       "pri colour",//0xf2
@@ -56,7 +56,7 @@ static char *comment[]={
         "end",  //0xff
         };
 
-static char *colname[]={
+static const char *colname[]={
   "black",
   "blue",
   "green",
@@ -84,7 +84,7 @@ PicEdit::PicEdit( QWidget *parent, const char *name,int win_num,ResourcesWin *re
 
   winnum = win_num;
   resources_win = res;
-  picture = new Picture();  
+  picture = new Picture();
 
   QPopupMenu *file = new QPopupMenu( this );
   CHECK_PTR( file );
@@ -141,7 +141,7 @@ PicEdit::PicEdit( QWidget *parent, const char *name,int win_num,ResourcesWin *re
   leftb->addWidget(tool);
 
   QBoxLayout *b1 = new QHBoxLayout(leftb,10);
-  
+
   palette = new Palette1(this,0,this);
   palette->setMinimumSize(250,40);
   palette->setMaximumSize(350,80);
@@ -178,7 +178,7 @@ PicEdit::PicEdit( QWidget *parent, const char *name,int win_num,ResourcesWin *re
   size->setValue(1);
   //  size->setFocusPolicy(ClickFocus);
   connect(size, SIGNAL(valueChanged(int)), SLOT(change_size(int)) );
-  
+
   QBoxLayout *b3 = new QHBoxLayout(leftb,1);
 
   QPushButton *home = new QPushButton(this);
@@ -269,7 +269,7 @@ PicEdit::PicEdit( QWidget *parent, const char *name,int win_num,ResourcesWin *re
     canvas->resizeContents(canvas->pixsize*MAX_W+canvas->x0,canvas->pixsize*MAX_HH+canvas->x0);
     canvas->resize(canvas->pixsize*MAX_W+canvas->x0,canvas->pixsize*MAX_HH+canvas->x0);
     //canvas->setFocusPolicy(ClickFocus);
-    
+
   }
   else{
     canvas = new PCanvas(this,0,this);
@@ -280,12 +280,12 @@ PicEdit::PicEdit( QWidget *parent, const char *name,int win_num,ResourcesWin *re
     setFocusProxy(canvas);
   }
 
-    
+
   changed = false;
   adjustSize();
   viewdata = NULL;
   closing = false;
-  
+
 }
 //*********************************************
 void PicEdit::save(char *filename)
@@ -298,9 +298,9 @@ void PicEdit::save(char *filename)
 //*********************************************
 void PicEdit::open_file()
 {
-  QFileDialog *f = new QFileDialog(0,"Open",true);  
+  QFileDialog *f = new QFileDialog(0,"Open",true);
   const char *filters[] = {"picture*.*","All files (*)",NULL};
-  
+
   f->setFilters(filters);
   f->setCaption("Open picture");
   f->setMode(QFileDialog::ExistingFile);
@@ -316,7 +316,7 @@ void PicEdit::open_file()
 void PicEdit::open(int ResNum)
 {
   if(picture->open(ResNum))return;
-  PicNum = ResNum;  
+  PicNum = ResNum;
   sprintf(tmp,"Picture editor: picture.%d",PicNum);
   setCaption(tmp);
   if(canvas->isTopLevel())
@@ -326,7 +326,7 @@ void PicEdit::open(int ResNum)
   changed=false;
   show();
   canvas->show();
-  update_palette();  
+  update_palette();
   update_tools();
 }
 
@@ -336,7 +336,7 @@ void PicEdit::open(char *filename)
   if(picture->open(filename))return;
   PicNum = -1;
   sprintf(tmp,"Picture editor");
-  setCaption(tmp);  
+  setCaption(tmp);
   if(canvas->isTopLevel())
     canvas->setCaption(tmp);
   canvas->update();
@@ -344,7 +344,7 @@ void PicEdit::open(char *filename)
   changed=false;
   show();
   canvas->show();
-  update_palette();  
+  update_palette();
   update_tools();
 }
 
@@ -353,7 +353,7 @@ void PicEdit::save_file()
 {
   QFileDialog *f = new QFileDialog(0,"Save",true);
   const char *filters[] = {"picture*.*","All files (*)",NULL};
-  
+
   f->setFilters(filters);
   f->setCaption("Save picture");
   f->setMode(QFileDialog::AnyFile);
@@ -416,10 +416,10 @@ void PicEdit::closeEvent( QCloseEvent *e )
       sprintf(tmp,"Save changes to picture.%d ?",PicNum);
     }
     else{
-      sprintf(tmp,"Save changes to picture ?");      
+      sprintf(tmp,"Save changes to picture ?");
     }
     strcat(tmp,"\n(picture will be saved to game)");
-    
+
     switch ( QMessageBox::warning( this, "Picture editor",
                                    tmp,
                                    "Yes",
@@ -438,7 +438,7 @@ void PicEdit::closeEvent( QCloseEvent *e )
     default: // cancel
       e->ignore();
       break;
-    }        
+    }
   }
   else{
     deinit();
@@ -472,7 +472,7 @@ void PicEdit::save_to_game_as()
 
   QString str = picture_number->num->text();
   int num = atoi((char *)str.latin1());
-  
+
   if(num<0||num>255){
     menu->errmes("Picture number must be between 0 and 255 !");
     return ;
@@ -484,7 +484,7 @@ void PicEdit::save_to_game_as()
                                   "Replace", "Cancel",
                                   0,      // Enter == button 0
                                   1 ) ) { // Escape == button 1
-    case 0: 
+    case 0:
       picture->save(num);
       PicNum = num;
       if(resources_win){
@@ -493,7 +493,7 @@ void PicEdit::save_to_game_as()
       }
       changed=false;
       break;
-    case 1:       
+    case 1:
       break;
     }
   }
@@ -507,7 +507,7 @@ void PicEdit::save_to_game_as()
     }
     open(num);
   }
-  
+
 }
 
 //*********************************************
@@ -520,7 +520,7 @@ void PicEdit::delete_picture()
                                 "Delete", "Cancel",
                                 0,      // Enter == button 0
                                 1 ) ) { // Escape == button 1
-  case 0: 
+  case 0:
     game->DeleteResource(PICTURE,PicNum);
     if(resources_win){
       k = resources_win->list->currentItem();
@@ -528,10 +528,10 @@ void PicEdit::delete_picture()
       resources_win->list->setCurrentItem(k);
     }
     break;
-  case 1:       
+  case 1:
     break;
   }
- 
+
 }
 
 //*********************************************
@@ -544,7 +544,7 @@ void PicEdit::open()
   canvas->update();
   show();
   canvas->show();
-  update_palette();  
+  update_palette();
   update_tools();
 }
 
@@ -565,9 +565,9 @@ void PicEdit::view_data()
 void PicEdit::background()
 {
 
-  QFileDialog *f = new QFileDialog(0,"Load background image",true);  
+  QFileDialog *f = new QFileDialog(0,"Load background image",true);
   const char *filters[] = {"All files (*)",NULL};
-  
+
   f->setFilters(filters);
   f->setCaption("Load background image");
   f->setMode(QFileDialog::ExistingFile);
@@ -598,7 +598,7 @@ void PicEdit::zoom_plus()
 {
 
   if(canvas->pixsize<4){
-    canvas->setPixsize(canvas->pixsize+1);    
+    canvas->setPixsize(canvas->pixsize+1);
     int w,h;
     w = canvas->cur_w+4;
     h = canvas->cur_h+4;
@@ -681,10 +681,10 @@ void PicEdit::show_pos()
   if(code>=0xf0&&code<=0xff){  //action: can add comments
     if(code==0xf0||code==0xf2){  //add color name
       sprintf(tmp,"%s %s",comment[code-0xf0],colname[val]);
-      comments->setText(tmp);  
+      comments->setText(tmp);
     }
-    else{      
-      comments->setText(comment[code-0xf0]);  
+    else{
+      comments->setText(comment[code-0xf0]);
     }
   }
   else comments->clear();
@@ -698,7 +698,7 @@ void PicEdit::home_cb()
   picture->home_proc();
   canvas->update();
   show_pos();
-  update_palette();   
+  update_palette();
   update_tools();
 }
 
@@ -709,7 +709,7 @@ void PicEdit::end_cb()
   picture->end_proc();
   canvas->update();
   show_pos();
-  update_palette();     
+  update_palette();
   update_tools();
 }
 
@@ -720,7 +720,7 @@ void PicEdit::left_cb()
   picture->left_proc();
   canvas->update();
   show_pos();
-  update_palette();     
+  update_palette();
   update_tools();
 }
 
@@ -728,11 +728,11 @@ void PicEdit::left_cb()
 void PicEdit::right_cb()
   //set picture buffer position to the next action
 {
-  
+
   picture->right_proc();
   canvas->update();
   show_pos();
-  update_palette();     
+  update_palette();
   update_tools();
 }
 
@@ -740,11 +740,11 @@ void PicEdit::right_cb()
 void PicEdit::del_cb()
   //delete action from the picture buffer position
 {
-  
+
   picture->del_proc();
-  canvas->update(); 
+  canvas->update();
   show_pos();
-  update_palette();     
+  update_palette();
   update_tools();
 }
 
@@ -752,9 +752,9 @@ void PicEdit::del_cb()
 void PicEdit::wipe_cb()
   //delete all action from the picture buffer position to the end
 {
-  
+
   picture->wipe_proc();
-  canvas->update(); 
+  canvas->update();
   show_pos();
   update_palette();
   update_tools();
@@ -762,7 +762,7 @@ void PicEdit::wipe_cb()
 
 //*********************************************
 void PicEdit::set_pos()
-  //set picture buffer position 
+  //set picture buffer position
 {
   QString str=pos->text();
   char *s = (char *)str.latin1();
@@ -773,11 +773,11 @@ void PicEdit::set_pos()
     }
   }
   show_pos();
-  update_palette();  
+  update_palette();
   update_tools();
   pos->clearFocus();
   setFocus();
-  return;  
+  return;
 
 }
 //*********************************************
@@ -832,7 +832,7 @@ void PicEdit::update_palette()
 
 }
 //*********************************************
-bool PicEdit::focusNextPrevChild ( bool ) 
+bool PicEdit::focusNextPrevChild ( bool )
 {
   canvas->setFocus();
   return true;
@@ -911,8 +911,8 @@ void PCanvas::viewportMousePressEvent(QMouseEvent* event)
   if (event->button() & LeftButton){
     if(picture->button_action(x,y))
       picedit->show_pos();
-  }  
-  else if (event->button() & RightButton){    
+  }
+  else if (event->button() & RightButton){
     /*
     QRadioButton *b = (QRadioButton *)picedit->tool->selected();
         if(b!=0)b->setChecked(false);
@@ -920,7 +920,7 @@ void PCanvas::viewportMousePressEvent(QMouseEvent* event)
     picture->tool = -1;
     */
     picture->init_tool();
-  }  
+  }
   update();
   picedit->changed=true;
 }
@@ -930,7 +930,7 @@ void PCanvas::viewportMouseMoveEvent(QMouseEvent* event)
 {
   int x,y,xx,yy;
 
-  viewportToContents( event->x(),  event->y(), x, y );  
+  viewportToContents( event->x(),  event->y(), x, y );
   xx=x;
   yy=y;
 
@@ -1025,7 +1025,7 @@ void PCanvas::line(bool mode)
   //mode==true - erase the old one, draw the new one
   //mode==false - only erase the old one
 {
-  QPainter p(&pixmap); 
+  QPainter p(&pixmap);
   byte c;
   Points *curp,*newp=NULL;
   int i;
@@ -1034,12 +1034,12 @@ void PCanvas::line(bool mode)
   curp = picture->curp;
 
   if(picture->bg_on){
-    //with background - must redraw the line containing background pixels 
+    //with background - must redraw the line containing background pixels
     //(x-pixels are not doubled !)
     for(i=0;i<curp->n;i++){
       p.fillRect(curp->p[i].x*pixsize,curp->p[i].y*pixsize,
                  pixsize,pixsize,curp->p[i].cc);
-      
+
     }
   }
   else{
@@ -1048,19 +1048,19 @@ void PCanvas::line(bool mode)
       c=curp->p[i].c;
       p.fillRect(curp->p[i].x*2*pixsize,curp->p[i].y*pixsize,
                  pixsize*2,pixsize,egacolor[c]);
-      
+
     }
   }
 
   if(mode==true){
     linedraw=true;
-    newp = picture->newp;  
+    newp = picture->newp;
     //draw the 'new' line
     for(int i=0;i<newp->n;i++){
       c=newp->p[i].c;
       p.fillRect(newp->p[i].x*2*pixsize,newp->p[i].y*pixsize,
                  pixsize*2,pixsize,egacolor[c]);
-      
+
     }
   }
   else{
@@ -1086,12 +1086,12 @@ void PCanvas::line(bool mode)
       x0_=newp->p[0].x*2;
       y0_=newp->p[0].y;
       x1=newp->p[newp->n-1].x*2;
-      y1=newp->p[newp->n-1].y;      
+      y1=newp->p[newp->n-1].y;
 
       X0=(MIN(MIN(x00,x0_),MIN(x11,x1)))*pixsize;
       Y0=(MIN(MIN(y00,y0_),MIN(y11,y1)))*pixsize;
       X1=(MAX(MAX(x00,x0_),MAX(x11,x1)))*pixsize;
-      Y1=(MAX(MAX(y00,y0_),MAX(y11,y1)))*pixsize;    
+      Y1=(MAX(MAX(y00,y0_),MAX(y11,y1)))*pixsize;
     }
     else{
       X0=(MIN(x00,x11))*pixsize;
@@ -1146,7 +1146,7 @@ void PCanvas::keyPressEvent( QKeyEvent *k )
     picedit->change_tool(T_BRUSH);
     break;
   case Key_Tab:
-    picedit->pri_mode=!picedit->pri_mode;    
+    picedit->pri_mode=!picedit->pri_mode;
     picedit->change_drawmode(picedit->pri_mode?1:0);
     break;
   case Key_Home:
@@ -1177,7 +1177,7 @@ void PCanvas::keyPressEvent( QKeyEvent *k )
 
 }
 //*********************************************
-bool PCanvas::focusNextPrevChild ( bool ) 
+bool PCanvas::focusNextPrevChild ( bool )
 {
 
   setFocus();
@@ -1190,7 +1190,7 @@ void PCanvas::load_bg(char *filename)
 
   if(!bgpix.load(filename)){  //loads all formats supported by QT
 #ifdef IMGEXT
-    //if can't load - try image extensions 
+    //if can't load - try image extensions
     //(currently only jpeg; loads with colors all wrong)
     if(!menu->imgext){
       menu->load_imgext();
@@ -1209,7 +1209,7 @@ void PCanvas::load_bg(char *filename)
 #endif
   }
   bg_loaded=true;
-  
+
   picture->bgpix=&bgpix;
   picedit->bg->setChecked(true);
   bg_on=true;
@@ -1279,14 +1279,14 @@ void Palette1::paintEvent( QPaintEvent * )
     for(y=0,i=0;y<h;y+=dy){
       for(x=0;x<w-dx;x+=dx,i++){
         p.fillRect(x,y,dx,dy,egacolor[i]);
-        if(i==left){          
+        if(i==left){
           p.setPen(i<10?egacolor[15]:egacolor[0]);
           p.drawText(x+dx/4,y+dy/2+2,"V");
         }
         if(i==right){
           p.setPen(i<10?egacolor[15]:egacolor[0]);
-          p.drawText(x+dx*2/3,y+dy/2+2,"P");          
-        }      
+          p.drawText(x+dx*2/3,y+dy/2+2,"P");
+        }
       }
     }
     p.fillRect(w-dx,0,dx,h,QColor(0x90,0x90,0x90));
@@ -1298,7 +1298,7 @@ void Palette1::paintEvent( QPaintEvent * )
     }
     if(right==-1){
       p.drawText(x+dx*2/3,dy/2+2,"P");
-    }    
+    }
 }
 
 //*****************************************
@@ -1313,7 +1313,7 @@ void Palette1::mousePressEvent(QMouseEvent* event)
   dy=h/2;
   w=dx*9;
   h=dy*2;
-    
+
   x=event->x()/dx;
   y=event->y()/dy;
 
@@ -1326,19 +1326,19 @@ void Palette1::mousePressEvent(QMouseEvent* event)
 
   if (event->button() & LeftButton){
     if(left != i){
-      left = i;    
+      left = i;
       picedit->picture->choose_color(M_LEFT,i);
-      repaint(); 
-    }    
-  }  
-  else if (event->button() & RightButton){
-    if(right != i){
-      right = i;    
-      picedit->picture->choose_color(M_RIGHT,i);
-      repaint(); 
+      repaint();
     }
   }
-    
+  else if (event->button() & RightButton){
+    if(right != i){
+      right = i;
+      picedit->picture->choose_color(M_RIGHT,i);
+      repaint();
+    }
+  }
+
 }
 
 //************************************************
@@ -1346,7 +1346,7 @@ ViewData::ViewData( QWidget *parent, const char *name,Picture *p )
     : QWidget( parent, name)
   //view picture codes
 {
-  
+
   picture = p;
   QBoxLayout *all = new QVBoxLayout(this,20);
   codes = new QMultiLineEdit(this);
@@ -1356,7 +1356,7 @@ ViewData::ViewData( QWidget *parent, const char *name,Picture *p )
 
   QBoxLayout *b = new QHBoxLayout(all,20);
   QBoxLayout *left = new QVBoxLayout(b,20);
-  comments = new QCheckBox("Show comments",this);  
+  comments = new QCheckBox("Show comments",this);
   connect(comments, SIGNAL(clicked()), SLOT(read()));
   left->addWidget(comments);
   wrap = new QCheckBox("Line wrap",this);
@@ -1372,7 +1372,7 @@ ViewData::ViewData( QWidget *parent, const char *name,Picture *p )
   right->addWidget(dummy);
 
   data.lfree();
-  
+
 }
 
 //************************************************
@@ -1389,7 +1389,7 @@ void ViewData::getmaxcol()
 {
 
   QFontMetrics f = fontMetrics();
-  maxcol = codes->width()/f.width('a'); 
+  maxcol = codes->width()/f.width('a');
 
 }
 
@@ -1449,9 +1449,9 @@ void ViewData::read()
           strcat(tmp," ");
           strcat(tmp,colname[cc]);
         }
-        codes->insertLine(tmp,-1);      
+        codes->insertLine(tmp,-1);
       }
-      else codes->insertLine(str,-1);      
+      else codes->insertLine(str,-1);
     }
   }
   codes->setUpdatesEnabled(true);

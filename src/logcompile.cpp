@@ -39,7 +39,7 @@ static string DefineNames[MaxDefines];
 static string DefineValues[MaxDefines];
 static int NumDefines;
 static int  RealLineNum[65535], LineFile[65535];
-static int DefineNameLength[MaxDefines]; 
+static int DefineNameLength[MaxDefines];
 static string Messages[MaxMessages];
 static bool MessageExists[MaxMessages];
 
@@ -53,19 +53,21 @@ static int NumLabels;
 static bool ErrorOccured;
 static int CurLine;
 static string LowerCaseLine,ArgText,LowerCaseArgText;
-static unsigned int LinePos,LineLength,ArgTextLength,ArgTextPos;
+static string::size_type LinePos,LineLength,ArgTextLength,ArgTextPos;
 static bool FinishedReading;
 static int CommandNameStartPos;
 static string CommandName;
 static int CommandNum;
 static bool NOTOn;
 
-extern char EncryptionKey[];
+char empty_tmp[] = {0};
+
+extern const char EncryptionKey[];
 static int EncryptionStart;
 //*************************************************
 static void WriteByte(byte b)
 {
-  
+
   if(ResPos < ResourceData.Size){
     ResourceData.Data[ResPos++]=b;
     if(ResPos > LogicSize)LogicSize=ResPos;
@@ -101,7 +103,7 @@ void Logic::ShowError(int Line, string ErrorMsg)
   }
   else{ //error in include file
     if (LineFile[Line] > IncludeFilenames.num){
-      sprintf(tmp,"[unknown include file] Line ???: %s\n",ErrorMsg.c_str());      
+      sprintf(tmp,"[unknown include file] Line ???: %s\n",ErrorMsg.c_str());
     }
     else{
       sprintf(tmp,"File %s Line %d: %s\n",IncludeFilenames.at(LineFile[Line]-1).c_str(),LineNum,ErrorMsg.c_str());
@@ -110,16 +112,16 @@ void Logic::ShowError(int Line, string ErrorMsg)
 
   ErrorList.append(tmp);
   ErrorOccured=true;
-  
+
 }
 
 //***************************************************
-string Logic::ReadString(unsigned int *pos,string str)
-  //returns string without quotes, starting from pos1  
+string Logic::ReadString(string::size_type *pos, string& str)
+  //returns string without quotes, starting from pos1
   //pos is set to the 1st char after string
 {
-  unsigned int pos1 = *pos;
-  unsigned int pos2 = pos1;
+  string::size_type pos1 = *pos;
+  string::size_type pos2 = pos1;
 
   //  printf ("ReadString: str=%s pos=%d\n",str.c_str(),*pos);
 
@@ -130,9 +132,9 @@ string Logic::ReadString(unsigned int *pos,string str)
       printf("string: *%s*\n",str.c_str());
       return "";
     }
-  }while(str[pos2-1]=='\\');          
-  
-  *pos = pos2+1;  
+  }while(str[pos2-1]=='\\');
+
+  *pos = pos2+1;
   if(pos2==pos1+1){
     return "";
   }
@@ -183,7 +185,7 @@ int Logic::AddIncludes()
   int  CurInputLine,CurIncludeLine;
   string filename;
   int err=0;
-  unsigned int pos1,pos2;
+  string::size_type pos1,pos2;
   int CurLine;
   char *ptr;
 
@@ -247,7 +249,7 @@ int Logic::AddIncludes()
     if(IncludeLines.num==0)continue;
     IncludeFilenames.add(filename);
     RemoveComments(IncludeLines);
-    EditLines.replace(CurLine,"");
+    EditLines.replace(CurLine,empty_tmp);
     for(CurIncludeLine=0;CurIncludeLine<IncludeLines.num;CurIncludeLine++){
       EditLines.add(IncludeLines.at(CurIncludeLine));
       CurLine=EditLines.num-1;
@@ -266,10 +268,10 @@ int Logic::AddIncludes()
 int Logic::ReadDefines()
 {
   int err=0,i;
-  unsigned int pos1,pos2;
-  string ThisDefineName,ThisDefineValue;  
+  string::size_type pos1,pos2;
+  string ThisDefineName,ThisDefineValue;
   int CurLine;
-  
+
   NumDefines = 0;
   for(CurLine = 0;CurLine<EditLines.num;CurLine++){
 #ifdef _WIN32
@@ -316,12 +318,12 @@ int Logic::ReadDefines()
         break;
       }
     }
-    if(err)continue;    
+    if(err)continue;
 
     for(i=0;i<=NumAGICommands;i++){
       if(ThisDefineName == AGICommand[i].Name){
         ShowError(CurLine,"Define name can not be a command name.");
-        err=1; 
+        err=1;
         break;
       }
     }
@@ -334,7 +336,7 @@ int Logic::ReadDefines()
       }
     }
     if(err)continue;
-    
+
     if(ThisDefineName == "if" || ThisDefineName == "else" || ThisDefineName == "goto"){
       ShowError(CurLine,"Invalid define name (" + ThisDefineName + ")");
       err=1;
@@ -375,12 +377,12 @@ int Logic::ReadDefines()
         continue;
       }
     }
-    
+
     DefineNames[NumDefines]=ThisDefineName;
     DefineValues[NumDefines]=ThisDefineValue;
     DefineNameLength[NumDefines] = ThisDefineName.length();
-    NumDefines++;    
-    EditLines.replace(CurLine,"");    
+    NumDefines++;
+    EditLines.replace(CurLine,empty_tmp);
   }
 
   return err;
@@ -390,7 +392,7 @@ int Logic::ReadDefines()
 int Logic::ReadPredefinedMessages()
 {
   int err=0,i;
-  unsigned int pos1;
+  string::size_type pos1;
   int MessageNum;
 
   for(i=0;i<MaxMessages;i++){
@@ -414,7 +416,7 @@ int Logic::ReadPredefinedMessages()
     MessageNum = atoi(str.c_str());
     if(MessageNum==0){
       ShowError(CurLine,"Invalid message number (must be 1-255).");
-      err=1;      
+      err=1;
       continue;
     }
     pos1 = str.find_first_of("\"");
@@ -432,7 +434,7 @@ int Logic::ReadPredefinedMessages()
       continue;
     }
     MessageExists[MessageNum] =true;
-    EditLines.replace(CurLine,"");
+    EditLines.replace(CurLine,empty_tmp);
   }
 
   return err;
@@ -442,7 +444,7 @@ int Logic::ReadPredefinedMessages()
 int Logic::ReadLabels()
 {
   int err=0,i;
-  unsigned int pos1,pos2;
+  string::size_type pos1,pos2;
   string LabelName;
   int CurLine;
 
@@ -497,9 +499,9 @@ void Logic::NextLine()
     FinishedReading = true;
     return;
   }
-  do{    
+  do{
     LowerCaseLine = EditLines.at(CurLine);
-    if(LowerCaseLine == "" || (LinePos=LowerCaseLine.find_first_not_of(" ")) == string::npos){
+    if(LowerCaseLine == empty_tmp || (LinePos=LowerCaseLine.find_first_not_of(" ")) == string::npos){
       CurLine++;
       continue;
     }
@@ -514,7 +516,6 @@ void Logic::NextLine()
 //***************************************************
 void Logic::SkipSpaces()
 {
-
   LinePos=LowerCaseLine.find_first_not_of(" ",LinePos);
   if(LinePos==string::npos)NextLine();
 
@@ -534,7 +535,7 @@ byte Logic::AddMessage(string TheMessage)
   // Adds a message to the message list regardles of whether or not it
   // already exists. Returns the number of the added message, or 0 if
   // there are already 255 messages.
-  
+
   for(int i=1;i<MaxMessages;i++){
     if(!MessageExists[i]){
       MessageExists[i]=true;
@@ -569,7 +570,7 @@ string Logic::ReplaceDefine(string InText)
 void Logic::ReadArgText()
  // do not use for string - does not take quotes into account
 {
-  unsigned int pos1,pos2;
+  string::size_type pos1,pos2;
 
   SkipSpaces();
   pos1 = pos2 = LinePos;
@@ -603,9 +604,9 @@ int Logic::ReadArgValue()
   char *ptr;
   string str2 = ArgText.substr(ArgTextPos);
   const char *str = str2.c_str();
-  int val = strtol(str,&ptr,10);
+  long val = strtol(str,&ptr,10);
   ArgTextPos += (int)(ptr-str);
-  if((val ==0 && ptr==str) || val==LONG_MIN||val==LONG_MAX)return -1;
+  if((val ==0 && ptr==str) || val==LONG_MIN||val==LONG_MAX) return -1;
   return val;
 
 }
@@ -614,13 +615,13 @@ int Logic::Val(string str)
 {
   char *ptr;
   const char *s = str.c_str();
-  int val = strtol(s,&ptr,10);
+  long val = strtol(s,&ptr,10);
   if(val==LONG_MIN||val==LONG_MAX)return -1;
   if(val==0){
     if(ptr==s)return -1;
     else return val;
   }
-  return val;  
+  return val;
 
 }
 //***************************************************
@@ -681,13 +682,13 @@ void Logic::ReadArgs(bool CommandIsIf, byte CmdNum)
       SaidArgs[NumSaidArgs] = ArgValue;
       if (SaidArgs[NumSaidArgs] < 0 || SaidArgs[NumSaidArgs] > 65535){
         ShowError(CurLine,"Invalid word number for argument " +IntToStr(NumSaidArgs)+ " (must be 0-65535).");
-         SaidArgs[NumSaidArgs] = 0;        
+         SaidArgs[NumSaidArgs] = 0;
       }
-      if (LinePos < LineLength & LowerCaseLine[LinePos] == ','){
+      if ((LinePos < LineLength) & (LowerCaseLine[LinePos] == ',')){
         if  (NumSaidArgs > MaxSaidArgs){
           ShowError(CurLine,"Too many arguments for said command.");
           FinishedReadingSaidArgs = true;
-        }        
+        }
       }
       else if(LinePos < LineLength && LowerCaseLine[LinePos] == ')'){
         FinishedReadingSaidArgs = true;
@@ -697,10 +698,10 @@ void Logic::ReadArgs(bool CommandIsIf, byte CmdNum)
       LinePos++;
     }while(!FinishedReadingSaidArgs||ErrorOccured);
     WriteByte(NumSaidArgs+1);
-    for (int i=0;i<=NumSaidArgs;i++){      
+    for (int i=0;i<=NumSaidArgs;i++){
       WriteByte(SaidArgs[i] % 256);
       WriteByte(SaidArgs[i] / 256);
-    }    
+    }
   }//if said test command
   else{ //other command
     if (CommandIsIf) ThisCommand = TestCommand[CmdNum];
@@ -715,7 +716,7 @@ void Logic::ReadArgs(bool CommandIsIf, byte CmdNum)
         //splitting the message into lines if it doesn't fit the screen
         do{
           if(ThisMessage != "" && ThisMessage[ThisMessage.length()-1]!=' ')ThisMessage += " ";
-          ThisMessage += ReadString(&ArgTextPos,ArgText);          
+          ThisMessage += ReadString(&ArgTextPos,ArgText);
           if(LinePos+1>=LineLength || LowerCaseLine.find_first_not_of(" ",LinePos+1)==string::npos){
 
             NextLine();
@@ -723,7 +724,7 @@ void Logic::ReadArgs(bool CommandIsIf, byte CmdNum)
             ReadArgText();
           }
           else break;
-        }while(true);        
+        }while(true);
         ThisMessageNum = MessageNum(ThisMessage);
         if (ThisMessageNum > 0){
           WriteByte(ThisMessageNum);
@@ -734,12 +735,12 @@ void Logic::ReadArgs(bool CommandIsIf, byte CmdNum)
             ShowError(CurLine,"Too many messages (max 255).");
           else
             WriteByte(ThisMessageNum);
-        }        
+        }
       }//argument is message and given as string
       else if (ThisCommand.argTypes[CurArg] == atIObj && ArgTextLength >= 1 && ArgText[0] == '"'){
            // argument is inventory object and given as string
         ArgTextPos=0;
-        ThisInvObjectName= ReadString(&ArgTextPos,ArgText);   
+        ThisInvObjectName= ReadString(&ArgTextPos,ArgText);
         if(ThisInvObjectName == "")ShowError(CurLine,"Object name must be at least one character.");
         else{
           for(i=0;i<objlist->ItemNames.num;i++){
@@ -768,19 +769,19 @@ void Logic::ReadArgs(bool CommandIsIf, byte CmdNum)
             ShowError(CurLine,"Invalid or missing value for argument "+IntToStr(CurArg)+" (must be 0-255)");
           else
             WriteByte(ArgValue);
-        }          
+        }
       }//normal argument
       if (CurArg < ThisCommand.NumArgs-1){
         if (ArgTextPos < ArgTextLength)
           ShowError(CurLine,"',' expected after argument "+IntToStr(CurArg)+".");
         else if(LinePos >= LineLength || LowerCaseLine[LinePos] != ',')
           ShowError(CurLine,"',' expected after argument "+IntToStr(CurArg)+".");
-        else 
-          LinePos++;        
+        else
+          LinePos++;
       }
       else if (ArgTextPos < ArgTextLength){
           ShowError(CurLine,"(1) ')' expected after argument "+IntToStr(CurArg)+".");
-          printf("Line %s argtextpos=%d arglen=%d\n",LowerCaseLine.c_str(),ArgTextPos,ArgTextLength);
+          printf("Line %s argtextpos=%d arglen=%d\n",LowerCaseLine.c_str(),(int)ArgTextPos,(int)ArgTextLength);
       }
     }
     SkipSpaces();
@@ -788,10 +789,10 @@ void Logic::ReadArgs(bool CommandIsIf, byte CmdNum)
 
       if (ThisCommand.NumArgs > 0){
         ShowError(CurLine,"(2) ')' expected after argument "+IntToStr(ThisCommand.NumArgs)+".");
-          printf("Line %s argtextpos=%d arglen=%d\n",LowerCaseLine.c_str(),ArgTextPos,ArgTextLength);
+          printf("Line %s argtextpos=%d arglen=%d\n",LowerCaseLine.c_str(),(int)ArgTextPos,(int)ArgTextLength);
       }
       else
-        ShowError(CurLine,"')' expected.");    
+        ShowError(CurLine,"')' expected.");
     }
     else
       LinePos++;
@@ -801,8 +802,8 @@ void Logic::ReadArgs(bool CommandIsIf, byte CmdNum)
 //***************************************************
 string Logic::ReadText()
 {
-  unsigned int p = LinePos;
-  unsigned int pos = LowerCaseLine.find_first_of("( ,):",LinePos);
+  int p = LinePos;
+  string::size_type pos = LowerCaseLine.find_first_of("( ,):",LinePos);
   if(pos == string::npos){
     LinePos = LineLength;
     return LowerCaseLine.substr(p);
@@ -816,9 +817,9 @@ string Logic::ReadText()
 //***************************************************
 string Logic::ReadPlainText()
 {
-  unsigned int p = LinePos;
-  unsigned int pos = LowerCaseLine.find_first_not_of("qwertyuiopasdfghjklzxcvbnm1234567890._",LinePos);
-  
+  int p = LinePos;
+  string::size_type pos = LowerCaseLine.find_first_not_of("qwertyuiopasdfghjklzxcvbnm1234567890._",LinePos);
+
   if(pos == string::npos){
     LinePos = LineLength;
     return LowerCaseLine.substr(p);
@@ -827,13 +828,13 @@ string Logic::ReadPlainText()
     LinePos = pos;
     return LowerCaseLine.substr(p,pos-p);
   }
-  
+
 }
 //***************************************************
 string Logic::ReadExprText()
 {
-  unsigned int p = LinePos;
-  unsigned int pos = LowerCaseLine.find_first_not_of("=+-*/><!",LinePos);
+  int p = LinePos;
+  string::size_type pos = LowerCaseLine.find_first_not_of("=+-*/><!",LinePos);
   if(pos == string::npos){
     LinePos = LineLength;
     return LowerCaseLine.substr(p);
@@ -842,7 +843,7 @@ string Logic::ReadExprText()
     LinePos = pos;
     return LowerCaseLine.substr(p,pos-p);
   }
-  
+
 }
 
 //***************************************************
@@ -858,7 +859,7 @@ byte Logic::FindCommandNum(bool CommandIsIf,string CmdName)
 {
   int i;
   const char *s;
-  
+
   s=CmdName.c_str();
 
   if (CommandIsIf){
@@ -866,7 +867,7 @@ byte Logic::FindCommandNum(bool CommandIsIf,string CmdName)
       if(!strcmp(s,TestCommand[i].Name))return i;
     }
     return 255;
-  } 
+  }
   else{
     for(i=0;i<=NumAGICommands;i++){
       if(!strcmp(s,AGICommand[i].Name))return i;
@@ -928,7 +929,7 @@ bool Logic::AddSpecialIFSyntax()
   else if(ArgText[0]=='f'){
     arg1 = Val(ArgText.substr(1));
     if(arg1<0||arg1>255)
-      ShowError(CurLine,"Invalid number given or error in expression syntax..");      
+      ShowError(CurLine,"Invalid number given or error in expression syntax..");
     else{
       WriteByte(0x07);  // isset
       WriteByte(arg1);
@@ -956,7 +957,7 @@ bool Logic::AddSpecialSyntax()
   }
   else ArgText = ReplaceDefine(ReadPlainText());
 
-  if(ArgText[0]=='v'){  
+  if(ArgText[0]=='v'){
 
     arg1 = Val(ArgText.substr(1));
     if(arg1<0 || arg1>255)
@@ -966,13 +967,13 @@ bool Logic::AddSpecialSyntax()
       expr = ReadExprText();
       if(expr == "++"){
          WriteByte(0x01); // increment
-         WriteByte(arg1); 
+         WriteByte(arg1);
          return true;
       }
       else if (expr == "--"){
          WriteByte(0x02); // decrement
-         WriteByte(arg1); 
-         return true;        
+         WriteByte(arg1);
+         return true;
       }
       else{
         if(expr[0]=='*'){
@@ -1007,21 +1008,21 @@ bool Logic::AddSpecialSyntax()
           }
           else if(expr == "-=" && !arg2isstar){
             if(arg2isvar)WriteByte(0x08);  //subv
-            else WriteByte(0x07);          //subn            
+            else WriteByte(0x07);          //subn
             WriteByte(arg1);
             WriteByte(arg2);
             return true;
           }
           else if(expr == "*=" && !arg2isstar){
             if(arg2isvar)WriteByte(0xa6);  //mul.v
-            else WriteByte(0xa5);          //mul.n           
+            else WriteByte(0xa5);          //mul.n
             WriteByte(arg1);
             WriteByte(arg2);
             return true;
           }
           else if(expr == "/=" && !arg2isstar){
             if(arg2isvar)WriteByte(0xa8);  //div.v
-            else WriteByte(0xa7);          //div.n            
+            else WriteByte(0xa7);          //div.n
             WriteByte(arg1);
             WriteByte(arg2);
             return true;
@@ -1038,7 +1039,7 @@ bool Logic::AddSpecialSyntax()
             }
             else if(arg2 != arg1) ShowError(CurLine,"Expression syntax error");
             else{
-              SkipSpaces(); 
+              SkipSpaces();
               expr2 = ReadExprText();
               SkipSpaces();
               ArgText = ReplaceDefine(ReadPlainText());
@@ -1108,7 +1109,7 @@ bool Logic::AddSpecialSyntax()
           WriteByte(arg1);
           WriteByte(arg2);
           return true;
-        }      
+        }
       }
     }
   }//if(ArgText.substr(0,2)=="*v")
@@ -1128,11 +1129,11 @@ int Logic::LabelNum(string LabelName)
 //***************************************************
 bool Logic::LabelAtStartOfLine(string LabelName)
 {
-  unsigned int pos = LinePos - LabelName.length()-1;
+  string::size_type pos = LinePos - LabelName.length()-1;
   if(LowerCaseLine.find_first_not_of(" ")<pos){
     return false;
   }
-  return true;  
+  return true;
 
 }
 //***************************************************
@@ -1177,7 +1178,7 @@ void Logic::WriteMessageSection()
         }
         else WriteEncByte(0x5c);
       }
-      else  WriteEncByte(Messages[CurMessage][i]);    
+      else  WriteEncByte(Messages[CurMessage][i]);
     }
     WriteEncByte(0x00);
   }
@@ -1276,7 +1277,7 @@ int Logic::CompileCommands()
         else if(CommandName == "else")
               ShowError(CurLine,"'}' required before 'else'.");
 
-        else if(CommandName == "goto"){        
+        else if(CommandName == "goto"){
           if(LinePos >= LineLength || LowerCaseLine[LinePos] != '(')
                 ShowError(CurLine,"'(' expected.");
           else{
@@ -1286,7 +1287,7 @@ int Logic::CompileCommands()
             if (LabelNum(CommandName) == 0)
                   ShowError(CurLine,"Unknown label "+CommandName+".");
             else if (NumGotos >= MaxGotos)
-                  ShowError(CurLine,"Too many labels (max "+IntToStr(MaxLabels)+").");            
+                  ShowError(CurLine,"Too many labels (max "+IntToStr(MaxLabels)+").");
             else{
               NumGotos++;
               Gotos[NumGotos].LabelNum = LabelNum(CommandName);
@@ -1317,7 +1318,7 @@ int Logic::CompileCommands()
           else{
             if (CommandNum == 255){ // not found
               if (!AddSpecialSyntax())
-                  ShowError(CurLine,"Unknown action command "+EditLines.at(CurLine).substr(CommandNameStartPos,CommandName.length())+".");              
+                  ShowError(CurLine,"Unknown action command "+EditLines.at(CurLine).substr(CommandNameStartPos,CommandName.length())+".");
             }
             else{
               WriteByte(CommandNum);
@@ -1325,7 +1326,7 @@ int Logic::CompileCommands()
               if (CommandNum == 0)LastCommandWasReturn = true;
             }
             if (LinePos >= LineLength || EditLines.at(CurLine)[LinePos] != ';')                           ShowError(CurLine,"';' expected after command.");
-            
+
             LinePos++;
           }//if we found a label
         }//command
@@ -1347,7 +1348,7 @@ int Logic::CompileCommands()
           else if(InIfBrackets && (NumCommandsInIfBrackets==0))
             ShowError(CurLine,"Brackets must contain at least one command.");
           else ShowError(CurLine,"Expected statement but found closing bracket.");
-          LinePos++;          
+          LinePos++;
         }
         else{
           NOTOn = false;
@@ -1421,7 +1422,7 @@ int Logic::CompileCommands()
           if (InIfBrackets)
             ShowError(CurLine,"Expected '||' or end of if statement.");
           else
-            ShowError(CurLine,"Expected '&&' or end of if statement.");        
+            ShowError(CurLine,"Expected '&&' or end of if statement.");
         }
       }// if (not AwaitingNextTestCommand) and (LinePos < LineLength)
     }//if InIf
@@ -1438,7 +1439,7 @@ int Logic::CompileCommands()
     else{
       if(InIfBrackets)ShowError(CurLine,"Expected '||' or end of if statement.");
       else ShowError(CurLine,"Expected '&&' or end of if statement.");
-    }    
+    }
   }
   else if (BlockDepth > 0){
     ShowError(CurLine,"'}' expected.");
@@ -1455,20 +1456,20 @@ int Logic::CompileCommands()
 int Logic::compile()
 {
   int ret,i,j;
-  
+
   sprintf(tmp,"%s/words.tok",game->dir.c_str());
   ret = wordlist->read(tmp);
   if(ret)return 1;
-  
-  sprintf(tmp,"%s/object",game->dir.c_str());  
+
+  sprintf(tmp,"%s/object",game->dir.c_str());
   ret = objlist->read(tmp,false);
   if(ret)return 1;
-  
+
   objlist->ItemNames.toLower();
   // words already in lower case in file so we don't need to convert them
    for(i=0;i<objlist->ItemNames.num;i++){
     if(objlist->ItemNames.at(i).find_first_of("\"")==string::npos)continue;
-    //replace " with \" 
+    //replace " with \"
     char *ptr=(char *)objlist->ItemNames.at(i).c_str();
     for(j=0;*ptr;ptr++){
       if(*ptr=='"'){
@@ -1481,27 +1482,27 @@ int Logic::compile()
     objlist->ItemNames.replace(i,tmp);
    }
 
-   ResourceData.Size = MaxResourceSize; 
+   ResourceData.Size = MaxResourceSize;
    LogicSize = 0;
    ResPos = 2;
-   ErrorOccured = false; 
+   ErrorOccured = false;
    NumDefines = 0;
-   ErrorList=""; 
-   
-   if(RemoveComments(InputLines))return 1;    
-   if(AddIncludes())return 1; 
+   ErrorList="";
+
+   if(RemoveComments(InputLines))return 1;
+   if(AddIncludes())return 1;
    if(ReadDefines())return 1;
    if(ReadPredefinedMessages())return 1;
    if(ReadLabels())return 1;
    if(CompileCommands())return 1;
-     
+
    WriteMessageSection();
 
    EditLines.lfree();
-   
+
    if(ErrorOccured)return 1;
-   //   printf("\n************* SUCCESS !!! ***********\n");  
-   ResourceData.Size = LogicSize;  
+   //   printf("\n************* SUCCESS !!! ***********\n");
+   ResourceData.Size = LogicSize;
    return 0;
-   
+
 }

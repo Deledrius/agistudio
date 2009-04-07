@@ -1,5 +1,5 @@
 /* XPM */
-static char *toolbar_logedit[] = {
+static const char *toolbar_logedit[] = {
 /* columns rows colors chars-per-pixel */
 "24 24 94 2",
 "   c black",

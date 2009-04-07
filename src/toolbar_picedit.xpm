@@ -1,5 +1,5 @@
 /* XPM */
-static char *toolbar_picedit[] = {
+static const char *toolbar_picedit[] = {
 /* columns rows colors chars-per-pixel */
 "24 24 172 2",
 "   c black",

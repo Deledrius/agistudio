@@ -239,7 +239,7 @@ Menu::Menu( QWidget *parent, const char *name )
 int get_win()
 {
   int n;
-  
+
   for(n=0;n<MAXWIN;n++){
     if(winlist[n].type==-1)break;
   }
@@ -262,14 +262,14 @@ void Menu::disable()
   view->setEnabled(false);
   logic->setEnabled(false);
   obj->setEnabled(false);
-  words->setEnabled(false);  
+  words->setEnabled(false);
   pic->setEnabled(false);
 }
 
 //**********************************************
 void Menu::enable()
 {
-  
+
   for(int i=0;i<max_disabled;i++){
     menubar->setItemEnabled( id[i], TRUE );
   }
@@ -278,7 +278,7 @@ void Menu::enable()
   view->setEnabled(true);
   logic->setEnabled(true);
   obj->setEnabled(true);
-  words->setEnabled(true);  
+  words->setEnabled(true);
   pic->setEnabled(true);
 }
 
@@ -312,7 +312,7 @@ void Menu::show_resources()
 //**********************************************
 void Menu::inc_res(ResourcesWin *res)
 {
-  
+
   num_res++;
   if(num_res==1){
     resources_win=res;
@@ -322,12 +322,12 @@ void Menu::inc_res(ResourcesWin *res)
     resources_win=NULL;
     disable_resources();
   }
-  
+
 }
 //**********************************************
 void Menu::dec_res()
 {
-  
+
   num_res--;
   if(num_res==1){
     for(int i=0;i<MAXWIN;i++){
@@ -397,7 +397,7 @@ void Menu::close_game()
       switch(winlist[i].type){
       case LOGIC:
         winlist[i].w.l->close();
-        break;    
+        break;
       case PICTURE:
         winlist[i].w.p->close();
         break;
@@ -406,7 +406,7 @@ void Menu::close_game()
         break;
       case OBJECT:
         winlist[i].w.o->close();
-        break;      
+        break;
       case WORDS:
         winlist[i].w.w->close();
         break;
@@ -423,7 +423,7 @@ void Menu::close_game()
     if(n>=LOGIC&&n<=TEXT)
       return ;  //some window was not closed
   }
-  
+
 
   //ok to close
   for(i=0;i<MAXWIN;i++){
@@ -441,7 +441,7 @@ void Menu::close_game()
 
 //**********************************************
 void Menu::run_game()
-{  
+{
 
 #ifdef _WIN32
   int i;
@@ -456,10 +456,10 @@ void Menu::run_game()
     strcpy(tmp,game->command.c_str());
     argv[0]=strtok(tmp," ");
     for(i=1;i<MAX_ARG;i++){
-      argv[i]=strtok(NULL," ");      
+      argv[i]=strtok(NULL," ");
       if(argv[i]==NULL)break;
     }
-    if(argv[MAX_ARG-1]!=NULL)argv[MAX_ARG-1]=NULL;   
+    if(argv[MAX_ARG-1]!=NULL)argv[MAX_ARG-1]=NULL;
 #ifdef _WIN32
 	STARTUPINFOA si;
 	PROCESS_INFORMATION pi;
@@ -478,7 +478,7 @@ void Menu::run_game()
 	CloseHandle(pi.hProcess);
 	CloseHandle(pi.hThread);
 #else
-    exit(0);  
+    exit(0);
   }
 #endif
 
@@ -515,10 +515,10 @@ void Menu::save_and_run()
 //**********************************************
 void Menu::window_list_cb()
 {
-  
+
   if(window_list==NULL)window_list=new WindowList();
   window_list->draw();
-  
+
 }
 //**********************************************
 void Menu::settings()
@@ -565,7 +565,7 @@ void Menu::new_resource_window()
   if((n=get_win())==-1)return;
   ResourcesWin *resources_win = new ResourcesWin(NULL,"Resources",n);
   winlist[n].type=RESOURCES;
-  winlist[n].w.r=resources_win; 
+  winlist[n].w.r=resources_win;
   int res=game->res_default;
   for(i=0;i<4;i++){
     if(sel[i]==0){
@@ -593,7 +593,7 @@ void Menu::extract_resource()
 {
 
   resources_win->extract_resource();
-  
+
 }
 
 //**********************************************
@@ -720,16 +720,16 @@ void Menu::sound_player()
 {
   extern void play_sound (char *);
 
-  QFileDialog *f = new QFileDialog(0,"Play sound",true);  
+  QFileDialog *f = new QFileDialog(0,"Play sound",true);
   const char *filters[] = {"sound*.*","All files (*)",NULL};
-  
+
   f->setFilters(filters);
   f->setCaption("Play sound");
   f->setMode(QFileDialog::ExistingFile);
   f->setDir(game->srcdir.c_str());
   if ( f->exec() == QDialog::Accepted ) {
     if ( !f->selectedFile().isEmpty() ){
-      play_sound((char *)f->selectedFile().latin1());      
+      play_sound((char *)f->selectedFile().latin1());
     }
   }
 
@@ -806,14 +806,14 @@ void Menu::about_qt()
 }
 
 //**********************************************
-void Menu::errmes(char *caption, char *fmt, ...)
+void Menu::errmes(const char *caption, const char *fmt, ...)
 {
   char tmp[512];
   va_list argp;
-  
+
   va_start(argp, fmt);
   vsprintf(tmp,fmt,argp);
-  va_end(argp);  
+  va_end(argp);
 
   err->setText(QString(tmp));
   err->setCaption(caption);
@@ -824,14 +824,14 @@ void Menu::errmes(char *caption, char *fmt, ...)
 }
 
 //*************************************************
-void Menu::errmes(char *fmt, ...)
+void Menu::errmes(const char *fmt, ...)
 {
   char tmp[512];
   va_list argp;
-  
+
   va_start(argp, fmt);
   vsprintf(tmp,fmt,argp);
-  va_end(argp);  
+  va_end(argp);
 
   err->setText(QString(tmp));
   err->setCaption("AGI studio");
@@ -842,14 +842,14 @@ void Menu::errmes(char *fmt, ...)
 
 
 //**********************************************
-void Menu::warnmes(char *fmt, ...)
+void Menu::warnmes(const char *fmt, ...)
 {
   char tmp[512];
   va_list argp;
-  
+
   va_start(argp, fmt);
   vsprintf(tmp,fmt,argp);
-  va_end(argp);  
+  va_end(argp);
 
   warn->setText(QString(tmp));
   warn->setCaption("AGI studio");
@@ -891,7 +891,7 @@ About::About(QWidget *parent, const char *name )
   about->setTextFormat(Qt::RichText);
   about->setReadOnly(true);
   about->setText(
-    "<center><b>QT AGI studio v. 1.2.3</b><br>"
+    "<center><b>QT AGI studio v. 1.2.4</b><br>"
     "http://agistudio.sourceforge.net/<br>"
     "<br>"
     "<b>Authors:</b><br>"
@@ -938,7 +938,7 @@ WindowList::WindowList(QWidget *parent, const char *name )
   l->add(win);
 
   QBoxLayout *l1 = new QHBoxLayout(l,10);
-    
+
   QPushButton *select = new QPushButton(this);
   select->setText("Select");
   connect( select, SIGNAL(clicked()), SLOT(select_ok()) );
@@ -960,7 +960,7 @@ WindowList::WindowList(QWidget *parent, const char *name )
 
 void WindowList::draw()
 {
-  QString caption;  
+  QString caption;
 
   win->clear();
   for(int i=0;i<MAXWIN;i++){
@@ -978,32 +978,32 @@ void WindowList::draw()
     case VIEW:
       caption = winlist[i].w.v->caption();
       if(winlist[i].w.v->isMinimized())caption.insert(0,"(.) ");
-      break;      
+      break;
     case OBJECT:
       caption = winlist[i].w.o->caption();
       if(winlist[i].w.o->isMinimized())caption.insert(0,"(.) ");
-      break;      
+      break;
     case WORDS:
       caption = winlist[i].w.w->caption();
       if(winlist[i].w.w->isMinimized())caption.insert(0,"(.) ");
-      break;      
+      break;
     case TEXT:
       caption = winlist[i].w.t->caption();
       if(winlist[i].w.t->isMinimized())caption.insert(0,"(.) ");
-      break;      
+      break;
     case RESOURCES:
       caption = winlist[i].w.r->caption();
       if(winlist[i].w.r->isMinimized())caption.insert(0,"(.) ");
-      break;      
+      break;
     case HELPWIN:
       caption = QString("Help");
       if(winlist[i].w.h->isMinimized())caption.insert(0,"(.) ");
       else if(!winlist[i].w.h->isVisible())caption.insert(0,"(~) ");
-      break;      
+      break;
     case PREVIEW:
       caption = winlist[i].w.pr->caption();
       if(winlist[i].w.pr->isMinimized())caption.insert(0,"(.) ");
-      break;      
+      break;
     }
     win->insertItem(caption);
   }
@@ -1023,14 +1023,14 @@ void WindowList::select_cb(int sel)
     if(n==sel){
       switch(winlist[i].type){
       case LOGIC:
-        if(winlist[i].w.l->isMinimized()){ 
-          winlist[i].w.l->showNormal(); 
+        if(winlist[i].w.l->isMinimized()){
+          winlist[i].w.l->showNormal();
           caption = QString("Logic editor: ").append(winlist[i].w.l->caption());
           win->changeItem(caption,sel);
         }
         winlist[i].w.l->setActiveWindow();
         winlist[i].w.l->raise();
-        break;    
+        break;
       case PICTURE:
         if(winlist[i].w.p->isMinimized()){
           winlist[i].w.p->showNormal();
@@ -1131,7 +1131,7 @@ void WindowList::del_cb()
 {
 
   int sel = win->currentItem();
-  if(sel==-1)return;  
+  if(sel==-1)return;
 
   int n=0;
   for(int i=0;i<MAXWIN;i++){
@@ -1140,7 +1140,7 @@ void WindowList::del_cb()
       switch(winlist[i].type){
       case LOGIC:
         winlist[i].w.l->close();
-        break;    
+        break;
       case VIEW:
         winlist[i].w.v->close();
         break;

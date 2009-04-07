@@ -1,3 +1,9 @@
+agistudio (1.2.4-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Jarno Elonen <elonen@iki.fi>  Wed, 08 Apr 2009 01:37:29 +0300
+
 agistudio (1.2.3+svn20070518-1) unstable; urgency=low
 
   * New upstream release (from SVN).

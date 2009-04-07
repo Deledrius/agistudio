@@ -1,5 +1,5 @@
 /* XPM */
-static char *downarrow_x[] = {
+static const char *downarrow_x[] = {
 /* columns rows colors chars-per-pixel */
 "16 16 2 1",
 "  c black",

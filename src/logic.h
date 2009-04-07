@@ -56,8 +56,8 @@ class Logic
   void AddSpecialSyntaxCommand();
   void AddSpecialIFSyntaxCommand();
   void ReadIfs();
-  
-  string ReadString(unsigned int *pos,string str);
+
+  string ReadString(string::size_type *pos, string& str);
   int RemoveComments(TStringList Lines);
   int AddIncludes();
   int ReadDefines();

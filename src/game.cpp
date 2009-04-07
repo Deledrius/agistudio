@@ -1,10 +1,10 @@
 /*
  *  QT AGI Studio :: Copyright (C) 2000 Helen Zommer
  *
- *  A big part of this code was adapted from the Windows AGI Studio 
+ *  A big part of this code was adapted from the Windows AGI Studio
  *  developed by Peter Kelly.
- * 
- *  LZW decompression code belongs to Lance Ewing. 
+ *
+ *  LZW decompression code belongs to Lance Ewing.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -53,7 +53,7 @@
 
 const char *ResTypeName[4] = {"logic","picture","view","sound"};
 const char *ResTypeAbbrv[4] = {"log","pic","view","snd"};
-static char *files[5] = {"vol.0","viewdir","logdir","snddir","picdir"};
+static const char *files[5] = {"vol.0","viewdir","logdir","snddir","picdir"};
 Game *game;
 
 static TResource CompressedResource;
@@ -71,12 +71,12 @@ static int input_bit_count=0;    /* Number of bits in input bit buffer */
 static unsigned long input_bit_buffer=0L;
 //*******************************************
 
-char EncryptionKey[] = "Avis Durgan";
+const char EncryptionKey[] = "Avis Durgan";
 TResourceInfo ResourceInfo[4][256];
 
 TResource ResourceData;
-/* global buffer used for all resource I/0 ! (for this reason it wouldn't be 
- wise to run several I/O operations simultaneously, like clicking compile 
+/* global buffer used for all resource I/0 ! (for this reason it wouldn't be
+ wise to run several I/O operations simultaneously, like clicking compile
  very fast in several logic editor windows ("compile all" is ok - it is
  sequential) - fortunately the program works too fast to allow the user
  to do it...) */
@@ -97,7 +97,7 @@ int Game::open(string name)
   long DirSize=-1,DirOffset=-1;
   byte byte1,byte2,byte3;
   FILE *fptr;
-  
+
   dir=name;
 
   ID = FindAGIV3GameID(dir.c_str());  // 'V2' if not found
@@ -163,7 +163,7 @@ int Game::open(string name)
         menu->errmes("Error: %s is too big (should not be mode than 3080 bytes) !",DIRFilename.c_str());
         ErrorOccured = true;
       }
-      else{                      
+      else{
         fread(DirData,size,1,fptr);
         //read resource info
         for(CurResType = 0;CurResType <= 3;CurResType++){
@@ -188,7 +188,7 @@ int Game::open(string name)
             }
             if(DirOffset < 0 || DirSize < 0){
               menu->errmes("Error: DIR file is invalid.");
-              ErrorOccured = true;              
+              ErrorOccured = true;
               break;
             }
             else if(DirOffset + DirSize > size){
@@ -213,21 +213,21 @@ int Game::open(string name)
               }
             }
           }
-        }        
+        }
       }
       fclose(fptr);
     }
   }
- 
+
   if(!ErrorOccured){
     AGIVersionNumber = GetAGIVersionNumber();
     //printf("AGIVersion = %f\n",AGIVersionNumber);
-    CorrectCommands(AGIVersionNumber);       
-    isOpen = true; 
+    CorrectCommands(AGIVersionNumber);
+    isOpen = true;
     make_source_dir();
     menu->status->message(dir.c_str());
     return 0;
-  }  
+  }
   else return 1;
 }
 
@@ -259,7 +259,7 @@ int copy(char *src,char *dest)
     return 1;
   }
   fwrite(ResourceData.Data,size,1,fptr);
-  fclose(fptr);  
+  fclose(fptr);
   return 0;
 
 }
@@ -267,7 +267,7 @@ int copy(char *src,char *dest)
 //*******************************************
 
 int Game::from_template(string name)
-  //create a new game (in 'name' directory) from template 
+  //create a new game (in 'name' directory) from template
 {
 
   int i;
@@ -283,7 +283,7 @@ int Game::from_template(string name)
     sprintf(tmp,"%s/%s",templatedir.c_str(),files[i]);
     if(stat(tmp,&buf)){
       menu->errmes("AGI Studio error", "Can't read %s in template directory %s !",files[i],templatedir.c_str());
-      return 1;    
+      return 1;
     }
   }
 
@@ -305,7 +305,7 @@ int Game::from_template(string name)
       if(!strcmp(ptr,"/src"))continue;
 	  if(!strcmp(ptr,"/."))continue;
 	  if(!strcmp(ptr,"/.."))continue;
-      sprintf(tmp,"%s%s",name.c_str(),ptr);    
+      sprintf(tmp,"%s%s",name.c_str(),ptr);
     }
     else{
       if(!strcmp(cfilename,"/src"))continue;
@@ -336,7 +336,7 @@ int Game::from_template(string name)
     if(ptr){
 	  if(!strcmp(ptr,"/."))continue;
 	  if(!strcmp(ptr,"/.."))continue;
-      sprintf(tmp,"%s%s",srcdir.c_str(),ptr);    
+      sprintf(tmp,"%s%s",srcdir.c_str(),ptr);
     }
     else{
 	  if(!strcmp(cfilename,"/."))continue;
@@ -349,11 +349,11 @@ int Game::from_template(string name)
   _findclose(hFile);
 #else
     }
-  globfree(&globbuf);  
+  globfree(&globbuf);
 #endif
 
   return open(name);
-  
+
 }
 
 //*******************************************
@@ -362,7 +362,7 @@ void Game::make_source_dir()
 {
 
   if(reldir)
-    srcdir=dir+"/"+srcdirname;   //srcdir is inside the game directory 
+    srcdir=dir+"/"+srcdirname;   //srcdir is inside the game directory
   else
     srcdir=srcdirname;           //srcdir can be anywhere
 
@@ -390,7 +390,7 @@ int Game::newgame(string name)
 0x00,0x00,0x00,0x00,0x00,0x9E,0x00,0x00,0x01,0x11,0x06,0x08,0x10,0x0D,0x9B,0x00,
 0x01,0x00,0x0D,0x10,0x93,0x27,0x0F,0x00};
 
-  static char* files[5] = {"vol.0","viewdir","logdir","snddir","picdir"};
+  static const char* files[5] = {"vol.0","viewdir","logdir","snddir","picdir"};
   FILE *fptr;
   int i,j;
 
@@ -415,7 +415,7 @@ int Game::newgame(string name)
   fclose(fptr);
   make_source_dir();
 
-  isOpen = true; 
+  isOpen = true;
   isV3 = false;
   ID = "";
   AGIVersionNumber = 2.917;
@@ -434,7 +434,7 @@ string Game::FindAGIV3GameID(const char *name)
   //it is a V3 game
 {
   string ID1;
-  char *ptr;  
+  char *ptr;
   char *cfilename;
 
   ID1 = "V2";  //default for V2 games
@@ -472,13 +472,13 @@ string Game::FindAGIV3GameID(const char *name)
   globfree(&globbuf);
 #endif
 
-  sprintf(tmp,"%s/*vol.0",name);  
+  sprintf(tmp,"%s/*vol.0",name);
 
 #ifdef _WIN32
   if ((hFile = _findfirst(tmp, &c_file)) == -1L) {
-#else  
+#else
   if (glob (tmp, GLOB_ERR | GLOB_NOSORT, NULL, &globbuf)) {
-    globfree(&globbuf);  
+    globfree(&globbuf);
 #endif
     return ID1;
   }
@@ -489,18 +489,18 @@ string Game::FindAGIV3GameID(const char *name)
   cfilename = globbuf.gl_pathv[0];
 #endif
   if((ptr=strrchr(cfilename,'/')))ptr++;
-  else ptr=cfilename;  
+  else ptr=cfilename;
   strncpy (volString, ptr, strlen (ptr) - 5);
 
 #ifdef _WIN32
   _findclose(hFile);
 #else
   globfree(&globbuf);
-#endif  
-  
+#endif
+
   if ((strcmp(volString, dirString) == 0) && (volString != NULL))
     ID1=volString;
-  
+
   return ID1;
 }
 
@@ -514,7 +514,7 @@ double Game::GetAGIVersionNumber(void)
   char VerNumText[16];
   string InFileName = dir + "/agidata.ovl";
   char VersionNumBuffer[] = "A_CDE_GHI";
-  double ret = 2.917; 
+  double ret = 2.917;
   // This is what we use if we can't find the version number.
   // Version 2.917 is the most common interpreter and
   // the one that all the "new" AGI games should be based on.
@@ -555,9 +555,9 @@ double Game::GetAGIVersionNumber(void)
       if (VerLen>0){
         if (VersionNumBuffer[5] == '.'){
           strcpy(VerNumText,VersionNumBuffer);
-          strcpy(VerNumText+5,VersionNumBuffer+6); // remove second .          
+          strcpy(VerNumText+5,VersionNumBuffer+6); // remove second .
         }
-        else{ 
+        else{
           strncpy(VerNumText,VersionNumBuffer,VerLen);
           VerNumText[VerLen]=0;
         }
@@ -570,7 +570,7 @@ double Game::GetAGIVersionNumber(void)
     }
   }
   return ret;
-} 
+}
 
 //***************************************
 int Game::GetResourceSize(char ResType_c,int ResNum)
@@ -635,18 +635,18 @@ int Game::ReadResource(char ResType_c, int ResNum)
     menu->errmes("Error: %s: Resource signature not found",ResourceInfo[ResType][ResNum].Filename);
     return 1;
   }
-  
+
   fseek(fptr,ResourceInfo[ResType][ResNum].Loc+3,SEEK_SET);
   fread(&lsbyte,1,1,fptr);
   fread(&msbyte,1,1,fptr);
   ResourceData.Size = msbyte * 256 + lsbyte;
-  
+
   if(ResourceData.Size==0){
     menu->errmes("Error: %s: Resource size 0 !",ResourceInfo[ResType][ResNum].Filename);
     return 1;
   }
-  
-  fread(ResourceData.Data, ResourceData.Size,1,fptr); 
+
+  fread(ResourceData.Data, ResourceData.Size,1,fptr);
   fclose(fptr);
   return 0;
 
@@ -656,7 +656,7 @@ int Game::ReadResource(char ResType_c, int ResNum)
 FILE * Game::OpenPatchVol(int PatchVol,int *filesize)
 {
   FILE *fptr;
-  
+
   if(isV3)
     sprintf(tmp,"%s/%svol.%d",dir.c_str(),ID.c_str(),PatchVol);
   else
@@ -666,8 +666,8 @@ FILE * Game::OpenPatchVol(int PatchVol,int *filesize)
   struct stat buf;
   fstat(fileno(fptr),&buf);
   *filesize=buf.st_size;
-  return fptr;  
-  
+  return fptr;
+
 }
 //***********************************************
 static int RewriteDirFile(FILE *dir,int dirsize)
@@ -678,7 +678,7 @@ static int RewriteDirFile(FILE *dir,int dirsize)
   byte lsbyte,msbyte;
   int Offset[4],Size[4];
   byte OffsetArray[8];
-  
+
   fseek(dir,0,SEEK_SET);
   for(CurResType=3;CurResType>=0;CurResType--){
     fseek(dir,CurResType*2,SEEK_SET);
@@ -694,18 +694,18 @@ static int RewriteDirFile(FILE *dir,int dirsize)
       fclose(dir);
       return 1;
     }
-    
+
   }
   for(CurResType =0;CurResType<=3;CurResType++){
     fseek(dir,Offset[CurResType],SEEK_SET);
     memset(DirData[CurResType],0xff,768);
-    fread(DirData[CurResType],Size[CurResType],1,dir);     
+    fread(DirData[CurResType],Size[CurResType],1,dir);
   }
-  
+
   OffsetArray[0] = 8;
   OffsetArray[1] = 0;
   Offset[0] = 8;
-  
+
   for(CurResType =1;CurResType<=3;CurResType++){
      Offset[CurResType] = Offset[CurResType-1] + 768;
      OffsetArray[CurResType*2] = Offset[CurResType] % 256;
@@ -717,7 +717,7 @@ static int RewriteDirFile(FILE *dir,int dirsize)
     fwrite(DirData[CurResType],768,1,dir);
   }
   fflush(dir);
-  
+
   return 0;
 
 }
@@ -763,7 +763,7 @@ int Game::AddResource(int ResType,int ResNum)
   }
 
   do{
-    if(filesize + ResourceData.Size > 1048000){  
+    if(filesize + ResourceData.Size > 1048000){
 //current volume is too big (to fit a diskette) - create the next one
       fclose(fptr);
       PatchVol++;
@@ -775,7 +775,7 @@ int Game::AddResource(int ResType,int ResNum)
           menu->errmes("Can't open vol.%d !",PatchVol);
         return 1;
       }
-    }      
+    }
   }while(filesize + ResourceData.Size > 1048000);
 
   //write the resource to the patch volume and update the DIR file
@@ -791,15 +791,15 @@ int Game::AddResource(int ResType,int ResNum)
       DirByte[1] = 0xff;
       fseek(dirf,dirsize,SEEK_SET);
       do{
-        fwrite(&DirByte[1],1,1,dirf);        
+        fwrite(&DirByte[1],1,1,dirf);
       }while(ftell(dirf)!=ResNum*3);
     }
-  }  
+  }
   fseek(fptr,filesize,SEEK_SET);
   off = ftell(fptr);
   DirByte[0] = PatchVol*0x10 + off / 0x10000;
   DirByte[1] = (off % 0x10000) / 0x100;
-  DirByte[2] = off % 0x100;    
+  DirByte[2] = off % 0x100;
   ResourceInfo[ResType][ResNum].Exists = true;
   ResourceInfo[ResType][ResNum].Loc = off;
   if(isV3)sprintf(ResourceInfo[ResType][ResNum].Filename,"%svol.%d",ID.c_str(),PatchVol);
@@ -845,7 +845,7 @@ int Game::DeleteResource(int ResType,int ResNum)
   int off;
 
   if((dirf = OpenDirUpdate(&dirsize,ResType))==NULL)return 1;
-  
+
   if(isV3){
     if(dirsize<8){
       menu->errmes("Error: %s file invalid!",dirname.c_str());
@@ -915,7 +915,7 @@ int Game::RebuildVOLfiles()
       }
     }
   }
-  
+
   QProgressDialog progress( "Rebuilding VOL files...", "Cancel", steps,0, 0, TRUE );  //shows up if the operation is taking more than 3 sec
   //(so it never shows up...)
 
@@ -928,8 +928,8 @@ int Game::RebuildVOLfiles()
     menu->errmes("Error creating file %s ! ",tmp);
     progress.cancel();
     return 1;
-  }    
-  
+  }
+
   if(isV3){
     sprintf(tmp,"%s/%sdir.new",dir.c_str(), ID.c_str());
     if((dirf=fopen(tmp,"wb"))==NULL){
@@ -948,8 +948,8 @@ int Game::RebuildVOLfiles()
       for(ResNum=0;ResNum<256;ResNum++){
         fwrite(&b,1,1,dirf);
         fwrite(&b,1,1,dirf);
-        fwrite(&b,1,1,dirf);        
-      }      
+        fwrite(&b,1,1,dirf);
+      }
     }
     fflush(dirf);
     fseek(dirf,0,SEEK_SET);
@@ -969,9 +969,9 @@ int Game::RebuildVOLfiles()
         fwrite(&b,1,1,dirf);
       }
       fflush(dirf);
-      fseek(dirf,0,SEEK_SET);      
+      fseek(dirf,0,SEEK_SET);
     }
-          
+
     for(ResNum=0;ResNum<256;ResNum++){
       if(!ResourceInfo[ResType][ResNum].Exists){
         NewResourceInfo[ResType][ResNum].Exists = false;
@@ -986,12 +986,12 @@ int Game::RebuildVOLfiles()
       if(off + ResourceData.Size + 5 > MaxVOLFileSize){
         fclose(fptr);
         VolFileNum++;
-        sprintf(tmp,"%s/%s.%d.new",dir.c_str(),volname,VolFileNum);    
+        sprintf(tmp,"%s/%s.%d.new",dir.c_str(),volname,VolFileNum);
         if((fptr=fopen(tmp,"wb"))==NULL){
           menu->errmes("Error creating file %s !",tmp);
           progress.cancel();
           return 1;
-        }    
+        }
         off=ftell(fptr);
       }
       NewResourceInfo[ResType][ResNum].Exists = true;
@@ -1020,11 +1020,11 @@ int Game::RebuildVOLfiles()
       fwrite(&byte1,1,1,dirf);
       fwrite(&byte2,1,1,dirf);
       fwrite(&byte3,1,1,dirf);
-      progress.setProgress( step++ );   
+      progress.setProgress( step++ );
       if ( progress.wasCancelled() ){
         cancel=true;
-        break;   
-      }   
+        break;
+      }
     }
     if(!isV3)
       fclose(dirf);
@@ -1073,7 +1073,7 @@ int Game::RebuildVOLfiles()
     d.rename( *it, new_name );
   }
 
-  memcpy(ResourceInfo,NewResourceInfo,sizeof(ResourceInfo));  
+  memcpy(ResourceInfo,NewResourceInfo,sizeof(ResourceInfo));
   QMessageBox::information( menu, "AGI studio","Rebuilding is complete !");
   return 0;
 }
@@ -1254,7 +1254,7 @@ static void DecompressPicture(byte *picBuf,byte *outBuf,int picLen,int *outLen)
       outData = ((data & 0xF0) >> 4) + ((oldData & 0x0F) << 4);
     else
       outData = data;
-    
+
     if ((outData == 0xF0) || (outData == 0xF2)) {
       *out++ = outData;
       if (mode == NORMAL) {
@@ -1294,7 +1294,7 @@ int Game::ReadV3Resource(char ResourceType1_c, int ResourceID1)
     menu->errmes("Error reading file %s/%s",dir.c_str(),ResourceInfo[ResourceType1][ResourceID1].Filename);
     return 1;
   }
-  
+
   struct stat buf;
   fstat(fileno(fptr),&buf);
   int size=buf.st_size;
@@ -1318,9 +1318,9 @@ int Game::ReadV3Resource(char ResourceType1_c, int ResourceID1)
   fread(&msbyte,1,1,fptr);
   CompressedResource.Size = msbyte * 256 + lsbyte;
   fread(CompressedResource.Data,CompressedResource.Size,1,fptr);
-  
+
   if(ResourceIsPicture){
-    DecompressPicture(CompressedResource.Data,ResourceData.Data,CompressedResource.Size,&ResourceData.Size);   
+    DecompressPicture(CompressedResource.Data,ResourceData.Data,CompressedResource.Size,&ResourceData.Size);
   }
   else if(CompressedResource.Size != ResourceData.Size){
     initLZW();
@@ -1388,7 +1388,7 @@ void Game::read_settings()
 #endif
   if(!home)home=getenv("home");
   if(!home)return;
-  
+
   sprintf(tmp,"%s/.agistudio",home);
   fptr=fopen(tmp,"rb");
   if(!fptr)return;
@@ -1400,28 +1400,28 @@ void Game::read_settings()
       res_default=atoi(tmp+12);
     }
     else if(!strncmp(tmp,"save_logic_as_text=",20)){
-      n=atoi(tmp+20);      
+      n=atoi(tmp+20);
       save_logic_as_text=(n==1);
     }
     else if(!strncmp(tmp,"show_all_messages=",18)){
-      n=atoi(tmp+18);      
+      n=atoi(tmp+18);
       show_all_messages=(n==1);
     }
     else if(!strncmp(tmp,"show_elses_as_gotos=",20)){
-      n=atoi(tmp+20);      
+      n=atoi(tmp+20);
       show_elses_as_gotos=(n==1);
     }
     else if(!strncmp(tmp,"show_special_syntax=",20)){
-      n=atoi(tmp+20);      
+      n=atoi(tmp+20);
       show_special_syntax=(n==1);
     }
     else if(!strncmp(tmp,"reldir=",8)){
-      n=atoi(tmp+8);      
+      n=atoi(tmp+8);
       reldir=(n==1);
     }
     else if(!strncmp(tmp,"command=",8)){
       command=string(tmp+8);
-    }    
+    }
     else if(!strncmp(tmp,"srcdirname=",11)){
       srcdirname=string(tmp+11);
     }
@@ -1459,7 +1459,7 @@ void Game::save_settings()
     menu->errmes("Can't determine HOME environment variable !\nSettings were not saved.");
     return;
   }
-  
+
   sprintf(tmp,"%s/.agistudio",home);
   fptr=fopen(tmp,"wb");
   if(!fptr){
@@ -1469,7 +1469,7 @@ void Game::save_settings()
   fprintf(fptr,"res_default=%d\n",res_default);
   fprintf(fptr,"save_logic_as_text=%d\n",save_logic_as_text);
   fprintf(fptr,"show_elses_as_gotos=%d\n",show_elses_as_gotos);
-  fprintf(fptr,"show_all_messages=%d\n",show_all_messages);  
+  fprintf(fptr,"show_all_messages=%d\n",show_all_messages);
   fprintf(fptr,"show_special_syntax=%d\n",show_special_syntax);
   fprintf(fptr,"reldir=%d\n",reldir);
   fprintf(fptr,"command=%s\n",command.c_str());
@@ -1488,22 +1488,22 @@ int Game::RecompileAll()
   FILE *fptr;
   Logic logic;
   char tmp1[16],*ptr;
-  extern TStringList InputLines; 
+  extern TStringList InputLines;
 
   for(i=0;i<MAXWIN;i++){
     if(winlist[i].type==TEXT){
       if(winlist[i].w.t->filename != ""){
         winlist[i].w.t->save();
-        winlist[i].w.t->status->message(""); 
+        winlist[i].w.t->status->message("");
       }
     }
     else if(winlist[i].type==LOGIC){
       if(winlist[i].w.l->filename != ""){
         winlist[i].w.l->save_logic();
-        winlist[i].w.l->status->message(""); 
+        winlist[i].w.l->status->message("");
       }
     }
-    
+
   }
 
   int step=0,steps=0;
@@ -1514,7 +1514,7 @@ int Game::RecompileAll()
   }
 
 
-  QProgressDialog progress( "Recompiling all logics...", "Cancel", steps,0, 0, TRUE ); 
+  QProgressDialog progress( "Recompiling all logics...", "Cancel", steps,0, 0, TRUE );
   progress.setMinimumDuration(0);
 
   for(ResNum=0;ResNum<256;ResNum++){
@@ -1530,7 +1530,7 @@ int Game::RecompileAll()
         sprintf(tmp,"%s/logic%d.txt",game->srcdir.c_str(),ResNum);
         fptr = fopen(tmp,"rb");
       }
-      if(fptr!=NULL){    
+      if(fptr!=NULL){
         InputLines.lfree();
         while(fgets(tmp,MAX_TMP,fptr)!=NULL){
           if((ptr=strchr(tmp,0x0a)))*ptr=0;
@@ -1541,14 +1541,14 @@ int Game::RecompileAll()
         fclose(fptr);
       }
       else{  //source file not found - reading from the game
-        err=logic.decode(ResNum);    
+        err=logic.decode(ResNum);
         if(err){
           sprintf(tmp,"logic.%d",ResNum);
           menu->errmes(tmp,"Errors:\n%s",logic.ErrorList.c_str());
           continue;
-        }        
+        }
         InputLines.lfree();
-        unsigned int pos;
+        string::size_type pos;
         string str=logic.OutputText;
         while((pos=str.find_first_of("\n"))!=string::npos){
           InputLines.add(str.substr(0,pos));
@@ -1568,12 +1568,12 @@ int Game::RecompileAll()
           menu->errmes(tmp1,"Errors:\n%s",logic.ErrorList.c_str());
         }
       }
-      progress.setProgress( step++ );   
+      progress.setProgress( step++ );
       if ( progress.wasCancelled() )return 1;
-    }    
+    }
   }
 
-  progress.setProgress( steps );     
+  progress.setProgress( steps );
   QMessageBox::information( menu, "AGI studio","Recompilation is complete !");
 
   return 0;

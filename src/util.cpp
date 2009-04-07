@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <cstring>
 
 TStringList::TStringList ()
 {
@@ -39,10 +40,10 @@ void TStringList::toLower(void)
 
   for(int i=0;i<num;i++){
     for(int k=0;k<(int)data[i].length();k++){
-      data[i][k]=tolower( (int)data[i][k]);  
+      data[i][k]=tolower( (int)data[i][k]);
     }
   }
-  
+
 
 }
 
@@ -51,10 +52,10 @@ void TStringList::toLower(int i)
 
 
   for(int k=0;k<(int)data[i].length();k++){
-    data[i][k]=tolower( (int)data[i][k]);  
+    data[i][k]=tolower( (int)data[i][k]);
   }
 
-  
+
 
 }
 
@@ -95,23 +96,23 @@ void TStringList::del(int n)
 
 }
 
-void TStringList::replace(int n,char *str)
+void TStringList::replace(int n, const char *str)
 {
 
   data[n]=string(str);
 
 }
 
-void TStringList::replace(int n,string str)
+void TStringList::replace(int n, const string& str)
 {
 
   data[n]=string(str);
 
 }
 
-void TStringList::add(string str)
+void TStringList::add(const string& str)
 {
-  
+
   if(num>=max){
     max+=inc;
     string *data1 = new string[max];
@@ -119,27 +120,27 @@ void TStringList::add(string str)
       data1[i]=data[i];
     }
     delete [] data;
-    data=data1;    
+    data=data1;
   }
 
   // printf("add %d=%s\n",num,str.c_str());
   data[num]=string(str);
   num++;
- 
-  
+
+
 }
 
 
-void TStringList::addsorted(char *str)
+void TStringList::addsorted(const char *str)
 {
-  
+
   addsorted(string(str));
-  
+
 }
 
-void TStringList::addsorted(string s)
+void TStringList::addsorted(const string& s)
 {
-  
+
   if(num>=max){
     max+=inc;
     string *data1 = new string[max];
@@ -147,11 +148,11 @@ void TStringList::addsorted(string s)
       data1[i]=data[i];
     }
     delete [] data;
-    data=data1;    
+    data=data1;
 
   }
 
-  for(int i=0;i<num;i++){    
+  for(int i=0;i<num;i++){
     if(data[i] > s){
       for(int k=num;k>i;k--){
         data[k]=data[k-1];
@@ -162,10 +163,10 @@ void TStringList::addsorted(string s)
     }
   }
   data[num++]=s;
-  
+
 }
 
-void TStringList::copy(TStringList list)
+void TStringList::copy(const TStringList& list)
 {
 
   num=list.num;
@@ -175,7 +176,7 @@ void TStringList::copy(TStringList list)
   for(int i=0;i<num;i++){
     data[i]=list.data[i];
   }
-  
+
 
 }
 void TStringList::lfree(void)
@@ -192,7 +193,7 @@ void TStringList::lfree(void)
 
 //**************************************
 
-string MultStr(char *str,int NumCopies)
+string MultStr(const char *str,int NumCopies)
 {
   char tmp[256];
 

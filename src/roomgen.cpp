@@ -2,7 +2,7 @@
  *  QT AGI Studio :: Copyright (C) 2000 Helen Zommer
  *
  *  The idea and most of the design of RoomGen module are copied from the
- *  "AGI Base Logic Generator" utility by Joel McCormick. 
+ *  "AGI Base Logic Generator" utility by Joel McCormick.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -38,9 +38,9 @@
 
 #include <qapplication.h>
 #include <qfiledialog.h>
-#include <qgrid.h> 
+#include <qgrid.h>
 
-static char *dirs[4] = {"left","right","bottom","horizon"};
+static const char *dirs[4] = {"left","right","bottom","horizon"};
 
 //***********************************************
 RoomGen::RoomGen( QWidget *parent, const char *name)
@@ -48,18 +48,18 @@ RoomGen::RoomGen( QWidget *parent, const char *name)
 {
   int i;
   setCaption("AGI Base Logic Generator");
-  
+
   QBoxLayout *all = new QVBoxLayout(this,5);
-  
+
   QHBoxLayout *upper = new QHBoxLayout(all,10);
-  
+
   QGrid *gtxt = new QGrid( 2, this);
   gtxt->setSpacing(4);
   upper->addWidget(gtxt);
 
   QLabel *llog = new QLabel("Logic Number:",gtxt);
   llog=llog; //avoid compilation warning
-  lnum = new QLineEdit(gtxt);  
+  lnum = new QLineEdit(gtxt);
   lnum->setFixedWidth(40);
   lnum->setText("0");
   //lnum->selectAll();
@@ -78,7 +78,7 @@ RoomGen::RoomGen( QWidget *parent, const char *name)
   hnum->setFixedWidth(40);
   hnum->setText("36");
   //hnum->selectAll();
-  
+
   QVBoxLayout *check = new QVBoxLayout(upper,2);
   draw_ego = new QCheckBox("Draw Ego initially",this);
   draw_ego->setChecked(true);
@@ -93,14 +93,14 @@ RoomGen::RoomGen( QWidget *parent, const char *name)
   gen_comm->setChecked(true);
   check->addWidget(gen_comm);
 
-  QVBoxLayout *but = new QVBoxLayout(upper,2);  
+  QVBoxLayout *but = new QVBoxLayout(upper,2);
   QPushButton *entry = new QPushButton("Entry and looking",this);
   connect(entry,SIGNAL(clicked()),SLOT(entry_cb()));
   but->addWidget(entry);
   QPushButton *first = new QPushButton("First room controls",this);
   connect(first,SIGNAL(clicked()),SLOT(first_cb()));
   but->addWidget(first);
-  
+
   QBoxLayout *ledge = new QHBoxLayout(all,1);
 
   //  QGroupBox *ego_pos_b = new QGroupBox(1,Horizontal,"Ego Positioning (-1 = ignore)",this);
@@ -110,26 +110,26 @@ RoomGen::RoomGen( QWidget *parent, const char *name)
   ego_pos_b->setMargin(2);
 
   QGridLayout *ego_pos = new QGridLayout(ego_pos_b,6,6,10,4);
-  
+
   QLabel *ll = new QLabel("Ego Positioning (-1 = ignore)",ego_pos_b);
   ego_pos->addMultiCellWidget(ll,0,0,0,5,AlignCenter);
-  
+
 
   int row=1,col;
-   
+
   QLabel *l_from = new QLabel("Coming from",ego_pos_b);
   ego_pos->addMultiCellWidget(l_from,row,row,0,1,AlignLeft);
 
-  QLabel *l_pos = new QLabel("Position Ego at",ego_pos_b);  
+  QLabel *l_pos = new QLabel("Position Ego at",ego_pos_b);
   ego_pos->addMultiCellWidget(l_pos,row,row,2,5,AlignCenter);
-  
+
   QLabel *l_lroom[4],*l_x[4],*l_y[4];
   row++;
 
   for(i=0;i<4;i++,row++){
     col=0;
     l_lroom[i] = new QLabel("room:",ego_pos_b);
-    ego_pos->addWidget(l_lroom[i],row,col,AlignRight); col++;     
+    ego_pos->addWidget(l_lroom[i],row,col,AlignRight); col++;
     from[i] = new QLineEdit(ego_pos_b);
     from[i]->setFixedWidth(40);
     from[i]->setText("-1");
@@ -182,7 +182,7 @@ RoomGen::RoomGen( QWidget *parent, const char *name)
   row++;
 
   QLabel *l_e[4];
-  char *dirs[4] = {"Left Edge:","Right Edge:","Bottom Edge:","Horizon Edge:"};
+  const char *dirs[4] = {"Left Edge:","Right Edge:","Bottom Edge:","Horizon Edge:"};
 
   for(i=0;i<4;i++,row++){
     col=0;
@@ -200,14 +200,14 @@ RoomGen::RoomGen( QWidget *parent, const char *name)
   connect(edge_adv,SIGNAL(clicked()),SLOT(edge_advanced_cb()));
   edge_control->addMultiCellWidget(edge_adv,row,row,0,1,AlignCenter);
 
-  ledge->addWidget(edge_control_b,0);    
-  
+  ledge->addWidget(edge_control_b,0);
+
   QHBoxLayout *ltitle = new QHBoxLayout(all,4);
 
   QLabel *lcom = new QLabel("Logic Title (for comments):",this);
   ltitle->addWidget(lcom);
   title = new QLineEdit(this);
-  ltitle->addWidget(title);  
+  ltitle->addWidget(title);
 
   QHBoxLayout *last = new QHBoxLayout(all,20);
 
@@ -220,9 +220,9 @@ RoomGen::RoomGen( QWidget *parent, const char *name)
   cancel->setMaximumSize(80,40);
   connect(cancel,SIGNAL(clicked()),SLOT(reject()));
   last->addWidget(cancel,AlignLeft);
-    
+
   adjustSize();
-  
+
   room_entry = NULL;
   room_first = NULL;
   ego_advanced = NULL;
@@ -239,9 +239,9 @@ RoomGen::RoomGen( QWidget *parent, const char *name)
   x1=y1=-1;
 }
 //************************************************
-bool RoomGen::bad_int(QLineEdit *w,int *res,int nmin,int nmax,bool ignore,char *text)
+bool RoomGen::bad_int(QLineEdit *w,int *res,int nmin,int nmax,bool ignore,const char *text)
 {
-  
+
   *res=-1;
   QString str=w->text();
 
@@ -256,9 +256,9 @@ bool RoomGen::bad_int(QLineEdit *w,int *res,int nmin,int nmax,bool ignore,char *
 
 }
 //************************************************
-bool RoomGen::bad_int(int res,int nmin,int nmax,bool ignore,char *text)
+bool RoomGen::bad_int(int res,int nmin,int nmax,bool ignore,const char *text)
 {
-  
+
   if(res==-1 && ignore)return false;
   if(res<nmin||res>nmax){
     menu->errmes("%s must be between %d and %d !",text,nmin,nmax);
@@ -271,7 +271,7 @@ bool RoomGen::bad_int(int res,int nmin,int nmax,bool ignore,char *text)
 //************************************************
 bool RoomGen::bad_input()
 {
-  
+
   QString str;
   int i;
 
@@ -302,9 +302,9 @@ bool RoomGen::bad_input()
   }
 
   for(i=0;i<4;i++){
-    if(bad_int(edge[i],&en[i],0,255,true,"Edge controls:\nroom number"))return true;        
+    if(bad_int(edge[i],&en[i],0,255,true,"Edge controls:\nroom number"))return true;
   }
-  
+
   if(!(xa==-1&&ya==-1)){
     if(bad_int(xa,0,319,false,"Unconditional Ego positioning:\nX"))return true;
     if(bad_int(ya,0,167,false,"Unconditional Ego positioning:\nY"))return true;
@@ -339,11 +339,11 @@ void RoomGen::ok_cb()
   }
   text+=tmp;
   text+="// \n// ****************************************************************\n";
-          
+
   if(inc_def->isChecked()){
     text+="#include \"defines.txt\"\n";
   }
-  
+
   text+="if (new_room) {\n";
 
   if(ln==pn){
@@ -356,14 +356,14 @@ void RoomGen::ok_cb()
     text+=tmp;
     text+="  load.pic(v255);\n\
   draw.pic(v255);\n\
-  discard.pic(v255);\n";    
+  discard.pic(v255);\n";
   }
   if(com)text+="  //ADD ADDITIONAL INITIALIZATION CODE HERE\n";
-  
+
 
   if(hn!=36){
     sprintf(tmp,"  set.horizon(%d);\n",hn);
-    text+=tmp;    
+    text+=tmp;
   }
 
   if(first_room->isChecked()){
@@ -376,7 +376,7 @@ void RoomGen::ok_cb()
     if(status)text+="    status.line.on();\n";
     if(input)text+="    accept.input();\n";
     text+="  }\n";
-    level++;  
+    level++;
   }
 
   for(i=0;i<4;i++){
@@ -584,23 +584,23 @@ RoomGenEntry::RoomGenEntry( QWidget *parent, const char *name)
 {
 
   setCaption("Room Entry and Looking");
-  
+
   QBoxLayout *all = new QVBoxLayout(this,5);
 
   QLabel *entry = new QLabel("On room entry:",this);
   all->addWidget(entry);
 
-  
+
   QBoxLayout *l1 = new QHBoxLayout(all,1);
   QLabel *print1 = new QLabel("print(\"",this);
   l1->addWidget(print1);
   entry_text = new QLineEdit(this);
   entry_text->setMinimumWidth(300);
-  l1->addWidget(entry_text);  
+  l1->addWidget(entry_text);
   QLabel *print11 = new QLabel("\");",this);
   l1->addWidget(print11);
 
-  
+
   QLabel *ifsaid = new QLabel("if said(\"look\")){",this);
   all->addWidget(ifsaid);
 
@@ -611,18 +611,18 @@ RoomGenEntry::RoomGenEntry( QWidget *parent, const char *name)
   l2->addWidget(print2);
   look_text = new QLineEdit(place);
   look_text->setMinimumWidth(300);
-  l2->addWidget(look_text);  
+  l2->addWidget(look_text);
   QLabel *print22 = new QLabel("\");",place);
   l2->addWidget(print22);
-  
+
   all->addWidget(place);
 
   QLabel *p = new QLabel("}",this);
   all->addWidget(p);
-  
-  
+
+
   QBoxLayout *last = new QHBoxLayout(all,10);
-  
+
   QPushButton *ok = new QPushButton("OK",this);
   ok->setMaximumSize(80,40);
   connect(ok,SIGNAL(clicked()),SLOT(accept()));
@@ -632,7 +632,7 @@ RoomGenEntry::RoomGenEntry( QWidget *parent, const char *name)
   cancel->setMaximumSize(80,40);
   connect(cancel,SIGNAL(clicked()),SLOT(reject()));
   last->addWidget(cancel,AlignLeft);
-  
+
   adjustSize();
 
 }
@@ -658,7 +658,7 @@ RoomGenFirst::RoomGenFirst( QWidget *parent, const char *name)
   x->setFixedWidth(40);
   x->setText("-1");
   x->selectAll();
-  l1->addWidget(x,0,1,AlignLeft);  
+  l1->addWidget(x,0,1,AlignLeft);
 
   QLabel *ly = new QLabel("Y:",this);
   l1->addWidget(ly,0,2,AlignRight);
@@ -666,8 +666,8 @@ RoomGenFirst::RoomGenFirst( QWidget *parent, const char *name)
   y->setFixedWidth(40);
   y->setText("-1");
   y->selectAll();
-  l1->addWidget(y,0,3,AlignLeft);  
-  
+  l1->addWidget(y,0,3,AlignLeft);
+
   QLabel *place = new QLabel(" ",this);
   l1->addWidget(place,0,4,AlignCenter);
   l1->setColStretch(4,1);
@@ -691,9 +691,9 @@ RoomGenFirst::RoomGenFirst( QWidget *parent, const char *name)
   cancel->setMaximumSize(80,40);
   connect(cancel,SIGNAL(clicked()),SLOT(reject()));
   last->addWidget(cancel,AlignLeft);
-  
+
   adjustSize();
-  
+
 
 }
 
@@ -708,7 +708,7 @@ RoomGenPos::RoomGenPos( QWidget *parent, const char *name)
 
   QLabel *l = new QLabel("Absolute (Unconditional) Position:",this);
   all->addWidget(l);
-  
+
   QGridLayout *l1 = new QGridLayout(all,6,1,5);
   QLabel *lx = new QLabel("X:",this);
   l1->addWidget(lx,0,0,AlignRight);
@@ -716,7 +716,7 @@ RoomGenPos::RoomGenPos( QWidget *parent, const char *name)
   x->setFixedWidth(40);
   x->setText("-1");
   x->selectAll();
-  l1->addWidget(x,0,1,AlignLeft);  
+  l1->addWidget(x,0,1,AlignLeft);
 
   QLabel *ly = new QLabel("Y:",this);
   l1->addWidget(ly,0,2,AlignRight);
@@ -724,12 +724,12 @@ RoomGenPos::RoomGenPos( QWidget *parent, const char *name)
   y->setFixedWidth(40);
   y->setText("-1");
   y->selectAll();
-  l1->addWidget(y,0,3,AlignLeft);  
-  
+  l1->addWidget(y,0,3,AlignLeft);
+
   QLabel *place = new QLabel(" ",this);
   l1->addWidget(place,0,4,AlignCenter);
   l1->setColStretch(4,1);
-  
+
 
   QLabel *com = new QLabel(
 "Unconditional positioning is useful for positioning ego\n\
@@ -751,7 +751,7 @@ where you won't get stuck behind control lines, etc."
   cancel->setMaximumSize(80,40);
   connect(cancel,SIGNAL(clicked()),SLOT(reject()));
   last->addWidget(cancel,AlignLeft);
-  
+
   adjustSize();
 
 
@@ -784,11 +784,11 @@ if (ego_edge_code == horizon_edge){\n\
     sprintf(tmp,"Include empty code for %s edge",dirs[i]);
     c_edge[i]=new QCheckBox(tmp,edge);
   }
-  
+
   all->addWidget(edge);
 
   QGroupBox *messages = new QGroupBox(4,Horizontal,
-"Messages (if Display is not checked, message will be ignored)",this);  
+"Messages (if Display is not checked, message will be ignored)",this);
   for(i=0;i<4;i++){
     m_edge[i] = new QCheckBox("Display",messages);
     b_edge[i] = new QPushButton(messages);
@@ -819,7 +819,7 @@ if (ego_edge_code == horizon_edge){\n\
   cancel->setMaximumSize(80,40);
   connect(cancel,SIGNAL(clicked()),SLOT(reject()));
   last->addWidget(cancel,AlignLeft);
-  
+
   adjustSize();
 
   message=NULL;
@@ -890,13 +890,13 @@ RoomGenMessage::RoomGenMessage( QWidget *parent, const char *name)
   QPushButton *cancel = new QPushButton("Cancel",this);
   cancel->setMaximumSize(80,40);
   connect(cancel,SIGNAL(clicked()),SLOT(reject()));
-  last->addWidget(cancel,AlignLeft);  
+  last->addWidget(cancel,AlignLeft);
 
   adjustSize();
 
 }
 
-void RoomGenMessage::name(char *title,const char *text)
+void RoomGenMessage::name(const char *title,const char *text)
 {
 
   sprintf(tmp,"%s Message",title);

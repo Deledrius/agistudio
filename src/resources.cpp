@@ -180,12 +180,12 @@ void ResourcesWin::select_resource( int k )
   if((n=get_win())==-1)return;
   switch(selected){
   case LOGIC:
-    winlist[n].w.l=new LogEdit(NULL,NULL,n); 
+    winlist[n].w.l=new LogEdit(NULL,NULL,n);
     winlist[n].type=LOGIC;
     winlist[n].w.l->open(i);
     break;
   case PICTURE:
-    winlist[n].w.p=new PicEdit(NULL,NULL,n); 
+    winlist[n].w.p=new PicEdit(NULL,NULL,n);
     winlist[n].type=PICTURE;
     winlist[n].w.p->open(i);
     break;
@@ -197,7 +197,7 @@ void ResourcesWin::select_resource( int k )
   case SOUND:
     play_sound(i);
     break;
-  } 
+  }
 }
 
 //********************************************************
@@ -215,7 +215,7 @@ void ResourcesWin::set_current( int n )
 //*********************************************
 void ResourcesWin::deinit( )
 {
-  closing = true;  
+  closing = true;
   if(preview){
     preview->close();
     preview=NULL;
@@ -232,7 +232,7 @@ void ResourcesWin::deinit( )
     case PICTURE:
       if(winlist[i].w.p->resources_win==this)winlist[i].w.p->resources_win=NULL;
       break;
-    }      
+    }
   }
 
   winlist[winnum].type=-1;
@@ -269,7 +269,7 @@ void ResourcesWin::showEvent( QShowEvent * )
 //**********************************************
 void ResourcesWin::new_resource_window()
 {
-  
+
   menu->new_resource_window();
 }
 
@@ -278,15 +278,15 @@ void ResourcesWin::delete_resource()
 {
 
   int restype = selected;
-  int k = list->currentItem();  
+  int k = list->currentItem();
   int resnum = ResourceIndex[k];
-  
+
   sprintf(tmp,"Really delete %s.%d ?",ResTypeName[restype],resnum);
   switch( QMessageBox::warning( this, "Delete resource", tmp,
                                 "Delete", "Cancel",
                                 0,      // Enter == button 0
                                 1 ) ) { // Escape == button 1
-  case 0: 
+  case 0:
     game->DeleteResource(restype,resnum);
     select_resource_type(restype);
     if(k>0)
@@ -294,9 +294,9 @@ void ResourcesWin::delete_resource()
     else
       list->setCurrentItem(0);
     break;
-  case 1:       
+  case 1:
     break;
-  }  
+  }
 
 }
 
@@ -304,7 +304,7 @@ void ResourcesWin::delete_resource()
 void ResourcesWin::renumber_resource()
 {
 
-  int k = list->currentItem();  
+  int k = list->currentItem();
   if(k==-1)return;
 
   AskNumber *ask_number = new AskNumber(0,0,"Resource number",
@@ -315,7 +315,7 @@ void ResourcesWin::renumber_resource()
   QString str = ask_number->num->text();
   int newnum = atoi((char *)str.latin1());
   int restype = selected;
-  int resnum = ResourceIndex[k];  
+  int resnum = ResourceIndex[k];
   if(game->ResourceInfo[restype][newnum].Exists){
     sprintf(tmp,"Resource %s.%d already exists. Replace it ?",ResTypeName[restype],newnum);
   }
@@ -323,15 +323,15 @@ void ResourcesWin::renumber_resource()
                                 "Replace", "Cancel",
                                 0,      // Enter == button 0
                                 1 ) ) { // Escape == button 1
-  case 0: 
+  case 0:
     game->ReadResource(restype,resnum);
     game->DeleteResource(restype,resnum);
     game->AddResource(restype,newnum);
     select_resource_type(restype);
     break;
-  case 1:       
+  case 1:
     break;
-  }  
+  }
 
 
 }
@@ -363,10 +363,10 @@ void ResourcesWin::extract_resource()
 {
 
   int restype = selected;
-  int k = list->currentItem();  
+  int k = list->currentItem();
   int resnum = ResourceIndex[k];
 
-  QFileDialog *f = new QFileDialog(0,"Extract resource",true);  
+  QFileDialog *f = new QFileDialog(0,"Extract resource",true);
   f->setCaption("Extract resource");
   f->setMode(QFileDialog::AnyFile);
   f->setDir(game->srcdir.c_str());
@@ -415,9 +415,9 @@ void ResourcesWin::add_resource()
 
   QFileDialog *f = new QFileDialog(0,"Add resource",true);
 
-  static char *types[6] = {"logic*.*","picture*.*","view*.*","sound*.*","All files (*)",NULL};
+  static const char *types[6] = {"logic*.*","picture*.*","view*.*","sound*.*","All files (*)",NULL};
 
-  char *filters[6];
+  const char *filters[6];
 
   switch(selected){
   case LOGIC:
@@ -465,10 +465,10 @@ void ResourcesWin::add_resource()
 //**********************************************
 void ResourcesWin::export_resource()
 {
-  int k = list->currentItem();  
+  int k = list->currentItem();
   if(k<0) return;
   int i = ResourceIndex[k];
-  
+
   switch(selected) {
   case SOUND:
     if(game->ReadResource(SOUND,i))
@@ -479,7 +479,7 @@ void ResourcesWin::export_resource()
   default:
     qWarning("BUG in code. Export not supported for this resource type!");
     break;
-  } 
+  }
 }
 
 //**********************************************
@@ -604,7 +604,7 @@ static int load_resource(const char *filename,int restype)
     fclose(fptr);
     return 1;
   }
-  
+
   if(restype==LOGIC){
     //check if file is binary or ascii
     fread(ResourceData.Data,MIN(size,64),1,fptr);
@@ -614,11 +614,11 @@ static int load_resource(const char *filename,int restype)
         fseek(fptr,0,SEEK_SET);
         ResourceData.Size = size;
         fread(ResourceData.Data,ResourceData.Size,1,fptr);
-        fclose(fptr);         
+        fclose(fptr);
         return 0;
-      }                              
+      }
     }
-    //file is ascii - trying to compile     
+    //file is ascii - trying to compile
     fseek(fptr,0,SEEK_SET);
     Logic *logic = new Logic();
     InputLines.lfree();
@@ -628,7 +628,7 @@ static int load_resource(const char *filename,int restype)
       InputLines.add(tmp);
     }
     fclose(fptr);
-    int err = logic->compile();     
+    int err = logic->compile();
     delete logic;
     if(err)return 1;
    }
@@ -638,33 +638,33 @@ static int load_resource(const char *filename,int restype)
     fclose(fptr);
   }
   return 0;
-  
+
 }
 
 //**********************************************
 void AddResource::ok_cb()
 {
-  
+
   QString str = number->text();
   int num = atoi((char *)str.latin1());
-  
+
   if(num<0||num>255){
     menu->errmes("Resource number must be between 0 and 255 !");
     return ;
   }
-  
+
   if(game->ResourceInfo[restype][num].Exists){
     sprintf(tmp,"Resource %s.%d already exists. Replace it ?",ResTypeName[restype],num);
-    
+
     switch( QMessageBox::warning( this, "Add resource", tmp,
                                   "Replace", "Cancel",
                                   0,      // Enter == button 0
                                   1 ) ) { // Escape == button 1
-    case 0: 
+    case 0:
       if(!load_resource(file.c_str(),restype))
         game->AddResource(restype,num);
       break;
-    case 1:       
+    case 1:
       break;
     }
   }

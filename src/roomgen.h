@@ -2,7 +2,7 @@
  *  QT AGI Studio :: Copyright (C) 2000 Helen Zommer
  *
  *  The idea and most of the design of RoomGen module are copied from the
- *  "AGI Base Logic Generator" utility by Joel McCormick. 
+ *  "AGI Base Logic Generator" utility by Joel McCormick.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -29,8 +29,8 @@
 #include <qlayout.h>
 #include <qkeycode.h>
 #include <qmessagebox.h>
-#include <qmultilineedit.h> 
-#include <qevent.h> 
+#include <qmultilineedit.h>
+#include <qevent.h>
 #include <qstatusbar.h>
 #include <qcheckbox.h>
 
@@ -66,7 +66,7 @@ class RoomGenPos: public QDialog
     public:
   RoomGenPos( QWidget *parent=0, const char *name=0 );
   QLineEdit *x,*y;
-  
+
 };
 
 
@@ -76,7 +76,7 @@ class RoomGenMessage: public QDialog
   Q_OBJECT
     public:
   RoomGenMessage( QWidget *parent=0, const char *name=0);
-  void name(char *title, const char *text);
+  void name(const char *title, const char *text);
   QLabel *l;
   QLineEdit *message;
 };
@@ -101,7 +101,7 @@ class RoomGenEdge: public QDialog
 };
 
 
-class RoomGen: public QDialog 
+class RoomGen: public QDialog
 {
   Q_OBJECT
     public:
@@ -130,8 +130,8 @@ class RoomGen: public QDialog
   string entry_mes,look_mes; //room entry & look messages
   bool status,input;  //1st room - status bar, player input
 
-  bool bad_int(QLineEdit *w,int *res,int nmin,int nmax,bool ignore,char *text);
-  bool bad_int(int res,int nmin,int nmax,bool ignore,char *text);
+  bool bad_int(QLineEdit *w,int *res,int nmin,int nmax,bool ignore,const char *text);
+  bool bad_int(int res,int nmin,int nmax,bool ignore,const char *text);
   bool bad_input();
 
   public slots:
