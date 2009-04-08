@@ -424,8 +424,8 @@ int LogEdit::open(char *filenam)
     char *ptr;
     QString filecont;
     while(fgets(tmp,MAX_TMP,fptr)!=NULL){
-      if((ptr=strchr(tmp,0x0a)))*ptr=0;
-      if((ptr=strchr(tmp,0x0d)))*ptr=0;
+      if((ptr=(char*)strchr(tmp,0x0a))) *ptr=0;
+      if((ptr=(char*)strchr(tmp,0x0d))) *ptr=0;
       filecont += QString(tmp) + "\n";
     }
     editor->setText( filecont );
@@ -526,7 +526,7 @@ void LogEdit::save_logic()
   else if(filename != ""){
     save((char *)filename.c_str());
     char *ptr;
-    if((ptr=strrchr(filename.c_str(),'/')))ptr++;
+    if((ptr=(char*)strrchr(filename.c_str(),'/')))ptr++;
     else ptr=(char *)filename.c_str();
     sprintf(tmp,"File %s",ptr);
     setCaption(tmp);
@@ -644,7 +644,7 @@ int LogEdit::compile_logic()
           if(winlist[i].type==TEXT){
             filename = winlist[i].w.t->filename;
             char *ptr2;
-            if((ptr2=strrchr(filename.c_str(),'/')))ptr2++;
+            if((ptr2=(char*)strrchr(filename.c_str(),'/')))ptr2++;
             else ptr2=(char *)filename.c_str();            
             if(!strcmp(ptr2,name)){
               int num=atoi(ptr+5);
@@ -665,7 +665,7 @@ int LogEdit::compile_logic()
               winlist[i].w.t = new TextEdit(NULL,NULL,i);
               winlist[i].type=TEXT;
               winlist[i].w.t->open(fullname);
-              ptr=strstr(tmp1.c_str(),"Line ");
+              ptr=(char*)strstr(tmp1.c_str(),"Line ");
               int num=atoi(ptr+5);
               winlist[i].w.t->editor->setCursorPosition(num,0,false);
               ptr1=strchr(ptr,'\n');
@@ -1202,7 +1202,7 @@ void TextEdit::save(const char *filename)
   fclose(fptr);
   changed=false;
   char *ptr;
-  if((ptr=strrchr(filename,'/')))ptr++;
+  if((ptr=(char*)strrchr(filename,'/')))ptr++;
   else ptr=(char *)filename;
   sprintf(tmp,"File %s",ptr);
   setCaption(tmp);
