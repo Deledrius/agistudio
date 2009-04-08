@@ -431,7 +431,7 @@ int LogEdit::open(char *filenam)
     editor->setText( filecont );
     fclose(fptr);
     logic->OutputText=editor->text().latin1();
-    if((ptr=strrchr(filename.c_str(),'/')))ptr++;
+    if(((char *)ptr=strrchr(filename.c_str(),'/')))ptr++;
     else ptr=(char *)filename.c_str();
     if(LogicNum!=-1)
       sprintf(tmp,"logic.%d (file %s)",LogicNum,ptr);
