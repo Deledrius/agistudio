@@ -26,12 +26,16 @@
 #include <qlabel.h>
 #include <qpushbutton.h>
 #include <qlayout.h>
-#include <qlistbox.h>
+#include <q3listbox.h>
 #include <qmessagebox.h>
 #include <qlineedit.h> 
 #include <qradiobutton.h> 
-#include <qbuttongroup.h> 
+#include <q3buttongroup.h> 
 #include <qevent.h> 
+//Added by qt3to4:
+#include <QShowEvent>
+#include <QHideEvent>
+#include <QCloseEvent>
 
 #include "util.h"
 #include "wutil.h"
@@ -46,7 +50,7 @@ class WordsEdit : public QWidget
     Q_OBJECT
 public:
     WordsEdit( QWidget *parent=0, const char *name=0, int winnum=0, ResourcesWin *res=0);
-    QListBox *listgroup,*listwords;
+    Q3ListBox *listgroup,*listwords;
     ResourcesWin *resources_win;
     WordList *wordlist;
     void open();

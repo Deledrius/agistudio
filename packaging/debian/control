@@ -2,7 +2,7 @@ Source: agistudio
 Section: x11
 Priority: optional
 Maintainer: Debian QA Group <packages@qa.debian.org>
-Build-Depends: debhelper (>= 4.0.0), tmake, libqt3-mt-dev
+Build-Depends: debhelper (>= 4.0.0), tmake, libqt4-dev, libqt4-qt3support
 Standards-Version: 3.6.1.1
 
 Package: agistudio

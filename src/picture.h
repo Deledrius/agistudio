@@ -21,10 +21,16 @@
 #ifndef PICTURE_H
 #define PICTURE_H
 
-#include <qimage.h>
+#ifndef __GNUCPP__
+#include <stdint.h>
+#endif
 
+#include <qimage.h>
+#include <QColor>
+ 
 #include "linklist.h"
 #include "util.h"
+
 
 #define MAX_W 320
 #define MAX_H 200
@@ -32,6 +38,7 @@
 //the actual height of the picture is 168 (to leave space for menu and text input) 
 
 typedef unsigned short int word;
+typedef uint8_t byte;
 
 #define M_LEFT 0
 #define M_RIGHT 2

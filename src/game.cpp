@@ -47,7 +47,7 @@
 #include <math.h>
 #include <errno.h>
 
-#include <qprogressdialog.h>
+#include <q3progressdialog.h>
 #include <qmessagebox.h>
 #include <qdir.h>
 
@@ -916,7 +916,7 @@ int Game::RebuildVOLfiles()
     }
   }
 
-  QProgressDialog progress( "Rebuilding VOL files...", "Cancel", steps,0, 0, TRUE );  //shows up if the operation is taking more than 3 sec
+  Q3ProgressDialog progress( "Rebuilding VOL files...", "Cancel", steps,0, 0, TRUE );  //shows up if the operation is taking more than 3 sec
   //(so it never shows up...)
 
   ResHeader[0]=0x12;
@@ -1514,7 +1514,7 @@ int Game::RecompileAll()
   }
 
 
-  QProgressDialog progress( "Recompiling all logics...", "Cancel", steps,0, 0, TRUE );
+  Q3ProgressDialog progress( "Recompiling all logics...", "Cancel", steps,0, 0, TRUE );
   progress.setMinimumDuration(0);
 
   for(ResNum=0;ResNum<256;ResNum++){

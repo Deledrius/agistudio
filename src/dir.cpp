@@ -27,6 +27,11 @@
 #else
 #include <unistd.h>
 #include <glob.h>
+//Added by qt3to4:
+#include <Q3BoxLayout>
+#include <Q3HBoxLayout>
+#include <Q3VBoxLayout>
+#include <QLabel>
 #endif
 
 
@@ -38,7 +43,7 @@ Dir::Dir( QWidget *parent, const char *name,bool mode)
 {
 
   newgame=mode;   //if true - can create new dirs
-  QBoxLayout *all = new QVBoxLayout(this,20);
+  Q3BoxLayout *all = new Q3VBoxLayout(this,20);
 
   QLabel *l;
   if(newgame){
@@ -51,7 +56,7 @@ Dir::Dir( QWidget *parent, const char *name,bool mode)
   }
   all->addWidget(l);
 
-  list = new QListBox(this);
+  list = new Q3ListBox(this);
   list->setColumnMode (1);
   list->setMinimumSize(200,300);
   connect( list, SIGNAL(highlighted(int)), SLOT(highlight_dir(int)) );
@@ -61,7 +66,7 @@ Dir::Dir( QWidget *parent, const char *name,bool mode)
   selected = new QLineEdit(this);
   all->addWidget(selected);
 
-  QBoxLayout *b = new QHBoxLayout(all,20);
+  Q3BoxLayout *b = new Q3HBoxLayout(all,20);
   if(newgame){
     QPushButton *create = new QPushButton("Create dir",this);
     connect(create, SIGNAL(clicked()), SLOT(create_dir()));
@@ -82,12 +87,12 @@ Dir::Dir( QWidget *parent, const char *name,bool mode)
 void Dir::open()
 {
   
-  const QFileInfoList *lst = d.entryInfoList();
-  QFileInfoListIterator it( *lst );      // create list iterator
-  QFileInfo *fi;                          // pointer for traversing
+  const QFileInfoList& lst = d.entryInfoList();
+  QFileInfoList::const_iterator it( lst.begin());      // create list iterator
+  const QFileInfo *fi;                          // pointer for traversing
   
   list->clear();
-  while ( (fi=it.current()) ) {           // for each file...
+  while ( (fi=&(*it)) ) {           // for each file...
     sprintf(tmp, "%s", fi->fileName().data() );
     if(strcmp(tmp,"."))list->insertItem(tmp);
     ++it;

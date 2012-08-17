@@ -26,7 +26,16 @@
 #include "menu.h"
 #include "midi.h"
 
-#include <qwidgetstack.h>
+#include <q3widgetstack.h>
+//Added by qt3to4:
+#include <Q3HBoxLayout>
+#include <QLabel>
+#include <QHideEvent>
+#include <Q3PopupMenu>
+#include <Q3VBoxLayout>
+#include <Q3BoxLayout>
+#include <QShowEvent>
+#include <QCloseEvent>
 
 #include <stdio.h>
 #ifdef _WIN32
@@ -40,21 +49,21 @@
 
 //**********************************************************
 ResourcesWin::ResourcesWin(  QWidget* parent, const char*  name, int win_num ):
-  QWidget(parent,name,WDestructiveClose)
+  QWidget(parent,name,Qt::WDestructiveClose)
 {
   setSizePolicy( QSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed ));
   setCaption("resources");
   winnum = win_num;
 
-  QPopupMenu *window = new QPopupMenu( this );
-  CHECK_PTR( window );
+  Q3PopupMenu *window = new Q3PopupMenu( this );
+  Q_CHECK_PTR( window );
   window->insertItem ( "New", this, SLOT(new_resource_window()) );
   window->insertSeparator();
   window->insertItem ( "Close", this, SLOT(close()) );
 
 
-  QPopupMenu *resource = new QPopupMenu( this );
-  CHECK_PTR( resource );
+  Q3PopupMenu *resource = new Q3PopupMenu( this );
+  Q_CHECK_PTR( resource );
   resource->insertItem ( "&Add", this, SLOT(add_resource()) );
   resource->insertItem ( "&Extract", this, SLOT(extract_resource()) );
   resource->insertItem ( "&Delete", this, SLOT(delete_resource()) );
@@ -62,16 +71,16 @@ ResourcesWin::ResourcesWin(  QWidget* parent, const char*  name, int win_num ):
   resource->insertItem ( "Extract all", this, SLOT(extract_all_resource()) );
 
   QMenuBar *menubar = new QMenuBar(this);
-  CHECK_PTR( menubar );
+  Q_CHECK_PTR( menubar );
   menubar->insertItem ("Window", window );
   menubar->insertItem( "&Resource", resource );
   menubar->setSeparator( QMenuBar::InWindowsStyle );
 
 
-  QBoxLayout *hbox =  new QHBoxLayout( this, 10 );
+  Q3BoxLayout *hbox =  new Q3HBoxLayout( this, 10 );
   hbox->setMenuBar(menubar);
 
-  QBoxLayout *resbox =  new QVBoxLayout( hbox, 10 );
+  Q3BoxLayout *resbox =  new Q3VBoxLayout( hbox, 10 );
 
   type = new QComboBox(FALSE, this, "type");
 
@@ -83,7 +92,7 @@ ResourcesWin::ResourcesWin(  QWidget* parent, const char*  name, int win_num ):
   type->setSizePolicy( QSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed ));
   resbox->addWidget(type);
 
-  list = new QListBox(this,"list");
+  list = new Q3ListBox(this,"list");
   list->setColumnMode (1);
   list->setMinimumSize(200,300);
   connect( list, SIGNAL(highlighted(int)), SLOT(highlight_resource(int)) );
@@ -94,15 +103,15 @@ ResourcesWin::ResourcesWin(  QWidget* parent, const char*  name, int win_num ):
   resbox->addWidget(list);
 
   msg = new QLabel( this, "message" );
-  msg->setAlignment( AlignLeft );
+  msg->setAlignment( Qt::AlignLeft );
   resbox->addWidget(msg);
 
   addmenu = NULL;
   preview = NULL;
   closing = false;
 
-  QBoxLayout *prevbox =  new QVBoxLayout(hbox,10);
-  QGroupBox* group = new QGroupBox( 1, Qt::Vertical, "Preview", this );
+  Q3BoxLayout *prevbox =  new Q3VBoxLayout(hbox,10);
+  Q3GroupBox* group = new Q3GroupBox( 1, Qt::Vertical, "Preview", this );
   group->setMinimumSize(340+10*2,280+10*2);
   group->setSizePolicy( QSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding ));
   previewPane = group;
@@ -366,9 +375,9 @@ void ResourcesWin::extract_resource()
   int k = list->currentItem();
   int resnum = ResourceIndex[k];
 
-  QFileDialog *f = new QFileDialog(0,"Extract resource",true);
+  Q3FileDialog *f = new Q3FileDialog(0,"Extract resource",true);
   f->setCaption("Extract resource");
-  f->setMode(QFileDialog::AnyFile);
+  f->setMode(Q3FileDialog::AnyFile);
   f->setDir(game->srcdir.c_str());
   sprintf(tmp,"%s.%03d",ResTypeName[restype],resnum);
   f->setSelection(tmp);
@@ -413,7 +422,7 @@ void ResourcesWin::extract_all_resource()
 void ResourcesWin::add_resource()
 {
 
-  QFileDialog *f = new QFileDialog(0,"Add resource",true);
+  Q3FileDialog *f = new Q3FileDialog(0,"Add resource",true);
 
   static const char *types[6] = {"logic*.*","picture*.*","view*.*","sound*.*","All files (*)",NULL};
 
@@ -450,7 +459,7 @@ void ResourcesWin::add_resource()
 
   f->setFilters((const char **)filters);
   f->setCaption("Add resource");
-  f->setMode(QFileDialog::ExistingFile);
+  f->setMode(Q3FileDialog::ExistingFile);
   f->setDir(game->srcdir.c_str());
   if ( f->exec() == QDialog::Accepted ) {
     if ( !f->selectedFile().isEmpty() ){
@@ -489,22 +498,22 @@ AddResource::AddResource( QWidget *parent, const char *nam ,ResourcesWin *res )
 
   resources_win = res;
   setCaption("Add resource");
-  QBoxLayout *box = new QVBoxLayout(this,10);
+  Q3BoxLayout *box = new Q3VBoxLayout(this,10);
 
   filename = new QLabel("Filename:",this);
-  filename->setAutoResize(true);
+  // filename->setAutoResize(true);  // TODO: REPLACE WITH A LAYOUT!
   box->addWidget(filename);
 
-  QBoxLayout *box0 = new QHBoxLayout(box,4);
+  Q3BoxLayout *box0 = new Q3HBoxLayout(box,4);
 
   QLabel *lname = new QLabel("Name of resource:",this);
   box0->addWidget(lname);
 
   name = new QLabel("",this);
-  name->setAutoResize(true);
+  // name->setAutoResize(true);  // TODO: REPLACE WITH A LAYOUT!
   box0->addWidget(name);
 
-  type = new QButtonGroup(4,Horizontal,"Type",this);
+  type = new Q3ButtonGroup(4,Qt::Horizontal,"Type",this);
   type->setExclusive(true);
   QRadioButton *logic = new QRadioButton(type);
   logic->setText("LOGIC");
@@ -521,7 +530,7 @@ AddResource::AddResource( QWidget *parent, const char *nam ,ResourcesWin *res )
 
   box->addWidget(type);
 
-  QBoxLayout *box1 = new QHBoxLayout(box,10);
+  Q3BoxLayout *box1 = new Q3HBoxLayout(box,10);
 
   QLabel *lnumber = new QLabel("Number: [0-255]",this);
   box1->addWidget(lnumber);
@@ -531,7 +540,7 @@ AddResource::AddResource( QWidget *parent, const char *nam ,ResourcesWin *res )
   connect( number, SIGNAL(textChanged(const QString &)), SLOT(edit_cb(const QString &)) );
   box1->addWidget(number);
 
-  QBoxLayout *box2 = new QHBoxLayout(box,40);
+  Q3BoxLayout *box2 = new Q3HBoxLayout(box,40);
 
   QPushButton *ok = new QPushButton("OK",this);
   connect( ok, SIGNAL(clicked()), SLOT(ok_cb()) );

@@ -20,6 +20,13 @@
 
 #include <stdio.h>
 #include <qpainter.h>
+//Added by qt3to4:
+#include <Q3BoxLayout>
+#include <Q3HBoxLayout>
+#include <Q3VBoxLayout>
+#include <QLabel>
+#include <QMouseEvent>
+#include <QPaintEvent>
 
 #include "wutil.h"
 
@@ -33,9 +40,9 @@ AskNumber::AskNumber( QWidget *parent, const char *name, const char *caption,con
 
   
   setCaption(caption);
-  QBoxLayout *all =  new QVBoxLayout(this,20);  
+  Q3BoxLayout *all =  new Q3VBoxLayout(this,20);  
 
-  QBoxLayout *top = new QHBoxLayout(all,4);
+  Q3BoxLayout *top = new Q3HBoxLayout(all,4);
   QLabel *label = new QLabel(prompt,this);
   top->addWidget(label);
   num = new QLineEdit(this);
@@ -43,7 +50,7 @@ AskNumber::AskNumber( QWidget *parent, const char *name, const char *caption,con
   connect( num, SIGNAL(returnPressed()), SLOT(accept()) );
   top->addWidget(num);
 
-  QBoxLayout *bottom = new QHBoxLayout(all,40);
+  Q3BoxLayout *bottom = new Q3HBoxLayout(all,40);
   QPushButton *ok = new QPushButton(this);
   ok->setText("OK");  
   connect( ok, SIGNAL(clicked()), SLOT(accept()) ); 
@@ -61,7 +68,7 @@ AskText::AskText( QWidget *parent, const char *name, const char *caption,const c
 
   
   setCaption(caption);
-  QBoxLayout *all =  new QVBoxLayout(this,20);  
+  Q3BoxLayout *all =  new Q3VBoxLayout(this,20);  
 
   QLabel *label = new QLabel(prompt,this);
   all->addWidget(label);
@@ -70,7 +77,7 @@ AskText::AskText( QWidget *parent, const char *name, const char *caption,const c
   connect( text, SIGNAL(returnPressed()), SLOT(accept()) );
   all->addWidget(text);
 
-  QBoxLayout *bottom = new QHBoxLayout(all,40);
+  Q3BoxLayout *bottom = new Q3HBoxLayout(all,40);
   QPushButton *ok = new QPushButton(this);
   ok->setText("OK");  
   connect( ok, SIGNAL(clicked()), SLOT(accept()) ); 
@@ -166,10 +173,10 @@ void Palette::mousePressEvent(QMouseEvent* event)
   y=event->y() / dy;
   i=y*8+x;
 
-  if (event->button() & LeftButton){
+  if (event->button() & Qt::LeftButton){
     left = i;    
   }  
-  else if (event->button() & RightButton){
+  else if (event->button() & Qt::RightButton){
     right = i;    
   }
   

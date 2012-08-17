@@ -28,15 +28,17 @@
 #include <qlabel.h>
 #include <qpushbutton.h>
 #include <qlayout.h>
-#include <qpopupmenu.h>
-#include <qkeycode.h>
+#include <q3popupmenu.h>
+#include <qnamespace.h>
 #include <qmessagebox.h>
-#include <qfiledialog.h>
+#include <q3filedialog.h>
 #include <qlineedit.h>
-#include <qbuttongroup.h>
+#include <q3buttongroup.h>
 #include <qradiobutton.h>
-#include <qmainwindow.h>
+#include <q3mainwindow.h>
 #include <qstatusbar.h>
+//Added by qt3to4:
+#include <QCloseEvent>
 
 #include "wordsedit.h"
 #include "objedit.h"
@@ -53,7 +55,7 @@ class WindowList : public QWidget
     Q_OBJECT
 public:
     WindowList( QWidget *parent=0, const char *name=0 );
-    QListBox *win;
+    Q3ListBox *win;
 public slots:
     void draw();
     void select_cb(int);
@@ -70,7 +72,7 @@ public:
 };
 
 
-class Menu : public QMainWindow
+class Menu : public Q3MainWindow
 {
     Q_OBJECT
 public:
@@ -133,7 +135,7 @@ protected:
     QMenuBar *menubar;
     QMessageBox *err,*warn;
     QPushButton *create;
-    QFileDialog *f;
+    Q3FileDialog *f;
     QPushButton *open,*close_,*run,*view,*logic,*text,*obj,*words,*pic;
     Dir *dir_new,*dir_open;
     int num_res;

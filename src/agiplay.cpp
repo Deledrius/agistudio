@@ -37,7 +37,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#include <qprogressdialog.h>
+#include <q3progressdialog.h>
 #endif
 
 #include "game.h"
@@ -191,7 +191,7 @@ void play_song (unsigned char *song, int size)
   }
 
   int step=0;
-  QProgressDialog progress( "Playing...", "Cancel", (size+16)/5,0, 0, TRUE );
+  Q3ProgressDialog progress( "Playing...", "Cancel", (size+16)/5,0, 0, TRUE );
   progress.setMinimumDuration(0);
 
   for (playing = 1; playing; ) {

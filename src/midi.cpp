@@ -28,10 +28,11 @@
 
 #include <qdatastream.h>
 #include <qiodevice.h>
-#include <qfiledialog.h>
+#include <q3filedialog.h>
 #include <qlabel.h>
-#include <qvbox.h>
+#include <q3vbox.h>
 #include <qcombobox.h>
+#include <q3combobox.h>
 #include <qpushbutton.h>
 
 static const char* g_gm_instrument_names[] =
@@ -194,7 +195,7 @@ void writeMidi(const byte* snd, QIODevice& write_to, const unsigned char instr[]
   for (int n=0;n<3;n++)
   {
     out.writeRawBytes("MTrk",4);
-    QIODevice::Offset lp = write_to.at();
+    qlonglong lp = write_to.at();
     out << Q_UINT32(0); // chunklength
     WRITE_DELTA(0); // set instrument
     out << Q_UINT8(0xc0+n)
@@ -249,7 +250,7 @@ void writeMidi(const byte* snd, QIODevice& write_to, const unsigned char instr[]
         << Q_UINT8(0x2f)
         << Q_UINT8(0x0);
     
-    QIODevice::Offset ep=write_to.at();
+    qlonglong ep=write_to.at();
     write_to.at(lp);
     out << Q_UINT32((ep-lp)-4);
     write_to.at(ep);
@@ -263,28 +264,28 @@ static unsigned char s_selected_instr[3] = {0,0,0};
 // Show a "Save as" file dialog and call the Midi export function
 void showSaveAsMidi( QWidget* parent, const byte* snd )
 {
-  class MyFileDialog : public QFileDialog
+  class MyFileDialog : public Q3FileDialog
   {
   public:
     MyFileDialog( QWidget* parent, const char* name ) :
-        QFileDialog( parent, name )
+        Q3FileDialog( parent, name )
     {
         QLabel* label = new QLabel( "Channel instruments", this );
         label->setAlignment( AlignAuto | AlignTop | ExpandTabs );
-        QVBox* butts = new QVBox(this);
+        Q3VBox* butts = new Q3VBox(this);
         butts->setSpacing ( 2 );
         for (int i=0; i<3; ++i )
         {        
-          instr[i] = new QComboBox( butts );
+          instr[i] = new Q3ComboBox( butts );
           instr[i]->insertStrList( g_gm_instrument_names );
           instr[i]->setCurrentItem( s_selected_instr[i] );
         }
         addWidgets( label, butts, 0 );
     }
-    QComboBox* instr[3];    
+    Q3ComboBox* instr[3];    
   } fd( parent, NULL );
 
-  fd.setMode( QFileDialog::AnyFile );
+  fd.setMode( Q3FileDialog::AnyFile );
   fd.setFilter( "MIDI files (*.mid *.midi)" );
 
   if ( fd.exec() == QDialog::Accepted )
@@ -294,7 +295,7 @@ void showSaveAsMidi( QWidget* parent, const byte* snd )
       fname += ".mid";
     
     QFile f( fname );
-    f.open( IO_WriteOnly );
+    f.open( QIODevice::WriteOnly );
         
     for (int i=0; i<3; ++i )
       s_selected_instr[i] = (unsigned char)fd.instr[i]->currentItem();

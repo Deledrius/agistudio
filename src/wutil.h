@@ -25,11 +25,14 @@
 #include <qlabel.h>
 #include <qpushbutton.h>
 #include <qlayout.h>
-#include <qlistbox.h>
+#include <q3listbox.h>
 #include <qmessagebox.h>
 #include <qlineedit.h> 
 #include <qradiobutton.h> 
-#include <qbuttongroup.h> 
+#include <q3buttongroup.h> 
+//Added by qt3to4:
+#include <QPaintEvent>
+#include <QMouseEvent>
 #include <vector>
 
 #include "global.h"

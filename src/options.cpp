@@ -24,13 +24,18 @@
 #include <stdlib.h>
 
 #include <qapplication.h>
-#include <qfiledialog.h>
+#include <q3filedialog.h>
+//Added by qt3to4:
+#include <Q3BoxLayout>
+#include <Q3HBoxLayout>
+#include <Q3VBoxLayout>
+#include <QLabel>
 
 Options *options;
 
 //***********************************************
 Options::Options( QWidget *parent, const char *name)
-    : QTabDialog( parent, name)
+    : Q3TabDialog( parent, name)
 {
 
   setCaption("Settings");
@@ -53,9 +58,9 @@ void Options::set_general()
 {
 
   QWidget *general = new QWidget(this);  
-  QBoxLayout *all = new QVBoxLayout(general,10);
+  Q3BoxLayout *all = new Q3VBoxLayout(general,10);
 
-  QGroupBox *b1 = new QGroupBox(2,Horizontal,"",general);
+  Q3GroupBox *b1 = new Q3GroupBox(2,Horizontal,"",general);
 
   QLabel *l = new QLabel("Default resource type",b1);
   l->setText("Default resource type");  //to avoid compilation warning
@@ -75,7 +80,7 @@ void Options::set_general()
 
   all->addWidget(b1);
 
-  QButtonGroup *extract = new QButtonGroup(2,Horizontal,"Extract logic as",general);
+  Q3ButtonGroup *extract = new Q3ButtonGroup(2,Horizontal,"Extract logic as",general);
   extract->setMaximumSize(200,100);
   extract->setExclusive(true);
   text = new QRadioButton("Text",extract);
@@ -94,7 +99,7 @@ void Options::set_logedit()
 
   QWidget *logedit = new QWidget(this);
 
-  QBoxLayout *all = new QVBoxLayout(logedit,10);
+  Q3BoxLayout *all = new Q3VBoxLayout(logedit,10);
   messages = new QCheckBox("Show all messages at end (not just unused ones)",logedit);
   all->addWidget(messages);
   elses = new QCheckBox("Show all elses as gotos",logedit);
@@ -110,8 +115,8 @@ void Options::set_directories()
 {
 
   QWidget *dirs = new QWidget(this);
-  QBoxLayout *all = new QVBoxLayout(dirs,10);
-  QGroupBox *src = new QGroupBox(3,Horizontal,"Logic source directory",dirs);
+  Q3BoxLayout *all = new Q3VBoxLayout(dirs,10);
+  Q3GroupBox *src = new Q3GroupBox(3,Horizontal,"Logic source directory",dirs);
   reldir = new QRadioButton("[Game_dir/]",src);
   connect(reldir,SIGNAL(clicked()),SLOT(set_reldir()));  
   relname = new QLineEdit(src);
@@ -127,7 +132,7 @@ void Options::set_directories()
 
   all->addWidget(src);
 
-  QBoxLayout *b1 = new QHBoxLayout(all);
+  Q3BoxLayout *b1 = new Q3HBoxLayout(all);
 
   QLabel *lt = new QLabel("Template:",dirs);
   b1->addWidget(lt);
@@ -139,7 +144,7 @@ void Options::set_directories()
   b1->addWidget(browse1);
   connect(browse1,SIGNAL(clicked()),SLOT(browse_template()));
 
-  QBoxLayout *b2 = new QHBoxLayout(all);
+  Q3BoxLayout *b2 = new Q3HBoxLayout(all);
 
   QLabel *lh = new QLabel("Help:",dirs);
   b2->addWidget(lh);
@@ -159,11 +164,11 @@ void Options::set_interpreter()
 {
 
   QWidget *interp = new QWidget(this);  
-  QBoxLayout *all = new QVBoxLayout(interp,10);  
+  Q3BoxLayout *all = new Q3VBoxLayout(interp,10);  
   QLabel *l = new QLabel("Interpreter command line:\n(will be invoked with the\ncurrent directory == game_directory)",interp);
   all->addWidget(l);
 
-  QBoxLayout *b1 = new QHBoxLayout(all);
+  Q3BoxLayout *b1 = new Q3HBoxLayout(all);
   command = new QLineEdit(interp);
   b1->addWidget(command);
 
@@ -239,7 +244,7 @@ void Options::set_settings()
 void Options::browse_abs()
 {
 
-  QString s (QFileDialog::getExistingDirectory ());
+  QString s (Q3FileDialog::getExistingDirectory ());
   if(s.isNull())return;
   absname->setText(s);
 
@@ -249,7 +254,7 @@ void Options::browse_abs()
 void Options::browse_template()
 {
   
-  QString s (QFileDialog::getExistingDirectory ());
+  QString s (Q3FileDialog::getExistingDirectory ());
   if(s.isNull())return;
   templatedir->setText(s);
 
@@ -259,7 +264,7 @@ void Options::browse_template()
 void Options::browse_help()
 {
 
-  QString s (QFileDialog::getExistingDirectory ());
+  QString s (Q3FileDialog::getExistingDirectory ());
   if(s.isNull())return;
   helpdir->setText(s);
 
@@ -269,7 +274,7 @@ void Options::browse_help()
 void Options::browse_interpreter()
 {
   
-  QString s (QFileDialog::getOpenFileName ());
+  QString s (Q3FileDialog::getOpenFileName ());
   if(s.isNull())return;
   command->setText(s);
 

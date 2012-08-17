@@ -25,18 +25,18 @@
 #include <qlabel.h>
 #include <qpushbutton.h>
 #include <qlayout.h>
-#include <qlistbox.h>
+#include <q3listbox.h>
 #include <qmessagebox.h>
 #include <qlineedit.h> 
 #include <qradiobutton.h> 
-#include <qbuttongroup.h>
+#include <q3buttongroup.h>
 #include <qcheckbox.h> 
-#include <qmultilineedit.h> 
+#include <q3multilineedit.h> 
 #include <qpixmap.h>
 #include <qlineedit.h>
 #include <qcombobox.h> 
 #include <qevent.h> 
-#include <qtabdialog.h>
+#include <q3tabdialog.h>
 
 #include "util.h"
 #include "wutil.h"
@@ -45,7 +45,7 @@
 
 
 
-class Options : public QTabDialog
+class Options : public Q3TabDialog
 {
     Q_OBJECT
 public:

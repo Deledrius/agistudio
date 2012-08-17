@@ -25,10 +25,15 @@
 #include <qlabel.h>
 #include <qpushbutton.h>
 #include <qlayout.h>
-#include <qlistbox.h>
+#include <q3listbox.h>
 #include <qmessagebox.h>
 #include <qlineedit.h> 
 #include <qevent.h>
+//Added by qt3to4:
+#include <Q3PopupMenu>
+#include <QShowEvent>
+#include <QHideEvent>
+#include <QCloseEvent>
 
 #include "util.h"
 #include "object.h"
@@ -55,10 +60,10 @@ public slots:
       void encrypted_cb();
  protected:
     int winnum;
-    QListBox *list;
+    Q3ListBox *list;
     QLineEdit *name,*num;
     QPushButton *add,*del,*left,*right;
-    QPopupMenu *options;
+    Q3PopupMenu *options;
     int encrypted;
     int CurObject;
     bool changed;

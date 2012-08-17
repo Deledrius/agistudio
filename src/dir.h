@@ -25,11 +25,11 @@
 #include <qlabel.h>
 #include <qpushbutton.h>
 #include <qlayout.h>
-#include <qkeycode.h>
+#include <qnamespace.h>
 #include <qmessagebox.h>
-#include <qmultilineedit.h> 
+#include <q3multilineedit.h> 
 #include <qevent.h> 
-#include <qscrollview.h> 
+#include <q3scrollview.h> 
 #include <qpixmap.h>
 #include <qimage.h>
 #include <qstatusbar.h>
@@ -48,7 +48,7 @@ class Dir: public QWidget
    Q_OBJECT
 public:
    Dir( QWidget *parent=0, const char *name=0,bool newgame=false);
-   QListBox *list;  //dir list
+   Q3ListBox *list;  //dir list
    QLineEdit *selected;  //selected directory
    QDir d;
    bool newgame;   //true - create new game, false - open existing game

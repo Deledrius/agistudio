@@ -47,13 +47,20 @@
 
 #include <qapplication.h>
 #include <qpixmap.h>
-#include <qtoolbar.h>
+#include <q3toolbar.h>
 #include <qtoolbutton.h>
 #include <qtooltip.h>
 #ifdef IMGEXT
   #include <qimageio.h>
 #endif
-#include <qstylesheet.h>
+#include <q3stylesheet.h>
+//Added by qt3to4:
+#include <Q3HBoxLayout>
+#include <QLabel>
+#include <Q3PopupMenu>
+#include <Q3VBoxLayout>
+#include <Q3BoxLayout>
+#include <QCloseEvent>
 
 #include "toolbar_open.xpm"
 #include "toolbar_close.xpm"
@@ -75,33 +82,33 @@ WinList winlist[MAXWIN];  //list of all open resource editor windows
 
 //*************************************************
 Menu::Menu( QWidget *parent, const char *name )
-    : QMainWindow( parent, name )
+    : Q3MainWindow( parent, name )
 {
   int n=0;
 
   setCaption("AGI Studio");
   setIcon((const char**)app_icon);
 
-  QPopupMenu *new_game = new QPopupMenu( this );
-  CHECK_PTR( new_game );
+  Q3PopupMenu *new_game = new Q3PopupMenu( this );
+  Q_CHECK_PTR( new_game );
 
   new_game->insertItem ( "From &Template", this, SLOT(from_template()) );
   new_game->insertItem ( "&Blank", this, SLOT(blank()) );
 
-  QPopupMenu *game = new QPopupMenu( this );
-  CHECK_PTR( game );
+  Q3PopupMenu *game = new Q3PopupMenu( this );
+  Q_CHECK_PTR( game );
 
   game->insertItem ( "&New", new_game );
   game->insertItem ( "&Open", this, SLOT(open_game()) );
   id[n++] = game->insertItem ( "&Close", this, SLOT(close_game()) );
-  id[n++] = game->insertItem ( "&Run", this, SLOT(run_game()), CTRL+Key_R );
+  id[n++] = game->insertItem ( "&Run", this, SLOT(run_game()), Qt::CTRL+Qt::Key_R );
   game->insertSeparator();
   game->insertItem ( "&Settings", this, SLOT(settings()) );
   game->insertSeparator();
-  game->insertItem( "E&xit",  this, SLOT(quit_cb()), CTRL+Key_Q );
+  game->insertItem( "E&xit",  this, SLOT(quit_cb()), Qt::CTRL+Qt::Key_Q );
 
-  QPopupMenu *resource = new QPopupMenu( this );
-  CHECK_PTR( resource );
+  Q3PopupMenu *resource = new Q3PopupMenu( this );
+  Q_CHECK_PTR( resource );
 
   id[n++] = resource->insertItem ("New window", this, SLOT(new_resource_window()));
   resource->insertSeparator();
@@ -115,8 +122,8 @@ Menu::Menu( QWidget *parent, const char *name )
   id[n++] = resource->insertItem ( "Recompile all", this, SLOT(recompile_all()) );
 
 
-  QPopupMenu *tools = new QPopupMenu( this );
-  CHECK_PTR( tools );
+  Q3PopupMenu *tools = new Q3PopupMenu( this );
+  Q_CHECK_PTR( tools );
 
   id[n++] = tools->insertItem ( "&View Editor", this, SLOT(view_editor()) );
   id[n++] = tools->insertItem ( "&Logic Editor", this, SLOT(logic_editor()) );
@@ -126,24 +133,24 @@ Menu::Menu( QWidget *parent, const char *name )
   id[n++] = tools->insertItem ( "&Picture Editor", this, SLOT(picture_editor()) );
   id[n++] = tools->insertItem ( "&Sound Player", this, SLOT(sound_player()) );
 
-  QPopupMenu *help = new QPopupMenu( this );
-  CHECK_PTR( help );
+  Q3PopupMenu *help = new Q3PopupMenu( this );
+  Q_CHECK_PTR( help );
 
   help->insertItem ( "&Contents", this, SLOT(help_contents()) );
-  help->insertItem ( "&Index", this, SLOT(help_index()), Key_F1);
+  help->insertItem ( "&Index", this, SLOT(help_index()), Qt::Key_F1);
   help->insertSeparator();
   help->insertItem ( "About", this, SLOT(about_it()) );
   help->insertItem ( "About QT", this, SLOT(about_qt()) );
 
-  QPopupMenu *window = new QPopupMenu( this );
-  CHECK_PTR( window );
+  Q3PopupMenu *window = new Q3PopupMenu( this );
+  Q_CHECK_PTR( window );
 
   window->insertItem ( "Save all", this, SLOT(save_all()) );
   window->insertItem ( "Save all and run", this, SLOT(save_and_run()) );
   window->insertItem ( "Window list", this, SLOT(window_list_cb()) );
 
   menubar = new QMenuBar(this);
-  CHECK_PTR( menubar );
+  Q_CHECK_PTR( menubar );
   menubar->insertItem( "&Game", game );
   menubar->insertItem( "&Resource", resource );
   menubar->insertItem( "&Tools", tools );
@@ -153,7 +160,7 @@ Menu::Menu( QWidget *parent, const char *name )
   menubar->setSeparator( QMenuBar::InWindowsStyle );
 
 
-  QToolBar *toolbar = new QToolBar(this);
+  Q3ToolBar *toolbar = new Q3ToolBar(this);
   open = new QPushButton(toolbar);
   open->setPixmap((const char**)toolbar_open);
   connect( open, SIGNAL(clicked()), SLOT(open_game()) );
@@ -720,12 +727,12 @@ void Menu::sound_player()
 {
   extern void play_sound (char *);
 
-  QFileDialog *f = new QFileDialog(0,"Play sound",true);
+  Q3FileDialog *f = new Q3FileDialog(0,"Play sound",true);
   const char *filters[] = {"sound*.*","All files (*)",NULL};
 
   f->setFilters(filters);
   f->setCaption("Play sound");
-  f->setMode(QFileDialog::ExistingFile);
+  f->setMode(Q3FileDialog::ExistingFile);
   f->setDir(game->srcdir.c_str());
   if ( f->exec() == QDialog::Accepted ) {
     if ( !f->selectedFile().isEmpty() ){
@@ -879,7 +886,7 @@ About::About(QWidget *parent, const char *name )
 {
   setCaption("About QT AGI Studio");
 
-  QBoxLayout *all = new QVBoxLayout(this,2);
+  Q3BoxLayout *all = new Q3VBoxLayout(this,2);
 
   QLabel *alogo = new QLabel(this);
   alogo->setPixmap(QPixmap(logo));
@@ -887,11 +894,11 @@ About::About(QWidget *parent, const char *name )
   alogo->setSizePolicy( QSizePolicy( QSizePolicy::Minimum, QSizePolicy::Minimum ));
   all->addWidget(alogo);
 
-  QTextEdit* about = new QTextEdit(this);
+  Q3TextEdit* about = new Q3TextEdit(this);
   about->setTextFormat(Qt::RichText);
   about->setReadOnly(true);
   about->setText(
-    "<center><b>QT AGI studio v. 1.2.4</b><br>"
+    "<center><b>QT AGI studio v. 1.2.5</b><br>"
     "http://agistudio.sourceforge.net/<br>"
     "<br>"
     "<b>Authors:</b><br>"
@@ -929,15 +936,15 @@ WindowList::WindowList(QWidget *parent, const char *name )
 {
 
   setCaption("Window list");
-  QBoxLayout *l =  new QVBoxLayout(this,10);
+  Q3BoxLayout *l =  new Q3VBoxLayout(this,10);
 
-  win = new QListBox(this);
+  win = new Q3ListBox(this);
   win->setColumnMode (1);
   win->setMinimumSize(100,200);
   connect( win, SIGNAL(selected(int)), SLOT(select_cb(int)) );
   l->add(win);
 
-  QBoxLayout *l1 = new QHBoxLayout(l,10);
+  Q3BoxLayout *l1 = new Q3HBoxLayout(l,10);
 
   QPushButton *select = new QPushButton(this);
   select->setText("Select");

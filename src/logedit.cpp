@@ -35,9 +35,20 @@
 #include <ctype.h>
 
 #include <qapplication.h>
-#include <qfiledialog.h>
-#include <qsyntaxhighlighter.h>
+#include <q3filedialog.h>
+#include <q3syntaxhighlighter.h>
 #include <qregexp.h>
+//Added by qt3to4:
+#include <Q3HBoxLayout>
+#include <QLabel>
+#include <QHideEvent>
+#include <QResizeEvent>
+#include <Q3PopupMenu>
+#include <QTextOStream>
+#include <Q3VBoxLayout>
+#include <Q3BoxLayout>
+#include <QShowEvent>
+#include <QCloseEvent>
 
 TStringList InputLines;  //temporary buffer for reading the text from editor
 //and sending to compilation
@@ -57,12 +68,12 @@ static QColor normal_color = QColor("black"),
               test_color = QColor("brown"),
               operator_color = QColor("blue");
 
-class LogicSyntaxHL : public QSyntaxHighlighter
+class LogicSyntaxHL : public Q3SyntaxHighlighter
 {
 public:
 
-  LogicSyntaxHL( QTextEdit* te )
-    : QSyntaxHighlighter( te ) {}
+  LogicSyntaxHL( Q3TextEdit* te )
+    : Q3SyntaxHighlighter( te ) {}
 
   void highlightWord( const QString& line, int start, int len )
   {
@@ -217,7 +228,7 @@ public:
 
 //***********************************************
 LogEdit::LogEdit( QWidget *parent, const char *name, int win_num, ResourcesWin *res, bool readonly)
-    : QWidget( parent, name, WDestructiveClose )
+    : QWidget( parent, name, Qt::WDestructiveClose )
 {
   setCaption("Logic editor");
 
@@ -225,7 +236,7 @@ LogEdit::LogEdit( QWidget *parent, const char *name, int win_num, ResourcesWin *
   winnum = win_num;  //my window number
   resources_win = res; //resources window which called me
 
-  editor = new QMultiLineEdit(this);
+  editor = new Q3MultiLineEdit(this);
 
   QFont font;
   font.setPointSize(readonly?8:10);
@@ -234,7 +245,7 @@ LogEdit::LogEdit( QWidget *parent, const char *name, int win_num, ResourcesWin *
 
   editor->setSizePolicy( QSizePolicy(
     QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding ));
-  editor->setWordWrap( QTextEdit::NoWrap );
+  editor->setWordWrap( Q3TextEdit::NoWrap );
   syntax_hl = new LogicSyntaxHL( editor );
 
   if ( readonly )
@@ -249,19 +260,19 @@ LogEdit::LogEdit( QWidget *parent, const char *name, int win_num, ResourcesWin *
 
   setSizePolicy( QSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding ));
   
-  QBoxLayout *all = new QVBoxLayout(this,10);
+  Q3BoxLayout *all = new Q3VBoxLayout(this,10);
   all->addWidget(editor);
 
   if ( !readonly ) {
-    QPopupMenu *file = new QPopupMenu( this );
-    CHECK_PTR( file );
+    Q3PopupMenu *file = new Q3PopupMenu( this );
+    Q_CHECK_PTR( file );
 
     file->insertItem( "Read from file", this, SLOT(read_logic()) );
-    file->insertItem( "Save", this, SLOT(save_logic()), CTRL + Key_S );
+    file->insertItem( "Save", this, SLOT(save_logic()), Qt::CTRL + Qt::Key_S );
     file->insertItem( "Save as", this, SLOT(save_as()) );
-    file->insertItem( "Compile", this, SLOT(compile_logic()) ,Key_F9 );
+    file->insertItem( "Compile", this, SLOT(compile_logic()) ,Qt::Key_F9 );
     file->insertItem( "Compile all", this, SLOT(compile_all_logic())  );
-    file->insertItem( "Compile all and run", this, SLOT(compile_and_run()) ,Key_F10 );
+    file->insertItem( "Compile all and run", this, SLOT(compile_and_run()) ,Qt::Key_F10 );
     file->insertItem( "Change logic number", this, SLOT(change_logic_number()) );
     file->insertSeparator();
     file->insertItem( "Delete", this, SLOT(delete_logic()) );
@@ -269,26 +280,26 @@ LogEdit::LogEdit( QWidget *parent, const char *name, int win_num, ResourcesWin *
     file->insertSeparator();
     file->insertItem( "Close", this, SLOT(close()) );
 
-    QPopupMenu *edit = new QPopupMenu( this );
-    CHECK_PTR( edit );
-    edit->insertItem( "Cut", editor, SLOT(cut()) , CTRL + Key_X );
-    edit->insertItem( "Copy", editor, SLOT(copy()) , CTRL + Key_C );
-    edit->insertItem( "Paste", editor, SLOT(paste()) , CTRL + Key_V);
+    Q3PopupMenu *edit = new Q3PopupMenu( this );
+    Q_CHECK_PTR( edit );
+    edit->insertItem( "Cut", editor, SLOT(cut()) , Qt::CTRL + Qt::Key_X );
+    edit->insertItem( "Copy", editor, SLOT(copy()) , Qt::CTRL + Qt::Key_C );
+    edit->insertItem( "Paste", editor, SLOT(paste()) , Qt::CTRL + Qt::Key_V);
     edit->insertSeparator();
     edit->insertItem( "Clear all", this, SLOT(clear_all()) );
     edit->insertSeparator();
-    edit->insertItem( "Find", this, SLOT(find_cb()) ,CTRL + Key_F);
-    edit->insertItem( "Find again", this, SLOT(find_again()) ,Key_F3);
+    edit->insertItem( "Find", this, SLOT(find_cb()) ,Qt::CTRL + Qt::Key_F);
+    edit->insertItem( "Find again", this, SLOT(find_again()) ,Qt::Key_F3);
     edit->insertSeparator();
-    edit->insertItem( "Go to line", this, SLOT(goto_cb()) ,ALT + Key_G);
+    edit->insertItem( "Go to line", this, SLOT(goto_cb()) ,Qt::ALT + Qt::Key_G);
 
-    QPopupMenu *help = new QPopupMenu( this );
-    CHECK_PTR( help );
-    help->insertItem( "Context help", this, SLOT(context_help()), Key_F1);
+    Q3PopupMenu *help = new Q3PopupMenu( this );
+    Q_CHECK_PTR( help );
+    help->insertItem( "Context help", this, SLOT(context_help()), Qt::Key_F1);
     help->insertItem( "All commands", this, SLOT(command_help()));
 
     QMenuBar *menu = new QMenuBar(this);
-    CHECK_PTR( menu );
+    Q_CHECK_PTR( menu );
     menu->insertItem( "File", file );
     menu->insertItem( "Edit", edit );
     menu->insertItem( "Help", help );
@@ -507,7 +518,7 @@ void LogEdit::save(char *filename)
   }
   for(int i=0;i<editor->numLines();i++){
     str = editor->textLine(i);
-    if(str){
+    if(!str.isNull()){
       s = (byte *)str.latin1();
       fprintf(fptr,"%s\n",s);
     }
@@ -543,12 +554,12 @@ void LogEdit::save_logic()
 void LogEdit::save_as()
 {
 
-  QFileDialog *f = new QFileDialog(0,"Save",true);  
+  Q3FileDialog *f = new Q3FileDialog(0,"Save",true);  
   const char *filters[] = {"logic*.*","All files (*)",NULL};
   
   f->setFilters(filters);
   f->setCaption("Save");
-  f->setMode(QFileDialog::AnyFile);
+  f->setMode(Q3FileDialog::AnyFile);
   f->setDir(game->srcdir.c_str());
   if ( f->exec() == QDialog::Accepted ) {
     if ( !f->selectedFile().isEmpty() )
@@ -560,12 +571,12 @@ void LogEdit::save_as()
 void LogEdit::read_logic()
 {
 
-  QFileDialog *f = new QFileDialog(0,"Read",true);  
+  Q3FileDialog *f = new Q3FileDialog(0,"Read",true);  
   const char *filters[] = {"logic*.*","All files (*)",NULL};
   
   f->setFilters(filters);
   f->setCaption("Read");
-  f->setMode(QFileDialog::ExistingFile);
+  f->setMode(Q3FileDialog::ExistingFile);
   f->setDir(game->srcdir.c_str());
   if ( f->exec() == QDialog::Accepted ) {
     if ( !f->selectedFile().isEmpty() )
@@ -599,7 +610,7 @@ int LogEdit::compile_logic()
   InputLines.lfree();
   for(i=0;i<editor->numLines();i++){
     str = editor->textLine(i);
-    if(str && str.length()>0){
+    if(!str.isNull() && str.length()>0){
       s = (byte *)str.latin1();
       if(s[0]<0x80)  //i'm getting \221\005 at the last line...
         InputLines.add((char *)str.latin1());
@@ -932,50 +943,50 @@ void LogEdit::update_line_num( int para, int pos )
 
 //*******************************************************
 TextEdit::TextEdit( QWidget *parent, const char *name,int win_num)
-    : QWidget( parent, name ,WDestructiveClose )
+    : QWidget( parent, name ,Qt::WDestructiveClose )
 {
 
   setCaption("Text editor");
 
   winnum = win_num;
-  editor = new QMultiLineEdit(this);
+  editor = new Q3MultiLineEdit(this);
   editor->setMinimumSize(380,380);
 
   QFont font;
   font.setPointSize(10);
   font.setStyleHint( QFont::TypeWriter );
   editor->setFont( font );
-  editor->setWordWrap( QTextEdit::NoWrap );
+  editor->setWordWrap( Q3TextEdit::NoWrap );
 
-  QPopupMenu *file = new QPopupMenu( this );
-  CHECK_PTR( file );
+  Q3PopupMenu *file = new Q3PopupMenu( this );
+  Q_CHECK_PTR( file );
 
   file->insertItem( "New", this, SLOT(new_text()));
   file->insertItem( "Open", this, SLOT(open()) );
-  file->insertItem( "Save", this, SLOT(save()), CTRL + Key_S );
+  file->insertItem( "Save", this, SLOT(save()), Qt::CTRL + Qt::Key_S );
   file->insertItem( "Save as", this, SLOT(save_as()) );
   file->insertSeparator();
   file->insertItem( "Close", this, SLOT(close()) );
 
-  QPopupMenu *edit = new QPopupMenu( this );
-  CHECK_PTR( edit );
-  edit->insertItem( "Cut", editor, SLOT(cut()) , CTRL + Key_X );
-  edit->insertItem( "Copy", editor, SLOT(copy()) , CTRL + Key_C );
-  edit->insertItem( "Paste", editor, SLOT(paste()) , CTRL + Key_V);
+  Q3PopupMenu *edit = new Q3PopupMenu( this );
+  Q_CHECK_PTR( edit );
+  edit->insertItem( "Cut", editor, SLOT(cut()) , Qt::CTRL + Qt::Key_X );
+  edit->insertItem( "Copy", editor, SLOT(copy()) , Qt::CTRL + Qt::Key_C );
+  edit->insertItem( "Paste", editor, SLOT(paste()) , Qt::CTRL + Qt::Key_V);
   edit->insertSeparator();
   edit->insertItem( "Clear all", this, SLOT(clear_all()) );
   edit->insertSeparator();  
-  edit->insertItem( "Find", this, SLOT(find_cb()) ,CTRL + Key_F);
-  edit->insertItem( "Find again", this, SLOT(find_again()) ,Key_F3);  
+  edit->insertItem( "Find", this, SLOT(find_cb()) ,Qt::CTRL + Qt::Key_F);
+  edit->insertItem( "Find again", this, SLOT(find_again()) ,Qt::Key_F3);  
 
   QMenuBar *menu = new QMenuBar(this);  
-  CHECK_PTR( menu );
+  Q_CHECK_PTR( menu );
   menu->insertItem( "File", file );
   menu->insertItem( "Edit", edit );
   menu->setSeparator( QMenuBar::InWindowsStyle );
   setMinimumSize(400,400);
 
-  QBoxLayout *all = new QVBoxLayout(this,10);
+  Q3BoxLayout *all = new Q3VBoxLayout(this,10);
   all->setMenuBar(menu);
 
   all->addWidget(editor);
@@ -1100,12 +1111,12 @@ void TextEdit::new_text()
 void TextEdit::open()
 {
 
-  QFileDialog *f = new QFileDialog(0,"Open",true);  
+  Q3FileDialog *f = new Q3FileDialog(0,"Open",true);  
   const char *filters[] = {"All files (*)",NULL};
 
   f->setFilters(filters);
   f->setCaption("Open");
-  f->setMode(QFileDialog::ExistingFile);
+  f->setMode(Q3FileDialog::ExistingFile);
   f->setDir(game->srcdir.c_str());
   if ( f->exec() == QDialog::Accepted ) {
     if ( !f->selectedFile().isEmpty() ){
@@ -1167,12 +1178,12 @@ void TextEdit::save()
 void TextEdit::save_as()
 {
 
-  QFileDialog *f = new QFileDialog(0,"Save",true);  
+  Q3FileDialog *f = new Q3FileDialog(0,"Save",true);  
   const char *filters[] = {"All files (*)",NULL};
   
   f->setFilters(filters);
   f->setCaption("Save");
-  f->setMode(QFileDialog::AnyFile);
+  f->setMode(Q3FileDialog::AnyFile);
   f->setDir(game->srcdir.c_str());
   if ( f->exec() == QDialog::Accepted ) {
     if ( !f->selectedFile().isEmpty() )
@@ -1194,7 +1205,7 @@ void TextEdit::save(const char *filename)
   }
   for(int i=0;i<editor->numLines();i++){
     str = editor->textLine(i);
-    if(str){
+    if(!str.isNull()){
       s = (byte *)str.latin1();
       fprintf(fptr,"%s\n",s);
     }
@@ -1244,8 +1255,8 @@ void TextEdit::find_again()
 }
 
 //***********************************************
-FindEdit::FindEdit( QWidget *parent, const char *name, QMultiLineEdit *edit ,QStatusBar *s)
-    : QWidget( parent, name ,WDestructiveClose)
+FindEdit::FindEdit( QWidget *parent, const char *name, Q3MultiLineEdit *edit ,QStatusBar *s)
+    : QWidget( parent, name ,Qt::WDestructiveClose)
 {
   setCaption("Find");
   //  setMinimumSize(340,140);
@@ -1253,9 +1264,9 @@ FindEdit::FindEdit( QWidget *parent, const char *name, QMultiLineEdit *edit ,QSt
   status = s;
   editor = edit;
 
-  QBoxLayout *all =  new QVBoxLayout(this,10);
+  Q3BoxLayout *all =  new Q3VBoxLayout(this,10);
 
-  QBoxLayout *txt = new QHBoxLayout(all,4);
+  Q3BoxLayout *txt = new Q3HBoxLayout(all,4);
 
   QLabel *label = new QLabel("Find what:",this);  
   txt->addWidget(label);
@@ -1265,16 +1276,16 @@ FindEdit::FindEdit( QWidget *parent, const char *name, QMultiLineEdit *edit ,QSt
   connect( find_field, SIGNAL(returnPressed()), SLOT(find_first_cb()) );
   txt->addWidget(find_field);
 
-  QBoxLayout *left1 =  new QHBoxLayout(all,10);
+  Q3BoxLayout *left1 =  new Q3HBoxLayout(all,10);
 
-  QButtonGroup *direction = new QButtonGroup(2,Vertical,"Dir",this);
+  Q3ButtonGroup *direction = new Q3ButtonGroup(2,Qt::Vertical,"Dir",this);
   up = new QRadioButton("Up",direction);
   up->setChecked(false);
   down = new QRadioButton("Down",direction);
   down->setChecked(true);
   left1->addWidget(direction);
 
-  QButtonGroup *from = new QButtonGroup(2,Vertical,"From",this);
+  Q3ButtonGroup *from = new Q3ButtonGroup(2,Qt::Vertical,"From",this);
   start = new QRadioButton("Start",from);
   start->setChecked(true);
   current = new QRadioButton("Current",from);
@@ -1282,7 +1293,7 @@ FindEdit::FindEdit( QWidget *parent, const char *name, QMultiLineEdit *edit ,QSt
   left1->addWidget(from);
 
 
-  QGroupBox *type = new QGroupBox(2,Vertical,"Match",this);
+  Q3GroupBox *type = new Q3GroupBox(2,Qt::Vertical,"Match",this);
   match_whole = new QCheckBox("Match exact",type);  
   //  box->addWidget(match_whole);
   match_case = new QCheckBox("Match case",type);
@@ -1290,7 +1301,7 @@ FindEdit::FindEdit( QWidget *parent, const char *name, QMultiLineEdit *edit ,QSt
   left1->addWidget(type);
 
 
-  QBoxLayout *right =  new QVBoxLayout(left1,5);  
+  Q3BoxLayout *right =  new Q3VBoxLayout(left1,5);  
   find_first = new QPushButton("Find",this);
   right->addWidget(find_first);
   connect( find_first, SIGNAL(clicked()), SLOT(find_first_cb()) );

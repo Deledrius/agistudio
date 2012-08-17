@@ -27,9 +27,9 @@
 #include <qlabel.h>
 #include <qpushbutton.h>
 #include <qlayout.h>
-#include <qkeycode.h>
+#include <qnamespace.h>
 #include <qmessagebox.h>
-#include <qmultilineedit.h>
+#include <q3multilineedit.h>
 #include <qevent.h>
 #include <qstatusbar.h>
 #include <qcheckbox.h>

@@ -32,13 +32,22 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <qapplication.h>
-#include <qfiledialog.h> 
+#include <q3filedialog.h> 
+//Added by qt3to4:
+#include <Q3HBoxLayout>
+#include <QCloseEvent>
+#include <Q3BoxLayout>
+#include <QShowEvent>
+#include <QLabel>
+#include <Q3PopupMenu>
+#include <QHideEvent>
+#include <Q3VBoxLayout>
 
 
 //*****************************************
 //Inventory object editor
 ObjEdit::ObjEdit( QWidget *parent, const char *nam, int win_num)
-    : QWidget( parent, nam, WDestructiveClose )
+    : QWidget( parent, nam, Qt::WDestructiveClose )
 {
   
   setCaption("Object Editor");
@@ -47,8 +56,8 @@ ObjEdit::ObjEdit( QWidget *parent, const char *nam, int win_num)
   winnum = win_num;
   objlist = new ObjList();
 
-  QPopupMenu *file = new QPopupMenu( this );
-  CHECK_PTR( file );
+  Q3PopupMenu *file = new Q3PopupMenu( this );
+  Q_CHECK_PTR( file );
 
   file->insertItem( "New", this, SLOT(new_file()) );
   file->insertItem( "Open", this, SLOT(open_file()) );
@@ -57,21 +66,21 @@ ObjEdit::ObjEdit( QWidget *parent, const char *nam, int win_num)
   file->insertSeparator();
   file->insertItem( "Close", this, SLOT(close()) );
 
-  options = new QPopupMenu( this );
-  CHECK_PTR( options );
+  options = new Q3PopupMenu( this );
+  Q_CHECK_PTR( options );
   encrypted = options->insertItem( "Encrypted", this, SLOT(encrypted_cb()) );
   options->setItemChecked(encrypted,true);  
 
   QMenuBar *menu = new QMenuBar(this);  
-  CHECK_PTR( menu );
+  Q_CHECK_PTR( menu );
   menu->insertItem( "File", file );
   menu->insertItem( "Options", options );
   menu->setSeparator( QMenuBar::InWindowsStyle );
 
-  QBoxLayout *all =  new QVBoxLayout(this,14);  
+  Q3BoxLayout *all =  new Q3VBoxLayout(this,14);  
   all->setMenuBar(menu);    
   
-  list = new QListBox(this);
+  list = new Q3ListBox(this);
   list->setMinimumSize(400,400);
   list->setColumnMode (1);
 
@@ -83,7 +92,7 @@ ObjEdit::ObjEdit( QWidget *parent, const char *nam, int win_num)
   connect( name, SIGNAL(returnPressed()), SLOT(name_cb()) );
   all->addWidget(name);
 
-  QBoxLayout *down =  new QHBoxLayout(all,4);
+  Q3BoxLayout *down =  new Q3HBoxLayout(all,4);
   
   add = new QPushButton("&Add",this);
   connect( add, SIGNAL(clicked()), SLOT(add_cb()) );
@@ -202,12 +211,12 @@ void ObjEdit::open(char *name)
 void ObjEdit::open_file()
 {
 
-  QFileDialog *f = new QFileDialog(0,"Open",true);  
+  Q3FileDialog *f = new Q3FileDialog(0,"Open",true);  
   const char *filters[] = {"object","All files (*)",NULL};
   
   f->setFilters(filters);
   f->setCaption("Open");
-  f->setMode(QFileDialog::ExistingFile);
+  f->setMode(Q3FileDialog::ExistingFile);
   f->setDir(game->dir.c_str());
   if ( f->exec() == QDialog::Accepted ) {
     if ( !f->selectedFile().isEmpty() )
@@ -231,12 +240,12 @@ void ObjEdit::save_file()
 void ObjEdit::save_as_file()
 {
 
-  QFileDialog *f = new QFileDialog(0,"Save",true);  
+  Q3FileDialog *f = new Q3FileDialog(0,"Save",true);  
   const char *filters[] = {"object","All files (*)",NULL};
   
   f->setFilters(filters);
   f->setCaption("Save");
-  f->setMode(QFileDialog::AnyFile);
+  f->setMode(Q3FileDialog::AnyFile);
   f->setDir(game->dir.c_str());
   if ( f->exec() == QDialog::Accepted ) {
     if ( !f->selectedFile().isEmpty() ){

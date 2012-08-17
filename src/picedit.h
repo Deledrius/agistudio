@@ -25,16 +25,24 @@
 #include <qlabel.h>
 #include <qpushbutton.h>
 #include <qlayout.h>
-#include <qkeycode.h>
+#include <qnamespace.h>
 #include <qmessagebox.h>
-#include <qmultilineedit.h> 
+#include <q3multilineedit.h> 
 #include <qevent.h> 
-#include <qscrollview.h> 
+#include <q3scrollview.h> 
 #include <qpixmap.h>
 #include <qimage.h>
 #include <qstatusbar.h>
 #include <qcheckbox.h>
 #include <qpaintdevice.h>
+//Added by qt3to4:
+#include <QCloseEvent>
+#include <QShowEvent>
+#include <QPaintEvent>
+#include <QResizeEvent>
+#include <QMouseEvent>
+#include <QHideEvent>
+#include <QKeyEvent>
 
 #include "util.h"
 #include "wutil.h"
@@ -57,7 +65,7 @@ public:
 };
 
 //************************************************
-class PCanvas : public QScrollView
+class PCanvas : public Q3ScrollView
 {
     Q_OBJECT
 public:
@@ -100,7 +108,7 @@ public slots:
     void read();
  protected:
     QCheckBox *comments,*wrap;
-    QMultiLineEdit *codes;
+    Q3MultiLineEdit *codes;
     TStringList data;
     Picture *picture;
     int maxcol;
@@ -118,7 +126,7 @@ public:
     PicEdit( QWidget *parent=0, const char *name=0,int winnum=0,ResourcesWin *res=0);
     void open(int ResNum);
     Picture *picture;
-    QButtonGroup *tool;
+    Q3ButtonGroup *tool;
     QRadioButton *line,*step,*pen,*fill,*brush;
     QRadioButton *pic,*pri;
     QStatusBar *status;

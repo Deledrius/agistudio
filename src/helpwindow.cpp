@@ -17,24 +17,29 @@
 #include "helpwindow.h"
 #include <qstatusbar.h>
 #include <qpixmap.h>
-#include <qpopupmenu.h>
+#include <q3popupmenu.h>
 #include <qmenubar.h>
-#include <qtoolbar.h>
+#include <q3toolbar.h>
 #include <qtoolbutton.h>
-#include <qiconset.h>
+#include <qicon.h>
 #include <qfile.h>
-#include <qtextstream.h>
-#include <qstylesheet.h>
+#include <q3textstream.h>
+#include <q3stylesheet.h>
 #include <qmessagebox.h>
-#include <qfiledialog.h>
+#include <q3filedialog.h>
 #include <qapplication.h>
 #include <qcombobox.h>
 #include <qevent.h>
 #include <qlineedit.h>
-#include <qobjectlist.h>
+#include <qobject.h>
 #include <qfileinfo.h>
 #include <qfile.h>
 #include <qdatastream.h>
+//Added by qt3to4:
+#include <QShowEvent>
+#include <Q3Frame>
+#include <QHideEvent>
+#include <QKeyEvent>
 
 #include <ctype.h>
 
@@ -47,30 +52,30 @@
 HelpWindow *helpwindow,*helpwindow1;
 
 HelpWindow::HelpWindow( const QString& home_, const QString& _path, QWidget* parent, const char *name )
-    : QMainWindow( parent, name ), pathCombo( 0 ), selectedURL(),
+    : Q3MainWindow( parent, name ), pathCombo( 0 ), selectedURL(),
       path( QFileInfo( home_ ).dirPath( TRUE ), "*.htm*" )
 {
 
 
-  QStyleSheetItem* style;
+  Q3StyleSheetItem* style;
   
   // Modify the application-wide default style sheet to handle
   // some extra HTML gracefully.
   //
   // Ignore any bodytext in <head>...</head>:
-  style = new QStyleSheetItem( QStyleSheet::defaultSheet(), "head" );
-  style->setDisplayMode(QStyleSheetItem::DisplayNone);
+  style = new Q3StyleSheetItem( Q3StyleSheet::defaultSheet(), "head" );
+  style->setDisplayMode(Q3StyleSheetItem::DisplayNone);
   //
   // Not in default style sheet, just fake it:
-  style = new QStyleSheetItem( QStyleSheet::defaultSheet(), "dl" );
-  style->setDisplayMode(QStyleSheetItem::DisplayBlock);
-  style = new QStyleSheetItem( QStyleSheet::defaultSheet(), "dt" );
-  style->setDisplayMode(QStyleSheetItem::DisplayBlock);
+  style = new Q3StyleSheetItem( Q3StyleSheet::defaultSheet(), "dl" );
+  style->setDisplayMode(Q3StyleSheetItem::DisplayBlock);
+  style = new Q3StyleSheetItem( Q3StyleSheet::defaultSheet(), "dt" );
+  style->setDisplayMode(Q3StyleSheetItem::DisplayBlock);
   style->setContexts("dl");
   //
   // Many HTML files omit the </p> or </li>, so we add this for efficiency:
-  QStyleSheet::defaultSheet()->item("p")->setSelfNesting( FALSE );
-  QStyleSheet::defaultSheet()->item("li")->setSelfNesting( FALSE );
+  Q3StyleSheet::defaultSheet()->item("p")->setSelfNesting( FALSE );
+  Q3StyleSheet::defaultSheet()->item("li")->setSelfNesting( FALSE );
 
 
 
@@ -79,9 +84,9 @@ HelpWindow::HelpWindow( const QString& home_, const QString& _path, QWidget* par
 
     fileList = path.entryList();
 
-    browser = new QTextBrowser( this );
+    browser = new Q3TextBrowser( this );
     browser->mimeSourceFactory()->setFilePath( _path );
-    browser->setFrameStyle( QFrame::Panel | QFrame::Sunken );
+    browser->setFrameStyle( Q3Frame::Panel | Q3Frame::Sunken );
     connect( browser, SIGNAL( textChanged() ),
              this, SLOT( textChanged() ) );
 
@@ -95,29 +100,29 @@ HelpWindow::HelpWindow( const QString& home_, const QString& _path, QWidget* par
 
     resize( 640,700 );
 
-    QPopupMenu* file = new QPopupMenu( this );
-    file->insertItem( "&New Window", this, SLOT( newWindow() ), ALT | Key_N );
-    file->insertItem( "&Open File", this, SLOT( openFile() ), ALT | Key_O );
+    Q3PopupMenu* file = new Q3PopupMenu( this );
+    file->insertItem( "&New Window", this, SLOT( newWindow() ), Qt::ALT | Qt::Key_N );
+    file->insertItem( "&Open File", this, SLOT( openFile() ), Qt::ALT | Qt::Key_O );
     file->insertSeparator();
-    file->insertItem( "&Close", this, SLOT( hide() ), ALT | Key_Q );
+    file->insertItem( "&Close", this, SLOT( hide() ), Qt::ALT | Qt::Key_Q );
 
-    QPopupMenu* go = new QPopupMenu( this );
+    Q3PopupMenu* go = new Q3PopupMenu( this );
     backwardId = go->insertItem( QPixmap(back),
                                  "&Backward", browser, SLOT( backward() ),
-                                 ALT | Key_Left );
+                                 Qt::ALT | Qt::Key_Left );
     forwardId = go->insertItem( QPixmap(forward),
                                 "&Forward", browser, SLOT( forward() ),
-                                ALT | Key_Right );
+                                Qt::ALT | Qt::Key_Right );
     go->insertItem( QPixmap(home), "&Home", browser, SLOT( home() ) );
 
-    hist = new QPopupMenu( this );
+    hist = new Q3PopupMenu( this );
     QStringList::Iterator it = history.begin();
     for ( ; it != history.end(); ++it )
         mHistory[ hist->insertItem( *it ) ] = *it;
     connect( hist, SIGNAL( activated( int ) ),
              this, SLOT( histChosen( int ) ) );
 
-    bookm = new QPopupMenu( this );
+    bookm = new Q3PopupMenu( this );
     bookm->insertItem( "Add Bookmark", this, SLOT( addBookmark() ) );
     bookm->insertSeparator();
 
@@ -140,7 +145,7 @@ HelpWindow::HelpWindow( const QString& home_, const QString& _path, QWidget* par
              this, SLOT( setForwardAvailable( bool ) ) );
 
 
-    QToolBar* toolbar = new QToolBar( this );
+    Q3ToolBar* toolbar = new Q3ToolBar( this );
     addToolBar( toolbar, "Toolbar");
     QToolButton* button;
 
@@ -162,9 +167,9 @@ HelpWindow::HelpWindow( const QString& home_, const QString& _path, QWidget* par
 
     pathCombo->insertItem( home_ );
     pathCombo->installEventFilter( this );
-    QObjectList *l = queryList( "QLineEdit" );
-    if ( l && l->first() )
-        ( (QLineEdit*)l->first() )->installEventFilter( this );
+    QObjectList l = queryList( "QLineEdit" );
+    if ( l.size()>0 )
+        ( (QLineEdit*)l.at(0) )->installEventFilter( this );
 
     browser->setFocus();
 }
@@ -218,7 +223,7 @@ HelpWindow::~HelpWindow()
         history.append( *it );
 
     QFile f( QDir::currentDirPath() + "/.history" );
-    f.open( IO_WriteOnly );
+    f.open( QIODevice::WriteOnly );
     QDataStream s( &f );
     s << history;
     f.close();
@@ -229,7 +234,7 @@ HelpWindow::~HelpWindow()
         bookmarks.append( *it2 );
 
     QFile f2( QDir::currentDirPath() + "/.bookmarks" );
-    f2.open( IO_WriteOnly );
+    f2.open( QIODevice::WriteOnly );
     QDataStream s2( &f2 );
     s2 << bookmarks;
     f2.close();
@@ -238,7 +243,7 @@ HelpWindow::~HelpWindow()
 
 void HelpWindow::openFile()
 {
-    QString fn = QFileDialog::getOpenFileName( QString::null, QString::null, this );
+    QString fn = Q3FileDialog::getOpenFileName( QString::null, QString::null, this );
     if ( !fn.isEmpty() )
         browser->setSource( fn );
 }
@@ -274,11 +279,11 @@ void HelpWindow::pathSelected( const QString &_path )
 bool HelpWindow::eventFilter( QObject * o, QEvent * e )
 {
 
-    QObjectList *l = queryList( "QLineEdit" );
-    if ( !l || !l->first() )
+    QObjectList l = queryList( "QLineEdit" );
+    if ( l.empty() )
         return FALSE;
 
-    QLineEdit *lined = (QLineEdit*)l->first();
+    QLineEdit *lined = (QLineEdit*)l.at(0);
 
     if ( ( o == pathCombo || o == lined ) &&
          e->type() == QEvent::KeyPress ) {
@@ -312,7 +317,7 @@ void HelpWindow::readHistory()
 {
     if ( QFile::exists( QDir::currentDirPath() + "/.history" ) ) {
         QFile f( QDir::currentDirPath() + "/.history" );
-        f.open( IO_ReadOnly );
+        f.open( QIODevice::ReadOnly );
         QDataStream s( &f );
         s >> history;
         f.close();
@@ -325,7 +330,7 @@ void HelpWindow::readBookmarks()
 {
     if ( QFile::exists( QDir::currentDirPath() + "/.bookmarks" ) ) {
         QFile f( QDir::currentDirPath() + "/.bookmarks" );
-        f.open( IO_ReadOnly );
+        f.open( QIODevice::ReadOnly );
         QDataStream s( &f );
         s >> bookmarks;
         f.close();

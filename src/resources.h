@@ -24,11 +24,15 @@
 #include <string>
 #include <qwidget.h>
 #include <qlabel.h>
-#include <qlistbox.h> 
+#include <q3listbox.h> 
 #include <qcombobox.h>
 #include <qlayout.h>
 #include <qlineedit.h>
-#include <qbuttongroup.h>
+#include <q3buttongroup.h>
+//Added by qt3to4:
+#include <QShowEvent>
+#include <QHideEvent>
+#include <QCloseEvent>
 
 #include "preview.h"
 
@@ -44,7 +48,7 @@ public:
     QLabel *filename;
     QLabel *name;
     QLineEdit *number;
-    QButtonGroup *type;
+    Q3ButtonGroup *type;
     ResourcesWin *resources_win;
     Preview *preview;
     int restype;
@@ -64,7 +68,7 @@ class ResourcesWin : public QWidget
     Q_OBJECT
 public:
     ResourcesWin( QWidget* parent = 0, const char*  name=0, int winnum=0);
-    QListBox *list;
+    Q3ListBox *list;
     int selected;
     int ResourceNum;
     Preview *preview;

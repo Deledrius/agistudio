@@ -27,14 +27,19 @@
 
 #include <string>
 #include <qwidget.h>
-#include <qwidgetstack.h>
+#include <q3widgetstack.h>
 #include <qlabel.h>
 #include <qlayout.h>
 #include <qradiobutton.h>
 #include <qpushbutton.h>
 #include <qpixmap.h>
-#include <qmultilineedit.h>
+#include <q3multilineedit.h>
 #include <qcombobox.h>
+//Added by qt3to4:
+#include <QShowEvent>
+#include <QHideEvent>
+#include <QCloseEvent>
+#include <QPaintEvent>
 
 class Animate;
 class Preview;
@@ -78,12 +83,12 @@ class ResourcesWin;
 class LogEdit;
 
 //****************************************************
-class Preview : public QWidgetStack
+class Preview : public Q3WidgetStack
 {
     Q_OBJECT
 public:
     Preview( QWidget* parent = 0, const char*  name=0, ResourcesWin *res=0);
-    QMultiLineEdit *description;
+    Q3MultiLineEdit *description;
     ResourcesWin *resources_win;
     void open(int i,int type);
 public slots:

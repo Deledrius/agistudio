@@ -37,8 +37,15 @@
 #include <ctype.h>
 
 #include <qapplication.h>
-#include <qfiledialog.h>
-#include <qgrid.h>
+#include <q3filedialog.h>
+#include <q3grid.h>
+//Added by qt3to4:
+#include <Q3HBoxLayout>
+#include <Q3BoxLayout>
+#include <Q3GridLayout>
+#include <Q3Frame>
+#include <QLabel>
+#include <Q3VBoxLayout>
 
 static const char *dirs[4] = {"left","right","bottom","horizon"};
 
@@ -49,11 +56,11 @@ RoomGen::RoomGen( QWidget *parent, const char *name)
   int i;
   setCaption("AGI Base Logic Generator");
 
-  QBoxLayout *all = new QVBoxLayout(this,5);
+  Q3BoxLayout *all = new Q3VBoxLayout(this,5);
 
-  QHBoxLayout *upper = new QHBoxLayout(all,10);
+  Q3HBoxLayout *upper = new Q3HBoxLayout(all,10);
 
-  QGrid *gtxt = new QGrid( 2, this);
+  Q3Grid *gtxt = new Q3Grid( 2, this);
   gtxt->setSpacing(4);
   upper->addWidget(gtxt);
 
@@ -79,7 +86,7 @@ RoomGen::RoomGen( QWidget *parent, const char *name)
   hnum->setText("36");
   //hnum->selectAll();
 
-  QVBoxLayout *check = new QVBoxLayout(upper,2);
+  Q3VBoxLayout *check = new Q3VBoxLayout(upper,2);
   draw_ego = new QCheckBox("Draw Ego initially",this);
   draw_ego->setChecked(true);
   check->addWidget(draw_ego);
@@ -93,7 +100,7 @@ RoomGen::RoomGen( QWidget *parent, const char *name)
   gen_comm->setChecked(true);
   check->addWidget(gen_comm);
 
-  QVBoxLayout *but = new QVBoxLayout(upper,2);
+  Q3VBoxLayout *but = new Q3VBoxLayout(upper,2);
   QPushButton *entry = new QPushButton("Entry and looking",this);
   connect(entry,SIGNAL(clicked()),SLOT(entry_cb()));
   but->addWidget(entry);
@@ -101,15 +108,15 @@ RoomGen::RoomGen( QWidget *parent, const char *name)
   connect(first,SIGNAL(clicked()),SLOT(first_cb()));
   but->addWidget(first);
 
-  QBoxLayout *ledge = new QHBoxLayout(all,1);
+  Q3BoxLayout *ledge = new Q3HBoxLayout(all,1);
 
   //  QGroupBox *ego_pos_b = new QGroupBox(1,Horizontal,"Ego Positioning (-1 = ignore)",this);
-  QFrame *ego_pos_b = new QFrame(this);
-  ego_pos_b->setFrameStyle( QFrame::Box | QFrame::Sunken );
+  Q3Frame *ego_pos_b = new Q3Frame(this);
+  ego_pos_b->setFrameStyle( Q3Frame::Box | Q3Frame::Sunken );
   ego_pos_b->setLineWidth(1);
   ego_pos_b->setMargin(2);
 
-  QGridLayout *ego_pos = new QGridLayout(ego_pos_b,6,6,10,4);
+  Q3GridLayout *ego_pos = new Q3GridLayout(ego_pos_b,6,6,10,4);
 
   QLabel *ll = new QLabel("Ego Positioning (-1 = ignore)",ego_pos_b);
   ego_pos->addMultiCellWidget(ll,0,0,0,5,AlignCenter);
@@ -162,12 +169,12 @@ RoomGen::RoomGen( QWidget *parent, const char *name)
   ledge->addWidget(ego_pos_b,1);
 
 
-  QFrame *edge_control_b = new QFrame(this);
-  edge_control_b->setFrameStyle( QFrame::Box | QFrame::Sunken );
+  Q3Frame *edge_control_b = new Q3Frame(this);
+  edge_control_b->setFrameStyle( Q3Frame::Box | Q3Frame::Sunken );
   edge_control_b->setLineWidth(1);
   edge_control_b->setMargin(4);
 
-  QGridLayout *edge_control = new QGridLayout(edge_control_b,6,2,10,1);
+  Q3GridLayout *edge_control = new Q3GridLayout(edge_control_b,6,2,10,1);
 
   QLabel *ll1 = new QLabel("Edge Controls (-1 = ignore)",edge_control_b);
   edge_control->addMultiCellWidget(ll1,0,0,0,1,AlignCenter);
@@ -202,14 +209,14 @@ RoomGen::RoomGen( QWidget *parent, const char *name)
 
   ledge->addWidget(edge_control_b,0);
 
-  QHBoxLayout *ltitle = new QHBoxLayout(all,4);
+  Q3HBoxLayout *ltitle = new Q3HBoxLayout(all,4);
 
   QLabel *lcom = new QLabel("Logic Title (for comments):",this);
   ltitle->addWidget(lcom);
   title = new QLineEdit(this);
   ltitle->addWidget(title);
 
-  QHBoxLayout *last = new QHBoxLayout(all,20);
+  Q3HBoxLayout *last = new Q3HBoxLayout(all,20);
 
   QPushButton *ok = new QPushButton("OK",this);
   ok->setMaximumSize(80,40);
@@ -585,13 +592,13 @@ RoomGenEntry::RoomGenEntry( QWidget *parent, const char *name)
 
   setCaption("Room Entry and Looking");
 
-  QBoxLayout *all = new QVBoxLayout(this,5);
+  Q3BoxLayout *all = new Q3VBoxLayout(this,5);
 
   QLabel *entry = new QLabel("On room entry:",this);
   all->addWidget(entry);
 
 
-  QBoxLayout *l1 = new QHBoxLayout(all,1);
+  Q3BoxLayout *l1 = new Q3HBoxLayout(all,1);
   QLabel *print1 = new QLabel("print(\"",this);
   l1->addWidget(print1);
   entry_text = new QLineEdit(this);
@@ -606,7 +613,7 @@ RoomGenEntry::RoomGenEntry( QWidget *parent, const char *name)
 
   QWidget *place = new QWidget(this);
 
-  QBoxLayout *l2 = new QHBoxLayout(place,1);
+  Q3BoxLayout *l2 = new Q3HBoxLayout(place,1);
   QLabel *print2 = new QLabel("print(\"",place);
   l2->addWidget(print2);
   look_text = new QLineEdit(place);
@@ -621,7 +628,7 @@ RoomGenEntry::RoomGenEntry( QWidget *parent, const char *name)
   all->addWidget(p);
 
 
-  QBoxLayout *last = new QHBoxLayout(all,10);
+  Q3BoxLayout *last = new Q3HBoxLayout(all,10);
 
   QPushButton *ok = new QPushButton("OK",this);
   ok->setMaximumSize(80,40);
@@ -645,13 +652,13 @@ RoomGenFirst::RoomGenFirst( QWidget *parent, const char *name)
 
   setCaption("Controls for First Room");
 
-  QBoxLayout *all = new QVBoxLayout(this,5);
+  Q3BoxLayout *all = new Q3VBoxLayout(this,5);
 
   QLabel *egopos = new QLabel("Ego positioning (-1 = ignore)",this);
   all->addWidget(egopos);
 
 
-  QGridLayout *l1 = new QGridLayout(all,6,1,5);
+  Q3GridLayout *l1 = new Q3GridLayout(all,6,1,5);
   QLabel *lx = new QLabel("X:",this);
   l1->addWidget(lx,0,0,AlignRight);
   x = new QLineEdit(this);
@@ -680,7 +687,7 @@ RoomGenFirst::RoomGenFirst( QWidget *parent, const char *name)
   input->setChecked(true);
   all->addWidget(input);
 
-  QBoxLayout *last = new QHBoxLayout(all,10);
+  Q3BoxLayout *last = new Q3HBoxLayout(all,10);
 
   QPushButton *ok = new QPushButton("OK",this);
   ok->setMaximumSize(80,40);
@@ -704,12 +711,12 @@ RoomGenPos::RoomGenPos( QWidget *parent, const char *name)
 
   setCaption("Controls for First Room");
 
-  QBoxLayout *all = new QVBoxLayout(this,5);
+  Q3BoxLayout *all = new Q3VBoxLayout(this,5);
 
   QLabel *l = new QLabel("Absolute (Unconditional) Position:",this);
   all->addWidget(l);
 
-  QGridLayout *l1 = new QGridLayout(all,6,1,5);
+  Q3GridLayout *l1 = new Q3GridLayout(all,6,1,5);
   QLabel *lx = new QLabel("X:",this);
   l1->addWidget(lx,0,0,AlignRight);
   x = new QLineEdit(this);
@@ -740,7 +747,7 @@ where you won't get stuck behind control lines, etc."
 ,this);
   all->addWidget(com);
 
-  QBoxLayout *last = new QHBoxLayout(all,10);
+  Q3BoxLayout *last = new Q3HBoxLayout(all,10);
 
   QPushButton *ok = new QPushButton("OK",this);
   ok->setMaximumSize(80,40);
@@ -765,7 +772,7 @@ RoomGenEdge::RoomGenEdge( QWidget *parent, const char *name)
 
   setCaption("Edge Code Advanced Controls");
 
-  QBoxLayout *all = new QVBoxLayout(this,5);
+  Q3BoxLayout *all = new Q3VBoxLayout(this,5);
 
   QLabel *com = new QLabel(
 "It may be desirable to have an edge code that does not lead to different room.\n\
@@ -778,7 +785,7 @@ if (ego_edge_code == horizon_edge){\n\
 ,this);
   all->addWidget(com);
 
-  QGroupBox *edge = new QGroupBox(2,Horizontal,"Empty edge controls",this);
+  Q3GroupBox *edge = new Q3GroupBox(2,Horizontal,"Empty edge controls",this);
 
   for(i=0;i<4;i++){
     sprintf(tmp,"Include empty code for %s edge",dirs[i]);
@@ -787,7 +794,7 @@ if (ego_edge_code == horizon_edge){\n\
 
   all->addWidget(edge);
 
-  QGroupBox *messages = new QGroupBox(4,Horizontal,
+  Q3GroupBox *messages = new Q3GroupBox(4,Horizontal,
 "Messages (if Display is not checked, message will be ignored)",this);
   for(i=0;i<4;i++){
     m_edge[i] = new QCheckBox("Display",messages);
@@ -808,7 +815,7 @@ if (ego_edge_code == horizon_edge){\n\
 
   all->addWidget(messages);
 
-  QBoxLayout *last = new QHBoxLayout(all,10);
+  Q3BoxLayout *last = new Q3HBoxLayout(all,10);
 
   QPushButton *ok = new QPushButton("OK",this);
   ok->setMaximumSize(80,40);
@@ -872,15 +879,15 @@ RoomGenMessage::RoomGenMessage( QWidget *parent, const char *name)
 {
 
 
-  QBoxLayout *all = new QVBoxLayout(this,5);
+  Q3BoxLayout *all = new Q3VBoxLayout(this,5);
 
   l = new QLabel("",this);
-  l->setAutoResize(true);
+  //l->setAutoResize(true); // TODO: REPLACE WITH A LAYOUT!
   all->addWidget(l);
   message = new QLineEdit(this);
   all->addWidget(message);
 
-  QBoxLayout *last = new QHBoxLayout(all,10);
+  Q3BoxLayout *last = new Q3HBoxLayout(all,10);
 
   QPushButton *ok = new QPushButton("OK",this);
   ok->setMaximumSize(80,40);

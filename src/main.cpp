@@ -22,7 +22,7 @@
 #include <stdio.h>
 
 #include <qapplication.h>
-#include <qmainwindow.h>
+#include <q3mainwindow.h>
 
 #include "menu.h"
 #include "game.h"
