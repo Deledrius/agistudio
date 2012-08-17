@@ -86,16 +86,11 @@ Dir::Dir( QWidget *parent, const char *name,bool mode)
 //*********************************************************
 void Dir::open()
 {
-  
-  const QFileInfoList& lst = d.entryInfoList();
-  QFileInfoList::const_iterator it( lst.begin());      // create list iterator
-  const QFileInfo *fi;                          // pointer for traversing
-  
+  QFileInfoList lst = d.entryInfoList();
   list->clear();
-  while ( (fi=&(*it)) ) {           // for each file...
-    sprintf(tmp, "%s", fi->fileName().data() );
-    if(strcmp(tmp,"."))list->insertItem(tmp);
-    ++it;
+  for ( int i=0; i<lst.size(); ++i ) {
+    QString f = lst.at(i).fileName();
+    if( f != "." ) list->insertItem( f );
   }
 
   show();
