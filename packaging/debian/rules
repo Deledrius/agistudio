@@ -25,7 +25,7 @@ endif
 configure: configure-stamp
 configure-stamp:
 	dh_testdir
-	cd src; qmake agistudio.pro -o Makefile
+	cd src; qmake-qt4 agistudio.pro -o Makefile
 	touch configure-stamp
 
 
