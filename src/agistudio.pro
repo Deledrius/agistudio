@@ -2,8 +2,7 @@ TEMPLATE = app
 CONFIG	 = qt warn_on release thread
 #CONFIG  = qt warn_on debug thread
 # DEFINES += QT_DLL QT_THREAD_SUPPORT # win32
-#INCLUDEPATH=/usr/include/qt4
-#INCLUDEPATH=/usr/include/qt4;/usr/include/qt4/Qt;/usr/include/qt4/QtGui;;/usr/include/qt4/QtCore;/usr/include/qt4/Qt3Support
+QMAKE_CXXFLAGS += -Wno-unused-result
 HEADERS	 = agicommands.h \
 		dir.h \
 		game.h \

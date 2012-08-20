@@ -129,7 +129,7 @@ class ReplaceWord : public QDialog
 {
     Q_OBJECT
 public:
-    ReplaceWord(string word=0,int OldGroupNum=0, int NewGroupNum=0, QWidget *parent=0, QString name=0 );
+    ReplaceWord(string word=0,int OldGroupNum=0, int NewGroupNum=0, QWidget *parent=0, QString name=(const char*)0);
 public slots:
     void yes();
     void yes_to_all();
