@@ -1022,17 +1022,22 @@ void PCanvas::update()
   linedraw=false;
 
   if(pri_lines){
-    // TODO: proper marching ants here?
     QPen pen;
-    pen.setStyle(Qt::DashDotLine);
-    pen.setWidth(1);
-    pen.setBrush(QColor(255, 0, 0, 127));
-    p.setPen(pen);
+    pen.setStyle(Qt::DashLine);
+    pen.setWidth(1);  
+    
     //p.setPen(Qt::white);
     // p.setRasterOp(XorROP);
+    int i=4;
     int step=MAX_HH*pixsize/14;
-    for(y=step;y<MAX_HH*pixsize;y+=step){
+    for(y=step*3;y<MAX_HH*pixsize;y+=step){
+      //pen.setBrush(QColor(255, 0, 0, 127));
+      pen.setBrush(egacolor[i++]);
+      p.setPen(pen);
       p.drawLine(0,y,MAX_W*pixsize,y);
+      pen.setBrush(QColor(0, 0, 0, 127));
+      p.setPen(pen);
+      p.drawLine(0,y+1,MAX_W*pixsize,y+1);
     }
   }
 
