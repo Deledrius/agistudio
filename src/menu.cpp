@@ -206,7 +206,8 @@ Menu::Menu( QWidget *parent, const char *name )
   connect( pic, SIGNAL(clicked()), SLOT(picture_editor()) );
   QToolTip::add( pic, "Picture editor" );
 
-  toolbar->adjustSize();
+  toolbar->setMovingEnabled(false);
+  toolbar->setResizeEnabled(false);
   toolbar->show();
 
   status = new QStatusBar(this);
@@ -226,8 +227,8 @@ Menu::Menu( QWidget *parent, const char *name )
   disable();
 
   adjustSize();
-  setFixedSize(400,100);
   setSizePolicy( QSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed ));
+  setFixedSize( toolbar->sizeHint());
 
   for(int i=0;i<MAXWIN;i++){
     winlist[i].type=-1;

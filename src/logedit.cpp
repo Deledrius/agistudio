@@ -238,7 +238,7 @@ LogEdit::LogEdit( QWidget *parent, const char *name, int win_num, ResourcesWin *
 
   editor = new Q3MultiLineEdit(this);
 
-  QFont font;
+  QFont font("Monospace");
   font.setPointSize(readonly?8:10);
   font.setStyleHint( QFont::TypeWriter );
   editor->setFont( font );
