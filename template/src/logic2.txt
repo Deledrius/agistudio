@@ -8,7 +8,7 @@ if (new_room) {
   load.pic(room_no);
   draw.pic(room_no);
   discard.pic(room_no);
-  set.horizon(50);
+  set.horizon(60);
   // The next 6 lines need only be in the first room of the game
   if ((prev_room_no == 1 ||    // just come from intro screen
       prev_room_no == 0)) {    // or just started game
@@ -16,6 +16,18 @@ if (new_room) {
     status.line.on();
     accept.input();
   }
+
+  load.view(2); // ego in water -view
+
+  // Show test object on the floor if the player hasn't piced it up
+  if (!has("test object")) {
+    animate.obj(o2);
+    load.view(221);
+    set.view(o2,221);
+    position(o2,70,130);
+    draw(o2);
+  }
+
 // Check what room the player came from and position them on the
 // screen accordingly here, e.g:
 // if (prev_room_no == 5) {
@@ -24,12 +36,35 @@ if (new_room) {
   draw(ego);
   show.pic();
 }
+
+if (ego_on_water) {
+  set.view(ego,2);
+}
+else {
+  set.view(ego,0);
+}
+
 if (said("look")) {
-  print("This is an empty room.");
+  if (!has("test object")) {
+    print("This is a test room. There is a test object on the ground.");
+  } else {
+    print("This is an empty test room.");
+  }
 }
-if (ego_edge_code == horizon_edge) {  // ego touching horizon
-  new.room(2);
+
+if (said("get","test object")) {
+  if (!has("test object")) {
+    get("test object");
+    erase(o2);
+    print("Ok. It looks like some kind of text plate.");
+  } else {
+    print("You already got it.");
+  }
 }
+
+//if (ego_edge_code == horizon_edge) {  // ego touching horizon
+//  new.room(2);
+//}
 if (ego_edge_code == right_edge) {    // ego touching right edge of screen
   new.room(2);
 }
@@ -40,3 +75,7 @@ if (ego_edge_code == left_edge) {     // ego touching left edge of screen
   new.room(2);
 }
 return();
+
+
+
+

@@ -31,6 +31,11 @@
 #define selected_inventory_item  v25
 #define video_mode               v26
 
+// Not standard, but define a few temp variables
+#define va                       v27
+#define vb                       v28
+#define vc                       v29
+
 // flags
 #define ego_on_water             f0
 #define ego_hidden               f1
