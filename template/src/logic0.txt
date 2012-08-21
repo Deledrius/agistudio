@@ -18,6 +18,7 @@ if (room_no == 0) {
     disable.item(menu_fileseparator);
     set(menu_enabled);
     reset(disable_game_functions);
+    assignn(score,0);
     new.room(2);     // go to first room here
   }
   else { 
@@ -45,7 +46,7 @@ if (room_no == 0) {
     set.menu.item("Fastest", menu_fastestspeed);
     submit.menu();
     disable.item(menu_fileseparator);
-    set(disable_game_functions);
+    //set(disable_game_functions);
     new.room(1);    // intro/opening screen
   }
 }
@@ -53,10 +54,17 @@ if (room_no == 0) {
 if (new_room) {          // First interpreter cycle in a new room
                          // Note: Everything other than logic 0 is discarded
                          // from memory when new.room is executed
-  load.logics(90);  // Load game specific functions logic into memory
-  reset(debug_active);  // If you remove this command to have debug
-                        // mode STAY on, remember to load the debug
-                        // logic here.
+  load.logics(90);  // Load game specific functions logic into memory  // Load game specific functions logic into memory
+
+  // Use debug mode?
+  if (v1!=v1) {
+    reset(debug_active);
+  } else {
+    set(debug_active);
+    load.logics(99); // debug code
+  }
+
+
   clear.lines(24,24,0);  // clear bottom line of screen (remove ego's coords if shown)
   animate.obj(ego);
   load.view.v(ego_view_no);
@@ -314,5 +322,8 @@ reset(input_parsed);
 
 End:
 return();
+
+
+
 
 

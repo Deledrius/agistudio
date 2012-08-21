@@ -30,6 +30,7 @@ if (input_recieved &&
 // put various input responses here
   
   if (said("die")) {     // this one should not be in your game - it is
+    score += 1;
     if ( ego_on_water ) {
       print("Blub! You drowned.");
       erase(ego);
@@ -68,5 +69,6 @@ if (input_recieved &&
 }
 
 return();
+
 
 

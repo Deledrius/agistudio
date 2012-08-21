@@ -128,7 +128,8 @@ if (said("coords")) {
 if (coords_shown) {
   get.posn(ego, v253, v254);
   get.priority(ego,v255);
-  display(24,15,"Rm %v0|3 Pri %v255|2 x:%v253|3 y:%v254|3");
+  display(23,15,"Rm %v0|3 Pri %v255|2 x:%v253|3 y:%v254|3");
 }
 
 return();
+

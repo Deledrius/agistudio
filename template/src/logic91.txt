@@ -53,15 +53,13 @@ if (new_room) {
   configure.screen(1, 22, 0);
   set.string(prompt_char, ">");
   set.cursor.char("_");
-  max_score = 0;
+  max_score = 2;
   cycle_delay = 1;  // set speed to fast (delay=1/20ths of a second)
-
-  // Put test object to room 2
-  assignn(va, 2);
-  put( "test object", va );
 }
 
 return();
+
+
 
 
 

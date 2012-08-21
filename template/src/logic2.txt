@@ -12,12 +12,13 @@ if (new_room) {
   // The next 6 lines need only be in the first room of the game
   if ((prev_room_no == 1 ||    // just come from intro screen
       prev_room_no == 0)) {    // or just started game
-    position(ego,120,140);
+    position(ego,76,90);
     status.line.on();
     accept.input();
   }
 
   load.view(2); // ego in water -view
+  ignore.objs(ego); // allow ego to walk over objects
 
   // Show test object on the floor if the player hasn't piced it up
   if (!has("test object")) {
@@ -25,6 +26,7 @@ if (new_room) {
     load.view(221);
     set.view(o2,221);
     position(o2,70,130);
+    set.priority(o2,4); // = floor
     draw(o2);
   }
 
@@ -37,6 +39,7 @@ if (new_room) {
   show.pic();
 }
 
+// Change ego's view when on water
 if (ego_on_water) {
   set.view(ego,2);
 }
@@ -54,9 +57,14 @@ if (said("look")) {
 
 if (said("get","test object")) {
   if (!has("test object")) {
-    get("test object");
-    erase(o2);
-    print("Ok. It looks like some kind of text plate.");
+    if (center.posn(ego, 64,125, 80,135)) { 
+      get("test object");
+      erase(o2);
+      score += 1;
+      print("Ok. It looks like some kind of text plate.");
+    } else {
+      print("It's too far away. Move closer.");
+    }
   } else {
     print("You already got it.");
   }
@@ -75,6 +83,9 @@ if (ego_edge_code == left_edge) {     // ego touching left edge of screen
   new.room(2);
 }
 return();
+
+
+
 
 
 
