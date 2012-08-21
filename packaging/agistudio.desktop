@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=QT AGI Studio
+Exec=agistudio
+Icon=qtagistudio
+Type=Application
+Terminal=false
+Categories=Development;Qt;

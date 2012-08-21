@@ -1,10 +1,10 @@
 Summary: AGI integrated development environment
 Name: agistudio
-Version: 1.2.3
+Version: 1.2.5
 Release: 0
 Copyright: GPL
 Group: Development/Tools
-Source: agistudio-1.2.3.tar.gz
+Source: agistudio-1.2.5.tar.gz
 URL: http://agistudio.sourceforge.net/
 %description
 AGI (Adventure Game Interpreter) is the adventure game engine used by
@@ -14,6 +14,7 @@ is a program which allows you to view, create and edit AGI games.
 %setup
 %build
 cd src
+qmake-qt4 agistudio.pro -o Makefile
 make RPM_OPT_FLAGS="$RPM_OPT_FLAGS"
 
 %install

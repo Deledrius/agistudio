@@ -52,6 +52,10 @@ install: build
 	dh_clean -k
 	dh_installdirs
 	dh_install
+	mkdir -p $(CURDIR)/debian/agistudio/usr/share/applications
+	install -m 644 $(CURDIR)/packaging/agistudio.desktop $(CURDIR)/debian/agistudio/usr/share/applications/
+	mkdir -p $(CURDIR)/debian/agistudio/usr/share/pixmaps
+	install -m 644 $(CURDIR)/packaging/qtagistudio.xpm $(CURDIR)/debian/agistudio/usr/share/pixmaps/
 
 # Build architecture-independent files here.
 binary-indep: build install
