@@ -8,7 +8,7 @@ Standards-Version: 3.6.1.1
 Package: agistudio
 Architecture: any
 Depends: ${shlibs:Depends}
-Recommends: nagi|sarien
+Recommends: scummvm|nagi|sarien
 Description: IDE for creating early Sierra style AGI games
  AGI (Adventure Game Interpreter) is the adventure game engine used by
  Sierra On-Line(tm) to create some of their early games. QT AGI Studio
