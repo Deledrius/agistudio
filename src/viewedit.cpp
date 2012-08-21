@@ -461,9 +461,6 @@ ViewEdit::ViewEdit( QWidget *parent, const char *name,int win_num, ResourcesWin 
   //  palette->setPalette( QPalette( QColor(255, 255, 80) ) );
   grid4->addMultiCellWidget(palette,1,1,0,maxcol2-2,Qt::AlignLeft);
 
-  adjustSize();
-  hide();
-
   description = NULL;
 
   changed=false;
@@ -472,6 +469,8 @@ ViewEdit::ViewEdit( QWidget *parent, const char *name,int win_num, ResourcesWin 
   animate=NULL;
   canvas->setFocus();
 
+  adjustSize();
+  hide();
 }
 
 //*********************************************

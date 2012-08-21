@@ -229,6 +229,8 @@ public:
 //***********************************************
 LogEdit::LogEdit( QWidget *parent, const char *name, int win_num, ResourcesWin *res, bool readonly)
     : QWidget( parent, name, Qt::WDestructiveClose )
+    , findedit(NULL)
+    , roomgen(NULL)
 {
   setCaption("Logic editor");
 
@@ -239,7 +241,7 @@ LogEdit::LogEdit( QWidget *parent, const char *name, int win_num, ResourcesWin *
   editor = new Q3MultiLineEdit(this);
 
   QFont font("Monospace");
-  font.setPointSize(readonly?8:10);
+  font.setPointSize(readonly?8:9);
   font.setStyleHint( QFont::TypeWriter );
   editor->setFont( font );
 
@@ -254,7 +256,7 @@ LogEdit::LogEdit( QWidget *parent, const char *name, int win_num, ResourcesWin *
   }
   else
   {
-    editor->setMinimumSize(430,380);
+    editor->setMinimumSize(512,600);
     setMinimumSize(450,400);
   }
 
@@ -317,12 +319,9 @@ LogEdit::LogEdit( QWidget *parent, const char *name, int win_num, ResourcesWin *
   }
 
   getmaxcol();
-
-  hide();
   changed=false;
-  filename="";
-  findedit=NULL;
-  roomgen=NULL;
+  filename="";  
+  hide();
 }
 
 //***********************************************

@@ -137,10 +137,10 @@ Preview::Preview( QWidget* parent, const char*  name ,ResourcesWin *res ):
   pbox2->addWidget(save_pic_butt,Qt::AlignCenter);
 
   formats_pic = new QComboBox(w_picture);
-  Q3StrList out =  QImageWriter::supportedImageFormats();
-  for (unsigned int k=0;k<out.count();k++ ){
-    formats_pic->insertItem(out.at(k));
+  for (int i = 0; i < QImageWriter::supportedImageFormats().size(); ++i) {
+    formats_pic->insertItem(QImageWriter::supportedImageFormats().at(i).constData());
   }
+
   pbox2->addWidget(formats_pic);
   pbox->addStretch();
 
@@ -222,8 +222,8 @@ Preview::Preview( QWidget* parent, const char*  name ,ResourcesWin *res ):
 
   formats_view = new QComboBox(w_view);
   // QStrList out =  QImageIO::outputFormats ();
-  for (unsigned int k=0;k<out.count();k++ ){
-    formats_view->insertItem(out.at(k));
+  for (int i = 0; i < QImageWriter::supportedImageFormats().size(); ++i) {
+    formats_view->insertItem(QImageWriter::supportedImageFormats().at(i).constData());
   }
   grid1->addWidget(formats_view,row,col,Qt::AlignCenter); // Reference to the same widget used in picture
 
