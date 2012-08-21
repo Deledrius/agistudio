@@ -14,6 +14,10 @@ if (error_code > 0) {
 if (room_no == 0) { 
   call(91);    // initialization
 
+  // Put test object to room2:
+  va=2;
+  put("test object", va);
+
   if (game_restarted) {
     disable.item(menu_fileseparator);
     set(menu_enabled);
@@ -322,6 +326,7 @@ reset(input_parsed);
 
 End:
 return();
+
 
 
 
