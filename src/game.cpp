@@ -234,34 +234,44 @@ int Game::open(string name)
 //*******************************************
 int copy(char *src,char *dest)
   //copy src file to dest file (to avoid using an external 'cp' command)
-  //works only for small files (< MaxResourceSize) to avoid malloc
-  //is used to copy template files
 {
-  FILE *fptr;
-  struct stat buf;
+  FILE *filer, *filew;
+  size_t numr;
+  char buffer[1024];
 
-  fptr=fopen(src,"rb");
-  if(fptr==NULL){
-    menu->errmes("Can't open file %s !",src);
+  filer=fopen(src,"rb");
+  if(!filer)
+  {
+    menu->errmes("Can't open src file %s !",src);
     return 1;
   }
-  fstat(fileno(fptr),&buf);
-  int size=buf.st_size;
-  if(size >= MaxResourceSize){
-    menu->errmes("Error:  File is too big (>%d bytes)",MaxResourceSize);
+  filew=fopen(dest,"wb");
+  if(!filew)
+  {
+    menu->errmes("Can't open dst file %s !",dest);
     return 1;
   }
-  fread(ResourceData.Data,size,1,fptr);
-  fclose(fptr);
-  fptr=fopen(dest,"wb");
-  if(fptr==NULL){
-    menu->errmes("Can't open file %s !",dest);
-    return 1;
+
+  while(feof(filer)==0)
+  {
+    if((numr=fread(buffer,1,1024,filer))!=1024)
+    {
+      if(ferror(filer)!=0)
+      {
+        menu->errmes("read file error: %s !",src);
+        return 1;
+      }
+    }
+    if(fwrite(buffer,1,numr,filew) != numr)
+    {
+      menu->errmes("write file error: %s !",dest);
+      return 1;
+    }
   }
-  fwrite(ResourceData.Data,size,1,fptr);
-  fclose(fptr);
+  
+  fclose(filew);
+  fclose(filer);
   return 0;
-
 }
 
 //*******************************************
