@@ -25,6 +25,7 @@
 #include "preview.h"
 #include "menu.h"
 #include "midi.h"
+#include "bmp2agipic.h"
 
 #include <q3widgetstack.h>
 //Added by qt3to4:
@@ -62,23 +63,24 @@ ResourcesWin::ResourcesWin(  QWidget* parent, const char*  name, int win_num ):
   window->insertItem ( "Close", this, SLOT(close()) );
 
 
-  Q3PopupMenu *resource = new Q3PopupMenu( this );
-  Q_CHECK_PTR( resource );
-  resource->insertItem ( "&Add", this, SLOT(add_resource()) );
-  resource->insertItem ( "&Extract", this, SLOT(extract_resource()) );
-  resource->insertItem ( "&Delete", this, SLOT(delete_resource()) );
-  resource->insertItem ( "&Renumber", this, SLOT(renumber_resource()) );
-  resource->insertItem ( "Extract all", this, SLOT(extract_all_resource()) );
+  resourceMenu = new Q3PopupMenu( this );
+  Q_CHECK_PTR( resourceMenu );
+  resourceMenu->insertItem ( "&Add", this, SLOT(add_resource()) );
+  resourceMenu->insertItem ( "&Extract", this, SLOT(extract_resource()) );
+  resourceMenu->insertItem ( "&Delete", this, SLOT(delete_resource()) );
+  resourceMenu->insertItem ( "&Renumber", this, SLOT(renumber_resource()) );
+  importMenuItemID = resourceMenu->insertItem ( "Import &bitmap", this, SLOT(import_resource()) );
+  resourceMenu->setItemEnabled(importMenuItemID, false);
+  resourceMenu->insertItem ( "Extract all", this, SLOT(extract_all_resource()) );
 
-  QMenuBar *menubar = new QMenuBar(this);
-  Q_CHECK_PTR( menubar );
-  menubar->insertItem ("Window", window );
-  menubar->insertItem( "&Resource", resource );
-  menubar->setSeparator( QMenuBar::InWindowsStyle );
-
+  QMenuBar* resourceMenubar = new QMenuBar(this);
+  Q_CHECK_PTR( resourceMenubar );
+  resourceMenubar->insertItem ("Window", window );
+  resourceMenubar->insertItem( "&Resource", resourceMenu );
+  resourceMenubar->setSeparator( QMenuBar::InWindowsStyle );
 
   Q3BoxLayout *hbox =  new Q3HBoxLayout( this, 10 );
-  hbox->setMenuBar(menubar);
+  hbox->setMenuBar(resourceMenubar);
 
   Q3BoxLayout *resbox =  new Q3VBoxLayout( hbox, 10 );
 
@@ -97,7 +99,7 @@ ResourcesWin::ResourcesWin(  QWidget* parent, const char*  name, int win_num ):
   list->setMinimumSize(200,300);
   connect( list, SIGNAL(highlighted(int)), SLOT(highlight_resource(int)) );
   connect( list, SIGNAL(selected(int)), SLOT(select_resource(int)) );
-  list->setSizePolicy( QSizePolicy( QSizePolicy::Fixed, QSizePolicy::Minimum ));
+  list->setSizePolicy( QSizePolicy( QSizePolicy::Fixed, QSizePolicy::MinimumExpanding ));
 
   selected = game->res_default;
   resbox->addWidget(list);
@@ -129,6 +131,10 @@ void ResourcesWin::select_resource_type( int ResType )
   type->setCurrentItem(ResType);
   selected = ResType;
 
+  // enable import item if resource type supports it
+  resourceMenu->setItemEnabled(importMenuItemID, selected == PICTURE );
+
+  // Show a resource list
   list->hide();
   list->clear();
   for(i=0,k=0;i<256;i++){
@@ -146,16 +152,6 @@ void ResourcesWin::select_resource_type( int ResType )
 //********************************************************
 void ResourcesWin::highlight_resource( int k )
 {
-  /*
-  if(first && (list->currentItem()==0) && (list->count()>1)){
-//QT bug ? when nothing is highlighted and then the user highlights an item,
-//this slot is called twice, the 1st time with item 0
-    first=false;
-    return;
-  }
-  first=false;
-  */
-
   int i = ResourceIndex[k];
   int size = game->GetResourceSize(selected,i);
 
@@ -168,11 +164,6 @@ void ResourcesWin::highlight_resource( int k )
 
   preview->open(i,selected);
   preview->show();
-
-  //preview->adjustSize();
-  //previewPane->adjustSize();
-  //repaint();
-  //adjustSize();
 }
 //********************************************************
 void ResourcesWin::select_resource( int k )
@@ -341,8 +332,87 @@ void ResourcesWin::renumber_resource()
   case 1:
     break;
   }
+}
 
+static QImage openBitmap( const char* title )
+{
+  Q3FileDialog *f = new Q3FileDialog(0,"Load visible bitmap",true);
+  const char *filters[] = {"All files (*)",NULL};
+  f->setFilters(filters);
 
+  QImage pic;
+  
+  f->setCaption(title);
+  f->setMode(Q3FileDialog::ExistingFile);
+  f->setDir(game->srcdir.c_str());
+  if ( f->exec() == QDialog::Accepted )
+    if ( !f->selectedFile().isEmpty() )
+    {
+      pic = QImage( f->selectedFile());
+      if ( pic.isNull())
+        menu->errmes("Error loading bitmap.");
+    }
+
+  if (!pic.isNull())
+    if ( (pic.width() != 320 && pic.width() != 160) || pic.height()<168 )
+    {
+      menu->errmes("Bitmap size must be 320x168 or 160x168.\nHeight can be more but will be cropped to 168.");
+    }
+  return pic;
+}
+
+//**********************************************
+void ResourcesWin::import_resource()
+{
+  QImage vis, pri;
+
+  vis = openBitmap("Open visible bitmap");
+  if ( vis.isNull())
+    return;
+  pri = openBitmap("Open PRIORITY bitmap (or press cancel)");
+  
+  AskNumber *ask_number = new AskNumber(0,0,"Resource number",
+                        "Enter new resource number [0-255]: ");
+  if(!ask_number->exec()) return;
+
+  QString str = ask_number->num->text();
+  int newnum = atoi((char *)str.latin1());
+  int restype = selected;
+  
+  int replace = 0;
+  if(game->ResourceInfo[restype][newnum].Exists)
+  {
+    sprintf(tmp,"Resource %s.%d already exists. Replace it ?",ResTypeName[restype],newnum);
+    replace = QMessageBox::warning( this, "Overwrite resource", tmp, "Replace", "Cancel", 0, 1 );
+  }
+  switch( replace )
+  {
+  case 0:
+    {
+      if(game->ResourceInfo[restype][newnum].Exists)
+        game->DeleteResource(restype, newnum);
+      
+      QByteArray res;
+      const char* err = bitmapToAGIPicture( vis, pri, &res );
+      if ( err )
+      {
+        menu->errmes(err);
+        return;
+      }    
+      ResourceData.Size = res.size();
+      memcpy( ResourceData.Data, res.data(), res.size());
+            
+      game->AddResource(restype, newnum); // uses data from ResourceData
+      select_resource_type(restype);
+      
+      for ( int k=0; k<255; ++k )
+        if ( ResourceIndex[k] == newnum )
+          list->setSelected(k, true);
+    }
+    break;
+  case 1:
+    break;
+  }
 }
 
 //**********************************************
@@ -387,8 +457,6 @@ void ResourcesWin::extract_resource()
       extract((char *)f->selectedFile().latin1(),restype,resnum);
     }
   }
-
-
 }
 
 //**********************************************

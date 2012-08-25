@@ -33,6 +33,8 @@
 #include <QShowEvent>
 #include <QHideEvent>
 #include <QCloseEvent>
+#include <Q3PopupMenu>
+
 
 #include "preview.h"
 
@@ -86,12 +88,18 @@ public slots:
     void renumber_resource(void);
     void new_resource_window(void);
     void export_resource(void);
+    void import_resource(void);
+    
  protected:
     bool first;
     QLabel *msg;
     QComboBox *type;
     QWidget *previewPane;
     AddResource *addmenu;
+    
+    Q3PopupMenu *resourceMenu;
+    int importMenuItemID;
+    
     int winnum;
     void closeEvent( QCloseEvent *e );
     void showEvent(  QShowEvent * );

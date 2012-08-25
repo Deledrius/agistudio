@@ -26,7 +26,8 @@ HEADERS	 = agicommands.h \
 		viewedit.h \
 		words.h \
 		wordsedit.h \
-		wutil.h 
+		wutil.h \
+		bmp2agipic.h
 SOURCES  = agicommands.cpp \
 		agiplay.cpp \
 		bpicture.cpp \
@@ -54,7 +55,8 @@ SOURCES  = agicommands.cpp \
 		viewedit.cpp \
 		words.cpp \
 		wordsedit.cpp \
-		wutil.cpp 
+		wutil.cpp \
+		bmp2agipic.cpp
 TARGET   = agistudio
 
 #The following line was inserted by qt3to4

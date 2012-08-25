@@ -207,6 +207,7 @@ PicEdit::PicEdit( QWidget *parent, const char *name,int win_num,ResourcesWin *re
   connect(left, SIGNAL(clicked()), SLOT(left_cb()) );
   b3->addWidget(left);
   pos = new QLineEdit(this);
+  pos->setMinimumWidth(64);
   //pos->setFocusPolicy(ClickFocus);
   connect( pos, SIGNAL(returnPressed()), SLOT(set_pos()) );
   b3->addWidget(pos);
