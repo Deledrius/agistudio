@@ -1358,7 +1358,7 @@ void Game::defaults()
   reldir=true;
   srcdirname="src";
 #ifdef _WIN32
-  command="sarien ./";
+  command="sarien -e -H 0 ./";
   char abspath[256];  // absolute path to the program file
   _fullpath(abspath,_pgmptr,255);
   char *mydir = (char *)(malloc(strlen(abspath)+1));  // will store the program's directory
@@ -1375,7 +1375,7 @@ void Game::defaults()
   templatedir = templatedir_c;
   helpdir = helpdir_c;
 #else
-  command="nagi ./ || sarien ./";
+  command="nagi ./ || sarien -e -H 0 ./";
   templatedir="/usr/share/agistudio/template";
   helpdir="/usr/share/agistudio/help";
 #endif
