@@ -1,6 +1,17 @@
-Release notes for QT AGI Studio version 1.2.5 (2012-08-18)
+Release notes for QT AGI Studio version 1.3.0 (2012-08-25)
 
-- (Lazy) port to QT4 and qmake
+- new features:
+ * ported to QT4
+ * bitmap import for picture resources (vectorization)
+ * replaced old game open dialog with QT4 native
+ * more useful/complete template game (more like an example now)
+ * monospace font in logic editor
+
+- bug fixes:
+ * fixed a long-standing random startup crash
+ * wider position text area in picture editor
+
+- cleaner compilation, again
 
 Release notes for QT AGI Studio version 1.2.4 (2009-04-09)
 

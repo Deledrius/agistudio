@@ -889,7 +889,7 @@ About::About(QWidget *parent, const char *name )
   about->setTextFormat(Qt::RichText);
   about->setReadOnly(true);
   about->setText(
-    "<center><b>QT AGI studio v. 1.2.5</b><br>"
+    "<center><b>QT AGI studio v. 1.3.0</b><br>"
     "http://agistudio.sourceforge.net/<br>"
     "<br>"
     "<b>Authors:</b><br>"

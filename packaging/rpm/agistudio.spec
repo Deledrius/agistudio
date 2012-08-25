@@ -1,10 +1,10 @@
 Summary: AGI integrated development environment
 Name: agistudio
-Version: 1.2.5
+Version: 1.3.0
 Release: 0
 Copyright: GPL
 Group: Development/Tools
-Source: agistudio-1.2.5.tar.gz
+Source: agistudio-1.3.0.tar.gz
 URL: http://agistudio.sourceforge.net/
 %description
 AGI (Adventure Game Interpreter) is the adventure game engine used by
