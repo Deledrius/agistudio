@@ -22,42 +22,7 @@
 #define DIR_H
 
 #include <qwidget.h>
-#include <qlabel.h>
-#include <qpushbutton.h>
-#include <qlayout.h>
-#include <qnamespace.h>
-#include <qmessagebox.h>
-#include <q3multilineedit.h> 
-#include <qevent.h> 
-#include <q3scrollview.h> 
-#include <qpixmap.h>
-#include <qimage.h>
-#include <qstatusbar.h>
-#include <qcheckbox.h>
-#include <qdir.h>
 
-#include "util.h"
-#include "wutil.h"
-
-//directory browser; since there is no way in QFileDialog to 
-//show only directories
-
-class Dir: public QWidget
-{
-
-   Q_OBJECT
-public:
-   Dir( QWidget *parent=0, const char *name=0,bool newgame=false);
-   Q3ListBox *list;  //dir list
-   QLineEdit *selected;  //selected directory
-   QDir d;
-   bool newgame;   //true - create new game, false - open existing game
-   void open();   
-public slots:
-     void highlight_dir(int);
-     void select_dir(int);
-     void create_dir();
-     void ok_cb();
-};
+void OpenGameDir( QWidget *parent=0, bool newgame=false );
 
 #endif

@@ -237,7 +237,6 @@ Menu::Menu( QWidget *parent, const char *name )
 #ifdef IMGEXT
   imgext=false;
 #endif
-  dir_new=dir_open=NULL;
   window_list=NULL;
   resources_win=NULL;
   num_res=0;
@@ -293,10 +292,7 @@ void Menu::enable()
 //**********************************************
 void Menu::open_game()
 {
-
-  if(dir_open==NULL)dir_open=new Dir(0,0,false);
-  dir_open->open();
-
+  OpenGameDir( 0, false );
 }
 
 //**********************************************
@@ -540,21 +536,15 @@ void Menu::settings()
 //**********************************************
 void Menu::from_template()
 {
-
   menu->templ=true;
-  if(dir_new==NULL)dir_new =new Dir(0,0,true);
-  dir_new->open();
-
+  OpenGameDir( 0, true );
 }
 
 //**********************************************
 void Menu::blank()
 {
-
   menu->templ=false;
-  if(dir_new==NULL)dir_new =new Dir(0,0,true);
-  dir_new->open();
-
+  OpenGameDir( 0, true );
 }
 
 //**********************************************

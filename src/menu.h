@@ -137,7 +137,6 @@ protected:
     QPushButton *create;
     Q3FileDialog *f;
     QPushButton *open,*close_,*run,*view,*logic,*text,*obj,*words,*pic;
-    Dir *dir_new,*dir_open;
     int num_res;
     int n_res;
     int id[24];

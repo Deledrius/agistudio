@@ -27,127 +27,32 @@
 #else
 #include <unistd.h>
 #include <glob.h>
-//Added by qt3to4:
-#include <Q3BoxLayout>
-#include <Q3HBoxLayout>
-#include <Q3VBoxLayout>
-#include <QLabel>
 #endif
 
+#include <QFileDialog>
 
-//directory browser; since there is no way in QFileDialog to 
-//show only directories
-
-Dir::Dir( QWidget *parent, const char *name,bool mode)
-    : QWidget( parent, name)
-{
-
-  newgame=mode;   //if true - can create new dirs
-  Q3BoxLayout *all = new Q3VBoxLayout(this,20);
-
-  QLabel *l;
-  if(newgame){
-    setCaption("New game");
-    l = new QLabel("Please select the directory\nyou wish to put the new game in:",this);
-  }
-  else{
-    setCaption("Open game");
-    l = new QLabel("Please select the game directory",this);
-  }
-  all->addWidget(l);
-
-  list = new Q3ListBox(this);
-  list->setColumnMode (1);
-  list->setMinimumSize(200,300);
-  connect( list, SIGNAL(highlighted(int)), SLOT(highlight_dir(int)) );
-  connect( list, SIGNAL(selected(int)), SLOT(select_dir(int)) );
-  all->addWidget(list);
-
-  selected = new QLineEdit(this);
-  all->addWidget(selected);
-
-  Q3BoxLayout *b = new Q3HBoxLayout(all,20);
-  if(newgame){
-    QPushButton *create = new QPushButton("Create dir",this);
-    connect(create, SIGNAL(clicked()), SLOT(create_dir()));
-    b->addWidget(create);
-  }
-  QPushButton *ok = new QPushButton("OK",this);
-  connect(ok, SIGNAL(clicked()), SLOT(ok_cb()));
-  b->addWidget(ok);
-  QPushButton *cancel = new QPushButton("Cancel",this);
-  connect(cancel, SIGNAL(clicked()), SLOT(close()));
-  b->addWidget(cancel);
-
-  d.setFilter( QDir::Dirs );
-  adjustSize();
-}
 
 //*********************************************************
-void Dir::open()
+void OpenGameDir( QWidget *parent, bool newgame )
 {
-  QFileInfoList lst = d.entryInfoList();
-  list->clear();
-  for ( int i=0; i<lst.size(); ++i ) {
-    QString f = lst.at(i).fileName();
-    if( f != "." ) list->insertItem( f );
-  }
-
-  show();
-
-}
-//*********************************************************
-void Dir::highlight_dir(int k)
-{
-
-  QString str = list->text(k);
-  selected->setText(str);
-
-}
-//*********************************************************
-void Dir::select_dir(int k)
-{
-
-  QString str = list->text(k);
-  if(d.cd(str)==true){    
-    open();
-  }
-
-}
-//*********************************************************
-void Dir::create_dir()
-{
-  AskText *name = new AskText(0,0,"Create directory","Enter directory name:");
-  if(!name->exec())return;
-  QString str = name->text->text();
-
-  if(d.mkdir(str,false)==true){
-    d.cd(str); //force to reread the cur dir...
-    d.cdUp();
-    open();
-    for(int i=0;i<(int)list->count();i++){
-      if(list->text(i) == str){
-        list->setCurrentItem(i);
-        break;
-      }
-    }
-  }
-
-}
-//*********************************************************
-void Dir::ok_cb()
-{
-  
-  QString str = selected->text();  
-  if(str.length()==0)return;
-
-  if(game->isOpen){  //close the currently edited game 
+  QString title("Open game");
+  if(newgame)
+    title = "New game";
+  QString dir = QFileDialog::getExistingDirectory(parent, title);
+  if ( dir.isNull())
+    return;
+ 
+  //close the currently edited game 
+  if(game->isOpen)
+  { 
     menu->close_game();
     if(game->isOpen)return;
-  }
-
-  string name = string((char *)d.absPath().latin1()) + "/" + string((char *)str.latin1()) ;
-  if(newgame){
+  }  
+  
+  std::string name = dir.toLocal8Bit().data();
+  
+  if(newgame)
+  {
     int game_exists;
     sprintf(tmp,"%s/*vol.?",name.c_str());   //check for an existing game
 #ifdef _WIN32
@@ -162,7 +67,7 @@ void Dir::ok_cb()
 #endif
     if (game_exists) {
       sprintf(tmp,"There seems to be already an AGI game in %s !\nDo you want to erase it ?",name.c_str());
-      switch ( QMessageBox::warning( this, "New game",
+      switch ( QMessageBox::warning( parent, "New game",
                                      tmp,
                                      "Yes",
                                      "No",
@@ -179,32 +84,15 @@ void Dir::ok_cb()
   }
 
   int err;
-  if(newgame){
+  if(newgame)
+  {
     if(menu->templ)
       err = game->from_template(name);
     else
       err = game->newgame(name);
   }
-  else{
+  else
     err = game->open(name);
-  }
-  if(!err)menu->show_resources();
-  hide();
-
+  if(!err)
+    menu->show_resources();  
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
