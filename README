@@ -10,7 +10,7 @@ view, create and edit AGI games. Basically, it is an enhanced port of
 the Windows AGI Studio developed by Peter Kelly.
 
 The program contains very little platform specific code so brave ones
-are encouraged to try it on other operating systems that have QT
+are encouraged to try it on other operating systems that have Qt
 library support.
 
 
@@ -25,9 +25,11 @@ See LICENSE for details.
 System requirements
 ===================
 
-Linux:  GNU make, g++, X Window System, QT library
+Linux:   GNU make, g++, cmake, X Window System, Qt library
+OS X:    GNU make or XCode, g++ or clang, cmake, Qt library
+Windows: MinGW or Visual Studio, cmake, Qt library
 
-The program is now being developed with QT version 5
+The program is now being developed with Qt version 5.
 
 NAGI, Sarien or ScummVM AGI interpreter is recommended to run games.
 ScummVM is available at https://www.scummvm.org/
@@ -38,23 +40,20 @@ with Sierra's original AGI interpreter. Both are free.
 ScummVM is actively developed, but does not integrate well
 with QT AGI studio.
 
-WINDOWS NOTE: the code hasn't been tested on Windows lately.
-If you are interested, please go ahead, make a working
-Visual Studio project and send a patch!
-
 
 Building
 ========
 
-Run "make" in the src subdirectory. If the supplied Makefile doesn't work,
-you can either fix it or use tmake to generate a makefile for your platform:
+CMake is used to create the necessary project files. Run "cmake" in a build
+subdirectory of your choice to generate a makefile, Visual Studio Solution,
+or XCode project, etc. appropriate for your platform:
 
- qmake agistudio.pro -o Makefile
+ mkdir build;cd build
+ cmake ..
 
-If you don't have tmake, you can download it at http://www.trolltech.com
+If you don't have CMake, you can download it at https://cmake.org/
 
-Make assumes that QT5 is installed and working (in particular, the QTDIR
-environment variable is properly set)
+CMake will detect that Qt5 is installed.
 
 
 Installation and setup
@@ -69,8 +68,6 @@ agistudio.
 AGI studio has its own help viewer, but you can also view the help with
 any HTML browser.
 
-If agistudio complains that it can't load qt shared library, then set the
-LD_LIBRARY_PATH environment variable to the path which contains libqt.so.*.
 
 Using
 =====
