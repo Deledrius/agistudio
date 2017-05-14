@@ -495,7 +495,7 @@ void Picture::absoluteLine(struct picCodeNode **temp)
 **************************************************************************/
 void Picture::plotPattern(byte x, byte y)
 { 
-  static char circles[][15] = { /* agi circle bitmaps */
+  static byte circles[][15] = { /* agi circle bitmaps */
     {0x80},
     {0xfc},
     {0x5f, 0xf4},
