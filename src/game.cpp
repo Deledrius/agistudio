@@ -301,8 +301,9 @@ int Game::from_template(std::string name)
   struct _finddata_t c_file;
   long hFile;
   if ((hFile = _findfirst(tmp, &c_file)) != -1L) do {
-    sprintf(tmp2,"%s/%s",templatedir.c_str(),c_file.name);
-    cfilename = tmp2;
+    auto tmp2 = QDir::cleanPath(QString(templatedir.c_str()) + "/" + c_file.name);
+    cfilename = (char *)malloc(tmp2.length());
+    strcpy(cfilename, tmp2.toStdString().c_str());
 #else
   glob_t globbuf;
   glob(tmp, 0, NULL, &globbuf);
@@ -334,8 +335,9 @@ int Game::from_template(std::string name)
   sprintf(tmp,"%s/src/*",templatedir.c_str());
 #ifdef _WIN32
   if ((hFile = _findfirst(tmp, &c_file)) != -1L) do {
-    sprintf(tmp2,"%s/src/%s",templatedir.c_str(),c_file.name);
-    cfilename = tmp2;
+      auto tmp2 = QDir::cleanPath(QString(templatedir.c_str()) + "/src/" + c_file.name);
+      cfilename = (char *)malloc(tmp2.length());
+      strcpy(cfilename, tmp2.toStdString().c_str());
 #else
   glob(tmp, 0, NULL, &globbuf);
   for(i=0;i<(int)globbuf.gl_pathc;i++){  //copy template src subdirectory
@@ -1356,21 +1358,8 @@ void Game::defaults()
   srcdirname="src";
 #ifdef _WIN32
   command="sarien -e -H 0 ./";
-  char abspath[256];  // absolute path to the program file
-  _fullpath(abspath,_pgmptr,255);
-  char *mydir = (char *)(malloc(strlen(abspath)+1));  // will store the program's directory
-  strcpy(mydir,abspath);
-  char *lastslash = 0;
-  lastslash = strrchr(mydir,'\\');
-  if (!lastslash)
-    lastslash = strrchr(mydir,'/');
-  *lastslash = '\0';
-  char templatedir_c[256];
-  char helpdir_c[256];
-  sprintf(templatedir_c,"%s/template",mydir);
-  sprintf(helpdir_c,"%s/help",mydir);
-  templatedir = templatedir_c;
-  helpdir = helpdir_c;
+  templatedir = QDir::cleanPath(QDir::currentPath() + QString("\\template\\")).toStdString();
+  helpdir = QDir::cleanPath(QDir::currentPath() + QString("\\help\\")).toStdString();
 #else
   command="nagi ./ || sarien -e -H 0 ./";
   templatedir="/usr/share/agistudio/template";
@@ -1388,8 +1377,13 @@ void Game::read_settings()
   char *ptr;
 
 #ifdef _WIN32
-  home = (char *)malloc(256);
-  GetWindowsDirectoryA(home,256);
+  wchar_t* localAppData = nullptr;
+  SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, NULL, &localAppData);
+
+  home = (char *)malloc(MAX_PATH);
+  wcstombs(home, localAppData, MAX_PATH);
+
+  CoTaskMemFree(static_cast<void*>(localAppData));
 #else
   home = getenv("HOME");
 #endif
@@ -1456,8 +1450,13 @@ void Game::save_settings()
   FILE *fptr;
 
 #ifdef _WIN32
-  home = (char *)malloc(256);
-  GetWindowsDirectoryA(home,256);
+  wchar_t* localAppData = nullptr;
+  SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, NULL, &localAppData);
+
+  home = (char *)malloc(MAX_PATH);
+  wcstombs(home, localAppData, MAX_PATH);
+
+  CoTaskMemFree(static_cast<void*>(localAppData));
 #else
   home = getenv("HOME");
 #endif
