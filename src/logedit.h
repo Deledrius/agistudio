@@ -21,17 +21,16 @@
 #ifndef LOGEDIT_H
 #define LOGEDIT_H
 
-#include <qwidget.h>
-#include <qlabel.h>
-#include <qpushbutton.h>
-#include <qlayout.h>
+#include <QWidget>
+#include <QLabel>
+#include <QPushButton>
+#include <QLayout>
 #include <qnamespace.h>
-#include <qmessagebox.h>
-#include <q3multilineedit.h> 
-#include <qevent.h> 
-#include <qstatusbar.h>
-#include <qcheckbox.h>
-//Added by qt3to4:
+#include <QMessageBox>
+#include <QTextEdit>
+#include <QEvent>
+#include <QStatusbar>
+#include <QCheckBox>
 #include <QResizeEvent>
 #include <QShowEvent>
 #include <QHideEvent>
@@ -48,13 +47,13 @@ class FindEdit : public QWidget
 {
     Q_OBJECT
 public:
-    FindEdit( QWidget *parent=0, const char *name=0, Q3MultiLineEdit *edit=0,QStatusBar *s=0);
+    FindEdit( QWidget *parent=0, const char *name=0, QTextEdit *edit=0,QStatusBar *s=0);
     QStatusBar *status;
     QPushButton *find_first,*find_next,*cancel;
     QRadioButton *up,*down,*start,*current;
     QCheckBox *match_whole,*match_case;
     QLineEdit *find_field;
-    Q3MultiLineEdit *editor;
+    QTextEdit *editor;
     int curline;
 public slots:
       void find_first_cb();
@@ -70,7 +69,7 @@ class LogEdit : public QWidget
     Q_OBJECT
 public:
     LogEdit( QWidget *parent=0, const char *name=0,int winnum=0,ResourcesWin *res=0, bool readonly=false );
-    Q3MultiLineEdit *editor;
+    QTextEdit *editor;
     FindEdit *findedit;
     ResourcesWin *resources_win;
     QStatusBar *status;
@@ -119,7 +118,7 @@ class TextEdit : public QWidget
     Q_OBJECT
 public:
     TextEdit( QWidget *parent=0, const char *name=0,int winnum=0);
-    Q3MultiLineEdit *editor;
+    QTextEdit *editor;
     FindEdit *findedit;
     QStatusBar *status;
     string filename;

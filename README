@@ -17,7 +17,7 @@ library support.
 Availability
 ============
 
-QT AGI Studio is available at http://agistudio.sourceforge.net/
+QT AGI Studio is available at https://github.com/Deledrius/agistudio/
 The project is licensed under the GPL, GNU General Public License.
 See COPYING for details.
 
@@ -27,11 +27,12 @@ System requirements
 
 Linux:  GNU make, g++, X Window System, QT library
 
-The program is now being developed with QT version 4
+The program is now being developed with QT version 5
 
 NAGI, Sarien or ScummVM AGI interpreter is recommended to run games.
-Sarien is available at http://sarien.sourceforge.net/
-and NAGI at http://www.agidev.com/nagi.html
+ScummVM is available at https://www.scummvm.org/
+Sarien is at https://sourceforge.net/projects/sarien/
+NAGI is at http://www.agidev.com/projects/nagi/
 Sarien is more focused on portability and NAGI on compatibility
 with Sierra's original AGI interpreter. Both are free.
 ScummVM is actively developed, but does not integrate well
@@ -52,7 +53,7 @@ you can either fix it or use tmake to generate a makefile for your platform:
 
 If you don't have tmake, you can download it at http://www.trolltech.com
 
-Make assumes that QT4 is installed and working (in particular, the QTDIR
+Make assumes that QT5 is installed and working (in particular, the QTDIR
 environment variable is properly set)
 
 
@@ -82,18 +83,18 @@ Credits
 =======
 
  * Helen Zommer <helen@cc.huji.ac.il> - primary development
- * Jarno Elonen <elonen@iki.fi> - bitmap import, current maintainer
-
+ * Jarno Elonen <elonen@iki.fi> - bitmap import
  * Nat Budin <natb@brandeis.edu> - Win32 port
  * Claudio Matsuoka <claudio@helllabs.org> - sound support
  * Peter Kelly <pmk@post.com> - the original Windows version
  * Lance Ewing <lance.e@ihug.co.nz> - the original (DOS) Picedit
+ * Joseph Davies <joseph.davies@zero-factorial.com> - Qt5 Port, current maintainer
 
 
 Feedback
 ========
 
-Please visit project website at http://agistudio.sourceforge.net/ to
+Please visit project website at https://github.com/Deledrius/agistudio/ to
 submit bug reports, comments, suggestions, etc.
 
 Hope you'll have as much fun using it as we've had developing it :-)

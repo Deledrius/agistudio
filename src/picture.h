@@ -25,7 +25,7 @@
 #include <stdint.h>
 #endif
 
-#include <qimage.h>
+#include <QImage>
 #include <QColor>
  
 #include "linklist.h"

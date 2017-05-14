@@ -23,74 +23,75 @@
 
 #include <stdlib.h>
 
-#include <qapplication.h>
-#include <q3filedialog.h>
-//Added by qt3to4:
-#include <Q3BoxLayout>
-#include <Q3HBoxLayout>
-#include <Q3VBoxLayout>
+#include <QApplication>
+#include <QFileDialog>
+#include <QGroupBox>
+#include <QBoxLayout>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
 #include <QLabel>
 
 Options *options;
 
 //***********************************************
 Options::Options( QWidget *parent, const char *name)
-    : Q3TabDialog( parent, name)
+    : QDialog(parent)
 {
+  setWindowTitle("Settings");
 
-  setCaption("Settings");
+  tabs = new QTabWidget(this);
 
   set_general();
   set_directories();
   set_logedit();
   set_interpreter();
 
-  connect( this, SIGNAL( applyButtonPressed() ), SLOT( apply() ) );
-  setDefaultButton();
-  connect( this, SIGNAL( defaultButtonPressed() ), SLOT( defaults() ) );
-  setCancelButton();
-  set_settings();
+  QVBoxLayout* dlgLayout = new QVBoxLayout(this);
+  bb = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
+  connect(bb, SIGNAL(accepted()), SLOT(apply()));
+  connect(bb, SIGNAL(rejected()), SLOT(defaults()));
 
+  dlgLayout->addWidget(tabs);
+  dlgLayout->addWidget(bb);
+  setLayout(dlgLayout);
+
+  set_settings();
 }
 
 //***********************************************
 void Options::set_general()
 {
+  QWidget *general = new QWidget(this);
 
-  QWidget *general = new QWidget(this);  
-  Q3BoxLayout *all = new Q3VBoxLayout(general,10);
+  QBoxLayout *all = new QVBoxLayout(general);
 
-  Q3GroupBox *b1 = new Q3GroupBox(2,Horizontal,"",general);
+  QLabel *l = new QLabel("Default resource type:", general);
+  all->addWidget(l);
+  type = new QComboBox(general);
+  type->addItem( "LOGIC" );
+  type->addItem( "PICTURE" );
+  type->addItem( "VIEW" );
+  type->addItem( "SOUND" );
+  all->addWidget(type);
 
-  QLabel *l = new QLabel("Default resource type",b1);
-  l->setText("Default resource type");  //to avoid compilation warning
+  QLabel *l2 = new QLabel("Picedit Style:", general);
+  all->addWidget(l2);
+  picstyle = new QComboBox(general);
+  picstyle->addItem( "One window" );
+  picstyle->addItem( "Two windows" );
+  all->addWidget(picstyle);
   
-  type = new QComboBox(false,b1,"type");
-  type->insertItem( "LOGIC" );
-  type->insertItem( "PICTURE" );
-  type->insertItem( "VIEW" );
-  type->insertItem( "SOUND" );
-
-  QLabel *l2 = new QLabel("Picedit style",b1);
-  l2->setText("Picedit style");  //to avoid compilation warning
-
-  picstyle = new QComboBox(false,b1,"picstyle");
-  picstyle->insertItem( "One window" );
-  picstyle->insertItem( "Two windows" );
-
-  all->addWidget(b1);
-
-  Q3ButtonGroup *extract = new Q3ButtonGroup(2,Horizontal,"Extract logic as",general);
-  extract->setMaximumSize(200,100);
-  extract->setExclusive(true);
-  text = new QRadioButton("Text",extract);
-  binary = new QRadioButton("Binary",extract);
-
+  QHBoxLayout *extractbox = new QHBoxLayout();
+  extractbox->setAlignment(Qt::AlignLeft);
+  QGroupBox *extract = new QGroupBox(tr("Extract logic as:"), general);
+  text = new QRadioButton(tr("Text"), extract);
+  binary = new QRadioButton(tr("Binary"), extract);
+  extractbox->addWidget(text);
+  extractbox->addWidget(binary);
   all->addWidget(extract);
+  extract->setLayout(extractbox);
 
-
-  addTab(general,"General");
-
+  tabs->addTab(general,"General");
 }
 
 //***********************************************
@@ -99,40 +100,50 @@ void Options::set_logedit()
 
   QWidget *logedit = new QWidget(this);
 
-  Q3BoxLayout *all = new Q3VBoxLayout(logedit,10);
+  QBoxLayout *all = new QVBoxLayout(logedit);
   messages = new QCheckBox("Show all messages at end (not just unused ones)",logedit);
   all->addWidget(messages);
   elses = new QCheckBox("Show all elses as gotos",logedit);
   all->addWidget(elses);
   special = new QCheckBox("Show special syntax (e.g. v30=4)",logedit);
   all->addWidget(special);
-  addTab(logedit,"Logic editor");
 
+  all->setAlignment(Qt::AlignTop);
+
+  tabs->addTab(logedit,"Logic editor");
 }
 
 //***********************************************
 void Options::set_directories()
 {
-
   QWidget *dirs = new QWidget(this);
-  Q3BoxLayout *all = new Q3VBoxLayout(dirs,10);
-  Q3GroupBox *src = new Q3GroupBox(3,Horizontal,"Logic source directory",dirs);
-  reldir = new QRadioButton("[Game_dir/]",src);
-  connect(reldir,SIGNAL(clicked()),SLOT(set_reldir()));  
+
+  QVBoxLayout *all = new QVBoxLayout(dirs);
+  dirs->setLayout(all);
+
+  QGroupBox *src = new QGroupBox(tr("Logic source directory"), dirs);
+  QGridLayout *s1 = new QGridLayout(this);;
+  src->setLayout(s1);
+
+  reldir = new QRadioButton("[Game_dir/]", src);
+  connect(reldir,SIGNAL(clicked()),SLOT(set_reldir()));
   relname = new QLineEdit(src);
+  s1->addWidget(reldir, 0, 0);
+  s1->addWidget(relname, 0, 1);
 
-  QLabel *l = new QLabel(" ",src); //dummy label to keep table alignment
-  l->setText(" ");  //to avoid compilation warning
-
-  absdir = new QRadioButton("Full path",src);
-  connect(absdir,SIGNAL(clicked()),SLOT(set_absdir()));  
+  absdir = new QRadioButton("Full path", src);
+  connect(absdir,SIGNAL(clicked()),SLOT(set_absdir()));
   absname = new QLineEdit(src);
-  QPushButton *browse = new QPushButton("Browse",src);
+  QPushButton *browse = new QPushButton("Browse", src);
   connect(browse,SIGNAL(clicked()),SLOT(browse_abs()));
+  s1->addWidget(absdir, 1, 0);
+  s1->addWidget(absname, 1, 1);
+  s1->addWidget(browse, 1, 2);
 
   all->addWidget(src);
+  all->addWidget(dirs);
 
-  Q3BoxLayout *b1 = new Q3HBoxLayout(all);
+  QBoxLayout *b1 = new QHBoxLayout(dirs);
 
   QLabel *lt = new QLabel("Template:",dirs);
   b1->addWidget(lt);
@@ -143,8 +154,9 @@ void Options::set_directories()
   QPushButton *browse1 = new QPushButton("Browse",dirs);
   b1->addWidget(browse1);
   connect(browse1,SIGNAL(clicked()),SLOT(browse_template()));
+  all->addLayout(b1);
 
-  Q3BoxLayout *b2 = new Q3HBoxLayout(all);
+  QBoxLayout *b2 = new QHBoxLayout(dirs);
 
   QLabel *lh = new QLabel("Help:",dirs);
   b2->addWidget(lh);
@@ -155,71 +167,70 @@ void Options::set_directories()
   QPushButton *browse2 = new QPushButton("Browse",dirs);
   b2->addWidget(browse2);
   connect(browse2,SIGNAL(clicked()),SLOT(browse_help()));
+  all->addLayout(b2);
 
-  addTab(dirs,"Directories");
+  tabs->addTab(dirs,"Directories");
 }
 
 //***********************************************
 void Options::set_interpreter()
 {
+  QWidget *interp = new QWidget(this);
 
-  QWidget *interp = new QWidget(this);  
-  Q3BoxLayout *all = new Q3VBoxLayout(interp,10);  
-  QLabel *l = new QLabel("Interpreter command line:\n(will be invoked with the\ncurrent directory == game_directory)",interp);
+  QBoxLayout *all = new QVBoxLayout(interp);
+  QLabel *l = new QLabel("Interpreter command line:\n(will be invoked with the current directory == game_directory)",interp);
   all->addWidget(l);
 
-  Q3BoxLayout *b1 = new Q3HBoxLayout(all);
+  QBoxLayout *b1 = new QHBoxLayout(interp);
   command = new QLineEdit(interp);
   b1->addWidget(command);
 
   QPushButton *browse = new QPushButton("Browse",interp);  
-  browse->setMaximumSize(80,60);
   connect(browse,SIGNAL(clicked()),SLOT(browse_interpreter()));
-  b1->addWidget(browse);  
-  
-  addTab(interp,"Interpreter");
+  b1->addWidget(browse);
 
+  all->addLayout(b1);
+
+  all->setAlignment(Qt::AlignTop);
+
+  tabs->addTab(interp,"Interpreter");
 }
 
 //***********************************************
 void Options::apply()
 {
-  
-  game->res_default=type->currentItem();
+  game->res_default=type->currentIndex();
   game->save_logic_as_text=text->isChecked();
   game->show_all_messages=messages->isChecked();
   game->show_elses_as_gotos=elses->isChecked();
   game->show_special_syntax=special->isChecked();
   game->reldir=reldir->isChecked();
-  game->command=string((char *)command->text().latin1());
+  game->command = command->text().toStdString();
   if(game->reldir){
-    game->srcdirname=string((char *)relname->text().latin1());
+    game->srcdirname = relname->text().toStdString();
   }
   else{
-    game->srcdirname=string((char *)absname->text().latin1());
+    game->srcdirname = absname->text().toStdString();
   }
-  game->templatedir=string((char *)templatedir->text().latin1());
-  game->helpdir=string((char *)helpdir->text().latin1());
-  game->picstyle=picstyle->currentItem();
+  game->templatedir = templatedir->text().toStdString();
+  game->helpdir = helpdir->text().toStdString();
+  game->picstyle=picstyle->currentIndex();
   game->save_settings();
   hide();
-
 }
 
 //***********************************************
 void Options::defaults()
 {
-
   game->defaults();
   set_settings();
-
+  hide();
 }
 
 //***********************************************
 void Options::set_settings()
 {
-
-  type->setCurrentItem(game->res_default);
+  type->setCurrentIndex(game->res_default);
   text->setChecked(game->save_logic_as_text);  
   messages->setChecked(game->show_all_messages);
   elses->setChecked(game->show_elses_as_gotos);
@@ -237,14 +248,14 @@ void Options::set_settings()
   }      
   templatedir->setText(game->templatedir.c_str());
   helpdir->setText(game->helpdir.c_str());
-  picstyle->setCurrentItem(game->picstyle);
+  picstyle->setCurrentIndex(game->picstyle);
 }
 
 //***********************************************
 void Options::browse_abs()
 {
 
-  QString s (Q3FileDialog::getExistingDirectory ());
+  QString s (QFileDialog::getExistingDirectory ());
   if(s.isNull())return;
   absname->setText(s);
 
@@ -254,7 +265,7 @@ void Options::browse_abs()
 void Options::browse_template()
 {
   
-  QString s (Q3FileDialog::getExistingDirectory ());
+  QString s (QFileDialog::getExistingDirectory ());
   if(s.isNull())return;
   templatedir->setText(s);
 
@@ -264,7 +275,7 @@ void Options::browse_template()
 void Options::browse_help()
 {
 
-  QString s (Q3FileDialog::getExistingDirectory ());
+  QString s (QFileDialog::getExistingDirectory ());
   if(s.isNull())return;
   helpdir->setText(s);
 
@@ -274,7 +285,7 @@ void Options::browse_help()
 void Options::browse_interpreter()
 {
   
-  QString s (Q3FileDialog::getOpenFileName ());
+  QString s (QFileDialog::getOpenFileName ());
   if(s.isNull())return;
   command->setText(s);
 

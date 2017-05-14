@@ -21,24 +21,20 @@
 #ifndef VIEWEDIT_H
 #define VIEWEDIT_H
 
-#include <qwidget.h>
-#include <qlabel.h>
-#include <qpushbutton.h>
-#include <qlayout.h>
-#include <q3listbox.h>
-#include <qmessagebox.h>
-#include <qlineedit.h> 
-#include <qradiobutton.h> 
-#include <q3buttongroup.h> 
-#include <qcheckbox.h> 
-#include <q3multilineedit.h> 
-#include <q3scrollview.h> 
-#include <qpixmap.h>
-#include <qlineedit.h>
-#include <qcombobox.h> 
-#include <qevent.h> 
-#include <qtimer.h>
-//Added by qt3to4:
+#include <QWidget>
+#include <QLabel>
+#include <QPushButton>
+#include <QLayout>
+#include <QMessageBox>
+#include <QLineEdit>
+#include <QRadioButton>
+#include <QButtonGroup>
+#include <QCheckBox>
+#include <QTextEdit>
+#include <QPixmap>
+#include <QComboBox>
+#include <QEvent>
+#include <QTimer>
 #include <QCloseEvent>
 #include <QShowEvent>
 #include <QPaintEvent>
@@ -46,6 +42,7 @@
 #include <QMouseEvent>
 #include <QHideEvent>
 #include <QKeyEvent>
+#include <QScrollArea>
 
 #include "util.h"
 #include "wutil.h"
@@ -70,7 +67,7 @@ public:
 
 };
 //********************************************************
-class Canvas : public Q3ScrollView
+class Canvas : public QScrollArea
 //view drawing area
 {
     Q_OBJECT
@@ -111,7 +108,7 @@ public slots:
 protected:
     ViewIcon *smallview;
     ViewEdit *viewedit;
-    Q3MultiLineEdit *desc;
+    QTextEdit *desc;
     unsigned int maxcol;
     void resizeEvent( QResizeEvent * );
 };

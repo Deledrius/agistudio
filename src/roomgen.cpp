@@ -36,57 +36,58 @@
 #include <stdlib.h>
 #include <ctype.h>
 
-#include <qapplication.h>
-#include <q3filedialog.h>
-#include <q3grid.h>
-//Added by qt3to4:
-#include <Q3HBoxLayout>
-#include <Q3BoxLayout>
-#include <Q3GridLayout>
-#include <Q3Frame>
+#include <QApplication>
+#include <QFileDialog>
+#include <QHBoxLayout>
+#include <QBoxLayout>
+#include <QGridLayout>
+#include <QFrame>
 #include <QLabel>
-#include <Q3VBoxLayout>
+#include <QVBoxLayout>
 
 static const char *dirs[4] = {"left","right","bottom","horizon"};
 
 //***********************************************
 RoomGen::RoomGen( QWidget *parent, const char *name)
-    : QDialog( parent, name, true )
+    : QDialog( parent )
 {
   int i;
-  setCaption("AGI Base Logic Generator");
+  setWindowTitle("AGI Base Logic Generator");
 
-  Q3BoxLayout *all = new Q3VBoxLayout(this,5);
+  QBoxLayout *all = new QVBoxLayout(this);
 
-  Q3HBoxLayout *upper = new Q3HBoxLayout(all,10);
+  QHBoxLayout *upper = new QHBoxLayout(this);
+  all->addLayout(upper);
 
-  Q3Grid *gtxt = new Q3Grid( 2, this);
+  QGridLayout *gtxt = new QGridLayout(this);
   gtxt->setSpacing(4);
-  upper->addWidget(gtxt);
+  upper->addLayout(gtxt);
 
-  QLabel *llog = new QLabel("Logic Number:",gtxt);
-  llog=llog; //avoid compilation warning
-  lnum = new QLineEdit(gtxt);
+  QLabel *llog = new QLabel("Logic Number:", this);
+  gtxt->addWidget(llog);
+  lnum = new QLineEdit(this);
+  gtxt->addWidget(lnum);
   lnum->setFixedWidth(40);
   lnum->setText("0");
-  //lnum->selectAll();
   connect(lnum,SIGNAL(textChanged(const QString &)),SLOT(lnum_cb()));
 
-  QLabel *lpic = new QLabel("Picture Number:",gtxt);
+  QLabel *lpic = new QLabel("Picture Number:", this);
+  gtxt->addWidget(lpic);
   lpic=lpic;
-  pnum = new QLineEdit(gtxt);
+  pnum = new QLineEdit(this);
+  gtxt->addWidget(pnum);
   pnum->setFixedWidth(40);
   pnum->setText("0");
-  //pnum->selectAll();
 
-  QLabel *lhor = new QLabel("Horizon at Y:",gtxt);
-  lhor=lhor;
-  hnum = new QLineEdit(gtxt);
+  QLabel *lhor = new QLabel("Horizon at Y:", this);
+  gtxt->addWidget(lhor);
+  hnum = new QLineEdit(this);
+  gtxt->addWidget(hnum);
   hnum->setFixedWidth(40);
   hnum->setText("36");
-  //hnum->selectAll();
 
-  Q3VBoxLayout *check = new Q3VBoxLayout(upper,2);
+  QVBoxLayout *check = new QVBoxLayout(this);
+  upper->addLayout(check);
   draw_ego = new QCheckBox("Draw Ego initially",this);
   draw_ego->setChecked(true);
   check->addWidget(draw_ego);
@@ -100,7 +101,8 @@ RoomGen::RoomGen( QWidget *parent, const char *name)
   gen_comm->setChecked(true);
   check->addWidget(gen_comm);
 
-  Q3VBoxLayout *but = new Q3VBoxLayout(upper,2);
+  QVBoxLayout *but = new QVBoxLayout(this);
+  upper->addLayout(but);
   QPushButton *entry = new QPushButton("Entry and looking",this);
   connect(entry,SIGNAL(clicked()),SLOT(entry_cb()));
   but->addWidget(entry);
@@ -108,27 +110,28 @@ RoomGen::RoomGen( QWidget *parent, const char *name)
   connect(first,SIGNAL(clicked()),SLOT(first_cb()));
   but->addWidget(first);
 
-  Q3BoxLayout *ledge = new Q3HBoxLayout(all,1);
+  QBoxLayout *ledge = new QHBoxLayout(this);
+  all->addLayout(ledge);
 
-  //  QGroupBox *ego_pos_b = new QGroupBox(1,Horizontal,"Ego Positioning (-1 = ignore)",this);
-  Q3Frame *ego_pos_b = new Q3Frame(this);
-  ego_pos_b->setFrameStyle( Q3Frame::Box | Q3Frame::Sunken );
+  QFrame *ego_pos_b = new QFrame(this);
+  ego_pos_b->setFrameStyle( QFrame::Box | QFrame::Sunken );
   ego_pos_b->setLineWidth(1);
-  ego_pos_b->setMargin(2);
+  ego_pos_b->setContentsMargins(2, 2, 2, 2);
 
-  Q3GridLayout *ego_pos = new Q3GridLayout(ego_pos_b,6,6,10,4);
+  QGridLayout *ego_pos = new QGridLayout(ego_pos_b);
+  ego_pos->setSpacing(4);
+  ego_pos->setMargin(10);
 
   QLabel *ll = new QLabel("Ego Positioning (-1 = ignore)",ego_pos_b);
-  ego_pos->addMultiCellWidget(ll,0,0,0,5,AlignCenter);
-
+  ego_pos->addWidget(ll, 0, 0, 1, 6, Qt::AlignCenter);
 
   int row=1,col;
 
   QLabel *l_from = new QLabel("Coming from",ego_pos_b);
-  ego_pos->addMultiCellWidget(l_from,row,row,0,1,AlignLeft);
+  ego_pos->addWidget(l_from, row, 0, 1, 2, Qt::AlignLeft);
 
   QLabel *l_pos = new QLabel("Position Ego at",ego_pos_b);
-  ego_pos->addMultiCellWidget(l_pos,row,row,2,5,AlignCenter);
+  ego_pos->addWidget(l_pos, row, 2, 1, 4, Qt::AlignCenter);
 
   QLabel *l_lroom[4],*l_x[4],*l_y[4];
   row++;
@@ -136,56 +139,58 @@ RoomGen::RoomGen( QWidget *parent, const char *name)
   for(i=0;i<4;i++,row++){
     col=0;
     l_lroom[i] = new QLabel("room:",ego_pos_b);
-    ego_pos->addWidget(l_lroom[i],row,col,AlignRight); col++;
+    ego_pos->addWidget(l_lroom[i], row, col, Qt::AlignRight); col++;
     from[i] = new QLineEdit(ego_pos_b);
     from[i]->setFixedWidth(40);
     from[i]->setText("-1");
     //    from[i]->selectAll();
-    ego_pos->addWidget(from[i],row,col,AlignLeft); col++;
+    ego_pos->addWidget(from[i], row, col, Qt::AlignLeft); col++;
 
 
     l_x[i] = new QLabel("X:",ego_pos_b);
-    ego_pos->addWidget(l_x[i],row,col,AlignRight); col++;
+    ego_pos->addWidget(l_x[i], row, col, Qt::AlignRight); col++;
     x[i] = new QLineEdit(ego_pos_b);
     x[i]->setText("-1");
     //    x[i]->selectAll();
     x[i]->setFixedWidth(40);
-    ego_pos->addWidget(x[i],row,col,AlignLeft); col++;
+    ego_pos->addWidget(x[i], row, col, Qt::AlignLeft); col++;
 
     l_y[i] = new QLabel("Y:",ego_pos_b);
-    ego_pos->addWidget(l_y[i],row,col,AlignRight); col++;
+    ego_pos->addWidget(l_y[i], row, col, Qt::AlignRight); col++;
     y[i] = new QLineEdit(ego_pos_b);
     y[i]->setText("-1");
     //    y[i]->selectAll();
     y[i]->setFixedWidth(40);
-    ego_pos->addWidget(y[i],row,col,AlignLeft); col++;
+    ego_pos->addWidget(y[i], row, col, Qt::AlignLeft); col++;
   }
 
 
   QPushButton *ego_adv = new QPushButton("Advanced",ego_pos_b);
   connect(ego_adv,SIGNAL(clicked()),SLOT(ego_advanced_cb()));
-  ego_pos->addMultiCellWidget(ego_adv,row,row,0,5,AlignCenter);
+  ego_pos->addWidget(ego_adv, row, 0, 1, 6, Qt::AlignCenter);
 
   ledge->addWidget(ego_pos_b,1);
 
 
-  Q3Frame *edge_control_b = new Q3Frame(this);
-  edge_control_b->setFrameStyle( Q3Frame::Box | Q3Frame::Sunken );
+  QFrame *edge_control_b = new QFrame(this);
+  edge_control_b->setFrameStyle( QFrame::Box | QFrame::Sunken );
   edge_control_b->setLineWidth(1);
-  edge_control_b->setMargin(4);
+  edge_control_b->setContentsMargins(4, 4, 4, 4);
 
-  Q3GridLayout *edge_control = new Q3GridLayout(edge_control_b,6,2,10,1);
+  QGridLayout *edge_control = new QGridLayout(edge_control_b);
+  edge_control->setSpacing(1);
+  edge_control->setMargin(10);
 
   QLabel *ll1 = new QLabel("Edge Controls (-1 = ignore)",edge_control_b);
-  edge_control->addMultiCellWidget(ll1,0,0,0,1,AlignCenter);
+  edge_control->addWidget(ll1, 0, 0, 1, 2, Qt::AlignCenter);
 
   row=1;
   col=0;
 
   QLabel *l_if = new QLabel("If Ego touches:",edge_control_b);
-  edge_control->addWidget(l_if,row,col,AlignLeft); col++;
+  edge_control->addWidget(l_if, row, col, Qt::AlignLeft); col++;
   QLabel *l_goto = new QLabel("Goto Room:",edge_control_b);
-  edge_control->addWidget(l_goto,row,col,AlignCenter); col++;
+  edge_control->addWidget(l_goto, row, col, Qt::AlignCenter); col++;
   row++;
 
   QLabel *l_e[4];
@@ -194,39 +199,41 @@ RoomGen::RoomGen( QWidget *parent, const char *name)
   for(i=0;i<4;i++,row++){
     col=0;
     l_e[i] = new QLabel(dirs[i],edge_control_b);
-    edge_control->addWidget(l_e[i],row,col,AlignLeft); col++;
+    edge_control->addWidget(l_e[i], row, col, Qt::AlignLeft); col++;
     edge[i] = new QLineEdit(edge_control_b);
     edge[i]->setFixedWidth(40);
     edge[i]->setText("-1");
     //    edge[i]->selectAll();
-    edge_control->addWidget(edge[i],row,col,AlignCenter); col++;
+    edge_control->addWidget(edge[i], row, col, Qt::AlignCenter); col++;
   }
 
   col=0;
   QPushButton *edge_adv = new QPushButton("Advanced",edge_control_b);
   connect(edge_adv,SIGNAL(clicked()),SLOT(edge_advanced_cb()));
-  edge_control->addMultiCellWidget(edge_adv,row,row,0,1,AlignCenter);
+  edge_control->addWidget(edge_adv, row, 0, 1, 2, Qt::AlignCenter);
 
   ledge->addWidget(edge_control_b,0);
 
-  Q3HBoxLayout *ltitle = new Q3HBoxLayout(all,4);
+  QHBoxLayout *ltitle = new QHBoxLayout(this);
+  all->addLayout(ltitle);
 
   QLabel *lcom = new QLabel("Logic Title (for comments):",this);
   ltitle->addWidget(lcom);
   title = new QLineEdit(this);
   ltitle->addWidget(title);
 
-  Q3HBoxLayout *last = new Q3HBoxLayout(all,20);
+  QHBoxLayout *last = new QHBoxLayout(this);
+  all->addLayout(last);
 
   QPushButton *ok = new QPushButton("OK",this);
   ok->setMaximumSize(80,40);
   connect(ok,SIGNAL(clicked()),SLOT(ok_cb()));
-  last->addWidget(ok,AlignRight);
+  last->addWidget(ok, Qt::AlignRight);
 
   QPushButton *cancel = new QPushButton("Cancel",this);
   cancel->setMaximumSize(80,40);
   connect(cancel,SIGNAL(clicked()),SLOT(reject()));
-  last->addWidget(cancel,AlignLeft);
+  last->addWidget(cancel, Qt::AlignLeft);
 
   adjustSize();
 
@@ -245,15 +252,15 @@ RoomGen::RoomGen( QWidget *parent, const char *name)
   status=input=true;
   x1=y1=-1;
 }
+
 //************************************************
 bool RoomGen::bad_int(QLineEdit *w,int *res,int nmin,int nmax,bool ignore,const char *text)
 {
-
   *res=-1;
   QString str=w->text();
 
   if(!str.isEmpty())
-    *res=atoi((char *)str.latin1());
+    *res=str.toInt();
   if((*res==-1) && ignore)return false;
   if((*res<nmin)||(*res>nmax)){
     menu->errmes("%s must be between %d and %d !",text,nmin,nmax);
@@ -286,15 +293,14 @@ bool RoomGen::bad_input()
   if(bad_int(pnum,&pn,0,255,false,"Picture number"))return true;
   if(bad_int(hnum,&hn,0,167,false,"Horizon value"))return true;
 
-
   for(i=0;i<4;i++){
     rn[i]=xn[i]=yn[i]=-1;
     str=from[i]->text();
-    if(!str.isEmpty())rn[i]=atoi((char *)str.latin1());
+    if(!str.isEmpty())rn[i]=str.toInt();
     str=x[i]->text();
-    if(!str.isEmpty())xn[i]=atoi((char *)str.latin1());
+    if(!str.isEmpty())xn[i]=str.toInt();
     str=y[i]->text();
-    if(!str.isEmpty())yn[i]=atoi((char *)str.latin1());
+    if(!str.isEmpty())yn[i]=str.toInt();
     if(rn[i]==-1||xn[i]==-1||yn[i]==-1){
       if(!(rn[i]==-1&&xn[i]==-1&&yn[i]==-1)){
         menu->errmes("Ego positioning: incomplete input !");
@@ -342,7 +348,7 @@ void RoomGen::ok_cb()
     sprintf(tmp,"// Logic %d\n",ln);
   }
   else{
-    sprintf(tmp,"// Logic %d: %s\n",ln,str.latin1());
+    sprintf(tmp,"// Logic %d: %s\n",ln,str.toLatin1().constData());
   }
   text+=tmp;
   text+="// \n// ****************************************************************\n";
@@ -495,17 +501,15 @@ void RoomGen::ok_cb()
 //************************************************
 void RoomGen::ego_advanced_cb()
 {
-
   if(ego_advanced==NULL)ego_advanced = new RoomGenPos();
   sprintf(tmp,"%d",xa);
   ego_advanced->x->setText(tmp);
   sprintf(tmp,"%d",ya);
   ego_advanced->y->setText(tmp);
   if(ego_advanced->exec()){
-    xa=atoi((char *)ego_advanced->x->text().latin1());
-    ya=atoi((char *)ego_advanced->y->text().latin1());
+    xa=ego_advanced->x->text().toInt();
+    ya=ego_advanced->y->text().toInt();
   }
-
 }
 //************************************************
 
@@ -540,8 +544,8 @@ void RoomGen::entry_cb()
   room_entry->entry_text->setText(entry_mes.c_str());
   room_entry->look_text->setText(look_mes.c_str());
   if(room_entry->exec()){
-    entry_mes=room_entry->entry_text->text().latin1();
-    look_mes=room_entry->look_text->text().latin1();
+    entry_mes = room_entry->entry_text->text().toStdString();
+    look_mes = room_entry->look_text->text().toStdString();
   }
 
 
@@ -572,8 +576,8 @@ void RoomGen::first_cb()
   if(room_first->exec()){
     status=room_first->status->isChecked();
     input=room_first->input->isChecked();
-    x1=atoi((char *)room_first->x->text().latin1());
-    y1=atoi((char *)room_first->y->text().latin1());
+    x1=room_first->x->text().toInt();
+    y1=room_first->y->text().toInt();
   }
 
 
@@ -587,18 +591,19 @@ void RoomGen::lnum_cb()
 }
 //************************************************
 RoomGenEntry::RoomGenEntry( QWidget *parent, const char *name)
-    : QDialog( parent, name, true )
+    : QDialog(parent)
 {
 
-  setCaption("Room Entry and Looking");
+  setWindowTitle("Room Entry and Looking");
 
-  Q3BoxLayout *all = new Q3VBoxLayout(this,5);
+  QBoxLayout *all = new QVBoxLayout(this);
 
   QLabel *entry = new QLabel("On room entry:",this);
   all->addWidget(entry);
 
 
-  Q3BoxLayout *l1 = new Q3HBoxLayout(all,1);
+  QBoxLayout *l1 = new QHBoxLayout(this);
+  all->addLayout(l1);
   QLabel *print1 = new QLabel("print(\"",this);
   l1->addWidget(print1);
   entry_text = new QLineEdit(this);
@@ -613,7 +618,8 @@ RoomGenEntry::RoomGenEntry( QWidget *parent, const char *name)
 
   QWidget *place = new QWidget(this);
 
-  Q3BoxLayout *l2 = new Q3HBoxLayout(place,1);
+  QBoxLayout *l2 = new QHBoxLayout(this);
+  place->setLayout(l2);
   QLabel *print2 = new QLabel("print(\"",place);
   l2->addWidget(print2);
   look_text = new QLineEdit(place);
@@ -628,56 +634,57 @@ RoomGenEntry::RoomGenEntry( QWidget *parent, const char *name)
   all->addWidget(p);
 
 
-  Q3BoxLayout *last = new Q3HBoxLayout(all,10);
+  QBoxLayout *last = new QHBoxLayout(this);
+  all->addLayout(last);
 
   QPushButton *ok = new QPushButton("OK",this);
   ok->setMaximumSize(80,40);
   connect(ok,SIGNAL(clicked()),SLOT(accept()));
-  last->addWidget(ok,AlignRight);
+  last->addWidget(ok, Qt::AlignRight);
 
   QPushButton *cancel = new QPushButton("Cancel",this);
   cancel->setMaximumSize(80,40);
   connect(cancel,SIGNAL(clicked()),SLOT(reject()));
-  last->addWidget(cancel,AlignLeft);
+  last->addWidget(cancel, Qt::AlignLeft);
 
   adjustSize();
-
 }
 
 
 //************************************************
 RoomGenFirst::RoomGenFirst( QWidget *parent, const char *name)
-    : QDialog( parent, name, true )
+    : QDialog(parent)
 {
 
-  setCaption("Controls for First Room");
+  setWindowTitle("Controls for First Room");
 
-  Q3BoxLayout *all = new Q3VBoxLayout(this,5);
+  QBoxLayout *all = new QVBoxLayout(this);
 
   QLabel *egopos = new QLabel("Ego positioning (-1 = ignore)",this);
   all->addWidget(egopos);
 
 
-  Q3GridLayout *l1 = new Q3GridLayout(all,6,1,5);
+  QGridLayout *l1 = new QGridLayout(this);//, 6, 1, 5);
+  all->addLayout(l1);
   QLabel *lx = new QLabel("X:",this);
-  l1->addWidget(lx,0,0,AlignRight);
+  l1->addWidget(lx, 0, 0, Qt::AlignRight);
   x = new QLineEdit(this);
   x->setFixedWidth(40);
   x->setText("-1");
   x->selectAll();
-  l1->addWidget(x,0,1,AlignLeft);
+  l1->addWidget(x, 0, 1, Qt::AlignLeft);
 
   QLabel *ly = new QLabel("Y:",this);
-  l1->addWidget(ly,0,2,AlignRight);
+  l1->addWidget(ly, 0, 2, Qt::AlignRight);
   y = new QLineEdit(this);
   y->setFixedWidth(40);
   y->setText("-1");
   y->selectAll();
-  l1->addWidget(y,0,3,AlignLeft);
+  l1->addWidget(y, 0, 3, Qt::AlignLeft);
 
   QLabel *place = new QLabel(" ",this);
-  l1->addWidget(place,0,4,AlignCenter);
-  l1->setColStretch(4,1);
+  l1->addWidget(place, 0, 4, Qt::AlignCenter);
+  l1->setColumnStretch(4,1);
 
   status = new QCheckBox("Turn on the status bar",this);
   status->setChecked(true);
@@ -687,55 +694,55 @@ RoomGenFirst::RoomGenFirst( QWidget *parent, const char *name)
   input->setChecked(true);
   all->addWidget(input);
 
-  Q3BoxLayout *last = new Q3HBoxLayout(all,10);
+  QBoxLayout *last = new QHBoxLayout(this);
+  all->addLayout(last);
 
   QPushButton *ok = new QPushButton("OK",this);
   ok->setMaximumSize(80,40);
   connect(ok,SIGNAL(clicked()),SLOT(accept()));
-  last->addWidget(ok,AlignRight);
+  last->addWidget(ok, Qt::AlignRight);
 
   QPushButton *cancel = new QPushButton("Cancel",this);
   cancel->setMaximumSize(80,40);
   connect(cancel,SIGNAL(clicked()),SLOT(reject()));
-  last->addWidget(cancel,AlignLeft);
+  last->addWidget(cancel, Qt::AlignLeft);
 
   adjustSize();
-
-
 }
 
 //************************************************
 RoomGenPos::RoomGenPos( QWidget *parent, const char *name)
-    : QDialog( parent, name, true )
+    : QDialog(parent)
 {
 
-  setCaption("Controls for First Room");
+  setWindowTitle("Controls for First Room");
 
-  Q3BoxLayout *all = new Q3VBoxLayout(this,5);
+  QBoxLayout *all = new QVBoxLayout(this);
 
   QLabel *l = new QLabel("Absolute (Unconditional) Position:",this);
   all->addWidget(l);
 
-  Q3GridLayout *l1 = new Q3GridLayout(all,6,1,5);
+  QGridLayout *l1 = new QGridLayout(this);//, 6, 1, 5);
+  all->addLayout(l1);
   QLabel *lx = new QLabel("X:",this);
-  l1->addWidget(lx,0,0,AlignRight);
+  l1->addWidget(lx, 0, 0, Qt::AlignRight);
   x = new QLineEdit(this);
   x->setFixedWidth(40);
   x->setText("-1");
   x->selectAll();
-  l1->addWidget(x,0,1,AlignLeft);
+  l1->addWidget(x, 0, 1, Qt::AlignLeft);
 
   QLabel *ly = new QLabel("Y:",this);
-  l1->addWidget(ly,0,2,AlignRight);
+  l1->addWidget(ly, 0, 2, Qt::AlignRight);
   y = new QLineEdit(this);
   y->setFixedWidth(40);
   y->setText("-1");
   y->selectAll();
-  l1->addWidget(y,0,3,AlignLeft);
+  l1->addWidget(y, 0, 3, Qt::AlignLeft);
 
   QLabel *place = new QLabel(" ",this);
-  l1->addWidget(place,0,4,AlignCenter);
-  l1->setColStretch(4,1);
+  l1->addWidget(place, 0, 4, Qt::AlignCenter);
+  l1->setColumnStretch(4,1);
 
 
   QLabel *com = new QLabel(
@@ -747,32 +754,31 @@ where you won't get stuck behind control lines, etc."
 ,this);
   all->addWidget(com);
 
-  Q3BoxLayout *last = new Q3HBoxLayout(all,10);
+  QBoxLayout *last = new QHBoxLayout(this);
+  all->addLayout(last);
 
   QPushButton *ok = new QPushButton("OK",this);
   ok->setMaximumSize(80,40);
   connect(ok,SIGNAL(clicked()),SLOT(accept()));
-  last->addWidget(ok,AlignRight);
+  last->addWidget(ok, Qt::AlignRight);
 
   QPushButton *cancel = new QPushButton("Cancel",this);
   cancel->setMaximumSize(80,40);
   connect(cancel,SIGNAL(clicked()),SLOT(reject()));
-  last->addWidget(cancel,AlignLeft);
+  last->addWidget(cancel, Qt::AlignLeft);
 
   adjustSize();
-
-
 }
 
 //************************************************
 RoomGenEdge::RoomGenEdge( QWidget *parent, const char *name)
-    : QDialog( parent, name, true )
+    : QDialog(parent)
 {
   int i;
 
-  setCaption("Edge Code Advanced Controls");
+  setWindowTitle("Edge Code Advanced Controls");
 
-  Q3BoxLayout *all = new Q3VBoxLayout(this,5);
+  QBoxLayout *all = new QVBoxLayout(this);
 
   QLabel *com = new QLabel(
 "It may be desirable to have an edge code that does not lead to different room.\n\
@@ -785,17 +791,20 @@ if (ego_edge_code == horizon_edge){\n\
 ,this);
   all->addWidget(com);
 
-  Q3GroupBox *edge = new Q3GroupBox(2,Horizontal,"Empty edge controls",this);
+  QGroupBox *edge = new QGroupBox("Empty edge controls", this);
+  QHBoxLayout *ledge = new QHBoxLayout(this);
 
   for(i=0;i<4;i++){
     sprintf(tmp,"Include empty code for %s edge",dirs[i]);
-    c_edge[i]=new QCheckBox(tmp,edge);
+    c_edge[i] = new QCheckBox(tmp, edge);
+    ledge->addWidget(c_edge[i]);
+    ledge->addSpacing(10);
   }
-
   all->addWidget(edge);
+  edge->setLayout(ledge);
 
-  Q3GroupBox *messages = new Q3GroupBox(4,Horizontal,
-"Messages (if Display is not checked, message will be ignored)",this);
+  QGroupBox *messages = new QGroupBox("Messages (if Display is not checked, message will be ignored)", this);
+  QHBoxLayout *lmess = new QHBoxLayout(this);
   for(i=0;i<4;i++){
     m_edge[i] = new QCheckBox("Display",messages);
     b_edge[i] = new QPushButton(messages);
@@ -811,75 +820,72 @@ if (ego_edge_code == horizon_edge){\n\
     case 3:
       connect(b_edge[i],SIGNAL(clicked()),SLOT(hor_message())); break;
     }
+    lmess->addWidget(m_edge[i]);
+    lmess->addWidget(b_edge[i]);
+    lmess->addSpacing(10);
   }
-
   all->addWidget(messages);
+  messages->setLayout(lmess);
 
-  Q3BoxLayout *last = new Q3HBoxLayout(all,10);
+  QBoxLayout *last = new QHBoxLayout(this);
+  all->addLayout(last);
 
   QPushButton *ok = new QPushButton("OK",this);
   ok->setMaximumSize(80,40);
   connect(ok,SIGNAL(clicked()),SLOT(accept()));
-  last->addWidget(ok,AlignRight);
+  last->addWidget(ok, Qt::AlignRight);
 
   QPushButton *cancel = new QPushButton("Cancel",this);
   cancel->setMaximumSize(80,40);
   connect(cancel,SIGNAL(clicked()),SLOT(reject()));
-  last->addWidget(cancel,AlignLeft);
+  last->addWidget(cancel, Qt::AlignLeft);
 
   adjustSize();
 
   message=NULL;
-
 }
 
 void RoomGenEdge::left_message()
 {
-
   if(message==NULL)message = new RoomGenMessage();
   message->name("Left",e_mes[0].c_str());
   if(message->exec()){
-    e_mes[0] = (char *)message->message->text().latin1();
+    e_mes[0] = message->message->text().toStdString();
   }
 }
 
 void RoomGenEdge::right_message()
 {
-
   if(message==NULL)message = new RoomGenMessage();
   message->name("Right",e_mes[1].c_str());
   if(message->exec()){
-    e_mes[1] = (char *)message->message->text().latin1();
+    e_mes[1] = message->message->text().toStdString();
   }
 }
 
 void RoomGenEdge::bot_message()
 {
-
   if(message==NULL)message = new RoomGenMessage();
   message->name("Bottom",e_mes[2].c_str());
   if(message->exec()){
-    e_mes[2] = (char *)message->message->text().latin1();
+    e_mes[2] = message->message->text().toStdString();
   }
 }
 
 void RoomGenEdge::hor_message()
 {
-
   if(message==NULL)message = new RoomGenMessage();
   message->name("Horizon",e_mes[3].c_str());
   if(message->exec()){
-    e_mes[3] = (char *)message->message->text().latin1();;
+    e_mes[3] = message->message->text().toStdString();;
   }
 }
 
 //************************************************
 RoomGenMessage::RoomGenMessage( QWidget *parent, const char *name)
-    : QDialog( parent, name, true )
+    : QDialog(parent)
 {
-
-
-  Q3BoxLayout *all = new Q3VBoxLayout(this,5);
+  QBoxLayout *all = new QVBoxLayout(this);
 
   l = new QLabel("",this);
   //l->setAutoResize(true); // TODO: REPLACE WITH A LAYOUT!
@@ -887,17 +893,18 @@ RoomGenMessage::RoomGenMessage( QWidget *parent, const char *name)
   message = new QLineEdit(this);
   all->addWidget(message);
 
-  Q3BoxLayout *last = new Q3HBoxLayout(all,10);
+  QBoxLayout *last = new QHBoxLayout(this);
+  all->addLayout(last);
 
   QPushButton *ok = new QPushButton("OK",this);
   ok->setMaximumSize(80,40);
   connect(ok,SIGNAL(clicked()),SLOT(accept()));
-  last->addWidget(ok,AlignRight);
+  last->addWidget(ok, Qt::AlignRight);
 
   QPushButton *cancel = new QPushButton("Cancel",this);
   cancel->setMaximumSize(80,40);
   connect(cancel,SIGNAL(clicked()),SLOT(reject()));
-  last->addWidget(cancel,AlignLeft);
+  last->addWidget(cancel, Qt::AlignLeft);
 
   adjustSize();
 
@@ -907,7 +914,7 @@ void RoomGenMessage::name(const char *title,const char *text)
 {
 
   sprintf(tmp,"%s Message",title);
-  setCaption(tmp);
+  setWindowTitle(tmp);
   sprintf(tmp,"Enter a message to display when ego\ntouches %c%s edge:",tolower(title[0]),title+1);
   l->setText(tmp);
   message->setText(text);

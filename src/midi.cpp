@@ -26,14 +26,13 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include <qdatastream.h>
-#include <qiodevice.h>
-#include <q3filedialog.h>
-#include <qlabel.h>
-#include <q3vbox.h>
-#include <qcombobox.h>
-#include <q3combobox.h>
-#include <qpushbutton.h>
+#include <QDataStream>
+#include <QIODevice>
+#include <QLabel>
+#include <QComboBox>
+#include <QPushButton>
+#include <QFileDialog>
+#include <QVBoxLayout>
 
 static const char* g_gm_instrument_names[] =
 {
@@ -173,33 +172,33 @@ void writeMidi(const byte* snd, QIODevice& write_to, const unsigned char instr[]
 {
   long delta_tmp;
   #define WRITE_DELTA(X) \
-    delta_tmp=X>>21; if (delta_tmp>0) out << Q_UINT8((delta_tmp&127)|128); \
-    delta_tmp=X>>14; if (delta_tmp>0) out << Q_UINT8((delta_tmp&127)|128); \
-    delta_tmp=X>>7;  if (delta_tmp>0) out << Q_UINT8((delta_tmp&127)|128); \
-    out << Q_UINT8(X&127)
+    delta_tmp=X>>21; if (delta_tmp>0) out << quint8((delta_tmp&127)|128); \
+    delta_tmp=X>>14; if (delta_tmp>0) out << quint8((delta_tmp&127)|128); \
+    delta_tmp=X>>7;  if (delta_tmp>0) out << quint8((delta_tmp&127)|128); \
+    out << quint8(X&127)
 
   double ll=log10(pow(2.0,1.0/12.0));
 
-  if ( write_to.isSequentialAccess() || !write_to.isWritable())
+  if ( write_to.isSequential() || !write_to.isWritable())
     qFatal("writeMidi() requires a writable random access IODevice");
   
   QDataStream out( &write_to );
   
   // Header
-  out.writeRawBytes("MThd",4);
-  out << Q_UINT32(6)
-      << Q_UINT16(1)   // mode
-      << Q_UINT16(3)   // # of tracks
-      << Q_UINT16(96); // ticks / quarter
+  out.writeRawData("MThd",4);
+  out << quint32(6)
+      << quint16(1)    // mode
+      << quint16(3)    // # of tracks
+      << quint16(96);  // ticks / quarter
 
   for (int n=0;n<3;n++)
   {
-    out.writeRawBytes("MTrk",4);
-    qlonglong lp = write_to.at();
-    out << Q_UINT32(0); // chunklength
+    out.writeRawData("MTrk",4);
+    qlonglong lp = write_to.pos();
+    out << quint32(0); // chunklength
     WRITE_DELTA(0); // set instrument
-    out << Q_UINT8(0xc0+n)
-        << Q_UINT8(instr[n]);
+    out << quint8(0xc0+n)
+        << quint8(instr[n]);
        
     unsigned short start=snd[n*2+0] | (snd[n*2+1]<<8);
     unsigned short end=((snd[n*2+2] | (snd[n*2+3]<<8)))-5;
@@ -221,84 +220,89 @@ void writeMidi(const byte* snd, QIODevice& write_to, const unsigned char instr[]
         if (note>127) note=127;
         // note on
         WRITE_DELTA(0);
-        out << Q_UINT8(0x90+n)
-            << Q_UINT8(note)
-            << Q_UINT8(100);
+        out << quint8(0x90+n)
+            << quint8(note)
+            << quint8(100);
         // note off
         WRITE_DELTA(dur);
-        out << Q_UINT8(0x80+n)
-            << Q_UINT8(note)
-            << Q_UINT8(0);
+        out << quint8(0x80+n)
+            << quint8(note)
+            << quint8(0);
       }
       else
       {
         // note on
         WRITE_DELTA(0);
-        out << Q_UINT8(0x90+n)
-            << Q_UINT8(0)
-            << Q_UINT8(0);
+        out << quint8(0x90+n)
+            << quint8(0)
+            << quint8(0);
         // note off
         WRITE_DELTA(dur);
-        out << Q_UINT8(0x80+n)
-            << Q_UINT8(0)
-            << Q_UINT8(0);
+        out << quint8(0x80+n)
+            << quint8(0)
+            << quint8(0);
       }
     }
     
     WRITE_DELTA(0);
-    out << Q_UINT8(0xff)
-        << Q_UINT8(0x2f)
-        << Q_UINT8(0x0);
+    out << quint8(0xff)
+        << quint8(0x2f)
+        << quint8(0x0);
     
-    qlonglong ep=write_to.at();
-    write_to.at(lp);
-    out << Q_UINT32((ep-lp)-4);
-    write_to.at(ep);
+    qlonglong ep=write_to.pos();
+    write_to.seek(lp);
+    out << quint32((ep-lp)-4);
+    write_to.seek(ep);
   }
-  
   #undef WRITE_DELTA
 }
 
 static unsigned char s_selected_instr[3] = {0,0,0};
 
-// Show a "Save as" file dialog and call the Midi export function
+// Show a "Save as" file dialog and call the MIDI export function
 void showSaveAsMidi( QWidget* parent, const byte* snd )
 {
-  class MyFileDialog : public Q3FileDialog
+  class MyFileDialog : public QFileDialog
   {
   public:
     MyFileDialog( QWidget* parent, const char* name ) :
-        Q3FileDialog( parent, name )
+        QFileDialog( parent, name )
     {
+        auto instrument_names = QStringList();
+        for (int n = 0; n < 128; n++) {
+            instrument_names.append(g_gm_instrument_names[n]);
+        }
+
         QLabel* label = new QLabel( "Channel instruments", this );
-        label->setAlignment( AlignAuto | AlignTop | ExpandTabs );
-        Q3VBox* butts = new Q3VBox(this);
-        butts->setSpacing ( 2 );
+        label->setAlignment(Qt::AlignHCenter | Qt::AlignTop);
+        QWidget* butts = new QWidget(this);
         for (int i=0; i<3; ++i )
         {        
-          instr[i] = new Q3ComboBox( butts );
-          instr[i]->insertStrList( g_gm_instrument_names );
-          instr[i]->setCurrentItem( s_selected_instr[i] );
+          instr[i] = new QComboBox( butts );
+          instr[i]->insertItems(i, instrument_names);
+          instr[i]->setCurrentIndex(s_selected_instr[i]);
         }
-        addWidgets( label, butts, 0 );
+
+        QVBoxLayout *layout = new QVBoxLayout;
+        layout->addWidget(label);
+        layout->addWidget(butts);
     }
-    Q3ComboBox* instr[3];    
+    QComboBox* instr[3];
   } fd( parent, NULL );
 
-  fd.setMode( Q3FileDialog::AnyFile );
-  fd.setFilter( "MIDI files (*.mid *.midi)" );
+  fd.setNameFilter("MIDI files (*.mid *.midi)");
+  fd.setAcceptMode(QFileDialog::AcceptSave);
 
-  if ( fd.exec() == QDialog::Accepted )
-  {
-    QString fname = fd.selectedFile();
-    if ( fname.find( '.' ) < 0 )
+  if ((fd.exec() == QDialog::Accepted) && !fd.selectedFiles().isEmpty()) {
+    QString fname = fd.selectedFiles().first();
+    if ( fname.lastIndexOf( '.' ) < 0 )
       fname += ".mid";
     
     QFile f( fname );
     f.open( QIODevice::WriteOnly );
         
     for (int i=0; i<3; ++i )
-      s_selected_instr[i] = (unsigned char)fd.instr[i]->currentItem();
+      s_selected_instr[i] = (unsigned char)fd.instr[i]->currentIndex();
     
     writeMidi(snd, f, s_selected_instr);
     f.close();

@@ -21,21 +21,19 @@
 #ifndef PICEDIT_H
 #define PICEDIT_H
 
-#include <qwidget.h>
-#include <qlabel.h>
-#include <qpushbutton.h>
-#include <qlayout.h>
-#include <qnamespace.h>
-#include <qmessagebox.h>
-#include <q3multilineedit.h> 
-#include <qevent.h> 
-#include <q3scrollview.h> 
-#include <qpixmap.h>
-#include <qimage.h>
-#include <qstatusbar.h>
-#include <qcheckbox.h>
-#include <qpaintdevice.h>
-//Added by qt3to4:
+#include <QWidget>
+#include <QLabel>
+#include <QPushButton>
+#include <QLayout>
+#include <QNamespace.h>
+#include <QMessagebox>
+#include <QTextEdit>
+#include <QEvent>
+#include <QPixmap>
+#include <QImage>
+#include <QStatusBar>
+#include <QCheckBox>
+#include <QPaintDevice>
 #include <QCloseEvent>
 #include <QShowEvent>
 #include <QPaintEvent>
@@ -43,6 +41,8 @@
 #include <QMouseEvent>
 #include <QHideEvent>
 #include <QKeyEvent>
+#include <QScrollArea>
+#include <QGroupBox>
 
 #include "util.h"
 #include "wutil.h"
@@ -65,7 +65,7 @@ public:
 };
 
 //************************************************
-class PCanvas : public Q3ScrollView
+class PCanvas : public QScrollArea
 {
     Q_OBJECT
 public:
@@ -108,7 +108,7 @@ public slots:
     void read();
  protected:
     QCheckBox *comments,*wrap;
-    Q3MultiLineEdit *codes;
+    QTextEdit *codes;
     TStringList data;
     Picture *picture;
     int maxcol;
@@ -126,7 +126,7 @@ public:
     PicEdit( QWidget *parent=0, const char *name=0,int winnum=0,ResourcesWin *res=0);
     void open(int ResNum);
     Picture *picture;
-    Q3ButtonGroup *tool;
+    QButtonGroup *tool;
     QRadioButton *line,*step,*pen,*fill,*brush;
     QRadioButton *pic,*pri;
     QStatusBar *status;

@@ -34,21 +34,17 @@
 #include <stdlib.h>
 #include <ctype.h>
 
-#include <qapplication.h>
-#include <q3filedialog.h>
-#include <q3syntaxhighlighter.h>
-#include <qregexp.h>
-//Added by qt3to4:
-#include <Q3HBoxLayout>
+#include <QApplication>
+#include <QRegexp>
 #include <QLabel>
 #include <QHideEvent>
 #include <QResizeEvent>
-#include <Q3PopupMenu>
-#include <QTextOStream>
-#include <Q3VBoxLayout>
-#include <Q3BoxLayout>
 #include <QShowEvent>
 #include <QCloseEvent>
+#include <QSyntaxHighlighter>
+#include <QTextStream>
+#include <QFileDialog>
+#include <QGroupBox>
 
 TStringList InputLines;  //temporary buffer for reading the text from editor
 //and sending to compilation
@@ -56,189 +52,153 @@ TStringList InputLines;  //temporary buffer for reading the text from editor
 //***********************************************
 // Syntax highlight
 
-static QString operators ="!-+=<>/*&|^%",
-               wordchars = "0123456789abcdefghijlkmnopqrstuvwxyz"
-                           "ABCDEFGHIJKLMNOPQRSTUVWXYZ._#";
+static QString operators = "!-+=<>/*&|^%";
 
-static QColor normal_color = QColor("black"),
-              comment_color = QColor("#808080"),
-              string_color = QColor("red"),
-              number_color = QColor("darkCyan"),
-              command_color = QColor("darkBlue"),
-              test_color = QColor("brown"),
-              operator_color = QColor("blue");
+static QColor normal_color =   QColor("black"),
+              comment_color =  QColor("gray"),
+              string_color =   QColor("firebrick"),
+              number_color =   QColor("darkCyan"),
+              command_color =  QColor("darkBlue"),
+              keyword_color =  QColor("green"),
+              test_color =     QColor("brown"),
+              operator_color = QColor("steelBlue");
 
-class LogicSyntaxHL : public Q3SyntaxHighlighter
+static QStringList keywords = {"if", "else", "goto"};
+
+class LogicSyntaxHL : public QSyntaxHighlighter
 {
 public:
+  LogicSyntaxHL(QTextEdit *parent)
+      : QSyntaxHighlighter(parent) {
 
-  LogicSyntaxHL( Q3TextEdit* te )
-    : Q3SyntaxHighlighter( te ) {}
+      HighlightingRule rule;
 
-  void highlightWord( const QString& line, int start, int len )
-  {
-    QColor* col = 0;
-    QString word( line.mid(start, len));
+      operatorFormat.setForeground(operator_color);
+      rule.pattern = QRegExp("[" + operators + "]");
+      rule.format = operatorFormat;
+      highlightingRules.append(rule);
 
-    // Number?
-    if ( word.find(QRegExp("[^0-9]")) < 0 )
-      col = &number_color;
-    else
-    {
-      // AGI command?
-      for ( CommandStruct* cmd = AGICommand;
-            cmd < AGICommand + (sizeof(AGICommand)/sizeof(CommandStruct));
-            ++cmd )
-      {
-        if ( word == cmd->Name )
-        {
-          col = &command_color;
-          break;
-        }
+      keywordFormat.setForeground(keyword_color);
+      keywordFormat.setFontWeight(QFont::Bold);
+      foreach(const QString &pattern, keywords) {
+          rule.pattern = QRegExp("\\b" + pattern + "\\b");
+          rule.format = keywordFormat;
+          highlightingRules.append(rule);
       }
-      // AGI test command?
-      for ( CommandStruct* cmd = TestCommand;
-            cmd < TestCommand + (sizeof(TestCommand)/sizeof(CommandStruct));
-            ++cmd )
-      {
-        if ( word == cmd->Name )
-          col = &test_color;
-      }
-      // Control structure
-      if ( word[0]=='#' || word == "if" || word == "else" || word == "goto" )
-        col = &operator_color;
-    }
+      rule.pattern = QRegExp("^#\\w+");
+      rule.format = keywordFormat;
+      highlightingRules.append(rule);
 
-    if ( col )
-      setFormat( start, len, *col);
+      testCmdFormat.setForeground(test_color);
+      testCmdFormat.setFontItalic(true);
+      for (size_t i = 0; i < NumTestCommands; i++) {
+          auto cmd = QString(TestCommand[i].Name);
+          if (!cmd.isEmpty()) {
+              cmd = cmd.replace(".", "\\.");
+              rule.pattern = QRegExp("\\b" + cmd + "\\b");
+              rule.format = testCmdFormat;
+              highlightingRules.append(rule);
+          }
+      }
+
+      AGICmdFormat.setForeground(command_color);
+      AGICmdFormat.setFontItalic(true);
+      for (size_t i = 0; i < NumAGICommands; i++) {
+          auto cmd = QString(AGICommand[i].Name);
+          if (!cmd.isEmpty()) {
+              cmd = cmd.replace(".", "\\.");
+              rule.pattern = QRegExp("\\b" + cmd + "\\b");
+              rule.format = AGICmdFormat;
+              highlightingRules.append(rule);
+          }
+      }
+
+      numberFormat.setForeground(number_color);
+      rule.pattern = QRegExp("\\d+");
+      rule.format = numberFormat;
+      highlightingRules.append(rule);
+
+      stringFormat.setForeground(string_color);
+      rule.pattern = QRegExp("\".*\"");
+      rule.format = stringFormat;
+      highlightingRules.append(rule);
+
+      singleLineCommentFormat.setForeground(comment_color);
+      rule.pattern = QRegExp("//[^\n]*");
+      rule.format = singleLineCommentFormat;
+      highlightingRules.append(rule);
+
+      multiLineCommentFormat.setForeground(comment_color);
+      commentStartExpression = QRegExp("/\\*");
+      commentEndExpression = QRegExp("\\*/");
   }
 
-  int highlightParagraph ( const QString & text, int endStateOfLastPara )
-  {
-    setFormat( 0, text.length(), normal_color);
-
-    QString txt = text;
-
-    int comment_depth = endStateOfLastPara;
-    bool in_quotes = (comment_depth==-1);
-    if ( comment_depth < 0 )
-      comment_depth = 0;
-
-    int curchar = 0, lastchar = 0;
-    while( !txt.isEmpty())
-    {
-      // Get next line & shorten
-      int eol = txt.find( '\n' );
-      if ( eol < 0 )
-        eol = txt.length()-1;
-      QString line = txt.mid(0,eol);
-      txt = txt.mid(eol+1);
-      bool in_word = false;
-
-      // Process the line
-      int i;
-      for ( i=0; i<(int)line.length(); ++i )
-      {
-        // Single words
-        if ( in_word && wordchars.find(line[i]) < 0 )
-        {
-          highlightWord( line, lastchar, curchar+i-lastchar );
-          in_word = false;
-        }
-
-        // Comments
-        if ( !in_quotes )
-        {
-          if (comment_depth==0 && line.mid(i,1) == "[")
-          {
-            setFormat( (curchar+i), line.length()-i+1, comment_color);
-            break;
+  void LogicSyntaxHL::highlightBlock(const QString &text) override {
+      foreach(const HighlightingRule &rule, highlightingRules) {
+          QRegExp expression(rule.pattern);
+          int index = expression.indexIn(text);
+          while (index >= 0) {
+              int length = expression.matchedLength();
+              setFormat(index, length, rule.format);
+              index = expression.indexIn(text, index + length);
           }
-          // More than two chars left?
-          if ( i<(int)line.length()-1 )
-          {
-            if (comment_depth==0 && (line.mid(i,2) == "//" ))
-            {
-              setFormat( (curchar+i), line.length()-i+1, comment_color);
-              break;
-            }
-            else if ( line.mid(i,2) == "/*")
-            {
-              if ( comment_depth == 0 )
-                lastchar = (curchar+i);
-              ++comment_depth;
-              ++i;
-              continue;
-            }
-            else if (comment_depth>0 && line.mid(i,2) == "*/" )
-            {
-              --comment_depth;
-              if ( comment_depth == 0 )
-              {
-                setFormat( lastchar, (curchar+i)-lastchar+2, comment_color);
-                lastchar = (curchar+i+2);
-              }
-              ++i;
-              continue;
-            }
-          }
-        }
-
-        // Quotes
-        if ( comment_depth == 0 )
-        {
-          if(line[i]=='\"' && (i==0 || line[i-1] != '\\'))
-          {
-            if ( in_quotes )
-              setFormat( lastchar, (curchar+i)-lastchar+1, string_color);
-            lastchar = curchar+i;
-            in_quotes = !in_quotes;
-          }
-
-          if ( !in_quotes )
-          {
-            if( !in_word && wordchars.find(line[i]) >= 0 &&
-                (i==0 || wordchars.find(line[i-1]) < 0 ))
-            {
-              in_word = true;
-              lastchar = curchar+i;
-            }
-            else if ( operators.find(line[i]) >= 0 )
-              setFormat((curchar+i), 1, operator_color);
-          }
-        }
       }
+      setCurrentBlockState(0);
 
-      // End of line, format word if still open
-      if ( in_word  )
-        highlightWord( line, lastchar, line.length()-lastchar );
+      int startIndex = 0;
+      if (previousBlockState() != 1)
+          startIndex = commentStartExpression.indexIn(text);
 
-      curchar += i;
-      if ( in_quotes )
-        setFormat( lastchar, curchar-lastchar+1, string_color);
-    }
-
-    // End of paragraph, format comment block if still open
-    if ( comment_depth > 0 )
-      setFormat( lastchar, curchar-lastchar+1, comment_color);
-
-    return (in_quotes ? -1 : comment_depth);
+      while (startIndex >= 0) {
+          int endIndex = commentEndExpression.indexIn(text, startIndex);
+          int commentLength;
+          if (endIndex == -1) {
+              setCurrentBlockState(1);
+              commentLength = text.length() - startIndex;
+          } else {
+              commentLength = endIndex - startIndex
+                  + commentEndExpression.matchedLength();
+          }
+          setFormat(startIndex, commentLength, multiLineCommentFormat);
+          startIndex = commentStartExpression.indexIn(text, startIndex + commentLength);
+      }
   }
+
+private:
+    struct HighlightingRule
+    {
+        QRegExp pattern;
+        QTextCharFormat format;
+    };
+    QVector<HighlightingRule> highlightingRules;
+
+    QRegExp commentStartExpression;
+    QRegExp commentEndExpression;
+
+    QTextCharFormat operatorFormat;
+    QTextCharFormat keywordFormat;
+    QTextCharFormat numberFormat;
+    QTextCharFormat stringFormat;
+    QTextCharFormat testCmdFormat;
+    QTextCharFormat AGICmdFormat;
+    QTextCharFormat singleLineCommentFormat;
+    QTextCharFormat multiLineCommentFormat;
 };
 
 //***********************************************
 LogEdit::LogEdit( QWidget *parent, const char *name, int win_num, ResourcesWin *res, bool readonly)
-    : QWidget( parent, name, Qt::WDestructiveClose )
+    : QWidget(parent)
     , findedit(NULL)
     , roomgen(NULL)
 {
-  setCaption("Logic editor");
+  setAttribute(Qt::WA_DeleteOnClose);
+  setWindowTitle("Logic editor");
 
   logic = new Logic();
   winnum = win_num;  //my window number
   resources_win = res; //resources window which called me
 
-  editor = new Q3MultiLineEdit(this);
+  editor = new QTextEdit(this);
 
   QFont font("Monospace");
   font.setPointSize(readonly?8:9);
@@ -247,8 +207,8 @@ LogEdit::LogEdit( QWidget *parent, const char *name, int win_num, ResourcesWin *
 
   editor->setSizePolicy( QSizePolicy(
     QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding ));
-  editor->setWordWrap( Q3TextEdit::NoWrap );
-  syntax_hl = new LogicSyntaxHL( editor );
+  editor->setWordWrapMode(QTextOption::NoWrap);
+  syntax_hl = new LogicSyntaxHL(editor);
 
   if ( readonly )
   {
@@ -257,60 +217,60 @@ LogEdit::LogEdit( QWidget *parent, const char *name, int win_num, ResourcesWin *
   else
   {
     editor->setMinimumSize(512,600);
-    setMinimumSize(450,400);
   }
 
   setSizePolicy( QSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding ));
-  
-  Q3BoxLayout *all = new Q3VBoxLayout(this,10);
+
+  QBoxLayout *all = new QVBoxLayout(this);
   all->addWidget(editor);
 
   if ( !readonly ) {
-    Q3PopupMenu *file = new Q3PopupMenu( this );
+    QMenu *file = new QMenu( this );
     Q_CHECK_PTR( file );
+    file->setTitle("&File");
+    file->addAction( "&Read from file", this, SLOT(read_logic()) );
+    file->addAction( "&Save", this, SLOT(save_logic()), Qt::CTRL + Qt::Key_S );
+    file->addAction( "Save &as", this, SLOT(save_as()) );
+    file->addAction( "&Compile", this, SLOT(compile_logic()) ,Qt::Key_F9 );
+    file->addAction( "Compile all", this, SLOT(compile_all_logic())  );
+    file->addAction( "Compile all and run", this, SLOT(compile_and_run()) ,Qt::Key_F10 );
+    file->addAction( "Change logic number", this, SLOT(change_logic_number()) );
+    file->addSeparator();
+    file->addAction( "&Delete", this, SLOT(delete_logic()) );
+    file->addAction( "&New room", this, SLOT(new_room()) );
+    file->addSeparator();
+    file->addAction( "&Close", this, SLOT(close()) );
 
-    file->insertItem( "Read from file", this, SLOT(read_logic()) );
-    file->insertItem( "Save", this, SLOT(save_logic()), Qt::CTRL + Qt::Key_S );
-    file->insertItem( "Save as", this, SLOT(save_as()) );
-    file->insertItem( "Compile", this, SLOT(compile_logic()) ,Qt::Key_F9 );
-    file->insertItem( "Compile all", this, SLOT(compile_all_logic())  );
-    file->insertItem( "Compile all and run", this, SLOT(compile_and_run()) ,Qt::Key_F10 );
-    file->insertItem( "Change logic number", this, SLOT(change_logic_number()) );
-    file->insertSeparator();
-    file->insertItem( "Delete", this, SLOT(delete_logic()) );
-    file->insertItem( "New room", this, SLOT(new_room()) );
-    file->insertSeparator();
-    file->insertItem( "Close", this, SLOT(close()) );
-
-    Q3PopupMenu *edit = new Q3PopupMenu( this );
+    QMenu *edit = new QMenu( this );
     Q_CHECK_PTR( edit );
-    edit->insertItem( "Cut", editor, SLOT(cut()) , Qt::CTRL + Qt::Key_X );
-    edit->insertItem( "Copy", editor, SLOT(copy()) , Qt::CTRL + Qt::Key_C );
-    edit->insertItem( "Paste", editor, SLOT(paste()) , Qt::CTRL + Qt::Key_V);
-    edit->insertSeparator();
-    edit->insertItem( "Clear all", this, SLOT(clear_all()) );
-    edit->insertSeparator();
-    edit->insertItem( "Find", this, SLOT(find_cb()) ,Qt::CTRL + Qt::Key_F);
-    edit->insertItem( "Find again", this, SLOT(find_again()) ,Qt::Key_F3);
-    edit->insertSeparator();
-    edit->insertItem( "Go to line", this, SLOT(goto_cb()) ,Qt::ALT + Qt::Key_G);
+    edit->setTitle("&Edit");
+    edit->addAction( "Cu&t", editor, SLOT(cut()) , Qt::CTRL + Qt::Key_X );
+    edit->addAction( "&Copy", editor, SLOT(copy()) , Qt::CTRL + Qt::Key_C );
+    edit->addAction( "&Paste", editor, SLOT(paste()) , Qt::CTRL + Qt::Key_V);
+    edit->addSeparator();
+    edit->addAction( "Clear &all", this, SLOT(clear_all()) );
+    edit->addSeparator();
+    edit->addAction( "&Find", this, SLOT(find_cb()) ,Qt::CTRL + Qt::Key_F);
+    edit->addAction( "Fi&nd again", this, SLOT(find_again()) ,Qt::Key_F3);
+    edit->addSeparator();
+    edit->addAction( "&Go to line", this, SLOT(goto_cb()) ,Qt::ALT + Qt::Key_G);
 
-    Q3PopupMenu *help = new Q3PopupMenu( this );
+    QMenu *help = new QMenu( this );
     Q_CHECK_PTR( help );
-    help->insertItem( "Context help", this, SLOT(context_help()), Qt::Key_F1);
-    help->insertItem( "All commands", this, SLOT(command_help()));
+    help->setTitle("&Help");
+    help->addAction( "&Context help", this, SLOT(context_help()), Qt::Key_F1);
+    help->addAction( "&All commands", this, SLOT(command_help()));
 
     QMenuBar *menu = new QMenuBar(this);
     Q_CHECK_PTR( menu );
-    menu->insertItem( "File", file );
-    menu->insertItem( "Edit", edit );
-    menu->insertItem( "Help", help );
-    menu->setSeparator( QMenuBar::InWindowsStyle );
+    menu->addMenu(file);
+    menu->addMenu(edit);
+    menu->addMenu(help);
 
     all->setMenuBar(menu);
 
     status = new QStatusBar(this);
-    QLabel *msg = new QLabel( status, "message" );
+    QLabel *msg = new QLabel("");
     status->addWidget( msg, 4 );
     all->addWidget(status);
 
@@ -329,11 +289,11 @@ void LogEdit::deinit()
 {
 
   if(findedit){
-    findedit->close(true);
+    findedit->close();
     findedit=NULL;
   }
   if(roomgen){
-    roomgen->close(true);
+    roomgen->close();
     roomgen=NULL;
   }
   delete logic;
@@ -351,7 +311,7 @@ void LogEdit::hideEvent( QHideEvent * )
 {
   
   if(findedit){
-    findedit->close(true);
+    findedit->close();
     findedit=NULL;
   }
   if(window_list && window_list->isVisible())window_list->draw();
@@ -368,10 +328,9 @@ void LogEdit::showEvent( QShowEvent * )
 //***********************************************
 void LogEdit::closeEvent( QCloseEvent *e )
 {
-
   if(changed){
-    QString str = editor->text();
-    if(!strcmp(str.latin1(),logic->OutputText.c_str())){  //not changed
+    QString str = editor->toPlainText();
+    if(!strcmp(str.toLatin1(),logic->OutputText.c_str())){  //not changed
       deinit();
       e->accept();
       return;
@@ -408,7 +367,6 @@ void LogEdit::closeEvent( QCloseEvent *e )
     deinit();
     e->accept();
   }
-
 }
 
 //***********************************************
@@ -440,23 +398,21 @@ int LogEdit::open(char *filenam)
     }
     editor->setText( filecont );
     fclose(fptr);
-    logic->OutputText=editor->text().latin1();
+    logic->OutputText = editor->toPlainText().toStdString();
     if((ptr=(char*)strrchr(filename.c_str(),'/')))ptr++;
     else ptr=(char *)filename.c_str();
     if(LogicNum!=-1)
       sprintf(tmp,"logic.%d (file %s)",LogicNum,ptr);
     else
       sprintf(tmp,"logic (file %s)",ptr);
-    setCaption(tmp);
+    setWindowTitle(tmp);
     show();
     changed=true;
 
     return 0;
   }
   else{
-    menu->errmes("Can't open file %s !",filenam);
-    //QMessageBox::critical( this, "Agistudio",
-    //  QString( "Can't open file '" ) + filenam + "'");
+    menu->errmes("Can't open file '%s'!", fname);
     return 1;
   }
 }
@@ -494,7 +450,7 @@ int LogEdit::open(int ResNum)
       menu->errmes(tmp,"Errors:\n%s",logic->ErrorList.c_str());
     }
     str.sprintf("logic.%d",ResNum);
-    setCaption(str);
+    setWindowTitle(str);
     LogicNum = ResNum;
     show();
     changed=true;
@@ -504,26 +460,17 @@ int LogEdit::open(int ResNum)
 }
 
 //***********************************************
-void LogEdit::save(char *filename)
+void LogEdit::save(char *fname)
 {
-
-  QString str;
-  byte *s;
-  FILE *fptr;
-
-  if((fptr=fopen(filename,"wb"))==NULL){
-    menu->errmes("Can't open file %s !\n",filename);
-    return;
-  }
-  for(int i=0;i<editor->numLines();i++){
-    str = editor->textLine(i);
-    if(!str.isNull()){
-      s = (byte *)str.latin1();
-      fprintf(fptr,"%s\n",s);
+    QFile file(fname);
+    if (!file.open(QIODevice::WriteOnly)) {
+        menu->errmes("Can't save file '%s'!", fname);
+        return;
     }
-  }
-  fclose(fptr);
-  changed=false;
+    file.write(editor->toPlainText().toLatin1());
+
+    changed = false;
+    filename = fname;
 }
 
 //***********************************************
@@ -539,48 +486,32 @@ void LogEdit::save_logic()
     if((ptr=(char*)strrchr(filename.c_str(),'/')))ptr++;
     else ptr=(char *)filename.c_str();
     sprintf(tmp,"File %s",ptr);
-    setCaption(tmp);
+    setWindowTitle(tmp);
   }
   else{
     sprintf(tmp,"%s/logic.%03d",game->srcdir.c_str(),LogicNum);
     save(tmp);
     sprintf(tmp,"Logic %d (file)",LogicNum);
-    setCaption(tmp);
+    setWindowTitle(tmp);
   }
 
 }
 //***********************************************
 void LogEdit::save_as()
 {
-
-  Q3FileDialog *f = new Q3FileDialog(0,"Save",true);  
-  const char *filters[] = {"logic*.*","All files (*)",NULL};
-  
-  f->setFilters(filters);
-  f->setCaption("Save");
-  f->setMode(Q3FileDialog::AnyFile);
-  f->setDir(game->srcdir.c_str());
-  if ( f->exec() == QDialog::Accepted ) {
-    if ( !f->selectedFile().isEmpty() )
-      save((char *)f->selectedFile().latin1());
-  }
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Logic File"), filename.c_str(), tr("Logic Files (logic*.*);;All Files (*)"));
+    if (!fileName.isNull()) {
+        save(fileName.toLatin1().data());
+    }
 }
 
 //***********************************************
 void LogEdit::read_logic()
 {
-
-  Q3FileDialog *f = new Q3FileDialog(0,"Read",true);  
-  const char *filters[] = {"logic*.*","All files (*)",NULL};
-  
-  f->setFilters(filters);
-  f->setCaption("Read");
-  f->setMode(Q3FileDialog::ExistingFile);
-  f->setDir(game->srcdir.c_str());
-  if ( f->exec() == QDialog::Accepted ) {
-    if ( !f->selectedFile().isEmpty() )
-      open((char *)f->selectedFile().latin1());
-  }
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Read Logic File"), game->srcdir.c_str(), tr("Logic Files (logic*.*);;All Files (*)"));
+    if (!fileName.isNull()) {
+        open(fileName.toLatin1().data());
+    }
 }
 
 //***********************************************
@@ -607,12 +538,12 @@ int LogEdit::compile_logic()
   char tmp1[16],*ptr,*ptr1;
 
   InputLines.lfree();
-  for(i=0;i<editor->numLines();i++){
-    str = editor->textLine(i);
+  for(i=0;i<editor->document()->lineCount();i++){
+    str = editor->document()->findBlockByLineNumber(i).text();
     if(!str.isNull() && str.length()>0){
-      s = (byte *)str.latin1();
+      s = (byte *)str.toLatin1().data();
       if(s[0]<0x80)  //i'm getting \221\005 at the last line...
-        InputLines.add((char *)str.latin1());
+        InputLines.add((char *)str.toLatin1().data());
     }
     else{
       InputLines.add("");
@@ -620,10 +551,10 @@ int LogEdit::compile_logic()
   }
 
   for(i=0;i<MAXWIN;i++){
-    if(winlist[i].type==TEXT){
+    if(winlist[i].type == TEXTRES){
       if(winlist[i].w.t->filename != ""){
         winlist[i].w.t->save();
-        winlist[i].w.t->status->message("");
+        winlist[i].w.t->status->showMessage("");
       }
     }
   }
@@ -631,7 +562,7 @@ int LogEdit::compile_logic()
   err=logic->compile();
 
   if(!err){
-    status->message("Compiled OK !", 2000);
+    status->showMessage("Compiled OK !", 2000);
     if(LogicNum!=-1){
       game->AddResource(LOGIC,LogicNum);
       save_logic();
@@ -651,17 +582,17 @@ int LogEdit::compile_logic()
         strncpy(name,tmp+5,(int)(ptr-tmp-6));
         name[(int)(ptr-tmp-6)]=0;
         for(i=0;i<MAXWIN;i++){
-          if(winlist[i].type==TEXT){
+          if(winlist[i].type == TEXTRES){
             filename = winlist[i].w.t->filename;
             char *ptr2;
             if((ptr2=(char*)strrchr(filename.c_str(),'/')))ptr2++;
             else ptr2=(char *)filename.c_str();            
             if(!strcmp(ptr2,name)){
               int num=atoi(ptr+5);
-              winlist[i].w.t->editor->setCursorPosition(num,0,false);
+              winlist[i].w.t->editor->textCursor().setPosition(num);
               ptr1=strchr(ptr,'\n');
               *ptr1=0;
-              winlist[i].w.t->status->message(ptr);
+              winlist[i].w.t->status->showMessage(ptr);
               break;
             }
           }
@@ -673,14 +604,14 @@ int LogEdit::compile_logic()
           for(i=0;i<MAXWIN;i++){
             if(winlist[i].type==-1){
               winlist[i].w.t = new TextEdit(NULL,NULL,i);
-              winlist[i].type=TEXT;
+              winlist[i].type = TEXTRES;
               winlist[i].w.t->open(fullname);
               ptr=(char*)strstr(tmp1.c_str(),"Line ");
               int num=atoi(ptr+5);
-              winlist[i].w.t->editor->setCursorPosition(num,0,false);
+              winlist[i].w.t->editor->textCursor().setPosition(num);
               ptr1=strchr(ptr,'\n');
               *ptr1=0;
-              winlist[i].w.t->status->message(ptr);
+              winlist[i].w.t->status->showMessage(ptr);
               break;
             }
           }
@@ -689,14 +620,15 @@ int LogEdit::compile_logic()
       else{
         ptr=strstr(tmp,"Line ");
         int num=atoi(ptr+5);
-        editor->setCursorPosition(num,0,false);
+        editor->textCursor().setPosition(num);
         ptr1=strchr(ptr,'\n');
         *ptr1=0;
-        status->message(tmp);
+        status->showMessage(tmp);
       }
       menu->errmes(tmp1,"Errors:\n%s",logic->ErrorList.c_str());
     }
   }
+
   return err;
 }
 
@@ -715,7 +647,7 @@ void LogEdit::change_logic_number()
 
   if(!changelogic->exec())return;
   QString str = changelogic->num->text();
-  int num = atoi((char *)str.latin1());  
+  int num = str.toInt();
   if(num<0||num>255){
     menu->errmes("Logic number must be between 0 and 255 !");
     return ;
@@ -742,7 +674,6 @@ void LogEdit::change_logic_number()
     resources_win->set_current(num);
   }
   open(num);
-
 }
 
 //***********************************************
@@ -761,16 +692,16 @@ void LogEdit::delete_logic()
     game->DeleteResource(LOGIC,LogicNum);
     delete_file(LogicNum);
     if(resources_win){
-      k = resources_win->list->currentItem();
+      k = resources_win->list->currentRow();
       resources_win->select_resource_type(LOGIC);
-      resources_win->list->setCurrentItem(k);
+      resources_win->list->setCurrentRow(k);
     }
     changed=false;
     close();
     break;
   case 1:       
     break;
-  } 
+  }
 }
 
 //***********************************************
@@ -833,14 +764,14 @@ void LogEdit::new_room()
     while(fgets(tmp,MAX_TMP,fptr)!=NULL){
       if((ptr=strchr(tmp,0x0a)))*ptr=0;
       if((ptr=strchr(tmp,0x0d)))*ptr=0;
-      editor->insertLine(tmp,-1);
+      editor->insertPlainText(tmp);
     }
     fclose(fptr);
     */
     if(roomgen==NULL)roomgen=new RoomGen();
     if(roomgen->exec()){
       editor->setText(roomgen->text.c_str());
-      logic->OutputText=editor->text().latin1();
+      logic->OutputText = editor->toPlainText().toStdString();
       changed=true;
     }
     break;
@@ -852,16 +783,14 @@ void LogEdit::new_room()
 //***********************************************
 void LogEdit::goto_cb()
 {
-
   AskNumber *ask_number = new AskNumber(0,0,"Go to line",
                         "Go to line: ");
 
   if(!ask_number->exec())return;
 
   QString str = ask_number->num->text();
-  int linenum = atoi((char *)str.latin1());
-  editor->setCursorPosition(linenum,0,false);
-
+  int linenum = str.toInt();
+  editor->textCursor().setPosition(linenum);
 }
 //***********************************************
 void LogEdit::find_cb()
@@ -896,7 +825,7 @@ void LogEdit::getmaxcol()
 void LogEdit::resizeEvent( QResizeEvent * )
 {
 
-  QString str = editor->text();
+  QString str = editor->toPlainText();
   getmaxcol();
   editor->setText(str);
 }
@@ -904,25 +833,14 @@ void LogEdit::resizeEvent( QResizeEvent * )
 //***********************************************
 void LogEdit::context_help()
 {
-  int para, index;
-  editor->getCursorPosition( &para, &index );
-  if ( para<0 || index<0 )
-    return;
-  QString paratxt = editor->text( para );
-  int start = index, end = index;
+    QTextCursor cursor = editor->textCursor();
+    if (!cursor.hasSelection())
+        cursor.select(QTextCursor::WordUnderCursor);
 
-  if (wordchars.find(paratxt[start]) < 0)
-    return;
+    auto word = cursor.selectedText().toLower();
 
-  // Find the bounds of the whole word
-  while( start > 0 && wordchars.find(paratxt[start-1]) >= 0 )
-    --start;
-  while( end < (int)paratxt.length() && wordchars.find(paratxt[end]) >= 0 )
-    ++end;
-
-  QString word = paratxt.mid( start, end-start ).lower();
-  if (!menu->help_topic( word ))
-    status->message("No help found for '" + word + "'", 2000);
+    if (!menu->help_topic(word))
+        status->showMessage("No help found for '" + word + "'", 2000);
 }
 
 //***********************************************
@@ -935,63 +853,63 @@ void LogEdit::command_help()
 void LogEdit::update_line_num( int para, int pos )
 {
   QString str;
-  QTextOStream( &str ) << pos << ", " << para;
-  status->message(str);
+  QTextStream(&str) << pos << ", " << para;
+  status->showMessage(str);
 }
 
 
 //*******************************************************
 TextEdit::TextEdit( QWidget *parent, const char *name,int win_num)
-    : QWidget( parent, name ,Qt::WDestructiveClose )
+    : QWidget(parent)
 {
-
-  setCaption("Text editor");
+  setAttribute(Qt::WA_DeleteOnClose);
+  setWindowTitle("Text Editor");
 
   winnum = win_num;
-  editor = new Q3MultiLineEdit(this);
+  editor = new QTextEdit(this);
   editor->setMinimumSize(380,380);
 
   QFont font;
   font.setPointSize(10);
   font.setStyleHint( QFont::TypeWriter );
   editor->setFont( font );
-  editor->setWordWrap( Q3TextEdit::NoWrap );
+  editor->setWordWrapMode( QTextOption::NoWrap );
 
-  Q3PopupMenu *file = new Q3PopupMenu( this );
+  QMenu *file = new QMenu( this );
   Q_CHECK_PTR( file );
+  file->setTitle("&File");
+  file->addAction( "&New", this, SLOT(new_text()));
+  file->addAction( "&Open", this, SLOT(open()) );
+  file->addAction( "&Save", this, SLOT(save()), Qt::CTRL + Qt::Key_S );
+  file->addAction( "Save &as", this, SLOT(save_as()) );
+  file->addSeparator();
+  file->addAction( "&Close", this, SLOT(close()) );
 
-  file->insertItem( "New", this, SLOT(new_text()));
-  file->insertItem( "Open", this, SLOT(open()) );
-  file->insertItem( "Save", this, SLOT(save()), Qt::CTRL + Qt::Key_S );
-  file->insertItem( "Save as", this, SLOT(save_as()) );
-  file->insertSeparator();
-  file->insertItem( "Close", this, SLOT(close()) );
-
-  Q3PopupMenu *edit = new Q3PopupMenu( this );
+  QMenu *edit = new QMenu( this );
   Q_CHECK_PTR( edit );
-  edit->insertItem( "Cut", editor, SLOT(cut()) , Qt::CTRL + Qt::Key_X );
-  edit->insertItem( "Copy", editor, SLOT(copy()) , Qt::CTRL + Qt::Key_C );
-  edit->insertItem( "Paste", editor, SLOT(paste()) , Qt::CTRL + Qt::Key_V);
-  edit->insertSeparator();
-  edit->insertItem( "Clear all", this, SLOT(clear_all()) );
-  edit->insertSeparator();  
-  edit->insertItem( "Find", this, SLOT(find_cb()) ,Qt::CTRL + Qt::Key_F);
-  edit->insertItem( "Find again", this, SLOT(find_again()) ,Qt::Key_F3);  
+  edit->setTitle("&Edit");
+  edit->addAction( "Cu&t", editor, SLOT(cut()) , Qt::CTRL + Qt::Key_X );
+  edit->addAction( "&Copy", editor, SLOT(copy()) , Qt::CTRL + Qt::Key_C );
+  edit->addAction( "&Paste", editor, SLOT(paste()) , Qt::CTRL + Qt::Key_V);
+  edit->addSeparator();
+  edit->addAction( "Clea&r all", this, SLOT(clear_all()) );
+  edit->addSeparator();
+  edit->addAction( "&Find", this, SLOT(find_cb()) ,Qt::CTRL + Qt::Key_F);
+  edit->addAction( "Fi&nd again", this, SLOT(find_again()) ,Qt::Key_F3);
 
   QMenuBar *menu = new QMenuBar(this);  
   Q_CHECK_PTR( menu );
-  menu->insertItem( "File", file );
-  menu->insertItem( "Edit", edit );
-  menu->setSeparator( QMenuBar::InWindowsStyle );
-  setMinimumSize(400,400);
+  menu->addMenu(file);
+  menu->addMenu(edit);
+  setMinimumSize(640, 480);
 
-  Q3BoxLayout *all = new Q3VBoxLayout(this,10);
+  QBoxLayout *all = new QVBoxLayout(this);
   all->setMenuBar(menu);
 
   all->addWidget(editor);
-  
+
   status = new QStatusBar(this);
-  QLabel *msg = new QLabel( status, "message" );
+  QLabel *msg = new QLabel("");
   status->addWidget( msg, 4 );
   all->addWidget(status);
 
@@ -1005,7 +923,7 @@ TextEdit::TextEdit( QWidget *parent, const char *name,int win_num)
 void TextEdit::deinit()
 {
   if(findedit){
-    findedit->close(true);
+    findedit->close();
     findedit=NULL;
   }
   winlist[winnum].type=-1;
@@ -1017,7 +935,7 @@ void TextEdit::hideEvent( QHideEvent * )
 {
   
   if(findedit){
-    findedit->close(true);
+    findedit->close();
     findedit=NULL;
   }
   if(window_list && window_list->isVisible())window_list->draw();
@@ -1037,8 +955,8 @@ void TextEdit::closeEvent( QCloseEvent *e )
 {
   
   if(changed){   
-    QString str = editor->text();
-    if(!strcmp(str.latin1(),OutputText.c_str())){  //not changed
+    QString str = editor->toPlainText();
+    if(!strcmp(str.toLatin1(),OutputText.c_str())){  //not changed
       deinit();
       e->accept();
       return;
@@ -1099,7 +1017,7 @@ void TextEdit::new_text()
   }
   
   filename="";
-  setCaption("New text");
+  setWindowTitle("New text");
   editor->clear();
   show();
   changed=true;
@@ -1109,57 +1027,32 @@ void TextEdit::new_text()
 //***********************************************
 void TextEdit::open()
 {
-
-  Q3FileDialog *f = new Q3FileDialog(0,"Open",true);  
-  const char *filters[] = {"All files (*)",NULL};
-
-  f->setFilters(filters);
-  f->setCaption("Open");
-  f->setMode(Q3FileDialog::ExistingFile);
-  f->setDir(game->srcdir.c_str());
-  if ( f->exec() == QDialog::Accepted ) {
-    if ( !f->selectedFile().isEmpty() ){
-      open((char *)f->selectedFile().latin1());
-      show();
-      changed=true;
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Text File"), game->srcdir.c_str(), tr("All Files (*)"));
+    if (!fileName.isNull()) {
+        open(fileName.toLatin1().data());
+        show();
+        changed = true;
     }
-  }
 }
 
 //***********************************************
-int TextEdit::open(char *filenam)
+int TextEdit::open(char *fname)
 {
-  FILE *fptr = fopen(filenam,"rb"); 
-  
-  if(fptr!=NULL){
-    struct stat buf;
-    fstat(fileno(fptr),&buf);
-    editor->clear();
-    char *ptr;
-    QString filecont;
-    while(fgets(tmp,MAX_TMP,fptr)!=NULL){
-      if((ptr=strchr(tmp,0x0a)))*ptr=0;
-      if((ptr=strchr(tmp,0x0d)))*ptr=0;
-      filecont += QString(tmp) + "\n";
+    QFile file(fname);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        menu->errmes("Can't open file '%s'!", fname);
+        return 1;
     }
-    editor->setText( filecont );
-    fclose(fptr);
-    OutputText=editor->text().latin1();
-    filename = string(filenam);
-    char *name = strrchr(filenam,'/');
-    if(name==NULL)name=filenam;
-    else name++;
-    QString str;
-    str.sprintf("file %s",name);
-    setCaption(str);    
+
+    QByteArray contents = file.readAll();
+    editor->setText(contents);
+    OutputText = editor->toPlainText().toStdString();
+
+    filename = fname;
+    setWindowTitle(file.fileName());
     show();
-    changed=true;
+    changed = true;
     return 0;
-  }
-  else{
-    menu->errmes("Can't open file %s !",filenam);
-    return 1;
-  }
 }
 
 //***********************************************
@@ -1176,46 +1069,25 @@ void TextEdit::save()
 //***********************************************
 void TextEdit::save_as()
 {
-
-  Q3FileDialog *f = new Q3FileDialog(0,"Save",true);  
-  const char *filters[] = {"All files (*)",NULL};
-  
-  f->setFilters(filters);
-  f->setCaption("Save");
-  f->setMode(Q3FileDialog::AnyFile);
-  f->setDir(game->srcdir.c_str());
-  if ( f->exec() == QDialog::Accepted ) {
-    if ( !f->selectedFile().isEmpty() )
-      save((const char *)f->selectedFile().latin1());
-  }
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Text File"), filename.c_str(), tr("All Files (*)"));
+    if (!fileName.isNull()) {
+        save(fileName.toLatin1());
+    }
 }
 
 //***********************************************
-void TextEdit::save(const char *filename)
+void TextEdit::save(const char *fname)
 {
-
-  QString str;
-  byte *s;
-  FILE *fptr;
-
-  if((fptr=fopen(filename,"wb"))==NULL){
-    menu->errmes("Can't open file %s !\n",filename);
-    return;
-  }
-  for(int i=0;i<editor->numLines();i++){
-    str = editor->textLine(i);
-    if(!str.isNull()){
-      s = (byte *)str.latin1();
-      fprintf(fptr,"%s\n",s);
+    QFile file(fname);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        menu->errmes("Can't save file '%s'!", fname);
+        return;
     }
-  }
-  fclose(fptr);
-  changed=false;
-  char *ptr;
-  if((ptr=(char*)strrchr(filename,'/')))ptr++;
-  else ptr=(char *)filename;
-  sprintf(tmp,"File %s",ptr);
-  setCaption(tmp);
+    file.write(editor->toPlainText().toLatin1());
+
+    changed = false;
+    filename = fname;
+    setWindowTitle(file.fileName());
 }
 
 //***********************************************
@@ -1254,18 +1126,20 @@ void TextEdit::find_again()
 }
 
 //***********************************************
-FindEdit::FindEdit( QWidget *parent, const char *name, Q3MultiLineEdit *edit ,QStatusBar *s)
-    : QWidget( parent, name ,Qt::WDestructiveClose)
+FindEdit::FindEdit( QWidget *parent, const char *name, QTextEdit *edit ,QStatusBar *s)
+    : QWidget(parent)
 {
-  setCaption("Find");
-  //  setMinimumSize(340,140);
+  setAttribute(Qt::WA_DeleteOnClose);
+  setWindowTitle("Find");
+  setMinimumSize(340,140);
 
   status = s;
   editor = edit;
 
-  Q3BoxLayout *all =  new Q3VBoxLayout(this,10);
+  QBoxLayout *all =  new QVBoxLayout(this);
 
-  Q3BoxLayout *txt = new Q3HBoxLayout(all,4);
+  QBoxLayout *txt = new QHBoxLayout(this);
+  all->addLayout(txt);
 
   QLabel *label = new QLabel("Find what:",this);  
   txt->addWidget(label);
@@ -1275,32 +1149,41 @@ FindEdit::FindEdit( QWidget *parent, const char *name, Q3MultiLineEdit *edit ,QS
   connect( find_field, SIGNAL(returnPressed()), SLOT(find_first_cb()) );
   txt->addWidget(find_field);
 
-  Q3BoxLayout *left1 =  new Q3HBoxLayout(all,10);
+  QBoxLayout *left1 =  new QHBoxLayout(this);
+  all->addLayout(left1);
 
-  Q3ButtonGroup *direction = new Q3ButtonGroup(2,Qt::Vertical,"Dir",this);
-  up = new QRadioButton("Up",direction);
-  up->setChecked(false);
-  down = new QRadioButton("Down",direction);
+  QVBoxLayout *dirbox = new QVBoxLayout();
+  QGroupBox *direction = new QGroupBox("Direction", this);
+  up = new QRadioButton("Up", direction);
+  down = new QRadioButton("Down", direction);
   down->setChecked(true);
+  dirbox->addWidget(up);
+  dirbox->addWidget(down);
   left1->addWidget(direction);
+  direction->setLayout(dirbox);
 
-  Q3ButtonGroup *from = new Q3ButtonGroup(2,Qt::Vertical,"From",this);
-  start = new QRadioButton("Start",from);
+  QVBoxLayout *frombox = new QVBoxLayout();
+  QGroupBox *from = new QGroupBox("From", this);
+  start = new QRadioButton("Start", from);
+  current = new QRadioButton("Current", from);
   start->setChecked(true);
-  current = new QRadioButton("Current",from);
-  current->setChecked(false);
+  frombox->addWidget(start);
+  frombox->addWidget(current);
   left1->addWidget(from);
+  from->setLayout(frombox);
 
-
-  Q3GroupBox *type = new Q3GroupBox(2,Qt::Vertical,"Match",this);
-  match_whole = new QCheckBox("Match exact",type);  
-  //  box->addWidget(match_whole);
+  QVBoxLayout *typebox = new QVBoxLayout();
+  QGroupBox *type = new QGroupBox("Match", this);
+  match_whole = new QCheckBox("Match exact",type);
   match_case = new QCheckBox("Match case",type);
-  // box->addWidget(match_case);
+  typebox->addWidget(match_whole);
+  typebox->addWidget(match_case);
   left1->addWidget(type);
+  type->setLayout(typebox);
 
 
-  Q3BoxLayout *right =  new Q3VBoxLayout(left1,5);  
+  QBoxLayout *right =  new QVBoxLayout(this);
+  left1->addLayout(right);
   find_first = new QPushButton("Find",this);
   right->addWidget(find_first);
   connect( find_first, SIGNAL(clicked()), SLOT(find_first_cb()) );
@@ -1311,7 +1194,6 @@ FindEdit::FindEdit( QWidget *parent, const char *name, Q3MultiLineEdit *edit ,QS
   connect( cancel, SIGNAL(clicked()), SLOT(cancel_cb()) );
   right->addWidget(cancel);
 
-
   adjustSize();
   curline=0;
 
@@ -1320,117 +1202,40 @@ FindEdit::FindEdit( QWidget *parent, const char *name, Q3MultiLineEdit *edit ,QS
 //***********************************************
 void FindEdit::find_first_cb()
 {
-
   if(current->isChecked()){
-    int line,col;
-    editor->getCursorPosition(&line,&col);
-    curline=line;
+    curline = editor->textCursor().position();
   }
   else if(down->isChecked()){
     curline=0;
   }
   else{
-    curline=editor->numLines()-1;
+    curline = editor->toPlainText().length();
   }
 
   find_next_cb();
-
 }
 
 //***********************************************
 void FindEdit::find_next_cb()
 {
+  QTextDocument::FindFlags flags;
+  if (match_whole->isChecked())
+      flags |= QTextDocument::FindWholeWords;
+  if (match_case->isChecked())
+      flags |= QTextDocument::FindCaseSensitively;
+  if (!down->isChecked())
+      flags |= QTextDocument::FindBackward;
 
-  int k;
-  QString str;
-  QString w = find_field->text();
-  char *word = (char *)w.latin1();
-  int len = strlen(word);
-  if(len==0)return;
-  char *ptr,*ptr0,*ww,*ww0;
-  int num=editor->numLines();
-  bool mwhole=match_whole->isChecked();
-  bool mcase=!(match_case->isChecked());
-  bool found;
-
-  if(mcase)toLower(word);
-
-  if(down->isChecked()){  
-    if(curline<0)curline=0;
-    for(;curline<num;curline++){
-      str = editor->textLine(curline);
-      ww = (char *)str.latin1();
-      ww0=ww;
-      if(mcase)toLower(ww);
-      if(mwhole){
-        ptr0=ww;
-        found=false;
-        do{
-          ptr=strstr(ptr0,word);
-          if(!ptr)break;
-          ptr0=ptr+len;
-          if(ptr>ww && isalnum(*(ptr-1)))continue;
-          if(isalnum(*ptr0))continue;
-          found=true;
-        }while(!found);
-        if(!found)continue;
-      }
-      else{
-        if((ptr=strstr(ww,word))==NULL)continue;
-      }
-      k=int(ptr-ww);
-      editor->setCursorPosition(curline,k,false);
-      editor->setSelection(curline,k,curline,k+len);
-      sprintf(tmp,"%d: %s",curline,ww0);
-      status->message(tmp);
-      curline++;
-      return;      
-    }
-  }
-  else{
-    if(curline>=num)curline=num-1;
-    for(;curline>=0;curline--){
-      str = editor->textLine(curline);
-      ww = (char *)str.latin1();
-      ww0=ww;
-      if(mcase)toLower(ww);
-      if((ptr=strstr(ww,word))==NULL)continue;
-      if(mwhole){
-        ptr0=ww;
-        found=false;
-        do{
-          ptr=strstr(ptr0,word);
-          if(!ptr)break;
-          ptr0=ptr+len;
-          if(ptr>ww && isalnum(*(ptr-1)))continue;
-          if(isalnum(*ptr0))continue;
-          found=true;
-        }while(!found);
-        if(!found)continue;
-      }
-      else{
-        if((ptr=strstr(ww,word))==NULL)continue;
-      }      
-      k=int(ptr-ww);
-      editor->setCursorPosition(curline,k,false);
-      editor->setSelection(curline,k,curline,k+len);      
-      sprintf(tmp,"%d: %s",curline,ww0);
-      status->message(tmp);
-      curline--;
-      return;      
-    }
-  }
-  menu->errmes("Find","'%s' not found !",word);
-  status->clear();
-
+  if (!editor->find(find_field->text(), flags))
+      menu->errmes("Find", "'%s' not found!", find_field->text().toStdString().c_str());
+  status->showMessage("");
 }
 
 //***********************************************
 void FindEdit::cancel_cb()
 {
-
   hide();
-  status->clear();
+  status->clearMessage();
 }
 //***********************************************
 

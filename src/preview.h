@@ -26,16 +26,15 @@
 #include "resources.h"
 
 #include <string>
-#include <qwidget.h>
-#include <q3widgetstack.h>
-#include <qlabel.h>
-#include <qlayout.h>
-#include <qradiobutton.h>
-#include <qpushbutton.h>
-#include <qpixmap.h>
-#include <q3multilineedit.h>
-#include <qcombobox.h>
-//Added by qt3to4:
+#include <QWidget>
+#include <QLabel>
+#include <QLayout>
+#include <QRadioButton>
+#include <QPushButton>
+#include <QPixmap>
+#include <QTextEdit>
+#include <QComboBox>
+#include <QStackedWidget>
 #include <QShowEvent>
 #include <QHideEvent>
 #include <QCloseEvent>
@@ -83,17 +82,17 @@ class ResourcesWin;
 class LogEdit;
 
 //****************************************************
-class Preview : public Q3WidgetStack
+class Preview : public QStackedWidget
 {
     Q_OBJECT
 public:
     Preview( QWidget* parent = 0, const char*  name=0, ResourcesWin *res=0);
-    Q3MultiLineEdit *description;
+    QTextEdit *description;
     ResourcesWin *resources_win;
     void open(int i,int type);
 public slots:
     void double_click();
-    void change_mode(int);
+    void change_mode();
     void previous_loop(void);
     void next_loop(void);
     void previous_cel(void);

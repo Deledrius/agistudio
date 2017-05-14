@@ -37,7 +37,6 @@
   #include <direct.h>
   #include <process.h>
   #include <windows.h>
-  #define TEXT 6
 #else
   #include <unistd.h>
 #endif
@@ -45,22 +44,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <qapplication.h>
-#include <qpixmap.h>
-#include <q3toolbar.h>
-#include <qtoolbutton.h>
-#include <qtooltip.h>
-#ifdef IMGEXT
-  #include <qimageio.h>
-#endif
-#include <q3stylesheet.h>
-//Added by qt3to4:
-#include <Q3HBoxLayout>
+#include <QApplication>
+#include <QPixmap>
+#include <QToolButton>
+#include <QTooltip>
 #include <QLabel>
-#include <Q3PopupMenu>
-#include <Q3VBoxLayout>
-#include <Q3BoxLayout>
 #include <QCloseEvent>
+#include <QToolBar>
 
 #include "toolbar_open.xpm"
 #include "toolbar_close.xpm"
@@ -82,153 +72,133 @@ WinList winlist[MAXWIN];  //list of all open resource editor windows
 
 //*************************************************
 Menu::Menu( QWidget *parent, const char *name )
-    : Q3MainWindow( parent, name )
+    : QMainWindow(parent)
 {
   int n=0;
 
-  setCaption("AGI Studio");
-  setIcon((const char**)app_icon);
+  setWindowTitle("AGI Studio");
+  setWindowIcon(QPixmap(app_icon));
 
-  Q3PopupMenu *new_game = new Q3PopupMenu( this );
+  QMenu *new_game = new QMenu(this);
   Q_CHECK_PTR( new_game );
+  new_game->setTitle("&New");
+  new_game->addAction( "From &Template", this, SLOT(from_template()) );
+  new_game->addAction( "&Blank", this, SLOT(blank()) );
 
-  new_game->insertItem ( "From &Template", this, SLOT(from_template()) );
-  new_game->insertItem ( "&Blank", this, SLOT(blank()) );
-
-  Q3PopupMenu *game = new Q3PopupMenu( this );
+  QMenu *game = new QMenu(this);
   Q_CHECK_PTR( game );
+  game->setTitle("&Game");
+  game->addMenu(new_game);
+  game->addAction( "&Open", this, SLOT(open_game()) );
+  id[n++] = game->addAction( "&Close", this, SLOT(close_game()) );
+  id[n++] = game->addAction( "&Run", this, SLOT(run_game()), Qt::CTRL+Qt::Key_R );
+  game->addSeparator();
+  game->addAction( "&Settings...", this, SLOT(settings()) );
+  game->addSeparator();
+  game->addAction("E&xit", this, SLOT(quit_cb()), Qt::ALT + Qt::Key_F4);
 
-  game->insertItem ( "&New", new_game );
-  game->insertItem ( "&Open", this, SLOT(open_game()) );
-  id[n++] = game->insertItem ( "&Close", this, SLOT(close_game()) );
-  id[n++] = game->insertItem ( "&Run", this, SLOT(run_game()), Qt::CTRL+Qt::Key_R );
-  game->insertSeparator();
-  game->insertItem ( "&Settings", this, SLOT(settings()) );
-  game->insertSeparator();
-  game->insertItem( "E&xit",  this, SLOT(quit_cb()), Qt::CTRL+Qt::Key_Q );
-
-  Q3PopupMenu *resource = new Q3PopupMenu( this );
+  QMenu *resource = new QMenu(this);
   Q_CHECK_PTR( resource );
-
-  id[n++] = resource->insertItem ("New window", this, SLOT(new_resource_window()));
-  resource->insertSeparator();
+  resource->setTitle("&Resource");
+  id[n++] = resource->addAction("New window", this, SLOT(new_resource_window()));
+  resource->addSeparator();
   n_res=n;
-  id[n++] = resource->insertItem ( "&Add", this, SLOT(add_resource()) );
-  id[n++] = resource->insertItem ( "&Extract", this, SLOT(extract_resource()) );
-  id[n++] = resource->insertItem ( "&Delete", this, SLOT(delete_resource()) );
-  id[n++] = resource->insertItem ( "&Renumber", this, SLOT(renumber_resource()) );
-  resource->insertSeparator();
-  id[n++] = resource->insertItem ( "Re&build VOL files", this, SLOT(rebuild_vol()) );
-  id[n++] = resource->insertItem ( "Recompile all", this, SLOT(recompile_all()) );
+  id[n++] = resource->addAction( "&Add", this, SLOT(add_resource()) );
+  id[n++] = resource->addAction( "&Extract", this, SLOT(extract_resource()) );
+  id[n++] = resource->addAction( "&Delete", this, SLOT(delete_resource()) );
+  id[n++] = resource->addAction( "&Renumber", this, SLOT(renumber_resource()) );
+  resource->addSeparator();
+  id[n++] = resource->addAction( "Re&build VOL files", this, SLOT(rebuild_vol()) );
+  id[n++] = resource->addAction( "Recompile all", this, SLOT(recompile_all()) );
 
-
-  Q3PopupMenu *tools = new Q3PopupMenu( this );
+  QMenu *tools = new QMenu(this);
   Q_CHECK_PTR( tools );
+  tools->setTitle("&Tools");
+  id[n++] = tools->addAction( "&View Editor", this, SLOT(view_editor()) );
+  id[n++] = tools->addAction( "&Logic Editor", this, SLOT(logic_editor()) );
+  id[n++] = tools->addAction( "&Text Editor", this, SLOT(text_editor()) );
+  id[n++] = tools->addAction( "&Object Editor", this, SLOT(object_editor()) );
+  id[n++] = tools->addAction( "&Words.tok Editor", this, SLOT(words_editor()) );
+  id[n++] = tools->addAction( "&Picture Editor", this, SLOT(picture_editor()) );
+  id[n++] = tools->addAction( "&Sound Player", this, SLOT(sound_player()) );
 
-  id[n++] = tools->insertItem ( "&View Editor", this, SLOT(view_editor()) );
-  id[n++] = tools->insertItem ( "&Logic Editor", this, SLOT(logic_editor()) );
-  id[n++] = tools->insertItem ( "&Text Editor", this, SLOT(text_editor()) );
-  id[n++] = tools->insertItem ( "&Object Editor", this, SLOT(object_editor()) );
-  id[n++] = tools->insertItem ( "&Words.tok Editor", this, SLOT(words_editor()) );
-  id[n++] = tools->insertItem ( "&Picture Editor", this, SLOT(picture_editor()) );
-  id[n++] = tools->insertItem ( "&Sound Player", this, SLOT(sound_player()) );
+  QMenu *help = new QMenu(this);
+  Q_CHECK_PTR(help);
+  help->setTitle("&Help");
+  help->addAction("&Contents", this, SLOT(help_contents()));
+  help->addAction("&Index", this, SLOT(help_index()), Qt::Key_F1);
+  help->addSeparator();
+  help->addAction("About", this, SLOT(about_it()));
+  help->addAction("About QT", this, SLOT(about_qt()));
 
-  Q3PopupMenu *help = new Q3PopupMenu( this );
-  Q_CHECK_PTR( help );
+  QMenu *window = menuBar()->addMenu("&Window");
+  Q_CHECK_PTR(window);
+  window->addAction("Save all", this, SLOT(save_all()));
+  window->addAction("Save all and run", this, SLOT(save_and_run()));
+  window->addAction("Window list", this, SLOT(window_list_cb()));
 
-  help->insertItem ( "&Contents", this, SLOT(help_contents()) );
-  help->insertItem ( "&Index", this, SLOT(help_index()), Qt::Key_F1);
-  help->insertSeparator();
-  help->insertItem ( "About", this, SLOT(about_it()) );
-  help->insertItem ( "About QT", this, SLOT(about_qt()) );
-
-  Q3PopupMenu *window = new Q3PopupMenu( this );
-  Q_CHECK_PTR( window );
-
-  window->insertItem ( "Save all", this, SLOT(save_all()) );
-  window->insertItem ( "Save all and run", this, SLOT(save_and_run()) );
-  window->insertItem ( "Window list", this, SLOT(window_list_cb()) );
-
-  menubar = new QMenuBar(this);
+  menubar = menuBar();
   Q_CHECK_PTR( menubar );
-  menubar->insertItem( "&Game", game );
-  menubar->insertItem( "&Resource", resource );
-  menubar->insertItem( "&Tools", tools );
-  menubar->insertItem( "Window", window );
-  menubar->insertSeparator();
-  menubar->insertItem( "&Help", help );
-  menubar->setSeparator( QMenuBar::InWindowsStyle );
+  menubar->addMenu(game);
+  menubar->addMenu(resource);
+  menubar->addMenu(tools);
+  menubar->addMenu(window);
+  menubar->addSeparator();
+  menubar->addMenu(help);
 
+  QToolBar *toolbar = addToolBar(tr("Main"));
 
-  Q3ToolBar *toolbar = new Q3ToolBar(this);
-  open = new QPushButton(toolbar);
-  open->setPixmap((const char**)toolbar_open);
-  connect( open, SIGNAL(clicked()), SLOT(open_game()) );
-  QToolTip::add( open, "Open game" );
+  open = new QAction((QPixmap)toolbar_open, "Open game", toolbar);
+  connect(open, &QAction::triggered, this, &Menu::open_game);
+  toolbar->addAction(open);
 
-  close_ = new QPushButton(toolbar);
-  close_->setPixmap((const char**)toolbar_close);
-  connect( close_, SIGNAL(clicked()), SLOT(close_game()) );
-  QToolTip::add( close_, "Close game" );
+  close_ = new QAction((QPixmap)toolbar_close, "Close game", toolbar);
+  connect(close_, &QAction::triggered, this, &Menu::close_game);
+  toolbar->addAction(close_);
 
-  run = new QPushButton(toolbar);
-  run->setPixmap((const char**)toolbar_run);
-  connect( run, SIGNAL(clicked()), SLOT(run_game()) );
-  QToolTip::add( run, "Run game" );
+  run = new QAction((QPixmap)toolbar_run, "Run game", toolbar);
+  connect(run, &QAction::triggered, this, &Menu::run_game);
+  toolbar->addAction(run);
 
-  view = new QPushButton(toolbar);
-  view->setPixmap((const char**)toolbar_viewedit);
-  connect( view, SIGNAL(clicked()), SLOT(view_editor()) );
-  QToolTip::add( view, "View editor" );
+  view = new QAction((QPixmap)toolbar_viewedit, "View Editor", toolbar);
+  connect(view, &QAction::triggered, this, &Menu::view_editor);
+  toolbar->addAction(view);
 
-  logic = new QPushButton(toolbar);
-  logic->setPixmap((const char**)toolbar_logedit);
-  connect( logic, SIGNAL(clicked()), SLOT(logic_editor()) );
-  QToolTip::add( logic, "Logic editor" );
+  logic = new QAction((QPixmap)toolbar_logedit, "Logic Editor", toolbar);
+  connect(logic, &QAction::triggered, this, &Menu::logic_editor);
+  toolbar->addAction(logic);
 
-  text = new QPushButton(toolbar);
-  text->setPixmap((const char**)toolbar_textedit);
-  connect( text, SIGNAL(clicked()), SLOT(text_editor()) );
-  QToolTip::add( text, "Text editor" );
+  text = new QAction((QPixmap)toolbar_textedit, "Text Editor", toolbar);
+  connect(text, &QAction::triggered, this, &Menu::text_editor);
+  toolbar->addAction(text);
 
-  obj = new QPushButton(toolbar);
-  obj->setPixmap((const char**)toolbar_objedit);
-  connect( obj, SIGNAL(clicked()), SLOT(object_editor()) );
-  QToolTip::add( obj, "Object editor" );
+  obj = new QAction((QPixmap)toolbar_objedit, "Object Editor", toolbar);
+  connect(obj, &QAction::triggered, this, &Menu::object_editor);
+  toolbar->addAction(obj);
 
-  words = new QPushButton(toolbar);
-  words->setPixmap((const char**)toolbar_wordsedit);
-  connect( words, SIGNAL(clicked()), SLOT(words_editor()) );
-  QToolTip::add( words, "WORDS.TOK editor" );
+  words = new QAction((QPixmap)toolbar_wordsedit, "WORDS.TOK editor", toolbar);
+  connect(words, &QAction::triggered, this, &Menu::words_editor);
+  toolbar->addAction(words);
 
-  pic = new QPushButton(toolbar);
-  pic->setPixmap((const char**)toolbar_picedit);
-  connect( pic, SIGNAL(clicked()), SLOT(picture_editor()) );
-  QToolTip::add( pic, "Picture editor" );
+  pic = new QAction((QPixmap)toolbar_picedit, "Picture Editor", toolbar);
+  connect(pic, &QAction::triggered, this, &Menu::picture_editor);
+  toolbar->addAction(pic);
 
-  toolbar->setMovingEnabled(false);
-  toolbar->setResizeEnabled(false);
+  toolbar->setMovable(false);
   toolbar->show();
 
-  status = new QStatusBar(this);
-  QLabel *msg = new QLabel( status, "message" );
+  status = statusBar();
+  QLabel *msg = new QLabel("", status);
   status->addWidget( msg, 4 );
   status->setSizeGripEnabled(false);
 
-  err = new QMessageBox(NULL, "AGI Studio");
-  err->setIcon(QMessageBox::Critical);
-  err->hide();
-
-  warn = new QMessageBox(NULL, "AGI Studio");
-  warn->setIcon(QMessageBox::Warning);
-  warn->hide();
+  err = new QMessageBox(QMessageBox::Critical, tr("AGI Studio"), tr(""));
+  warn = new QMessageBox(QMessageBox::Warning, tr("AGI Studio"), tr(""));
 
   max_disabled = n;
   disable();
-
   adjustSize();
-  setSizePolicy( QSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed ));
-  setFixedSize( toolbar->sizeHint());
+  setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
 
   for(int i=0;i<MAXWIN;i++){
     winlist[i].type=-1;
@@ -262,7 +232,7 @@ void Menu::disable()
 {
 
   for(int i=0;i<max_disabled;i++){
-    menubar->setItemEnabled( id[i], FALSE );
+    id[i]->setEnabled(false);
   }
   close_->setEnabled(false);
   run->setEnabled(false);
@@ -278,7 +248,7 @@ void Menu::enable()
 {
 
   for(int i=0;i<max_disabled;i++){
-    menubar->setItemEnabled( id[i], TRUE );
+      id[i]->setEnabled(true);
   }
   close_->setEnabled(true);
   run->setEnabled(true);
@@ -352,7 +322,7 @@ void Menu::dec_res()
 void Menu::enable_resources()
 {
   for(int i=n_res;i<n_res+4;i++){
-    menubar->setItemEnabled( id[i], TRUE );
+      id[i]->setEnabled(true);
   }
 
 
@@ -362,7 +332,7 @@ void Menu::disable_resources()
 {
 
   for(int i=n_res;i<n_res+4;i++){
-    menubar->setItemEnabled( id[i], FALSE );
+      id[i]->setEnabled(false);
   }
 
 }
@@ -414,7 +384,7 @@ void Menu::close_game()
       case WORDS:
         winlist[i].w.w->close();
         break;
-      case TEXT:
+      case TEXTRES:
         winlist[i].w.t->close();
         break;
       }
@@ -424,7 +394,7 @@ void Menu::close_game()
   int n;
   for(i=0;i<MAXWIN;i++){
     n=winlist[i].type;
-    if(n>=LOGIC&&n<=TEXT)
+    if(n >= LOGIC && n <= TEXTRES)
       return ;  //some window was not closed
   }
 
@@ -672,7 +642,7 @@ void Menu::text_editor()
   int n;
   if((n=get_win())==-1)return;
   winlist[n].w.t = new TextEdit(NULL,NULL,n);
-  winlist[n].type=TEXT;
+  winlist[n].type = TEXTRES;
   winlist[n].w.t->new_text();
 
 }
@@ -684,7 +654,7 @@ void Menu::object_editor()
   int n;
   if((n=get_win())==-1)return;
   winlist[n].w.o = new ObjEdit(NULL,NULL,n);
-  winlist[n].type=OBJECT;
+  winlist[n].type = OBJECT;
   winlist[n].w.o->open();
 
 }
@@ -696,7 +666,7 @@ void Menu::words_editor()
   int n;
   if((n=get_win())==-1)return;
   winlist[n].w.w = new WordsEdit(NULL,NULL,n,resources_win);
-  winlist[n].type=WORDS;
+  winlist[n].type = WORDS;
   winlist[n].w.w->open();
 
 }
@@ -716,21 +686,12 @@ void Menu::picture_editor()
 //**********************************************
 void Menu::sound_player()
 {
-  extern void play_sound (char *);
+    extern void play_sound(char *);
 
-  Q3FileDialog *f = new Q3FileDialog(0,"Play sound",true);
-  const char *filters[] = {"sound*.*","All files (*)",NULL};
-
-  f->setFilters(filters);
-  f->setCaption("Play sound");
-  f->setMode(Q3FileDialog::ExistingFile);
-  f->setDir(game->srcdir.c_str());
-  if ( f->exec() == QDialog::Accepted ) {
-    if ( !f->selectedFile().isEmpty() ){
-      play_sound((char *)f->selectedFile().latin1());
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Play Sound File"), game->srcdir.c_str(), tr("Sound Files (sound*.*);;All Files (*)"));
+    if (!fileName.isNull()) {
+        play_sound(fileName.toLatin1().data());
     }
-  }
-
 }
 
 //**********************************************
@@ -753,14 +714,14 @@ void Menu::help_contents()
 bool Menu::help_topic( const QString& topic )
 {
   sprintf(tmp,"%s/%s.html",game->helpdir.c_str(),
-    QString(topic).replace(".", "_").latin1());
+    QString(topic).replace(".", "_").toLatin1().constData());
 
-  if ( QFile( tmp ).exists())
+  if (QFile(tmp).exists())
   {
     if(helpwindow1==NULL){
       int n;
       if((n=get_win())==-1) return true;
-      helpwindow1 = new HelpWindow(tmp,".");
+      helpwindow1 = new HelpWindow(tmp, ".");
       winlist[n].type=HELPWIN;
       winlist[n].w.h=helpwindow1;
     }
@@ -814,7 +775,7 @@ void Menu::errmes(const char *caption, const char *fmt, ...)
   va_end(argp);
 
   err->setText(QString(tmp));
-  err->setCaption(caption);
+  err->setWindowTitle(caption);
   err->adjustSize();
   err->show();
 
@@ -832,7 +793,7 @@ void Menu::errmes(const char *fmt, ...)
   va_end(argp);
 
   err->setText(QString(tmp));
-  err->setCaption("AGI studio");
+  err->setWindowTitle("AGI studio");
   err->adjustSize();
   err->show();
 
@@ -850,7 +811,7 @@ void Menu::warnmes(const char *fmt, ...)
   va_end(argp);
 
   warn->setText(QString(tmp));
-  warn->setCaption("AGI studio");
+  warn->setWindowTitle("AGI studio");
   warn->adjustSize();
   warn->show();
 
@@ -873,11 +834,11 @@ void Menu::load_imgext()
 //**********************************************
 
 About::About(QWidget *parent, const char *name )
-    : QWidget( parent, name )
+    : QWidget(parent)
 {
-  setCaption("About QT AGI Studio");
+  setWindowTitle("About QT AGI Studio");
 
-  Q3BoxLayout *all = new Q3VBoxLayout(this,2);
+  QBoxLayout *all = new QVBoxLayout(this);
 
   QLabel *alogo = new QLabel(this);
   alogo->setPixmap(QPixmap(logo));
@@ -885,8 +846,7 @@ About::About(QWidget *parent, const char *name )
   alogo->setSizePolicy( QSizePolicy( QSizePolicy::Minimum, QSizePolicy::Minimum ));
   all->addWidget(alogo);
 
-  Q3TextEdit* about = new Q3TextEdit(this);
-  about->setTextFormat(Qt::RichText);
+  QTextEdit* about = new QTextEdit(this);
   about->setReadOnly(true);
   about->setText(
     "<center><b>QT AGI studio v. 1.3.0</b><br>"
@@ -916,42 +876,40 @@ About::About(QWidget *parent, const char *name )
   ok->setMaximumSize(80,40);
   connect(ok, SIGNAL(clicked()), SLOT(hide()));
   all->addWidget(ok);
-
-
 }
 
 //**********************************************
 
 WindowList::WindowList(QWidget *parent, const char *name )
-    : QWidget( parent, name )
+    : QWidget(parent)
 {
+  setWindowTitle("Window list");
+  QBoxLayout *l =  new QVBoxLayout(this);
 
-  setCaption("Window list");
-  Q3BoxLayout *l =  new Q3VBoxLayout(this,10);
-
-  win = new Q3ListBox(this);
-  win->setColumnMode (1);
+  win = new QListWidget(this);
   win->setMinimumSize(100,200);
   connect( win, SIGNAL(selected(int)), SLOT(select_cb(int)) );
-  l->add(win);
+  l->addWidget(win);
 
-  Q3BoxLayout *l1 = new Q3HBoxLayout(l,10);
+  QBoxLayout *l1 = new QHBoxLayout();
+  l->addLayout(l1);
 
   QPushButton *select = new QPushButton(this);
   select->setText("Select");
   connect( select, SIGNAL(clicked()), SLOT(select_ok()) );
   l1->addWidget(select);
+
   QPushButton *del = new QPushButton(this);
   del->setText("Delete");
   connect( del, SIGNAL(clicked()), SLOT(del_cb()) );
   l1->addWidget(del);
+
   QPushButton *close = new QPushButton(this);
   close->setText("Close list");
   connect( close, SIGNAL(clicked()), SLOT(hide()) );
   l1->addWidget(close);
 
   adjustSize();
-
 }
 
 //**********************************************
@@ -966,31 +924,31 @@ void WindowList::draw()
     //    printf("i=%d type=%d\n",i,winlist[i].type);
     switch(winlist[i].type){
     case LOGIC:
-      caption = QString("Logic editor: ").append(winlist[i].w.l->caption());
+      caption = QString("Logic editor: ").append(winlist[i].w.l->windowTitle());
       if(winlist[i].w.l->isMinimized())caption.insert(0,"(.) ");
       break;
     case PICTURE:
-      caption = winlist[i].w.p->caption();
+      caption = winlist[i].w.p->windowTitle();
       if(winlist[i].w.p->isMinimized())caption.insert(0,"(.) ");
       break;
     case VIEW:
-      caption = winlist[i].w.v->caption();
+      caption = winlist[i].w.v->windowTitle();
       if(winlist[i].w.v->isMinimized())caption.insert(0,"(.) ");
       break;
     case OBJECT:
-      caption = winlist[i].w.o->caption();
+      caption = winlist[i].w.o->windowTitle();
       if(winlist[i].w.o->isMinimized())caption.insert(0,"(.) ");
       break;
     case WORDS:
-      caption = winlist[i].w.w->caption();
+      caption = winlist[i].w.w->windowTitle();
       if(winlist[i].w.w->isMinimized())caption.insert(0,"(.) ");
       break;
-    case TEXT:
-      caption = winlist[i].w.t->caption();
+    case TEXTRES:
+      caption = winlist[i].w.t->windowTitle();
       if(winlist[i].w.t->isMinimized())caption.insert(0,"(.) ");
       break;
     case RESOURCES:
-      caption = winlist[i].w.r->caption();
+      caption = winlist[i].w.r->windowTitle();
       if(winlist[i].w.r->isMinimized())caption.insert(0,"(.) ");
       break;
     case HELPWIN:
@@ -999,13 +957,12 @@ void WindowList::draw()
       else if(!winlist[i].w.h->isVisible())caption.insert(0,"(~) ");
       break;
     case PREVIEW:
-      caption = winlist[i].w.pr->caption();
+      caption = winlist[i].w.pr->windowTitle();
       if(winlist[i].w.pr->isMinimized())caption.insert(0,"(.) ");
       break;
     }
-    win->insertItem(caption);
+    win->addItem(caption);
   }
-
   show();
 }
 
@@ -1023,87 +980,87 @@ void WindowList::select_cb(int sel)
       case LOGIC:
         if(winlist[i].w.l->isMinimized()){
           winlist[i].w.l->showNormal();
-          caption = QString("Logic editor: ").append(winlist[i].w.l->caption());
-          win->changeItem(caption,sel);
+          caption = QString("Logic editor: ").append(winlist[i].w.l->windowTitle());
+          win->setCurrentRow(sel);
         }
-        winlist[i].w.l->setActiveWindow();
+        winlist[i].w.l->activateWindow();
         winlist[i].w.l->raise();
         break;
       case PICTURE:
         if(winlist[i].w.p->isMinimized()){
           winlist[i].w.p->showNormal();
-           caption = winlist[i].w.p->caption();
-           win->changeItem(caption,sel);
+           caption = winlist[i].w.p->windowTitle();
+           win->setCurrentRow(sel);
         }
-        winlist[i].w.p->setActiveWindow();
+        winlist[i].w.p->activateWindow();
         winlist[i].w.p->raise();
         break;
       case VIEW:
         if(winlist[i].w.v->isMinimized()){
           winlist[i].w.v->showNormal();
-          caption = winlist[i].w.v->caption();
-          win->changeItem(caption,sel);
+          caption = winlist[i].w.v->windowTitle();
+          win->setCurrentRow(sel);
         }
-        winlist[i].w.v->setActiveWindow();
+        winlist[i].w.v->activateWindow();
         winlist[i].w.v->raise();
         break;
-      case TEXT:
+      case TEXTRES:
         if(winlist[i].w.t->isMinimized()){
           winlist[i].w.t->showNormal();
-          caption = winlist[i].w.t->caption();
-          win->changeItem(caption,sel);
+          caption = winlist[i].w.t->windowTitle();
+          win->setCurrentRow(sel);
         }
-        winlist[i].w.t->setActiveWindow();
+        winlist[i].w.t->activateWindow();
         winlist[i].w.t->raise();
         break;
       case WORDS:
         if(winlist[i].w.w->isMinimized()){
           winlist[i].w.w->showNormal();
-          caption = winlist[i].w.w->caption();
-          win->changeItem(caption,sel);
+          caption = winlist[i].w.w->windowTitle();
+          win->setCurrentRow(sel);
         }
-        winlist[i].w.w->setActiveWindow();
+        winlist[i].w.w->activateWindow();
         winlist[i].w.w->raise();
         break;
       case OBJECT:
         if(winlist[i].w.o->isMinimized()){
           winlist[i].w.o->showNormal();
-          caption = winlist[i].w.o->caption();
-          win->changeItem(caption,sel);
+          caption = winlist[i].w.o->windowTitle();
+          win->setCurrentRow(sel);
         }
-        winlist[i].w.o->setActiveWindow();
+        winlist[i].w.o->activateWindow();
         winlist[i].w.o->raise();
         break;
       case RESOURCES:
         if(winlist[i].w.r->isMinimized()){
           winlist[i].w.r->showNormal();
-          caption = winlist[i].w.r->caption();
-          win->changeItem(caption,sel);
+          caption = winlist[i].w.r->windowTitle();
+          win->setCurrentRow(sel);
         }
-        winlist[i].w.r->setActiveWindow();
+        winlist[i].w.r->activateWindow();
         winlist[i].w.r->raise();
         break;
       case HELPWIN:
         if(winlist[i].w.h->isMinimized()){
           winlist[i].w.h->showNormal();
           caption = QString("Help");
-          win->changeItem(caption,sel);
+          win->setCurrentRow(sel);
         }
         else if(!winlist[i].w.h->isVisible()){
           winlist[i].w.h->show();
-          caption = winlist[i].w.h->caption();
-          win->changeItem(caption,sel);
+          caption = winlist[i].w.h->windowTitle();
+          win->setCurrentRow(sel);
         }
-        winlist[i].w.h->setActiveWindow();
+        winlist[i].w.h->activateWindow();
         winlist[i].w.h->raise();
         break;
       case PREVIEW:
         if(winlist[i].w.pr->isMinimized()){
           winlist[i].w.pr->showNormal();
-          caption = winlist[i].w.pr->caption();
-          win->changeItem(caption,sel);
+          caption = winlist[i].w.pr->windowTitle();
+          win->setCurrentRow(sel);
         }
-        winlist[i].w.pr->setActiveWindow();
+        winlist[i].w.pr->activateWindow();
         winlist[i].w.pr->raise();
         break;
       }
@@ -1111,15 +1068,14 @@ void WindowList::select_cb(int sel)
     }
     n++;
   }
-
 }
 
 //**********************************************
 
 void WindowList::select_ok()
 {
-  if(win->currentItem()!=-1)
-    select_cb(win->currentItem());
+  if(win->currentRow()!=-1)
+    select_cb(win->currentRow());
 
 }
 
@@ -1127,8 +1083,7 @@ void WindowList::select_ok()
 
 void WindowList::del_cb()
 {
-
-  int sel = win->currentItem();
+  int sel = win->currentRow();
   if(sel==-1)return;
 
   int n=0;
@@ -1145,7 +1100,7 @@ void WindowList::del_cb()
       case PICTURE:
         winlist[i].w.p->close();
         break;
-      case TEXT:
+      case TEXTRES:
         winlist[i].w.t->close();
         break;
       case WORDS:
@@ -1169,5 +1124,4 @@ void WindowList::del_cb()
     n++;
   }
   draw();
-
 }

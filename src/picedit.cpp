@@ -25,25 +25,21 @@
 #include "preview.h"
 
 #include <cstdlib>
-#include <qspinbox.h>
-#include <qapplication.h>
-#include <qpainter.h>
-#include <qtooltip.h>
-//Added by qt3to4:
-#include <Q3HBoxLayout>
+
+#include <QSpinBox>
+#include <QApplication>
+#include <QPainter>
+#include <QTooltip>
 #include <QKeyEvent>
 #include <QLabel>
 #include <QPixmap>
-#include <Q3Frame>
 #include <QHideEvent>
 #include <QResizeEvent>
-#include <Q3PopupMenu>
 #include <QMouseEvent>
-#include <Q3VBoxLayout>
-#include <Q3BoxLayout>
 #include <QShowEvent>
 #include <QPaintEvent>
 #include <QCloseEvent>
+#include <QGroupBox>
 
 #include "left1_x.xpm"
 #include "left2_x.xpm"
@@ -93,144 +89,152 @@ static const char *colname[]={
 
 //***************************************
 PicEdit::PicEdit( QWidget *parent, const char *name,int win_num,ResourcesWin *res )
-    : QWidget( parent, name, Qt::WDestructiveClose)
+    : QWidget(parent)
 {
-  setCaption("Picture Editor");
+  setAttribute(Qt::WA_DeleteOnClose);
+  setWindowTitle("Picture Editor");
 
   winnum = win_num;
   resources_win = res;
   picture = new Picture();
 
-  Q3PopupMenu *file = new Q3PopupMenu( this );
+  QMenu *file = new QMenu( this );
   Q_CHECK_PTR( file );
-  file->insertItem( "New", this, SLOT(open()) );
-  file->insertItem( "Load from file", this, SLOT(open_file()) );
-  file->insertItem( "Save to game", this, SLOT(save_to_game()) );
-  file->insertItem( "Save to game as...", this, SLOT(save_to_game_as()) );
-  file->insertItem( "Save to file", this, SLOT(save_file()) );
-  file->insertSeparator();
-  file->insertItem( "Delete", this, SLOT(delete_picture()) );
-  file->insertSeparator();
-  file->insertItem( "Close", this, SLOT(close()) );
+  file->setTitle("&File");
+  file->addAction("&New", this, SLOT(open()));
+  file->addAction("&Load from file", this, SLOT(open_file()));
+  file->addAction("&Save to game", this, SLOT(save_to_game()));
+  file->addAction("Save to game &as...", this, SLOT(save_to_game_as()));
+  file->addAction("Save to file", this, SLOT(save_file()));
+  file->addSeparator();
+  file->addAction("&Delete", this, SLOT(delete_picture()));
+  file->addSeparator();
+  file->addAction("&Close", this, SLOT(close()));
 
-  Q3PopupMenu *util = new Q3PopupMenu( this );
+  QMenu *util = new QMenu( this );
   Q_CHECK_PTR( util );
-  util->insertItem("View data", this, SLOT(view_data()) );
-  util->insertItem("Background", this, SLOT(background()) );
+  util->setTitle("&Utilities");
+  util->addAction("&View data", this, SLOT(view_data()));
+  util->addAction("&Background", this, SLOT(background()));
 
-  Q3PopupMenu *help = new Q3PopupMenu( this );
+  QMenu *help = new QMenu( this );
   Q_CHECK_PTR( help );
-  help->insertItem( "Help on picture editor", this, SLOT(editor_help()) );
+  help->setTitle("&Help");
+  help->addAction("Help on picture &editor", this, SLOT(editor_help()));
 
   QMenuBar *menu = new QMenuBar(this);
   Q_CHECK_PTR( menu );
-  menu->insertItem( "File", file );
-  menu->insertItem( "Utilities", util );
-  menu->insertItem( "Help", help );
-  menu->setSeparator( QMenuBar::InWindowsStyle );
+  menu->addMenu(file);
+  menu->addMenu(util);
+  menu->addMenu(help);
 
-  Q3BoxLayout *all =  new Q3HBoxLayout(this,10);
+  QBoxLayout *all =  new QHBoxLayout(this);
   all->setMenuBar(menu);
 
-  Q3BoxLayout *leftb = new Q3VBoxLayout(all,10);
+  QBoxLayout *leftb = new QVBoxLayout(this);
+  all->addLayout(leftb);
 
-  tool = new Q3ButtonGroup(5,Qt::Horizontal,0,this);
-  line = new QRadioButton("Line",tool);
-  line->setChecked(false);
-  //  line->setFocusPolicy(ClickFocus);
-  pen = new QRadioButton("Pen",tool);
-  pen->setChecked(false);
-  // pen->setFocusPolicy(ClickFocus);
-  step = new QRadioButton("Step",tool);
-  step->setChecked(false);
-  // step->setFocusPolicy(ClickFocus);
-  fill = new QRadioButton("Fill",tool);
-  fill->setChecked(false);
-  // fill->setFocusPolicy(ClickFocus);
-  brush = new QRadioButton("Brush",tool);
-  brush->setChecked(false);
-  // brush->setFocusPolicy(ClickFocus);
-  connect(tool, SIGNAL(clicked(int)), SLOT(change_tool(int)) );
+  QHBoxLayout *toollay = new QHBoxLayout();
+  toollay->setAlignment(Qt::AlignLeft);
+  QGroupBox *toolbox = new QGroupBox(this);
+  tool = new QButtonGroup(this);
+  line = new QRadioButton(tr("Line"), toolbox);
+  pen = new QRadioButton(tr("Pen"), toolbox);
+  step = new QRadioButton(tr("Step"), toolbox);
+  fill = new QRadioButton(tr("Fill"), toolbox);
+  brush = new QRadioButton(tr("Brush"), toolbox);
+  toollay->addWidget(line);
+  toollay->addWidget(pen);
+  toollay->addWidget(step);
+  toollay->addWidget(fill);
+  toollay->addWidget(brush);
+  tool->addButton(line, T_LINE);
+  tool->addButton(pen, T_PEN);
+  tool->addButton(step, T_STEP);
+  tool->addButton(fill, T_FILL);
+  tool->addButton(brush, T_BRUSH);
+  leftb->addWidget(toolbox);
+  toolbox->setLayout(toollay);
+  connect(tool, SIGNAL(buttonClicked(int)), SLOT(change_tool(int)) );
 
-
-  leftb->addWidget(tool);
-
-  Q3BoxLayout *b1 = new Q3HBoxLayout(leftb,10);
+  QBoxLayout *b1 = new QHBoxLayout(this);
+  leftb->addLayout(b1);
 
   palette = new Palette1(this,0,this);
   palette->setMinimumSize(250,40);
   palette->setMaximumSize(350,80);
   b1->addWidget(palette);
 
-  Q3BoxLayout *b2 = new Q3HBoxLayout(leftb,10);
+  QBoxLayout *b2 = new QHBoxLayout(this);
+  leftb->addLayout(b2);
 
-  Q3ButtonGroup *shape = new Q3ButtonGroup(2,Qt::Vertical,"Shape",this);
-  QRadioButton *circle = new QRadioButton("Circle",shape);
+  QVBoxLayout *shapebox = new QVBoxLayout();
+  QGroupBox *shape = new QGroupBox("Shape", this);
+  QRadioButton *circle = new QRadioButton("Circle", shape);
+  QRadioButton *square = new QRadioButton("Square", shape);
   circle->setChecked(true);
-  //  circle->setFocusPolicy(ClickFocus);
-  QRadioButton *square = new QRadioButton("Square",shape);
-  square->setChecked(false);
-  // square->setFocusPolicy(ClickFocus);
+  shapebox->addWidget(circle);
+  shapebox->addWidget(square);
   b2->addWidget(shape);
+  shape->setLayout(shapebox);
   connect(shape, SIGNAL(clicked(int)), SLOT(change_shape(int)) );
 
-  Q3ButtonGroup *type = new Q3ButtonGroup(2,Qt::Vertical,"Type",this);
-  QRadioButton *spray = new QRadioButton("Spray",type);
+
+  QVBoxLayout *typebox = new QVBoxLayout();
+  QGroupBox *type = new QGroupBox("Type", this);
+  QRadioButton *spray = new QRadioButton("Spray", type);
+  QRadioButton *solid = new QRadioButton("Solid", type);
   spray->setChecked(true);
-  //  spray->setFocusPolicy(ClickFocus);
-  QRadioButton *solid = new QRadioButton("Solid",type);
-  solid->setChecked(false);
-  //  solid->setFocusPolicy(ClickFocus);
+  typebox->addWidget(spray);
+  typebox->addWidget(solid);
   b2->addWidget(type);
+  type->setLayout(typebox);
   connect(type, SIGNAL(clicked(int)), SLOT(change_type(int)) );
 
-  Q3GroupBox *lsize = new Q3GroupBox(1,Qt::Vertical,this);
-  lsize->setTitle("Size");
-  lsize->setMargin(4);
+  QVBoxLayout *sizebox = new QVBoxLayout();
+  QGroupBox *lsize = new QGroupBox(tr("Size"), this); //vert
   b2->addWidget(lsize);
 
-  QSpinBox *size = new QSpinBox(1,7,1,lsize);
+  QSpinBox *size = new QSpinBox(lsize);
+  size->setMinimum(1);
+  size->setMinimum(7);
   size->setValue(1);
-  //  size->setFocusPolicy(ClickFocus);
+  sizebox->addWidget(size);
+  lsize->setLayout(sizebox);
   connect(size, SIGNAL(valueChanged(int)), SLOT(change_size(int)) );
 
-  Q3BoxLayout *b3 = new Q3HBoxLayout(leftb,1);
+  QHBoxLayout *b3 = new QHBoxLayout(this);
+  leftb->addLayout(b3);
 
   QPushButton *home = new QPushButton(this);
-  home->setPixmap(QPixmap(left2_x));
-  //  home->setFocusPolicy(ClickFocus);
+  home->setIcon(QPixmap(left2_x));
   connect(home, SIGNAL(clicked()), SLOT(home_cb()) );
   b3->addWidget(home);
   QPushButton *left = new QPushButton(this);
-  //left->setFocusPolicy(ClickFocus);
-  left->setPixmap(QPixmap(left1_x));
+  left->setIcon(QPixmap(left1_x));
   connect(left, SIGNAL(clicked()), SLOT(left_cb()) );
   b3->addWidget(left);
   pos = new QLineEdit(this);
   pos->setMinimumWidth(64);
-  //pos->setFocusPolicy(ClickFocus);
   connect( pos, SIGNAL(returnPressed()), SLOT(set_pos()) );
   b3->addWidget(pos);
   QPushButton *right = new QPushButton(this);
-  //right->setFocusPolicy(ClickFocus);
   connect(right, SIGNAL(clicked()), SLOT(right_cb()) );
-  right->setPixmap(QPixmap(right1_x));
+  right->setIcon(QPixmap(right1_x));
   b3->addWidget(right);
   QPushButton *end = new QPushButton(this);
-  //end->setFocusPolicy(ClickFocus);
   connect(end, SIGNAL(clicked()), SLOT(end_cb()) );
-  end->setPixmap(QPixmap(right2_x));
+  end->setIcon(QPixmap(right2_x));
   b3->addWidget(end);
   QPushButton *del = new QPushButton("Del",this);
-  //del->setFocusPolicy(ClickFocus);
   connect(del, SIGNAL(clicked()), SLOT(del_cb()) );
   b3->addWidget(del);
   QPushButton *wipe = new QPushButton("Wipe",this);
-  //wipe->setFocusPolicy(ClickFocus);
   connect(wipe, SIGNAL(clicked()), SLOT(wipe_cb()) );
   b3->addWidget(wipe);
 
-  Q3BoxLayout *b31 = new Q3HBoxLayout(leftb,4);
+  QBoxLayout *b31 = new QHBoxLayout(this);
+  leftb->addLayout(b31);
 
   codeline = new QLineEdit(this);
   codeline->setFocusPolicy(Qt::NoFocus);
@@ -240,62 +244,63 @@ PicEdit::PicEdit( QWidget *parent, const char *name,int win_num,ResourcesWin *re
   comments->setFocusPolicy(Qt::NoFocus);
   b31->addWidget(comments);
 
-  Q3BoxLayout *b4 = new Q3HBoxLayout(leftb,2);
+  QBoxLayout *b4 = new QHBoxLayout(this);
+  leftb->addLayout(b4);
 
   QPushButton *zoom_minus = new QPushButton(this);
-  zoom_minus->setPixmap(QPixmap(zoom_minus_x));
+  zoom_minus->setIcon(QPixmap(zoom_minus_x));
   zoom_minus->setFixedSize(32,32);
-  //zoom_minus->setFocusPolicy(ClickFocus);
   connect( zoom_minus, SIGNAL(clicked()), SLOT(zoom_minus()) );
   b4->addWidget(zoom_minus);
 
   QPushButton *zoom_plus = new QPushButton(this);
-  zoom_plus->setPixmap(QPixmap(zoom_plus_x));
+  zoom_plus->setIcon(QPixmap(zoom_plus_x));
   zoom_plus->setFixedSize(32,32);
-  //zoom_plus->setFocusPolicy(ClickFocus);
   connect( zoom_plus, SIGNAL(clicked()), SLOT(zoom_plus()) );
   b4->addWidget(zoom_plus);
 
-  Q3ButtonGroup *drawmode = new Q3ButtonGroup(2,Qt::Vertical,"Show",this);
-  pic = new QRadioButton("Visual",drawmode);
+  QVBoxLayout *drawbox = new QVBoxLayout();
+  QGroupBox *drawmode = new QGroupBox("Show", this);
+  pic = new QRadioButton("Visual", drawmode);
+  pri = new QRadioButton("Priority", drawmode);
+  bg = new QCheckBox("Background", drawmode);
+  prilines = new QCheckBox("PriorityLines", drawmode);
+  drawbox->addWidget(pic);
+  drawbox->addWidget(pri);
+  drawbox->addWidget(bg);
+  drawbox->addWidget(prilines);
   pic->setChecked(true);
   pri_mode=false;
   picture->set_mode(0);
-  pri = new QRadioButton("Priority",drawmode);
-  bg = new QCheckBox("Background",drawmode);
-  prilines = new QCheckBox("PriorityLines",drawmode);
-  connect( drawmode, SIGNAL(clicked(int)), SLOT(change_drawmode(int)) );
-  drawmode->setExclusive(false);
   b4->addWidget(drawmode);
+  drawmode->setLayout(drawbox);
+  connect(drawmode, SIGNAL(clicked(int)), SLOT(change_drawmode(int)));
 
   status = new QStatusBar(this);
-  QLabel *msg = new QLabel( status, "message" );
+  QLabel *msg = new QLabel(status);
   status->addWidget( msg, 4 );
-  pricolor = new Q3Frame( status );
+  pricolor = new QFrame( status );
   pricolor->setMinimumSize( 8,8 );
   pricolor->setMaximumSize( 8,8 );
-  QToolTip::add( pricolor, "Priority 'color' required to mask an EGO on this priority level" );
-  status->addWidget( pricolor, 0, true );
+  pricolor->setToolTip(tr("Priority 'color' required to mask an EGO on this priority level"));
+  status->addWidget(pricolor);
   status->setSizeGripEnabled( false );
   leftb->addWidget(status);
 
   if(game->picstyle==P_TWO){
     canvas = new PCanvas(0,0,this);
     canvas->setMinimumSize(canvas->pixsize*MAX_W+canvas->x0+10,canvas->pixsize*MAX_HH+canvas->x0+10);
-    canvas->resizeContents(canvas->pixsize*MAX_W+canvas->x0,canvas->pixsize*MAX_HH+canvas->x0);
+    //canvas->resizeContents(canvas->pixsize*MAX_W+canvas->x0,canvas->pixsize*MAX_HH+canvas->x0);
     canvas->resize(canvas->pixsize*MAX_W+canvas->x0,canvas->pixsize*MAX_HH+canvas->x0);
-    //canvas->setFocusPolicy(ClickFocus);
 
   }
   else{
     canvas = new PCanvas(this,0,this);
     canvas->setMinimumSize(canvas->pixsize*MAX_W+canvas->x0+10,canvas->pixsize*MAX_HH+canvas->x0+10);
-    canvas->resizeContents(canvas->pixsize*MAX_W+canvas->x0,canvas->pixsize*MAX_HH+canvas->x0);
+    //canvas->resizeContents(canvas->pixsize*MAX_W+canvas->x0,canvas->pixsize*MAX_HH+canvas->x0);
     all->addWidget(canvas,1);
-    //canvas->setFocusPolicy(ClickFocus);
     setFocusProxy(canvas);
   }
-
 
   changed = false;
   adjustSize();
@@ -314,18 +319,10 @@ void PicEdit::save(char *filename)
 //*********************************************
 void PicEdit::open_file()
 {
-  Q3FileDialog *f = new Q3FileDialog(0,"Open",true);
-  const char *filters[] = {"picture*.*","All files (*)",NULL};
-
-  f->setFilters(filters);
-  f->setCaption("Open picture");
-  f->setMode(Q3FileDialog::ExistingFile);
-  f->setDir(game->srcdir.c_str());
-  if ( f->exec() == QDialog::Accepted ) {
-    if ( !f->selectedFile().isEmpty() )
-      open((char *)f->selectedFile().latin1());
-  }
-
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Picture File"), game->srcdir.c_str(), tr("Picture Files (picture*.*);;All Files (*)"));
+    if (!fileName.isNull()) {
+        open(fileName.toLatin1().data());
+    }
 }
 
 //*********************************************
@@ -334,9 +331,9 @@ void PicEdit::open(int ResNum)
   if(picture->open(ResNum))return;
   PicNum = ResNum;
   sprintf(tmp,"Picture editor: picture.%d",PicNum);
-  setCaption(tmp);
+  setWindowTitle(tmp);
   if(canvas->isTopLevel())
-    canvas->setCaption(tmp);
+    canvas->setWindowTitle(tmp);
   canvas->update();
   show_pos();
   changed=false;
@@ -352,9 +349,9 @@ void PicEdit::open(char *filename)
   if(picture->open(filename))return;
   PicNum = -1;
   sprintf(tmp,"Picture editor");
-  setCaption(tmp);
+  setWindowTitle(tmp);
   if(canvas->isTopLevel())
-    canvas->setCaption(tmp);
+    canvas->setWindowTitle(tmp);
   canvas->update();
   show_pos();
   changed=false;
@@ -367,29 +364,22 @@ void PicEdit::open(char *filename)
 //*********************************************
 void PicEdit::save_file()
 {
-  Q3FileDialog *f = new Q3FileDialog(0,"Save",true);
-  const char *filters[] = {"picture*.*","All files (*)",NULL};
-
-  f->setFilters(filters);
-  f->setCaption("Save picture");
-  f->setMode(Q3FileDialog::AnyFile);
-  f->setDir(game->srcdir.c_str());
-  if ( f->exec() == QDialog::Accepted ) {
-    if ( !f->selectedFile().isEmpty() )
-      save((char *)f->selectedFile().latin1());
-  }
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Picture File"), game->srcdir.c_str(), tr("Picture Files (picture*.*);;All Files (*)"));
+    if (!fileName.isNull()) {
+        save(fileName.toLatin1().data());
+    }
 }
 
 //*********************************************
 void PicEdit::deinit()
 {
   if(viewdata){
-    viewdata->close(true);
+    viewdata->close();
     viewdata=NULL;
   }
   if(canvas->isTopLevel()){
     closing=true;
-    canvas->close(true);
+    canvas->close();
   }
   delete picture;
   winlist[winnum].type=-1;
@@ -417,7 +407,7 @@ void PicEdit::hideEvent( QHideEvent * )
   }
   hiding=false;
   if(viewdata){
-    viewdata->close(true);
+    viewdata->close();
     viewdata=NULL;
   }
   if(window_list && window_list->isVisible())window_list->draw();
@@ -487,7 +477,7 @@ void PicEdit::save_to_game_as()
   if(!picture_number->exec())return;
 
   QString str = picture_number->num->text();
-  int num = atoi((char *)str.latin1());
+  int num = str.toInt();
 
   if(num<0||num>255){
     menu->errmes("Picture number must be between 0 and 255 !");
@@ -523,7 +513,6 @@ void PicEdit::save_to_game_as()
     }
     open(num);
   }
-
 }
 
 //*********************************************
@@ -539,15 +528,14 @@ void PicEdit::delete_picture()
   case 0:
     game->DeleteResource(PICTURE,PicNum);
     if(resources_win){
-      k = resources_win->list->currentItem();
+      k = resources_win->list->currentRow();
       resources_win->select_resource_type(PICTURE);
-      resources_win->list->setCurrentItem(k);
+      resources_win->list->setCurrentRow(k);
     }
     break;
   case 1:
     break;
   }
-
 }
 
 //*********************************************
@@ -556,7 +544,7 @@ void PicEdit::open()
   picture->newpic();
   show_pos();
   if(canvas->isTopLevel())
-    canvas->setCaption("picture");
+    canvas->setWindowTitle("picture");
   canvas->update();
   show();
   canvas->show();
@@ -570,9 +558,9 @@ void PicEdit::view_data()
   if(viewdata==NULL)viewdata=new ViewData(0,0,picture);
   if(PicNum!=-1){
     sprintf(tmp,"View data: picture %d",PicNum);
-    viewdata->setCaption(tmp);
+    viewdata->setWindowTitle(tmp);
   }
-  else viewdata->setCaption("View data: picture");
+  else viewdata->setWindowTitle("View data: picture");
   viewdata->read();
 
 }
@@ -580,47 +568,34 @@ void PicEdit::view_data()
 //*********************************************
 void PicEdit::background()
 {
-
-  Q3FileDialog *f = new Q3FileDialog(0,"Load background image",true);
-  const char *filters[] = {"All files (*)",NULL};
-
-  f->setFilters(filters);
-  f->setCaption("Load background image");
-  f->setMode(Q3FileDialog::ExistingFile);
-  f->setDir(game->srcdir.c_str());
-  if ( f->exec() == QDialog::Accepted ) {
-    if ( !f->selectedFile().isEmpty() )
-      canvas->load_bg((char *)f->selectedFile().latin1());
-  }
-
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Background Image"), game->srcdir.c_str(), tr("All Files (*)"));
+    if (!fileName.isNull()) {
+        canvas->load_bg(fileName.toLatin1().data());
+    }
 }
 
 //*********************************************
 void PicEdit::zoom_minus()
 {
-
   if(canvas->pixsize>1){
     canvas->setPixsize(canvas->pixsize-1);
     int w,h;
     w = canvas->cur_w+4;
     h = canvas->cur_h+4;
-    canvas->resizeContents(w,h);
+    canvas->resize(w, h);
   }
-
 }
 
 //*********************************************
 void PicEdit::zoom_plus()
 {
-
   if(canvas->pixsize<4){
     canvas->setPixsize(canvas->pixsize+1);
     int w,h;
     w = canvas->cur_w+4;
     h = canvas->cur_h+4;
-    canvas->resizeContents(w,h);
+    canvas->resize(w, h);
   }
-
 }
 
 //*********************************************
@@ -781,7 +756,7 @@ void PicEdit::set_pos()
   //set picture buffer position
 {
   QString str=pos->text();
-  char *s = (char *)str.latin1();
+  char *s = str.toLatin1().data();
   int num = atoi(s);
   if(num!=0 || s[0]=='0'){
     if(!picture->setBufPos(num)){
@@ -794,7 +769,6 @@ void PicEdit::set_pos()
   pos->clearFocus();
   setFocus();
   return;
-
 }
 //*********************************************
 void PicEdit::update_tools()
@@ -817,8 +791,10 @@ void PicEdit::update_tools()
     if(!brush->isChecked())brush->setChecked(true);
     break;
   default:
-    QRadioButton *b = (QRadioButton *)tool->selected();
-    if(b)b->setChecked(false);
+    QRadioButton *b = (QRadioButton *)tool->checkedButton();
+    if(b)
+        b->setChecked(false);
+    break;
   }
 
 }
@@ -864,7 +840,7 @@ void PicEdit::editor_help()
 //************************************************
 
 PCanvas::PCanvas ( QWidget *parent, const char *name, PicEdit *w)
-    : Q3ScrollView( parent, name )
+    : QScrollArea(parent)
   //the area to draw picture
 {
 
@@ -886,7 +862,7 @@ PCanvas::PCanvas ( QWidget *parent, const char *name, PicEdit *w)
 void PCanvas::setSize(int w,int h)
 {
   if(cur_w != w || cur_h != h){
-    pixmap.resize(w*pixsize*2,h*pixsize);
+    pixmap = pixmap.scaled(w*pixsize*2,h*pixsize);
     cur_w=w;
     cur_h=h;
   }
@@ -895,24 +871,20 @@ void PCanvas::setSize(int w,int h)
 //*********************************************
 void PCanvas::setPixsize(int s)
 {
-
   pixsize=s;
   cur_w=MAX_W*pixsize;
   cur_h=MAX_HH*pixsize;
-  pixmap.resize(cur_w,cur_h);
+  pixmap = pixmap.scaled(cur_w,cur_h);
   QPainter p(&pixmap);
   p.eraseRect(0,0,cur_w,cur_h);
   update();
-
 }
 //*********************************************
 void PCanvas::viewportMousePressEvent(QMouseEvent* event)
 {
-  int x,y,xx,yy;
+  int x = event->x(), y = event->y();
+  int xx = x, yy = y;
 
-  viewportToContents( event->x(),  event->y(), x, y );
-  xx=x;
-  yy=y;
   x-=x0;
   y-=y0;
 
@@ -929,12 +901,11 @@ void PCanvas::viewportMousePressEvent(QMouseEvent* event)
       picedit->show_pos();
   }
   else if (event->button() & Qt::RightButton){
-    /*
-    QRadioButton *b = (QRadioButton *)picedit->tool->selected();
-        if(b!=0)b->setChecked(false);
+    QRadioButton *b = (QRadioButton *)picedit->tool->checkedButton();
+    if(b!=0)
+        b->setChecked(false);
     picture->clear_tools();
     picture->tool = -1;
-    */
     picture->init_tool();
   }
   update();
@@ -944,11 +915,8 @@ void PCanvas::viewportMousePressEvent(QMouseEvent* event)
 //*********************************************
 void PCanvas::viewportMouseMoveEvent(QMouseEvent* event)
 {
-  int x,y,xx,yy;
-
-  viewportToContents( event->x(),  event->y(), x, y );
-  xx=x;
-  yy=y;
+  int x = event->x(), y = event->y();
+  int xx = x, yy = y;
 
   x-=x0;
   y-=y0;
@@ -972,8 +940,10 @@ void PCanvas::viewportMouseMoveEvent(QMouseEvent* event)
   if(x>=0&&y>=0){
     int pri = y/12+1;
     sprintf(tmp,"X=%d  Y=%d  Pri=%d",x/2,y,pri);
-    picedit->status->message(tmp);
-    picedit->pricolor->setPaletteBackgroundColor( egacolor[pri+1] );
+    picedit->status->showMessage(tmp);
+    auto pal = picedit->pricolor->palette();
+    pal.setColor(QPalette::Background, egacolor[pri + 1]);
+    picedit->pricolor->setPalette(pal);
   }
 
 }
@@ -1041,9 +1011,7 @@ void PCanvas::update()
       p.drawLine(0,y+1,MAX_W*pixsize,y+1);
     }
   }
-
-  repaintContents(x0,y0,x0+MAX_W*pixsize,y0+MAX_HH*pixsize,false);
-
+  repaint(x0, y0, x0 + MAX_W*pixsize, y0 + MAX_HH*pixsize);
 }
 
 //*********************************************
@@ -1140,7 +1108,7 @@ void PCanvas::line(bool mode)
 
   }
 #endif
-  repaintContents(x0,y0,x0+MAX_W*pixsize,y0+MAX_HH*pixsize,false);
+  repaint(x0, y0, x0+MAX_W*pixsize, y0+MAX_HH*pixsize);
 
 }
 //*********************************************
@@ -1281,7 +1249,7 @@ void PCanvas::closeEvent( QCloseEvent *e )
 }
 /*******************************************************/
 Palette1::Palette1( QWidget *parent, const char *name , PicEdit *p)
-    : QWidget( parent, name )
+    : QWidget(parent)
 {
 
   left=right=-1;
@@ -1370,19 +1338,20 @@ void Palette1::mousePressEvent(QMouseEvent* event)
 
 //************************************************
 ViewData::ViewData( QWidget *parent, const char *name,Picture *p )
-    : QWidget( parent, name)
+    : QWidget(parent)
   //view picture codes
 {
-
   picture = p;
-  Q3BoxLayout *all = new Q3VBoxLayout(this,20);
-  codes = new Q3MultiLineEdit(this);
+  QBoxLayout *all = new QVBoxLayout(this);
+  codes = new QTextEdit(this);
   codes->setMinimumSize(300,200);
   codes->setReadOnly(true);
   all->addWidget(codes);
 
-  Q3BoxLayout *b = new Q3HBoxLayout(all,20);
-  Q3BoxLayout *left = new Q3VBoxLayout(b,20);
+  QBoxLayout *b = new QHBoxLayout(this);
+  all->addLayout(b);
+  QBoxLayout *left = new QVBoxLayout(this);
+  b->addLayout(left);
   comments = new QCheckBox("Show comments",this);
   connect(comments, SIGNAL(clicked()), SLOT(read()));
   left->addWidget(comments);
@@ -1390,23 +1359,21 @@ ViewData::ViewData( QWidget *parent, const char *name,Picture *p )
   connect(wrap, SIGNAL(clicked()), SLOT(read()));
   left->addWidget(wrap);
 
-  Q3BoxLayout *right = new Q3VBoxLayout(b,20);
+  QBoxLayout *right = new QVBoxLayout(this);
+  b->addLayout(right);
   QPushButton *close = new QPushButton("Close",this);
   close->setMaximumSize(80,60);
   connect(close, SIGNAL(clicked()), SLOT(close()));
   right->addWidget(close);
-  QLabel *dummy = new QLabel("     ",this);
-  right->addWidget(dummy);
 
   data.lfree();
-
 }
 
 //************************************************
 void ViewData::resizeEvent( QResizeEvent * )
 {
 
-  QString str = codes->text();
+  QString str = codes->toPlainText();
   getmaxcol();
   codes->setText(str);
 }
@@ -1448,7 +1415,7 @@ void ViewData::read()
           len=(int)(ptr-ptr0);
           strncat(tmp,ptr0,len);
           tmp[len]=0;
-          codes->insertLine(tmp,-1);
+          codes->insertPlainText(tmp);
           strcpy(tmp,"   ");
           first=false;
           ptr0=ptr;
@@ -1466,7 +1433,7 @@ void ViewData::read()
           strcat(tmp,colname[cc]);
         }
       }
-      codes->insertLine(tmp,-1);
+      codes->insertPlainText(tmp);
     }
     else{
       if(comm){  //add comments (action and color when applicable)
@@ -1476,13 +1443,14 @@ void ViewData::read()
           strcat(tmp," ");
           strcat(tmp,colname[cc]);
         }
-        codes->insertLine(tmp,-1);
+        codes->insertPlainText(tmp);
       }
-      else codes->insertLine(str,-1);
+      else codes->insertPlainText(str);
     }
   }
   codes->setUpdatesEnabled(true);
   codes->update();
+
   show();
 }
 

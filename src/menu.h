@@ -23,21 +23,17 @@
 
 #include <stdarg.h>
 #include <string>
-#include <qwidget.h>
-#include <qmenubar.h>
-#include <qlabel.h>
-#include <qpushbutton.h>
-#include <qlayout.h>
-#include <q3popupmenu.h>
-#include <qnamespace.h>
-#include <qmessagebox.h>
-#include <q3filedialog.h>
-#include <qlineedit.h>
-#include <q3buttongroup.h>
-#include <qradiobutton.h>
-#include <q3mainwindow.h>
-#include <qstatusbar.h>
-//Added by qt3to4:
+#include <QWidget>
+#include <QMenubar>
+#include <QLabel>
+#include <QPushbutton>
+#include <QLayout>
+#include <QMessageBox>
+#include <QFileDialog>
+#include <QLineEdit>
+#include <QRadioButton>
+#include <QMainWindow>
+#include <QStatusbar>
 #include <QCloseEvent>
 
 #include "wordsedit.h"
@@ -55,7 +51,7 @@ class WindowList : public QWidget
     Q_OBJECT
 public:
     WindowList( QWidget *parent=0, const char *name=0 );
-    Q3ListBox *win;
+    QListWidget *win;
 public slots:
     void draw();
     void select_cb(int);
@@ -72,7 +68,7 @@ public:
 };
 
 
-class Menu : public Q3MainWindow
+class Menu : public QMainWindow
 {
     Q_OBJECT
 public:
@@ -135,11 +131,11 @@ protected:
     QMenuBar *menubar;
     QMessageBox *err,*warn;
     QPushButton *create;
-    Q3FileDialog *f;
-    QPushButton *open,*close_,*run,*view,*logic,*text,*obj,*words,*pic;
+    QFileDialog *f;
+    QAction *open,*close_,*run,*view,*logic,*text,*obj,*words,*pic;
     int num_res;
     int n_res;
-    int id[24];
+    QAction *id[24];
     int max_disabled;
 
 };

@@ -26,6 +26,7 @@
 #include "util.h"
 #include "resources.h"
 #include "agicommands.h"
+#include "game.h"
 
 #include <string>
 #include <stdio.h>
@@ -33,10 +34,8 @@
 #ifdef _WIN32
 #include <io.h>
 #include <direct.h>
-#include <windows.h>
-#undef TEXT
-#include "game.h"
-#define TEXT 6
+#include <Windows.h>
+#include <ShlObj.h>
 #else
 #include <unistd.h>
 #include <glob.h>
@@ -47,9 +46,9 @@
 #include <math.h>
 #include <errno.h>
 
-#include <q3progressdialog.h>
-#include <qmessagebox.h>
-#include <qdir.h>
+#include <QProgressDialog>
+#include <QMessageBox>
+#include <QDir>
 
 const char *ResTypeName[4] = {"logic","picture","view","sound"};
 const char *ResTypeAbbrv[4] = {"log","pic","view","snd"};
@@ -225,7 +224,7 @@ int Game::open(string name)
     CorrectCommands(AGIVersionNumber);
     isOpen = true;
     make_source_dir();
-    menu->status->message(dir.c_str());
+    menu->status->showMessage(dir.c_str());
     return 0;
   }
   else return 1;
@@ -434,7 +433,7 @@ int Game::newgame(string name)
       ResourceInfo[_i][j].Exists = false;
     }
   }
-  menu->status->message(dir.c_str());
+  menu->status->showMessage(dir.c_str());
   return 0;
 }
 
@@ -926,7 +925,7 @@ int Game::RebuildVOLfiles()
     }
   }
 
-  Q3ProgressDialog progress( "Rebuilding VOL files...", "Cancel", steps,0, 0, TRUE );  //shows up if the operation is taking more than 3 sec
+  QProgressDialog progress("Rebuilding VOL files...", "Cancel", 0, 100, nullptr);  //shows up if the operation is taking more than 3 sec
   //(so it never shows up...)
 
   ResHeader[0]=0x12;
@@ -1030,8 +1029,8 @@ int Game::RebuildVOLfiles()
       fwrite(&byte1,1,1,dirf);
       fwrite(&byte2,1,1,dirf);
       fwrite(&byte3,1,1,dirf);
-      progress.setProgress( step++ );
-      if ( progress.wasCancelled() ){
+      progress.setValue( step++ );
+      if ( progress.wasCanceled() ){
         cancel=true;
         break;
       }
@@ -1039,12 +1038,12 @@ int Game::RebuildVOLfiles()
     if(!isV3)
       fclose(dirf);
 
-    if ( progress.wasCancelled() ){
+    if ( progress.wasCanceled() ){
       cancel=true;
       break;
     }
   }
-  progress.setProgress( steps );
+  progress.setValue(steps);
 
   fclose(fptr);
   if(isV3)fclose(dirf);
@@ -1069,20 +1068,18 @@ int Game::RebuildVOLfiles()
   QDir d( dir.c_str());
 
   // Delete old VOLs...
-  QStringList list = d.entryList(
-    QString(volname) + ".?;" + QString(volname) + ".??" );
+  QStringList list = d.entryList(QStringList() << QString(volname) + ".?;;" << QString(volname) + ".??");
   for ( QStringList::Iterator it = list.begin(); it != list.end(); ++it )
         d.remove( *it );
 
   // ...and replace them with the new ones:
-  list = d.entryList( QString(volname) + ".*.new" );
+  list = d.entryList(QStringList() << QString(volname) + ".*.new");
   for ( QStringList::Iterator it = list.begin(); it != list.end(); ++it )
   {
     QString new_name = *it;
     new_name.replace(".new", "");
     d.rename( *it, new_name );
   }
-
   memcpy(ResourceInfo,NewResourceInfo,sizeof(ResourceInfo));
   QMessageBox::information( menu, "AGI studio","Rebuilding is complete !");
   return 0;
@@ -1114,12 +1111,12 @@ static void resetLZW()
 ***************************************************************************/
 static int setBITS(int value)
 {
-   if (value == MAXBITS) return TRUE;
+   if (value == MAXBITS) return true;
 
    BITS = value;
    MAX_VALUE = (1 << BITS) - 1;
    MAX_CODE = MAX_VALUE - 1;
-   return FALSE;
+   return false;
 }
 
 /***************************************************************************
@@ -1501,16 +1498,16 @@ int Game::RecompileAll()
   extern TStringList InputLines;
 
   for(i=0;i<MAXWIN;i++){
-    if(winlist[i].type==TEXT){
+    if(winlist[i].type == TEXTRES){
       if(winlist[i].w.t->filename != ""){
         winlist[i].w.t->save();
-        winlist[i].w.t->status->message("");
+        winlist[i].w.t->status->showMessage("");
       }
     }
     else if(winlist[i].type==LOGIC){
       if(winlist[i].w.l->filename != ""){
         winlist[i].w.l->save_logic();
-        winlist[i].w.l->status->message("");
+        winlist[i].w.l->status->showMessage("");
       }
     }
 
@@ -1524,7 +1521,7 @@ int Game::RecompileAll()
   }
 
 
-  Q3ProgressDialog progress( "Recompiling all logics...", "Cancel", steps,0, 0, TRUE );
+  QProgressDialog progress( "Recompiling all logics...", "Cancel", 0, 100, nullptr );
   progress.setMinimumDuration(0);
 
   for(ResNum=0;ResNum<256;ResNum++){
@@ -1578,12 +1575,12 @@ int Game::RecompileAll()
           menu->errmes(tmp1,"Errors:\n%s",logic.ErrorList.c_str());
         }
       }
-      progress.setProgress( step++ );
-      if ( progress.wasCancelled() )return 1;
+      progress.setValue( step++ );
+      if ( progress.wasCanceled() )return 1;
     }
   }
 
-  progress.setProgress( steps );
+  progress.setValue( steps );
   QMessageBox::information( menu, "AGI studio","Recompilation is complete !");
 
   return 0;

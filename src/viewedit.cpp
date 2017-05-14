@@ -33,26 +33,24 @@
 #include <stdlib.h>
 #include <ctype.h>
 
-#include <qapplication.h>
-#include <qsplitter.h> 
-#include <q3frame.h> 
-#include <qmessagebox.h> 
-#include <q3filedialog.h> 
-#include <qstringlist.h> 
-#include <qlayout.h>
-#include <qpixmap.h>
-#include <qpainter.h>
-//Added by qt3to4:
-#include <Q3HBoxLayout>
+#include <QApplication>
+#include <QSplitter>
+#include <QFrame>
+#include <QMessageBox>
+#include <QFileDialog>
+#include <QStringList>
+#include <QLayout>
+#include <QPixmap>
+#include <QPainter>
+#include <QHBoxLayout>
 #include <QKeyEvent>
 #include <QLabel>
-#include <Q3GridLayout>
+#include <QGridLayout>
 #include <QHideEvent>
 #include <QResizeEvent>
-#include <Q3PopupMenu>
 #include <QMouseEvent>
-#include <Q3VBoxLayout>
-#include <Q3BoxLayout>
+#include <QVBoxLayout>
+#include <QBoxLayout>
 #include <QShowEvent>
 #include <QPaintEvent>
 #include <QCloseEvent>
@@ -71,108 +69,108 @@ bool cel_copied = false;
 
 //*********************************************
 ViewEdit::ViewEdit( QWidget *parent, const char *name,int win_num, ResourcesWin *res)
-    : QWidget( parent, name, Qt::WDestructiveClose)
+    : QWidget(parent)
 {
-
-  setCaption("View Editor");
+  setAttribute(Qt::WA_DeleteOnClose);
+  setWindowTitle("View Editor");
 
   winnum = win_num;
   resources_win = res;
   view = new View();
 
-  Q3PopupMenu *file = new Q3PopupMenu( this );
+  QMenu *file = new QMenu( this );
   Q_CHECK_PTR( file );
+  file->setTitle("&File");
+  file->addAction( "&New", this, SLOT(open()) );
+  file->addAction( "&Load from file", this, SLOT(open_file()) );
+  file->addAction( "&Save to game", this, SLOT(save_to_game()) );
+  file->addAction( "Save to game &as...", this, SLOT(save_to_game_as()) );
+  file->addAction( "Save to file", this, SLOT(save_file()) );
+  file->addSeparator();
+  file->addAction( "&Delete", this, SLOT(delete_view()) );
+  file->addSeparator();
+  file->addAction( "&Close", this, SLOT(close()) );
 
-  file->insertItem( "New", this, SLOT(open()) );
-  file->insertItem( "Load from file", this, SLOT(open_file()) );
-  file->insertItem( "Save to game", this, SLOT(save_to_game()) );
-  file->insertItem( "Save to game as...", this, SLOT(save_to_game_as()) );
-  file->insertItem( "Save to file", this, SLOT(save_file()) );
-  file->insertSeparator();
-  file->insertItem( "Delete", this, SLOT(delete_view()) );
-  file->insertSeparator();
-  file->insertItem( "Close", this, SLOT(close()) );
-
-  Q3PopupMenu *edit = new Q3PopupMenu( this );
+  QMenu *edit = new QMenu( this );
   Q_CHECK_PTR( edit );
+  edit->setTitle("&Edit");
+  edit->addAction( "&Undo", this, SLOT(undo_cel()) );
+  edit->addSeparator();
+  edit->addAction( "&Copy cel", this, SLOT(copy_cel()) ,Qt::CTRL+Qt::Key_C );
+  edit->addAction( "&Paste cel", this, SLOT(paste_cel()), Qt::CTRL+Qt::Key_V );
 
-  edit->insertItem( "Undo", this, SLOT(undo_cel()) );
-  edit->insertSeparator();
-  edit->insertItem( "&Copy cel", this, SLOT(copy_cel()) ,Qt::CTRL+Qt::Key_C );
-  edit->insertItem( "&Paste cel", this, SLOT(paste_cel()), Qt::CTRL+Qt::Key_V );
-
-  Q3PopupMenu *loop = new Q3PopupMenu( this );
+  QMenu *loop = new QMenu( this );
   Q_CHECK_PTR( loop );
-
-  loop->insertItem( "Next", this, SLOT(next_loop()) );
-  loop->insertItem( "Previous", this, SLOT(previous_loop()) );
-  loop->insertItem( "First", this, SLOT(first_loop()) );
-  loop->insertItem( "Last", this, SLOT(last_loop()) );
-  loop->insertSeparator();
-  loop->insertItem( "Insert before", this, SLOT(insert_loop_before()) );
-  loop->insertItem( "Insert after", this, SLOT(insert_loop_after()) );
-  loop->insertItem( "Append", this, SLOT(append_loop()) );
-  loop->insertItem( "Delete", this, SLOT(delete_loop()) );
-  loop->insertItem( "Clear", this, SLOT(clear_loop()) );
+  loop->setTitle("&Loop");
+  loop->addAction( "&Next", this, SLOT(next_loop()) );
+  loop->addAction( "&Previous", this, SLOT(previous_loop()) );
+  loop->addAction( "&First", this, SLOT(first_loop()) );
+  loop->addAction( "&Last", this, SLOT(last_loop()) );
+  loop->addSeparator();
+  loop->addAction( "Insert &before", this, SLOT(insert_loop_before()) );
+  loop->addAction( "&Insert after", this, SLOT(insert_loop_after()) );
+  loop->addAction( "&Append", this, SLOT(append_loop()) );
+  loop->addAction( "&Delete", this, SLOT(delete_loop()) );
+  loop->addAction( "&Clear", this, SLOT(clear_loop()) );
 
  
-  Q3PopupMenu *cel = new Q3PopupMenu( this );
+  QMenu *cel = new QMenu( this );
   Q_CHECK_PTR( cel );
-
-  cel->insertItem( "Next", this, SLOT(next_cel()) );
-  cel->insertItem( "Previous", this, SLOT(previous_cel()) );
-  cel->insertItem( "First", this, SLOT(first_cel()) );
-  cel->insertItem( "Last", this, SLOT(last_cel()) );
-  cel->insertSeparator();
-  cel->insertItem( "Insert before", this, SLOT(insert_cel_before()) );
-  cel->insertItem( "Insert after", this, SLOT(insert_cel_after()) );
-  cel->insertItem( "Append", this, SLOT(append_cel()) );
-  cel->insertItem( "Delete", this, SLOT(delete_cel()) );
-  cel->insertItem( "Clear", this, SLOT(clear_cel()) );
-  cel->insertSeparator();
-  cel->insertItem( "Flip Horizontally", this, SLOT(fliph_cel()) );
-  cel->insertItem( "Flip Vertically", this, SLOT(flipv_cel()) );
+  cel->setTitle("&Cel");
+  cel->addAction( "&Next", this, SLOT(next_cel()) );
+  cel->addAction( "&Previous", this, SLOT(previous_cel()) );
+  cel->addAction( "&First", this, SLOT(first_cel()) );
+  cel->addAction( "&Last", this, SLOT(last_cel()) );
+  cel->addSeparator();
+  cel->addAction( "Insert &before", this, SLOT(insert_cel_before()) );
+  cel->addAction( "&Insert after", this, SLOT(insert_cel_after()) );
+  cel->addAction( "&Append", this, SLOT(append_cel()) );
+  cel->addAction( "&Delete", this, SLOT(delete_cel()) );
+  cel->addAction( "&Clear", this, SLOT(clear_cel()) );
+  cel->addSeparator();
+  cel->addAction( "Flip &Horizontally", this, SLOT(fliph_cel()) );
+  cel->addAction( "Flip &Vertically", this, SLOT(flipv_cel()) );
 
   QMenuBar *menu = new QMenuBar(this);  
   Q_CHECK_PTR( menu );
-  menu->insertItem( "File", file );
-  menu->insertItem( "Edit", edit );
-  menu->insertItem( "Loop", loop );
-  menu->insertItem( "Cel", cel );
-  menu->insertItem( "Animate", this, SLOT(animate_cb()) );
-  menu->setSeparator( QMenuBar::InWindowsStyle );
+  menu->addMenu(file);
+  menu->addMenu(edit);
+  menu->addMenu(loop);
+  menu->addMenu(cel);
+  menu->addAction( "&Animate", this, SLOT(animate_cb()) );
 
-  Q3BoxLayout *all =  new Q3HBoxLayout(this,10);
+  QBoxLayout *all =  new QHBoxLayout(this);
   all->setMenuBar(menu);
 
-  Q3BoxLayout *left = new Q3VBoxLayout(all,1);
+  QBoxLayout *left = new QVBoxLayout(this);
+  all->addLayout(left);
 
   
   QPixmap pright=QPixmap(right_x);
   QPixmap pleft=QPixmap(left_x);
 
 
-  Q3Frame *frame1 = new Q3Frame(this);
-  frame1->setFrameStyle(Q3Frame::Box | Q3Frame::Sunken);
+  QFrame *frame1 = new QFrame(this);
+  frame1->setFrameStyle(QFrame::Box | QFrame::Sunken);
   frame1->setLineWidth(1);
   frame1->setMinimumSize(200,180);
-  frame1->setMargin(10);
+  frame1->setContentsMargins(10, 10, 10, 10);
   left->addWidget(frame1);
 
   
   int maxrow1 = 9,maxcol1 = 4;
-  Q3GridLayout *grid1 = new Q3GridLayout( frame1, maxrow1,maxcol1, 1 );
+  QGridLayout *grid1 = new QGridLayout(frame1);
 
   int i;
 
   for(i=0;i<maxcol1;i++){
-    grid1->setColStretch(i,1);
-    grid1->addColSpacing(i,1);
+    grid1->setColumnStretch(i,1);
+    grid1->addItem(new QSpacerItem(1, 0), 0, i);
   }
 
   for(i=0;i<maxrow1;i++){
     grid1->setRowStretch(i,1);
-    grid1->addRowSpacing(i,2);
+    grid1->addItem(new QSpacerItem(0, 2), i, 0);
   }
  
 
@@ -187,14 +185,12 @@ ViewEdit::ViewEdit( QWidget *parent, const char *name,int win_num, ResourcesWin 
 
 
   QPushButton *loopleft = new QPushButton(frame1);
-  //  loopleft->setFocusPolicy(ClickFocus);
-  loopleft->setPixmap(pleft);
+  loopleft->setIcon(pleft);
   connect( loopleft, SIGNAL(clicked()), SLOT(previous_loop()) );
   grid1->addWidget(loopleft,row,col,Qt::AlignRight);    col++;
 
   QPushButton *loopright = new QPushButton(frame1);
-  //  loopright->setFocusPolicy(ClickFocus);
-  loopright->setPixmap(pright);
+  loopright->setIcon(pright);
   connect( loopright, SIGNAL(clicked()), SLOT(next_loop()) );
   grid1->addWidget(loopright,row,col,Qt::AlignLeft);    col++;
 
@@ -207,14 +203,12 @@ ViewEdit::ViewEdit( QWidget *parent, const char *name,int win_num, ResourcesWin 
   grid1->addWidget(celnum,row,col,Qt::AlignLeft);    col++;
 
   QPushButton *celleft = new QPushButton(frame1);
-  //  celleft->setFocusPolicy(ClickFocus);
-  celleft->setPixmap(pleft);
+  celleft->setIcon(pleft);
   connect( celleft, SIGNAL(clicked()), SLOT(previous_cel()) );
   grid1->addWidget(celleft,row,col,Qt::AlignRight);     col++;
 
   QPushButton *celright = new QPushButton(frame1);
-  celright->setPixmap(pright);
-  //  celright->setFocusPolicy(ClickFocus);
+  celright->setIcon(pright);
   connect( celright, SIGNAL(clicked()), SLOT(next_cel()) );
   grid1->addWidget(celright,row,col,Qt::AlignLeft); col++;
   
@@ -230,16 +224,12 @@ ViewEdit::ViewEdit( QWidget *parent, const char *name,int win_num, ResourcesWin 
   grid1->addWidget(width,row,col,Qt::AlignLeft);      col++;
 
   QPushButton *widthleft = new QPushButton(frame1);
-  //  widthleft->setFocusPolicy(ClickFocus);
-  widthleft->setPixmap(pleft);
-  //  widthleft->setFocusPolicy(ClickFocus);
+  widthleft->setIcon(pleft);
   connect( widthleft, SIGNAL(clicked()), SLOT(dec_width()) );
   grid1->addWidget(widthleft,row,col,Qt::AlignRight);  col++;
 
   QPushButton *widthright = new QPushButton(frame1);
-  //  widthright->setFocusPolicy(ClickFocus);
-  widthright->setPixmap(pright);
-  //  widthright->setFocusPolicy(ClickFocus);
+  widthright->setIcon(pright);
   connect( widthright, SIGNAL(clicked()), SLOT(inc_width()) );
   grid1->addWidget(widthright,row,col,Qt::AlignLeft);   col++;
 
@@ -255,182 +245,171 @@ ViewEdit::ViewEdit( QWidget *parent, const char *name,int win_num, ResourcesWin 
   grid1->addWidget(height,row,col,Qt::AlignLeft);     col++;
 
   QPushButton *heightleft = new QPushButton(frame1);
-  //  heightleft->setFocusPolicy(ClickFocus);
-  heightleft->setPixmap(pleft);
-  //  heightleft->setFocusPolicy(ClickFocus);
+  heightleft->setIcon(pleft);
   connect( heightleft, SIGNAL(clicked()), SLOT(dec_height()) );
   grid1->addWidget(heightleft,row,col,Qt::AlignRight);  col++;
 
   QPushButton *heightright = new QPushButton(frame1);
-  //  heightright->setFocusPolicy(ClickFocus);
-  heightright->setPixmap(pright);
-  //  heightright->setFocusPolicy(ClickFocus);
+  heightright->setIcon(pright);
   connect( heightright, SIGNAL(clicked()), SLOT(inc_height()) );
   grid1->addWidget(heightright,row,col,Qt::AlignLeft);  col++;
 
 
   row++;col=0;
   is_descriptor = new QCheckBox("Description",frame1);
-  //  is_descriptor->setFocusPolicy(ClickFocus);
   connect( is_descriptor, SIGNAL(clicked()), SLOT(is_descriptor_cb()) );
 
-  grid1->addMultiCellWidget(is_descriptor,row,row,0,2,Qt::AlignCenter);   
+  grid1->addWidget(is_descriptor, row, 0, 1, 2, Qt::AlignCenter);
   
   edit_descriptor = new QPushButton(frame1);
-  //  edit_descriptor->setFocusPolicy(ClickFocus);
   edit_descriptor->setText("Edit");
   edit_descriptor->setMaximumHeight(20);
   edit_descriptor->setEnabled(false);
   connect( edit_descriptor, SIGNAL(clicked()), SLOT(show_description()) );
-  grid1->addMultiCellWidget(edit_descriptor,row,row,maxcol1-2,maxcol1-1,Qt::AlignCenter);
+  grid1->addWidget(edit_descriptor, row, (maxcol1 - 2), 1, -1, Qt::AlignCenter);
 
 
   row++;col=0;
 
 
   QLabel *mirrorloop = new QLabel("This loop mirrors: ", frame1, 0);
-  grid1->addMultiCellWidget(mirrorloop,row,row,0,maxcol1-1,Qt::AlignCenter);
+  grid1->addWidget(mirrorloop, row, 0, 1, (maxcol1 - 1), Qt::AlignCenter);
 
   
   row++;col=0;
 
 
-  mirror_loop = new QComboBox( FALSE, frame1,0 );
-  mirror_loop->insertItem(" no other loop ");
+  mirror_loop = new QComboBox(this);
+  left->addWidget(mirror_loop);
+  mirror_loop->insertItem(0, " no other loop ");
   mirror_loop->setMinimumSize(100,20);
   connect( mirror_loop, SIGNAL(activated(int)), this, SLOT(change_mirror(int)) );
  
-  grid1->addMultiCellWidget(mirror_loop,row,row,0,maxcol1-1,Qt::AlignCenter);  
+  grid1->addWidget(mirror_loop, row, 0, 1, (maxcol1 - 1), Qt::AlignCenter);
   
 
-  Q3Frame *frame2 = new Q3Frame(this);
-  frame2->setFrameStyle(Q3Frame::Box | Q3Frame::Sunken);
+  QFrame *frame2 = new QFrame(this);
+  frame2->setFrameStyle(QFrame::Box | QFrame::Sunken);
   frame2->setLineWidth(1);
   frame2->setMinimumSize(180,100);
-  frame2->setMargin(1);
+  frame2->setContentsMargins(1, 1, 1, 1);
   left->addWidget(frame2);
 
 
-  Q3BoxLayout *h_frame2 = new Q3HBoxLayout(frame2, 10);
+  QBoxLayout *h_frame2 = new QHBoxLayout(frame2);
 
 
-  Q3GridLayout *grid2 = new Q3GridLayout( h_frame2, 3, 2, 1);
+  QGridLayout *grid2 = new QGridLayout();
+  h_frame2->addLayout(grid2);
 
   for(i=0;i<2;i++){
-    grid2->setColStretch(i,1);
-    grid2->addColSpacing(i,1);
+    grid2->setColumnStretch(i,1);
+    grid2->addItem(new QSpacerItem(1, 0), 0, i);
   }
   for(i=0;i<3;i++){
     grid2->setRowStretch(i,1);
-    grid2->addRowSpacing(i,2);
+    grid2->addItem(new QSpacerItem(0, 2), i, 0);
   }
 
 
   QPushButton *zoom_minus = new QPushButton(frame2);
-  //  zoom_minus->setFocusPolicy(ClickFocus);
-  zoom_minus->setPixmap(QPixmap(zoom_minus_x));
+  zoom_minus->setIcon(QPixmap(zoom_minus_x));
   connect( zoom_minus, SIGNAL(clicked()), SLOT(zoom_minus()) );
   grid2->addWidget(zoom_minus,0,0,Qt::AlignLeft);
 
   QPushButton *zoom_plus = new QPushButton(frame2);
-  //  zoom_plus->setFocusPolicy(ClickFocus);
-  zoom_plus->setPixmap(QPixmap(zoom_plus_x));
+  zoom_plus->setIcon(QPixmap(zoom_plus_x));
   connect( zoom_plus, SIGNAL(clicked()), SLOT(zoom_plus()) );
   grid2->addWidget(zoom_plus,0,1,Qt::AlignRight);
   
 
   view_draw = new QRadioButton("Draw",frame2);
-  //  view_draw->setFocusPolicy(ClickFocus);
   view_draw->setChecked(true);
   drawing_mode=V_DRAW;
-  grid2->addMultiCellWidget(view_draw,1,1,0,1,Qt::AlignLeft);  
+  grid2->addWidget(view_draw, 1, 0, 1, 1, Qt::AlignLeft);
 
   view_fill = new QRadioButton("Fill",frame2);
-  //  view_fill->setFocusPolicy(ClickFocus);
-  grid2->addMultiCellWidget(view_fill,2,2,0,1,Qt::AlignLeft);  
+  grid2->addWidget(view_fill, 2, 0, 1, 1, Qt::AlignLeft);
 
 
-  Q3ButtonGroup *bg = new Q3ButtonGroup(frame2);
+  QButtonGroup *bg = new QButtonGroup(frame2);
   bg->setExclusive(true);
-  bg->hide();
-  bg->insert(view_draw);
-  bg->insert(view_fill,1);
+  bg->addButton(view_draw);
+  bg->addButton(view_fill,1);
   connect( bg, SIGNAL(clicked(int)), SLOT(change_mode(int)) );
 
 
-  Q3GridLayout *grid3 = new Q3GridLayout( h_frame2, 3, 3, 0);
+  QGridLayout *grid3 = new QGridLayout();
+  h_frame2->addLayout(grid3);
 
   for(i=0;i<3;i++){
-    grid3->setColStretch(i,1);
-    grid3->addColSpacing(i,0);
+    grid3->setColumnStretch(i,1);
+    grid3->addItem(new QSpacerItem(0, 0), 0, i);
   }
   for(i=0;i<3;i++){
     grid3->setRowStretch(i,1);
-    grid3->addRowSpacing(i,0);
+    grid3->addItem(new QSpacerItem(0, 0), i, 0);
   }
 
 
   QPushButton *view_up = new QPushButton(frame2);
-  //  view_up->setFocusPolicy(ClickFocus);
-  view_up->setPixmap(QPixmap(uparrow_x));
+  view_up->setIcon(QPixmap(uparrow_x));
   connect( view_up, SIGNAL(clicked()), SLOT(shift_up()) );
   grid3->addWidget(view_up,0,1,Qt::AlignBottom|Qt::AlignHCenter);
   
   QPushButton *view_left = new QPushButton(frame2);
-  //  view_left->setFocusPolicy(ClickFocus);
-  view_left->setPixmap(QPixmap(leftarrow_x));
+  view_left->setIcon(QPixmap(leftarrow_x));
   connect( view_left, SIGNAL(clicked()), SLOT(shift_left()) );
   grid3->addWidget(view_left,1,0,Qt::AlignRight|Qt::AlignVCenter);
   
   QPushButton *view_right = new QPushButton(frame2);
-  //  view_right->setFocusPolicy(ClickFocus);
-  view_right->setPixmap(QPixmap(rightarrow_x));
+  view_right->setIcon(QPixmap(rightarrow_x));
   connect( view_right, SIGNAL(clicked()), SLOT(shift_right()) );
   grid3->addWidget(view_right,1,2,Qt::AlignLeft|Qt::AlignVCenter);
   
   QPushButton *view_down = new QPushButton(frame2);
-  //  view_down->setFocusPolicy(ClickFocus);
-  view_down->setPixmap(QPixmap(downarrow_x));
+  view_down->setIcon(QPixmap(downarrow_x));
   connect( view_down, SIGNAL(clicked()), SLOT(shift_down()) );
   grid3->addWidget(view_down,2,1,Qt::AlignTop|Qt::AlignHCenter);
   
 
 
-  Q3Frame *frame3 = new Q3Frame(this);
-  frame3->setFrameStyle(Q3Frame::Box | Q3Frame::Sunken);
+  QFrame *frame3 = new QFrame(this);
+  frame3->setFrameStyle(QFrame::Box | QFrame::Sunken);
   frame3->setLineWidth(1);
   frame3->setMinimumSize(420,300);
-  frame3->setMargin(4);
+  frame3->setContentsMargins(4, 4, 4, 4);
   all->addWidget(frame3,1);
   
 
-  Q3BoxLayout *right = new Q3VBoxLayout(frame3,10);
+  QBoxLayout *right = new QVBoxLayout(this);
+  frame3->setLayout(right);
 
-  //  QScrollView *canvas = new QScrollView(frame3);
+  //  QScrollArea *canvas = new QScrollArea(frame3);
   canvas = new Canvas(frame3,0,this);
   canvas->setMinimumSize(400,200);
   right->addWidget(canvas,1);
   canvas->setFocusPolicy(Qt::ClickFocus);
   setFocusProxy(canvas);
 
-  Q3Frame *frame4 = new Q3Frame(frame3);
-  frame4->setFrameStyle(Q3Frame::Box | Q3Frame::Sunken);
+  QFrame *frame4 = new QFrame(frame3);
+  frame4->setFrameStyle(QFrame::Box | QFrame::Sunken);
   frame4->setLineWidth(1);
   frame4->setMinimumSize(400,80);
-  frame4->setMargin(10);
+  frame4->setContentsMargins(10, 10, 10, 10);
   right->addWidget(frame4);
   
 
   int maxcol2 = 6;
-  Q3GridLayout *grid4 = new Q3GridLayout( frame4, 2, maxcol2, 2);
+  QGridLayout *grid4 = new QGridLayout(frame4);
   
   for(i=0;i<maxcol2;i++){
-    grid4->setColStretch(i,1);
-    grid4->addColSpacing(i,4);
+    grid4->setColumnStretch(i,1);
+    grid4->addItem(new QSpacerItem(4, 0), 0, i);
   }
   for(i=0;i<2;i++){
     grid4->setRowStretch(i,1);
-    grid4->addRowSpacing(i,2);
+    grid4->addItem(new QSpacerItem(0, 2), i, 0);
   }
 
  
@@ -446,20 +425,18 @@ ViewEdit::ViewEdit( QWidget *parent, const char *name,int win_num, ResourcesWin 
   grid4->addWidget(transcolor,0,1,Qt::AlignCenter);   
 
   QPushButton *set_trans_color = new QPushButton(frame4);
-  //  set_trans_color->setFocusPolicy(ClickFocus);
   set_trans_color->setText("Set");
   set_trans_color->setMaximumHeight(20);
   connect( set_trans_color, SIGNAL(clicked()), SLOT(set_transcolor()) );
   grid4->addWidget(set_trans_color,0,2,Qt::AlignRight);
 
   QWidget *dummy = new QWidget(frame4);
-  grid4->addMultiCellWidget(dummy,0,3,maxcol2-1,Qt::AlignCenter);
+  grid4->addWidget(dummy, 0, 0, 3, (maxcol2 - 1), Qt::AlignCenter);
   
   palette = new Palette(frame4);
   palette->setMinimumSize(250,40);
   palette->setMaximumSize(350,80);
-  //  palette->setPalette( QPalette( QColor(255, 255, 80) ) );
-  grid4->addMultiCellWidget(palette,1,1,0,maxcol2-2,Qt::AlignLeft);
+  grid4->addWidget(palette, 1, 0, 1, (maxcol2 - 2), Qt::AlignLeft);
 
   description = NULL;
 
@@ -509,7 +486,7 @@ void ViewEdit::open(int ResNum)
   if(view->open(ResNum))return ;
   ViewNum = ResNum;
   sprintf(tmp,"View editor: view.%d",ViewNum);
-  setCaption(tmp);
+  setWindowTitle(tmp);
   changed=false;
   display();
 
@@ -522,7 +499,7 @@ void ViewEdit::open(char *filename)
   if(view->open(filename))return;
   ViewNum = -1;
   sprintf(tmp,"View editor");
-  setCaption(tmp);  
+  setWindowTitle(tmp);
   changed=false;
   display();
 }
@@ -549,13 +526,12 @@ void ViewEdit::DisplayView()
 //*********************************************
 void ViewEdit::DisplayView(int pixsize)
 {
-
   int w,h;
   w = canvas->x0+canvas->cur_w*pixsize*2+10;
   h = canvas->y0+canvas->cur_h*pixsize+10;
 
-  if(canvas->contentsWidth() < w || canvas->contentsHeight() < h){
-    canvas->resizeContents(w,h);
+  if(canvas->width() < w || canvas->height() < h){
+    canvas->resize(w,h);
   }
 
 
@@ -585,29 +561,27 @@ void ViewEdit::showlooppar()
 //*********************************************
 void ViewEdit::showmirror()
 {
-
   int m=view->loops[view->CurLoop].mirror;
   int m1=view->loops[view->CurLoop].mirror1;
 
   mirror_loop->clear();
-  mirror_loop->insertItem("no other loop");
-  mirror_loop->setCurrentItem(0);
+  mirror_loop->addItem("no other loop");
+  mirror_loop->setCurrentIndex(0);
   int item=1;
   for(int i=0;i<view->NumLoops;i++){
     if(i==view->CurLoop)continue;
     if((view->loops[i].mirror==-1 && view->loops[i].mirror1==-1)||i==m||i==m1){
 
       sprintf(tmp,"Loop %d",i);
-      mirror_loop->insertItem(tmp);
+      mirror_loop->addItem(tmp);
       if(m==i)
-        mirror_loop->setCurrentItem(item);
+        mirror_loop->setCurrentIndex(item);
       else if(m==-1&&m1==i)
-        mirror_loop->setCurrentItem(item);
+        mirror_loop->setCurrentIndex(item);
       item++;
 
     }
   }
-
 }
 
 //*********************************************
@@ -628,7 +602,7 @@ void ViewEdit::showcelpar()
 void ViewEdit::deinit()
 {
   if(description){
-    description->close(true);
+    description->close();
     description=NULL;
   }
   if(animate)animate->closeall();
@@ -643,7 +617,7 @@ void ViewEdit::hideEvent( QHideEvent * )
 {
   
   if(description){
-    description->close(true);
+    description->close();
     description=NULL;
   }
   if(window_list && window_list->isVisible())window_list->draw();
@@ -706,26 +680,17 @@ void ViewEdit::closeEvent( QCloseEvent *e )
 //*********************************************
 void ViewEdit::open_file()
 {
-  
-  Q3FileDialog *f = new Q3FileDialog(0,"Open",true);  
-  const char *filters[] = {"view*.*","All files (*)",NULL};
-  
-  f->setFilters(filters);
-  f->setCaption("Open view");
-  f->setMode(Q3FileDialog::ExistingFile);
-  f->setDir(game->srcdir.c_str());
-  if ( f->exec() == QDialog::Accepted ) {
-    if ( !f->selectedFile().isEmpty() )
-      open((char *)f->selectedFile().latin1());
-  }
-
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open View File"), game->srcdir.c_str(), tr("View Files (view*.*);;All Files (*)"));
+    if (!fileName.isNull()) {
+        open(fileName.toLatin1().data());
+    }
 }
 
 //*********************************************
 void ViewEdit::open()
 {
   
-  setCaption("View editor");
+  setWindowTitle("View editor");
   view->newView();
   ViewNum = -1;
   showlooppar();
@@ -738,20 +703,10 @@ void ViewEdit::open()
 //*********************************************
 void ViewEdit::save_file()
 {
-
-
-  Q3FileDialog *f = new Q3FileDialog(0,"Save",true);  
-  const char *filters[] = {"view*.*","All files (*)",NULL};
-  
-  f->setFilters(filters);
-  f->setCaption("Save view");
-  f->setMode(Q3FileDialog::AnyFile);
-  f->setDir(game->srcdir.c_str());
-  if ( f->exec() == QDialog::Accepted ) {
-    if ( !f->selectedFile().isEmpty() )
-      save((char *)f->selectedFile().latin1());
-  }
-
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save View File"), game->srcdir.c_str(), tr("View Files (view*.*);;All Files (*)"));
+    if (!fileName.isNull()) {
+        save(fileName.toLatin1().data());
+    }
 }
 
 //*********************************************
@@ -773,13 +728,12 @@ void ViewEdit::save_to_game()
 //*********************************************
 void ViewEdit::save_to_game_as()
 {
-
   AskNumber *view_number = new AskNumber(0,0,"View number","Enter view number: [0-255]");    
 
   if(!view_number->exec())return;
 
   QString str = view_number->num->text();
-  int num = atoi((char *)str.latin1());
+  int num = str.toInt();
   
   if(num<0||num>255){
     menu->errmes("View number must be between 0 and 255 !");
@@ -833,15 +787,14 @@ void ViewEdit::delete_view()
   case 0: 
     game->DeleteResource(VIEW,ViewNum);
     if(resources_win){
-      k = resources_win->list->currentItem();
+      k = resources_win->list->currentRow();
       resources_win->select_resource_type(VIEW);
-      resources_win->list->setCurrentItem(k);
+      resources_win->list->setCurrentRow(k);
     }
     break;
   case 1:       
     break;
-  } 
-
+  }
 }
 
 //*********************************************
@@ -1030,7 +983,7 @@ void ViewEdit::change_mirror(int i)
   }
   else{
     QString str = mirror_loop->currentText();
-    int k = atoi((char *)str.latin1()+5);
+    int k = str.toInt() + 5;
     printf("set %d to mirror %d\n",view->CurLoop,k);
     if(view->loops[view->CurLoop].mirror != k){
 
@@ -1273,13 +1226,12 @@ void ViewEdit::inc_height()
 //*********************************************
 void ViewEdit::change_width_height()
 {
-
   QString str = width->text();
-  int w = atoi((char *)str.latin1());
+  int w = str.toInt();
   view->loops[view->CurLoop].cels[view->CurCel].setW(w);
 
   str = height->text();
-  int h = atoi((char *)str.latin1());
+  int h = str.toInt();
   view->loops[view->CurLoop].cels[view->CurCel].setH(h);
 
   DisplayView();
@@ -1483,15 +1435,16 @@ void ViewEdit::animate_cb()
 }
 /*******************************************************/
 Animate::Animate( QWidget *parent, const char *name, Preview *p, ViewEdit *v)
-    : QWidget( parent, name )
+    : QWidget(parent)
 {
-
   viewedit = v;
   preview = p;
-  setCaption("Animate");
-  Q3BoxLayout *b = new Q3VBoxLayout(this,10);
+  setWindowTitle("Animate");
 
-  Q3HBoxLayout *b1 = new Q3HBoxLayout(b,4);
+  QBoxLayout *b = new QVBoxLayout(this);
+
+  QHBoxLayout *b1 = new QHBoxLayout(this);
+  b->addLayout(b1);
   QLabel *l = new QLabel("Delay (ms)",this);
   b1->addWidget(l);
   delay = new QLineEdit(this);
@@ -1499,15 +1452,19 @@ Animate::Animate( QWidget *parent, const char *name, Preview *p, ViewEdit *v)
   delay->setMaximumWidth(100);
   b1->addWidget(delay);
 
-  Q3ButtonGroup *fb = new Q3ButtonGroup(2,Qt::Horizontal,"",this);
+  QButtonGroup *fb = new QButtonGroup(this);
   fb->setExclusive(true);
-  forward = new QRadioButton("Forward",fb);
+  forward = new QRadioButton("Forward");
   forward->setChecked(true);
-  backward = new QRadioButton("Backward",fb);
+  backward = new QRadioButton("Backward");
   connect(fb,SIGNAL(clicked(int)),SLOT(fb_cb()));
-  b->addWidget(fb);
+  fb->addButton(forward);
+  fb->addButton(backward);
+  b1->addWidget(forward);
+  b1->addWidget(backward);
 
-  Q3HBoxLayout *b2 = new Q3HBoxLayout(b,4);
+  QHBoxLayout *b2 = new QHBoxLayout(this);
+  b->addLayout(b2);
   button = new QPushButton(this);
   button->setText("Start");
   b2->addWidget(button);
@@ -1532,7 +1489,7 @@ void Animate::start_stop()
   }
   else{
     QString str = delay->text();
-    num = atoi((char *)str.latin1());
+    num = str.toInt();
     button->setText("Stop");
     fwd = forward->isChecked();
     timer->start(num);    
@@ -1564,18 +1521,18 @@ void Animate::closeall()
 {
   
    if(timer->isActive())timer->stop();
-   close(true);
+   close();
 }
 
 /*******************************************************/
 Description::Description( QWidget *parent, const char *name , ViewEdit *v)
-    : QWidget( parent, name ,Qt::WDestructiveClose)
+    : QWidget(parent)
 {
-
-  setCaption("View description");
+  setAttribute(Qt::WA_DeleteOnClose);
+  setWindowTitle("View description");
   viewedit = v;
 
-  Q3BoxLayout *d1 = new Q3VBoxLayout(this,10);
+  QBoxLayout *d1 = new QVBoxLayout(this);
   d1->addSpacing(10);
   
   smallview = new ViewIcon(this,0,viewedit);
@@ -1583,11 +1540,12 @@ Description::Description( QWidget *parent, const char *name , ViewEdit *v)
 
   d1->addWidget(smallview,0,Qt::AlignCenter);
 
-  desc = new Q3MultiLineEdit(this);
+  desc = new QTextEdit(this);
   desc->setMinimumSize(300,100);
   d1->addWidget(desc,1);  
 
-  Q3BoxLayout *d2 = new Q3HBoxLayout(d1,10);  
+  QBoxLayout *d2 = new QHBoxLayout(this);
+  d1->addLayout(d2);
   d2->addSpacing(10);
 
   QPushButton *ok = new QPushButton(this);
@@ -1647,7 +1605,7 @@ void Description::set()
       if (n <= 0)n = maxcol-ThisLine.length();
       ThisLine += ThisMessage.substr(0,n);      
       ThisMessage = (n < (int)ThisMessage.length())?ThisMessage.substr(n+1):"";
-      desc->insertLine(ThisLine.c_str(),-1);
+      desc->insertPlainText(ThisLine.c_str());
       ThisLine = "";
     }
     else{
@@ -1657,9 +1615,8 @@ void Description::set()
   }while(ThisMessage != "");     
 
   if(ThisLine != ""){
-    desc->insertLine(ThisLine.c_str(),-1);
+    desc->insertPlainText(ThisLine.c_str());
   }
-  
 }
 
 //*********************************************
@@ -1667,8 +1624,8 @@ void Description::ok_cb()
 {
   int i;
 
-  QString str = desc->text();
-  char *s = (char *)str.latin1();
+  QString str = desc->toPlainText();
+  char *s = (char *)str.toLatin1().data();
   tmp[0]=0;
   for(i=0;*s;s++){
     if(*s!='\n')
@@ -1694,7 +1651,7 @@ void Description::cancel_cb()
 }
 //**********************************************
 Canvas::Canvas ( QWidget *parent, const char *name, ViewEdit *v)
-    : Q3ScrollView( parent, name )
+    : QScrollArea(parent)
 {
 
   viewedit = v;
@@ -1710,7 +1667,7 @@ Canvas::Canvas ( QWidget *parent, const char *name, ViewEdit *v)
 void Canvas::setSize(int w,int h)
 {
   if(cur_w != w || cur_h != h){
-    pixmap.resize(w*pixsize*2,h*pixsize);
+    pixmap = pixmap.scaled(w*pixsize*2,h*pixsize);
     cur_w=w;
     cur_h=h;
   }
@@ -1719,8 +1676,7 @@ void Canvas::setSize(int w,int h)
 //*********************************************
 void Canvas::viewportMousePressEvent(QMouseEvent* event)
 {
-  int x, y;
-  viewportToContents( event->x(),  event->y(), x, y );
+  int x = event->x(), y = event->y();
 
   if (event->button() & Qt::LeftButton){
     CurColor = viewedit->palette->left;
@@ -1735,9 +1691,7 @@ void Canvas::viewportMousePressEvent(QMouseEvent* event)
 //*********************************************
 void Canvas::viewportMouseMoveEvent(QMouseEvent* event)
 {
-  int x, y;
-
-  viewportToContents( event->x(),  event->y(), x, y );  
+  int x = event->x(), y = event->y();
   UpdateCel(x-x0,y-y0);
 }
 
@@ -1760,7 +1714,7 @@ void Canvas::DrawCel(int w,int h,byte *celdata,bool mirror, int size)
   ww0=(x0+w0)*2*pixsize;
   hh0=(y0+h0)*pixsize;
   pixsize=size;
-  pixmap.resize(cur_w*pixsize*2,cur_h*pixsize);
+  pixmap = pixmap.scaled(cur_w*pixsize*2,cur_h*pixsize);
   ww=(x0+w)*2*pixsize;
   hh=(y0+h)*pixsize;
 
@@ -1782,8 +1736,7 @@ void Canvas::DrawCel(int w,int h,byte *celdata,bool mirror, int size)
       }
     }
   }
-  repaintContents(x0,y0,MAX(ww,ww0),MAX(hh,hh0),true);
-
+  repaint(x0, y0, MAX(ww,ww0), MAX(hh,hh0));
 }
 
 //*********************************************
@@ -1829,14 +1782,14 @@ void Canvas::DrawCel(int w,int h,byte *celdata,bool mirror)
   }
 
   if(changed)
-    repaintContents(x0,y0,MAX(ww,ww0),MAX(hh,hh0),true);
+    repaint(x0, y0, MAX(ww,ww0), MAX(hh,hh0));
   else
-    repaintContents(x0,y0,ww,hh,false);
+    repaint(x0, y0, ww, hh);
 }
 
 //*********************************************
-void Canvas::UpdateCel(int x,int y){
-
+void Canvas::UpdateCel(int x,int y)
+{
   int xn=x/pixsize/2;
   int yn=y/pixsize;
       
@@ -1849,7 +1802,7 @@ void Canvas::UpdateCel(int x,int y){
       y=yn*pixsize;
           
       p.fillRect(x,y,pixsize*2,pixsize,egacolor[CurColor]);
-      repaintContents(x0+x,y0+y,pixsize*2,pixsize,false);
+      repaint(x0+x, y0+y, pixsize*2, pixsize);
       if(cur_mirror){
         data[yn*cur_w*2+cur_w*2-2-xn*2]=CurColor;
         data[yn*cur_w*2+cur_w*2-2-xn*2+1]=CurColor;
@@ -1932,7 +1885,7 @@ bool Canvas::focusNextPrevChild ( bool )
 }
 //********************************************
 ViewIcon::ViewIcon ( QWidget *parent, const char *name , ViewEdit *v)
-    : QWidget( parent, name )
+    : QWidget(parent)
 {
 
   viewedit=v;
@@ -1957,8 +1910,8 @@ void ViewIcon::paintEvent(QPaintEvent *)
   int W = viewedit->description->width();
   setGeometry((W-pixsize*w*2)/2,10,pixsize*w*2,pixsize*h);
 
-  //  if(pixsize*w*2>width() || pixsize*h>height()){
-  //    resize(pixsize*w*2,pixsize*h);
+    if(pixsize*w*2>width() || pixsize*h>height())
+      resize(pixsize*w*2,pixsize*h);
   
   
   if(mirror){      

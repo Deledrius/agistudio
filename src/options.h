@@ -21,22 +21,20 @@
 #ifndef OPTIONS_H
 #define OPTIONS_H
 
-#include <qwidget.h>
-#include <qlabel.h>
-#include <qpushbutton.h>
-#include <qlayout.h>
-#include <q3listbox.h>
-#include <qmessagebox.h>
-#include <qlineedit.h> 
-#include <qradiobutton.h> 
-#include <q3buttongroup.h>
-#include <qcheckbox.h> 
-#include <q3multilineedit.h> 
-#include <qpixmap.h>
-#include <qlineedit.h>
-#include <qcombobox.h> 
-#include <qevent.h> 
-#include <q3tabdialog.h>
+#include <QWidget>
+#include <QLabel>
+#include <QPushButton>
+#include <QLayout>
+#include <QMessageBox>
+#include <QLineEdit>
+#include <QRadioButton>
+#include <QButtonGroup>
+#include <QCheckBox>
+#include <QTextEdit>
+#include <QPixmap>
+#include <QComboBox>
+#include <QEvent>
+#include <QDialogButtonBox>
 
 #include "util.h"
 #include "wutil.h"
@@ -45,17 +43,19 @@
 
 
 
-class Options : public Q3TabDialog
+class Options : public QDialog
 {
     Q_OBJECT
 public:
     Options( QWidget *parent=0, const char *name=0);
-    QComboBox *type,/* *style,*/ *picstyle;
+    QTabWidget *tabs;
+    QComboBox *type, *picstyle;
     QCheckBox *messages,*elses,*special;
     QRadioButton *text,*binary;
     QLineEdit *relname,*absname;
     QRadioButton *reldir,*absdir;
     QLineEdit *command,*templatedir,*helpdir;
+    QDialogButtonBox* bb;
 
 public slots:
     void set_general();

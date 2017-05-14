@@ -24,5 +24,3 @@ typedef unsigned char byte;
 using namespace std;
 #endif
 
-namespace Qt {}
-using namespace Qt;

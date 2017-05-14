@@ -11,21 +11,23 @@
 #ifndef HELPWINDOW_H
 #define HELPWINDOW_H
 
-#include <q3textbrowser.h>
-#include <q3mainwindow.h>
-#include <qstringlist.h>
-#include <qmap.h>
-#include <qdir.h>
-//Added by qt3to4:
-#include <Q3PopupMenu>
+#include <QTextBrowser>
+#include <QMainWindow>
+#include <QStringList>
+#include <QMap>
+#include <QDir>
 #include <QShowEvent>
 #include <QHideEvent>
 #include <QEvent>
 
-class QComboBox;
-class Q3PopupMenu;
+#ifdef _WIN32
+#include <windows.h>
+#endif
 
-class HelpWindow : public Q3MainWindow
+class QComboBox;
+class QMenu;
+
+class HelpWindow : public QMainWindow
 {
     Q_OBJECT
 public:
@@ -52,14 +54,14 @@ private:
     void readHistory();
     void readBookmarks();
     
-    Q3TextBrowser* browser;
+    QTextBrowser* browser;
     QComboBox *pathCombo;
-    int backwardId, forwardId;
+    QAction *backwardAction, *forwardAction;
     QString selectedURL;
     QDir path;
     QStringList fileList, history, bookmarks;
     QMap<int, QString> mHistory, mBookmarks;
-    Q3PopupMenu *hist, *bookm;
+    QMenu *hist, *bookm;
 };
 
 

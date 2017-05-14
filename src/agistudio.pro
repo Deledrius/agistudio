@@ -58,6 +58,3 @@ SOURCES  = agicommands.cpp \
 		wutil.cpp \
 		bmp2agipic.cpp
 TARGET   = agistudio
-
-#The following line was inserted by qt3to4
-QT +=  qt3support 

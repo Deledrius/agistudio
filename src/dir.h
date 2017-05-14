@@ -21,7 +21,7 @@
 #ifndef DIR_H
 #define DIR_H
 
-#include <qwidget.h>
+#include <QWidget>
 
 void OpenGameDir( QWidget *parent=0, bool newgame=false );
 

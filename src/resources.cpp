@@ -27,16 +27,14 @@
 #include "midi.h"
 #include "bmp2agipic.h"
 
-#include <q3widgetstack.h>
-//Added by qt3to4:
-#include <Q3HBoxLayout>
+#include <QHBoxLayout>
 #include <QLabel>
 #include <QHideEvent>
-#include <Q3PopupMenu>
-#include <Q3VBoxLayout>
-#include <Q3BoxLayout>
+#include <QVBoxLayout>
+#include <QBoxLayout>
 #include <QShowEvent>
 #include <QCloseEvent>
+#include <QGroupBox>
 
 #include <stdio.h>
 #ifdef _WIN32
@@ -50,61 +48,63 @@
 
 //**********************************************************
 ResourcesWin::ResourcesWin(  QWidget* parent, const char*  name, int win_num ):
-  QWidget(parent,name,Qt::WDestructiveClose)
+  QWidget(parent)
 {
-  setSizePolicy( QSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed ));
-  setCaption("resources");
+  setAttribute(Qt::WA_DeleteOnClose);
+  setWindowTitle("Resources");
+
+  setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
   winnum = win_num;
 
-  Q3PopupMenu *window = new Q3PopupMenu( this );
+  QMenu *window = new QMenu( this );
   Q_CHECK_PTR( window );
-  window->insertItem ( "New", this, SLOT(new_resource_window()) );
-  window->insertSeparator();
-  window->insertItem ( "Close", this, SLOT(close()) );
+  window->setTitle("&Window");
+  window->addAction( "&New", this, SLOT(new_resource_window()) );
+  window->addSeparator();
+  window->addAction( "&Close", this, SLOT(close()) );
 
-
-  resourceMenu = new Q3PopupMenu( this );
+  resourceMenu = new QMenu( this );
   Q_CHECK_PTR( resourceMenu );
-  resourceMenu->insertItem ( "&Add", this, SLOT(add_resource()) );
-  resourceMenu->insertItem ( "&Extract", this, SLOT(extract_resource()) );
-  resourceMenu->insertItem ( "&Delete", this, SLOT(delete_resource()) );
-  resourceMenu->insertItem ( "&Renumber", this, SLOT(renumber_resource()) );
-  importMenuItemID = resourceMenu->insertItem ( "Import &bitmap", this, SLOT(import_resource()) );
-  resourceMenu->setItemEnabled(importMenuItemID, false);
-  resourceMenu->insertItem ( "Extract all", this, SLOT(extract_all_resource()) );
+  resourceMenu->setTitle("&Resource");
+  resourceMenu->addAction("&Add", this, SLOT(add_resource()));
+  resourceMenu->addAction("&Extract", this, SLOT(extract_resource()));
+  resourceMenu->addAction("&Delete", this, SLOT(delete_resource()));
+  resourceMenu->addAction("&Renumber", this, SLOT(renumber_resource()));
+  importMenuItemAction = resourceMenu->addAction("Import &bitmap", this, SLOT(import_resource()));
+  importMenuItemAction->setEnabled(false);
+  resourceMenu->addAction("E&xtract all", this, SLOT(extract_all_resource()));
 
   QMenuBar* resourceMenubar = new QMenuBar(this);
   Q_CHECK_PTR( resourceMenubar );
-  resourceMenubar->insertItem ("Window", window );
-  resourceMenubar->insertItem( "&Resource", resourceMenu );
-  resourceMenubar->setSeparator( QMenuBar::InWindowsStyle );
+  resourceMenubar->addMenu(window);
+  resourceMenubar->addMenu(resourceMenu);
+  resourceMenubar->addSeparator();
 
-  Q3BoxLayout *hbox =  new Q3HBoxLayout( this, 10 );
+  QBoxLayout *hbox =  new QHBoxLayout(this);
   hbox->setMenuBar(resourceMenubar);
 
-  Q3BoxLayout *resbox =  new Q3VBoxLayout( hbox, 10 );
+  QBoxLayout *resbox =  new QVBoxLayout(this);
+  hbox->addLayout(resbox);
 
-  type = new QComboBox(FALSE, this, "type");
-
-  type->insertItem( "LOGIC" );
-  type->insertItem( "PICTURE" );
-  type->insertItem( "VIEW" );
-  type->insertItem( "SOUND" );
+  type = new QComboBox(this);
+  type->addItem("LOGIC");
+  type->addItem("PICTURE");
+  type->addItem("VIEW");
+  type->addItem("SOUND");
   connect( type, SIGNAL(activated(int)), SLOT(select_resource_type(int)) );
   type->setSizePolicy( QSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed ));
   resbox->addWidget(type);
 
-  list = new Q3ListBox(this,"list");
-  list->setColumnMode (1);
+  list = new QListWidget();
   list->setMinimumSize(200,300);
-  connect( list, SIGNAL(highlighted(int)), SLOT(highlight_resource(int)) );
-  connect( list, SIGNAL(selected(int)), SLOT(select_resource(int)) );
+  connect(list, SIGNAL(itemSelectionChanged()), this, SLOT(highlight_resource()));
+  connect(list, SIGNAL(itemActivated(QListWidgetItem *)), this, SLOT(select_resource(QListWidgetItem *)));
   list->setSizePolicy( QSizePolicy( QSizePolicy::Fixed, QSizePolicy::MinimumExpanding ));
 
   selected = game->res_default;
   resbox->addWidget(list);
 
-  msg = new QLabel( this, "message" );
+  msg = new QLabel(this);
   msg->setAlignment( Qt::AlignLeft );
   resbox->addWidget(msg);
 
@@ -112,12 +112,14 @@ ResourcesWin::ResourcesWin(  QWidget* parent, const char*  name, int win_num ):
   preview = NULL;
   closing = false;
 
-  Q3BoxLayout *prevbox =  new Q3VBoxLayout(hbox,10);
-  Q3GroupBox* group = new Q3GroupBox( 1, Qt::Vertical, "Preview", this );
+  QBoxLayout *prevbox =  new QVBoxLayout();
+  prevbox->addLayout(hbox);
+
+  QGroupBox* group = new QGroupBox("Preview", this);
   group->setMinimumSize(340+10*2,280+10*2);
   group->setSizePolicy( QSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding ));
   previewPane = group;
-  prevbox->addWidget(previewPane);
+  hbox->addWidget(previewPane);
 
   adjustSize();
 }
@@ -128,11 +130,11 @@ void ResourcesWin::select_resource_type( int ResType )
   QString str;
   int i,k;
 
-  type->setCurrentItem(ResType);
+  type->setCurrentIndex(ResType);
   selected = ResType;
 
   // enable import item if resource type supports it
-  resourceMenu->setItemEnabled(importMenuItemID, selected == PICTURE );
+  importMenuItemAction->setEnabled(selected == PICTURE);
 
   // Show a resource list
   list->hide();
@@ -140,13 +142,20 @@ void ResourcesWin::select_resource_type( int ResType )
   for(i=0,k=0;i<256;i++){
     if(game->ResourceInfo[ResType][i].Exists){
       str.sprintf( "%s.%3d", ResTypeName[ResType],i);
-      list->insertItem( str );
+      list->addItem(str);
       ResourceIndex[k++]=i;
     }
   }
   ResourceNum = k;
   list->show();
   first=true;
+}
+
+//********************************************************
+void ResourcesWin::highlight_resource() {
+    if (!list->selectedItems().isEmpty()) {
+        highlight_resource(list->currentRow());
+    }
 }
 
 //********************************************************
@@ -165,6 +174,14 @@ void ResourcesWin::highlight_resource( int k )
   preview->open(i,selected);
   preview->show();
 }
+
+//********************************************************
+void ResourcesWin::select_resource(QListWidgetItem * item) {
+    if (!list->selectedItems().isEmpty()) {
+        select_resource(list->currentRow());
+    }
+}
+
 //********************************************************
 void ResourcesWin::select_resource( int k )
 {
@@ -203,14 +220,12 @@ void ResourcesWin::select_resource( int k )
 //********************************************************
 void ResourcesWin::set_current( int n )
 {
-
   for(int i=0;i<ResourceNum;i++){
     if(ResourceIndex[i]==n){
-      list->setCurrentItem(i);
+      list->setCurrentRow(i);
       break;
     }
   }
-
 }
 //*********************************************
 void ResourcesWin::deinit( )
@@ -276,9 +291,8 @@ void ResourcesWin::new_resource_window()
 //**********************************************
 void ResourcesWin::delete_resource()
 {
-
   int restype = selected;
-  int k = list->currentItem();
+  int k = list->currentRow();
   int resnum = ResourceIndex[k];
 
   sprintf(tmp,"Really delete %s.%d ?",ResTypeName[restype],resnum);
@@ -290,21 +304,19 @@ void ResourcesWin::delete_resource()
     game->DeleteResource(restype,resnum);
     select_resource_type(restype);
     if(k>0)
-      list->setCurrentItem(k-1);
+      list->setCurrentRow(k-1);
     else
-      list->setCurrentItem(0);
+      list->setCurrentRow(0);
     break;
   case 1:
     break;
   }
-
 }
 
 //**********************************************
 void ResourcesWin::renumber_resource()
 {
-
-  int k = list->currentItem();
+  int k = list->currentRow();
   if(k==-1)return;
 
   AskNumber *ask_number = new AskNumber(0,0,"Resource number",
@@ -313,7 +325,7 @@ void ResourcesWin::renumber_resource()
   if(!ask_number->exec())return;
 
   QString str = ask_number->num->text();
-  int newnum = atoi((char *)str.latin1());
+  int newnum = str.toInt();
   int restype = selected;
   int resnum = ResourceIndex[k];
   if(game->ResourceInfo[restype][newnum].Exists){
@@ -334,31 +346,21 @@ void ResourcesWin::renumber_resource()
   }
 }
 
-static QImage openBitmap( const char* title )
+static QImage openBitmap(const char* title)
 {
-  Q3FileDialog *f = new Q3FileDialog(0,"Load visible bitmap",true);
-  const char *filters[] = {"All files (*)",NULL};
-  f->setFilters(filters);
-
-  QImage pic;
-  
-  f->setCaption(title);
-  f->setMode(Q3FileDialog::ExistingFile);
-  f->setDir(game->srcdir.c_str());
-  if ( f->exec() == QDialog::Accepted )
-    if ( !f->selectedFile().isEmpty() )
-    {
-      pic = QImage( f->selectedFile());
-      if ( pic.isNull())
-        menu->errmes("Error loading bitmap.");
+    QImage pic;
+    QString fileName = QFileDialog::getOpenFileName(nullptr, title, game->srcdir.c_str(), "All Files (*)");
+    if (!fileName.isNull()) {
+        pic = QImage(fileName);
+        if (pic.isNull())
+            menu->errmes("Error loading bitmap.");
+        else {
+            if ((pic.width() != 320 && pic.width() != 160) || pic.height() < 168) {
+                menu->errmes("Bitmap size must be 320x168 or 160x168.\nHeight can be more but will be cropped to 168.");
+            }
+        }
     }
-
-  if (!pic.isNull())
-    if ( (pic.width() != 320 && pic.width() != 160) || pic.height()<168 )
-    {
-      menu->errmes("Bitmap size must be 320x168 or 160x168.\nHeight can be more but will be cropped to 168.");
-    }
-  return pic;
+    return pic;
 }
 
 //**********************************************
@@ -376,7 +378,7 @@ void ResourcesWin::import_resource()
   if(!ask_number->exec()) return;
 
   QString str = ask_number->num->text();
-  int newnum = atoi((char *)str.latin1());
+  int newnum = str.toInt();
   int restype = selected;
   
   int replace = 0;
@@ -404,10 +406,10 @@ void ResourcesWin::import_resource()
             
       game->AddResource(restype, newnum); // uses data from ResourceData
       select_resource_type(restype);
-      
+
       for ( int k=0; k<255; ++k )
         if ( ResourceIndex[k] == newnum )
-          list->setSelected(k, true);
+          list->setCurrentRow(k);
     }
     break;
   case 1:
@@ -440,22 +442,15 @@ static void extract(char *filename,int restype,int resnum)
 //**********************************************
 void ResourcesWin::extract_resource()
 {
-
   int restype = selected;
-  int k = list->currentItem();
-  int resnum = ResourceIndex[k];
+  int resnum = ResourceIndex[list->currentRow()];
 
-  Q3FileDialog *f = new Q3FileDialog(0,"Extract resource",true);
-  f->setCaption("Extract resource");
-  f->setMode(Q3FileDialog::AnyFile);
-  f->setDir(game->srcdir.c_str());
-  sprintf(tmp,"%s.%03d",ResTypeName[restype],resnum);
-  f->setSelection(tmp);
+  auto defaultfile = QString("%1.%2").arg(ResTypeName[restype]).arg(resnum, 3, 10, QLatin1Char('0'));
+  auto defaultpath = QDir::cleanPath(QString(game->srcdir.c_str()) + QDir::separator() + defaultfile);
 
-  if ( f->exec() == QDialog::Accepted ) {
-    if ( !f->selectedFile().isEmpty() ){
-      extract((char *)f->selectedFile().latin1(),restype,resnum);
-    }
+  QString fileName = QFileDialog::getSaveFileName(this, tr("Extract Resource"), defaultpath, tr("All Files (*)"));
+  if (!fileName.isNull()) {
+      extract(fileName.toLatin1().data(), restype, resnum);
   }
 }
 
@@ -489,60 +484,22 @@ void ResourcesWin::extract_all_resource()
 //**********************************************
 void ResourcesWin::add_resource()
 {
+  QStringList types = { "logic*.*", "picture*.*", "view*.*", "sound*.*", "All files (*)" };
+  QString filters = types.join(";;");
+  QString preferredfilter(types[selected]);
 
-  Q3FileDialog *f = new Q3FileDialog(0,"Add resource",true);
-
-  static const char *types[6] = {"logic*.*","picture*.*","view*.*","sound*.*","All files (*)",NULL};
-
-  const char *filters[6];
-
-  switch(selected){
-  case LOGIC:
-    filters[0]=types[LOGIC];
-    filters[1]=types[PICTURE];
-    filters[2]=types[VIEW];
-    filters[3]=types[SOUND];
-    break;
-  case PICTURE:
-    filters[1]=types[LOGIC];
-    filters[0]=types[PICTURE];
-    filters[2]=types[VIEW];
-    filters[3]=types[SOUND];
-    break;
-  case VIEW:
-    filters[1]=types[LOGIC];
-    filters[2]=types[PICTURE];
-    filters[0]=types[VIEW];
-    filters[3]=types[SOUND];
-    break;
-  case SOUND:
-    filters[1]=types[LOGIC];
-    filters[2]=types[PICTURE];
-    filters[3]=types[VIEW];
-    filters[0]=types[SOUND];
-    break;
+  QString fileName = QFileDialog::getOpenFileName(this, tr("Add Resource"), game->srcdir.c_str(), filters, &preferredfilter);
+  if (!fileName.isNull()) {
+      if (addmenu == NULL)
+          addmenu = new AddResource(0, 0, this);
+      addmenu->open(fileName.toLatin1().data());
   }
-  filters[4]=types[4];
-  filters[5]=NULL;
-
-  f->setFilters((const char **)filters);
-  f->setCaption("Add resource");
-  f->setMode(Q3FileDialog::ExistingFile);
-  f->setDir(game->srcdir.c_str());
-  if ( f->exec() == QDialog::Accepted ) {
-    if ( !f->selectedFile().isEmpty() ){
-      if(addmenu==NULL)addmenu = new AddResource(0,0,this);
-      addmenu->open((char *)f->selectedFile().latin1());
-    }
-  }
-
-
 }
 
 //**********************************************
 void ResourcesWin::export_resource()
 {
-  int k = list->currentItem();
+  int k = list->currentRow();
   if(k<0) return;
   int i = ResourceIndex[k];
 
@@ -560,45 +517,48 @@ void ResourcesWin::export_resource()
 }
 
 //**********************************************
-AddResource::AddResource( QWidget *parent, const char *nam ,ResourcesWin *res )
-    : QWidget( parent, nam )
+AddResource::AddResource( QWidget *parent, const char *name, ResourcesWin *res )
+    : QWidget(parent)
 {
-
   resources_win = res;
-  setCaption("Add resource");
-  Q3BoxLayout *box = new Q3VBoxLayout(this,10);
+  setWindowTitle("Add resource");
+
+  QBoxLayout *box = new QVBoxLayout(this);
 
   filename = new QLabel("Filename:",this);
-  // filename->setAutoResize(true);  // TODO: REPLACE WITH A LAYOUT!
   box->addWidget(filename);
 
-  Q3BoxLayout *box0 = new Q3HBoxLayout(box,4);
+  QBoxLayout *box0 = new QHBoxLayout(this);
+  box->addLayout(box0);
 
   QLabel *lname = new QLabel("Name of resource:",this);
   box0->addWidget(lname);
 
-  name = new QLabel("",this);
-  // name->setAutoResize(true);  // TODO: REPLACE WITH A LAYOUT!
-  box0->addWidget(name);
+  resname = new QLabel("",this);
+  box0->addWidget(resname);
 
-  type = new Q3ButtonGroup(4,Qt::Horizontal,"Type",this);
+  type = new QButtonGroup(this);
   type->setExclusive(true);
-  QRadioButton *logic = new QRadioButton(type);
-  logic->setText("LOGIC");
+  QRadioButton *logic = new QRadioButton(tr("LOGIC"), this);
+  QRadioButton *picture = new QRadioButton(tr("PICTURE"),this);
+  QRadioButton *view = new QRadioButton(tr("VIEW"),this);
+  QRadioButton *sound = new QRadioButton(tr("SOUND"),this);
   logic->setChecked(true);
-  restype=0;
-  QRadioButton *picture = new QRadioButton(type);
-  picture->setText("PICTURE");
-  QRadioButton *view = new QRadioButton(type);
-  view->setText("VIEW");
-  QRadioButton *sound = new QRadioButton(type);
-  sound->setText("SOUND");
+  restype = 0;
 
   connect( type, SIGNAL(clicked(int)), SLOT(select_type(int)) );
 
-  box->addWidget(type);
+  type->addButton(logic);
+  type->addButton(picture);
+  type->addButton(view);
+  type->addButton(sound);
+  box->addWidget(logic);
+  box->addWidget(picture);
+  box->addWidget(view);
+  box->addWidget(sound);
 
-  Q3BoxLayout *box1 = new Q3HBoxLayout(box,10);
+  QBoxLayout *box1 = new QHBoxLayout(this);
+  box->addLayout(box1);
 
   QLabel *lnumber = new QLabel("Number: [0-255]",this);
   box1->addWidget(lnumber);
@@ -608,7 +568,8 @@ AddResource::AddResource( QWidget *parent, const char *nam ,ResourcesWin *res )
   connect( number, SIGNAL(textChanged(const QString &)), SLOT(edit_cb(const QString &)) );
   box1->addWidget(number);
 
-  Q3BoxLayout *box2 = new Q3HBoxLayout(box,40);
+  QBoxLayout *box2 = new QHBoxLayout(this);
+  box->addLayout(box2);
 
   QPushButton *ok = new QPushButton("OK",this);
   connect( ok, SIGNAL(clicked()), SLOT(ok_cb()) );
@@ -617,36 +578,29 @@ AddResource::AddResource( QWidget *parent, const char *nam ,ResourcesWin *res )
   QPushButton *cancel = new QPushButton("Cancel",this);
   connect( cancel, SIGNAL(clicked()), SLOT(cancel_cb()) );
   box2->addWidget(cancel);
-
 }
 
 //**********************************************
 void AddResource::open(char *file_name)
 {
-  char *ptr;
+  file = std::string(file_name);
+  auto f = QFileInfo(file_name).fileName();
 
-  file = string(file_name);
-  if((ptr = strrchr(file_name,'/'))==NULL)ptr=file_name;
-  else ptr++;
-  sprintf(tmp,"Filename: %s",ptr);
-  filename->setText(tmp);
-  if(!strncasecmp(ptr,"logic",5)){
+  filename->setText("Filename: " + f);
+  if(f.startsWith("logic")){
     restype=LOGIC;
-    type->setButton(restype);
   }
-  else if(!strncasecmp(ptr,"picture",7)){
+  else if(f.startsWith("picture")){
     restype=PICTURE;
-    type->setButton(restype);
   }
-  else if(!strncasecmp(ptr,"view",4)){
+  else if(f.startsWith("view")){
     restype=VIEW;
-    type->setButton(VIEW);
   }
-  else if(!strncasecmp(ptr,"sound",5)){
+  else if(f.startsWith("sound")){
     restype=SOUND;
-    type->setButton(SOUND);
   }
 
+  type->buttons()[restype]->setChecked(true);
   select_type(restype);
   show();
 
@@ -656,9 +610,9 @@ void AddResource::open(char *file_name)
 void AddResource::edit_cb(const QString &str)
 {
 
-  int num = atoi((char *)str.latin1());
+  int num = str.toInt();
   sprintf(tmp,"%s.%d",ResTypeName[restype],num);
-  name->setText(tmp);
+  resname->setText(tmp);
 
 }
 
@@ -723,7 +677,7 @@ void AddResource::ok_cb()
 {
 
   QString str = number->text();
-  int num = atoi((char *)str.latin1());
+  int num = str.toInt();
 
   if(num<0||num>255){
     menu->errmes("Resource number must be between 0 and 255 !");
@@ -770,10 +724,9 @@ void AddResource::select_type(int type)
   restype = type;
 
   QString str = number->text();
-  int num = atoi((char *)str.latin1());
+  int num = str.toInt();
 
   sprintf(tmp,"%s.%d",ResTypeName[restype],num);
-  name->setText(tmp);
-
+  resname->setText(tmp);
 }
 

@@ -29,23 +29,23 @@
 
 #include <stdio.h>
 
-#include <q3buttongroup.h>
-#include <qpixmap.h>
-#include <qimage.h>
+#include <QButtonGroup>
+#include <QPixmap>
+#include <QImage>
 #include <QImageWriter>
-#include <q3filedialog.h>
-#include <qpainter.h>
-//Added by qt3to4:
-#include <Q3HBoxLayout>
-#include <Q3StrList>
+#include <QFileDialog>
+#include <QPainter>
+#include <QHBoxLayout>
 #include <QLabel>
-#include <Q3GridLayout>
+#include <QGridLayout>
 #include <QHideEvent>
-#include <Q3VBoxLayout>
-#include <Q3BoxLayout>
+#include <QVBoxLayout>
+#include <QBoxLayout>
 #include <QShowEvent>
 #include <QPaintEvent>
 #include <QCloseEvent>
+#include <QStackedWidget>
+#include <QGroupBox>
 
 #include "right_x.xpm"
 #include "left_x.xpm"
@@ -53,10 +53,10 @@
 
 //*****************************************
 Preview::Preview( QWidget* parent, const char*  name ,ResourcesWin *res ):
-  Q3WidgetStack(parent,name)
+    QStackedWidget(parent)
 {
 
-  setCaption("Preview");
+  setWindowTitle("Preview");
   make_egacolors();
 
   resources_win = res;
@@ -66,9 +66,11 @@ Preview::Preview( QWidget* parent, const char*  name ,ResourcesWin *res ):
   w_logic = new QWidget (this);
   w_logic->setMinimumSize(340,280);
 
-  Q3BoxLayout *d =  new Q3VBoxLayout(w_logic,5);
+  QBoxLayout *d =  new QVBoxLayout(w_logic);
+
   p_logic = new LogEdit( w_logic,0,0,res,true );
   d->addWidget(p_logic);
+
   QPushButton *edit = new QPushButton("Edit",w_logic);
   edit->setMaximumSize(80,60);
   connect(edit,SIGNAL(clicked()),SLOT(double_click()));
@@ -79,8 +81,9 @@ Preview::Preview( QWidget* parent, const char*  name ,ResourcesWin *res ):
   w_sound = new QWidget (this);
   w_sound->setMinimumSize(340,280);
 
-  Q3BoxLayout *d1 =  new Q3VBoxLayout(w_sound, 5);
-  QLabel *l1 = new QLabel("Preview is not available !\nDouble-click to listen.\nOr click the 'Listen' button.",w_sound,0);
+  QVBoxLayout *d1 =  new QVBoxLayout(w_sound);
+  d1->addSpacing(10);
+  QLabel *l1 = new QLabel("Preview is not available!\nDouble-click to listen, or click the 'Listen' button.", w_sound, 0);
   d1->addWidget(l1);
 
   QPushButton *listen = new QPushButton("Listen",w_sound);
@@ -97,35 +100,33 @@ Preview::Preview( QWidget* parent, const char*  name ,ResourcesWin *res ):
 
   // Picture
 
-  w_picture = new QWidget (this,0);
+  w_picture = new QWidget(this);
   w_picture->setMinimumSize(340,280);
 
-  Q3BoxLayout *pbox =  new Q3VBoxLayout(w_picture,10);
+  QVBoxLayout *pbox =  new QVBoxLayout(w_picture);
 
+  pbox->addSpacing(10);
   p_picture = new PreviewPicture(w_picture,0,this);
   p_picture->setFixedSize(MAX_W,MAX_HH);
   pbox->addWidget(p_picture);
 
-  Q3BoxLayout *pbox1 =  new Q3HBoxLayout(pbox,10);
-
-  visual = new QRadioButton("Visual",w_picture);
-  visual->setChecked(true);
+  QHBoxLayout *pbox1 = new QHBoxLayout(w_picture);
+  pbox1->setAlignment(Qt::AlignLeft);
+  QGroupBox *ptype = new QGroupBox(w_picture);
+  visual = new QRadioButton(tr("Visual"), ptype);
+  priority = new QRadioButton(tr("Priority"), ptype);
   pbox1->addWidget(visual);
-
-  priority = new QRadioButton("Priority",w_picture);
-  priority->setChecked(false);
   pbox1->addWidget(priority);
+  pbox->addWidget(ptype);
+  ptype->setLayout(pbox1);
 
-  p_picture->drawing_mode=0;
+  visual->setChecked(true);
+  p_picture->drawing_mode = 0;
+  connect(visual, SIGNAL(clicked()), SLOT(change_mode()));
+  connect(priority, SIGNAL(clicked()), SLOT(change_mode()));
 
-  Q3ButtonGroup *bg = new Q3ButtonGroup(w_picture);
-  bg->hide();
-  bg->insert(visual,0);
-  bg->insert(priority,1);
-  connect( bg, SIGNAL(clicked(int)), SLOT(change_mode(int)) );
-
-
-  Q3BoxLayout *pbox2 =  new Q3HBoxLayout(pbox,10);
+  QBoxLayout *pbox2 =  new QHBoxLayout(w_picture);
+  pbox->addLayout(pbox2);
   QPushButton *pedit = new QPushButton("Edit",w_picture);
   pedit->setMaximumWidth(100);
   connect(pedit,SIGNAL(clicked()),SLOT(double_click()));
@@ -138,7 +139,7 @@ Preview::Preview( QWidget* parent, const char*  name ,ResourcesWin *res ):
 
   formats_pic = new QComboBox(w_picture);
   for (int i = 0; i < QImageWriter::supportedImageFormats().size(); ++i) {
-    formats_pic->insertItem(QImageWriter::supportedImageFormats().at(i).constData());
+    formats_pic->addItem(QImageWriter::supportedImageFormats().at(i).constData());
   }
 
   pbox2->addWidget(formats_pic);
@@ -149,20 +150,21 @@ Preview::Preview( QWidget* parent, const char*  name ,ResourcesWin *res ):
   w_view = new QWidget (this,0);
   w_view->setMinimumSize(340,240);
 
-  Q3BoxLayout *vbox = new Q3VBoxLayout(w_view,10);
+  QVBoxLayout *vbox = new QVBoxLayout(w_view);
 
   int maxrow1=3,maxcol1=5;
-  Q3GridLayout *grid1 = new Q3GridLayout( vbox, maxrow1,maxcol1, 1 );
+  QGridLayout *grid1 = new QGridLayout(w_view);
+  vbox->addLayout(grid1);
 
   int i;
   for(i=0;i<maxcol1;i++){
-    grid1->setColStretch(i,1);
-    grid1->addColSpacing(i,1);
+    grid1->setColumnStretch(i,1);
+    grid1->setHorizontalSpacing(1);
   }
 
   for(i=0;i<maxrow1;i++){
     grid1->setRowStretch(i,1);
-    grid1->addRowSpacing(i,2);
+    grid1->setVerticalSpacing(2);
   }
 
 
@@ -177,12 +179,12 @@ Preview::Preview( QWidget* parent, const char*  name ,ResourcesWin *res ):
   grid1->addWidget(loopnum,row,col,Qt::AlignLeft);   col++;
 
   QPushButton *loopleft = new QPushButton(w_view);
-  loopleft->setPixmap(pleft);
+  loopleft->setIcon(QPixmap(pleft));
   connect( loopleft, SIGNAL(clicked()), SLOT(previous_loop()) );
   grid1->addWidget(loopleft,row,col,Qt::AlignRight);    col++;
 
   QPushButton *loopright = new QPushButton(w_view);
-  loopright->setPixmap(pright);
+  loopright->setIcon(QPixmap(pright));
   connect( loopright, SIGNAL(clicked()), SLOT(next_loop()) );
   grid1->addWidget(loopright,row,col,Qt::AlignLeft);    col++;
 
@@ -200,12 +202,12 @@ Preview::Preview( QWidget* parent, const char*  name ,ResourcesWin *res ):
   grid1->addWidget(celnum,row,col,Qt::AlignLeft);    col++;
 
   QPushButton *celleft = new QPushButton(w_view);
-  celleft->setPixmap(pleft);
+  celleft->setIcon(QPixmap(pleft));
   connect( celleft, SIGNAL(clicked()), SLOT(previous_cel()) );
   grid1->addWidget(celleft,row,col,Qt::AlignRight);     col++;
 
   QPushButton *celright = new QPushButton(w_view);
-  celright->setPixmap(pright);
+  celright->setIcon(QPixmap(pright));
   connect( celright, SIGNAL(clicked()), SLOT(next_cel()) );
   grid1->addWidget(celright,row,col,Qt::AlignLeft); col++;
 
@@ -223,7 +225,7 @@ Preview::Preview( QWidget* parent, const char*  name ,ResourcesWin *res ):
   formats_view = new QComboBox(w_view);
   // QStrList out =  QImageIO::outputFormats ();
   for (int i = 0; i < QImageWriter::supportedImageFormats().size(); ++i) {
-    formats_view->insertItem(QImageWriter::supportedImageFormats().at(i).constData());
+    formats_view->addItem(QImageWriter::supportedImageFormats().at(i).constData());
   }
   grid1->addWidget(formats_view,row,col,Qt::AlignCenter); // Reference to the same widget used in picture
 
@@ -233,7 +235,7 @@ Preview::Preview( QWidget* parent, const char*  name ,ResourcesWin *res ):
   p_view->setSizePolicy( QSizePolicy( QSizePolicy::Minimum, QSizePolicy::Minimum ));
   vbox->addWidget(p_view);
 
-  description = new Q3MultiLineEdit(w_view);
+  description = new QTextEdit(w_view);
   description->setReadOnly(true);
   description->setSizePolicy( QSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding ));
   vbox->addWidget(description);
@@ -257,32 +259,33 @@ void Preview::open(int ResNum,int type)
   switch(type){
   case LOGIC:
     if(animate){ animate->closeall(); animate=NULL; }
-    raiseWidget( w_logic );
+    setCurrentIndex(3);
     p_logic->open(ResNum);
     break;
   case VIEW:
-    raiseWidget( w_view );
+    setCurrentIndex(1);
     p_view->draw(ResNum);
     break;
   case PICTURE:
     if(animate){ animate->closeall(); animate=NULL; }
-    raiseWidget( w_picture );
+    setCurrentIndex(0);
     p_picture->draw(ResNum);
     break;
   case SOUND:
     if(animate){ animate->closeall(); animate=NULL; }
-    raiseWidget( w_sound );
+    setCurrentIndex(2);
     break;
   }
-
   show();
 }
 
 //*****************************************
-void Preview::change_mode(int mode)
+void Preview::change_mode()
 {
-
-  p_picture->drawing_mode=mode;
+  if (visual->isChecked())
+      p_picture->drawing_mode = 0; // MODE_VISUAL
+  else
+      p_picture->drawing_mode = 1; // MODE_PRIORITY
   p_picture->update();
 
 }
@@ -290,9 +293,7 @@ void Preview::change_mode(int mode)
 //******************************************************
 void Preview::double_click()
 {
-
-  resources_win->select_resource(resources_win->list->currentItem());
-
+  resources_win->select_resource(resources_win->list->currentRow());
 }
 //******************************************************
 void Preview::previous_loop()
@@ -397,36 +398,27 @@ void Preview::showcelpar()
 
 void Preview::save_pic()
 {
-  save_image( p_picture->pixmap, formats_pic->currentText().latin1() );
+  save_image( p_picture->pixmap, formats_pic->currentText().toLatin1() );
 }
 
 //******************************************************
 
 void Preview::save_view()
 {
-  save_image( p_view->pixmap, formats_view->currentText().latin1() );
+  save_image( p_view->pixmap, formats_view->currentText().toLatin1() );
 }
 
 //******************************************************
 void Preview::save_image( QPixmap& pixmap, const char* format )
 {
-  Q3FileDialog *f = new Q3FileDialog(0,"Save",true);
-  sprintf(tmp,"*.%s",format);
-  toLower(tmp);
-  const char *filters[] = {tmp,"All files (*)",NULL};
-
-  f->setFilters(filters);
-  f->setCaption("Save as image");
-  f->setMode(Q3FileDialog::AnyFile);
-  f->setDir(game->srcdir.c_str());
-  if ( f->exec() == QDialog::Accepted ) {
-    if ( !f->selectedFile().isEmpty() ){
-      if(!pixmap.save((char *)f->selectedFile().latin1(),format))
-        menu->errmes("Couldn't save picture !");
+    QString filters = QString("Image Files (*.%1);;%2").arg(QString(format).toLower(), tr("All Files (*)"));
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save As Image"), game->srcdir.c_str(), filters);
+    if (!fileName.isNull()) {
+        if (!pixmap.save(fileName, format))
+            menu->errmes("Couldn't save picture!");
     }
-  }
-
 }
+
 //******************************************************
 void Preview::export_resource()
 {
@@ -472,7 +464,7 @@ void Preview::showEvent( QShowEvent * )
 //******************************************************
 
 PreviewPicture::PreviewPicture(  QWidget* parent, const char*  name, Preview *p ):
-  QWidget(parent,name)
+  QWidget(parent)
 {
 
   preview = p;
@@ -525,12 +517,11 @@ void PreviewPicture::paintEvent(QPaintEvent *)
 }
 //******************************************************
 PreviewView::PreviewView(  QWidget* parent, const char*  name, Preview *p ):
-  QWidget(parent,name)
+  QWidget(parent)
 {
-
   preview = p;
   view = new View();
-  pixmap = QPixmap();
+  pixmap = QPixmap(MAX_W, MAX_HH);
   cur_w = cur_h = 0;
   pixsize = 2;
 }
@@ -557,7 +548,7 @@ void PreviewView::update()
   byte *data = view->loops[view->CurLoop].cels[view->CurCel].data;
 
   if(cur_w != w || cur_h != h){
-    pixmap.resize(w*pixsize*2,h*pixsize);
+    pixmap = pixmap.scaled(w*pixsize*2,h*pixsize);
     cur_w=w;
     cur_h=h;
   }
@@ -579,7 +570,6 @@ void PreviewView::update()
     }
   }
   repaint();
-
 }
 
 //*****************************************
@@ -632,7 +622,7 @@ void PreviewView::show_description()
       if (n <= 0)n = maxcol-ThisLine.length();
       ThisLine += ThisMessage.substr(0,n);
       ThisMessage = (n < (int)ThisMessage.length())?ThisMessage.substr(n+1):"";
-      preview->description->insertLine(ThisLine.c_str(),-1);
+      preview->description->insertPlainText(ThisLine.c_str());
       ThisLine = "";
     }
     else{
@@ -643,8 +633,7 @@ void PreviewView::show_description()
   }while(ThisMessage != "");
 
   if(ThisLine != ""){
-    preview->description->insertLine(ThisLine.c_str(),-1);
+    preview->description->insertPlainText(ThisLine.c_str());
   }
-
 }
 //*****************************************

@@ -23,16 +23,16 @@
 #ifndef ROOMGEN_H
 #define ROOMGEN_H
 
-#include <qwidget.h>
-#include <qlabel.h>
-#include <qpushbutton.h>
-#include <qlayout.h>
+#include <QWidget>
+#include <QLabel>
+#include <QPushButton>
+#include <QLayout>
 #include <qnamespace.h>
-#include <qmessagebox.h>
-#include <q3multilineedit.h>
-#include <qevent.h>
-#include <qstatusbar.h>
-#include <qcheckbox.h>
+#include <QMessageBox>
+#include <QTextEdit>
+#include <QEvent>
+#include <QStatusbar>
+#include <QCheckBox>
 
 #include "util.h"
 #include "wutil.h"

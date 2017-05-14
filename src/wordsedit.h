@@ -22,17 +22,16 @@
 #ifndef WORDSEDIT_H
 #define WORDSEDIT_H
 
-#include <qwidget.h>
-#include <qlabel.h>
-#include <qpushbutton.h>
-#include <qlayout.h>
-#include <q3listbox.h>
-#include <qmessagebox.h>
-#include <qlineedit.h> 
-#include <qradiobutton.h> 
-#include <q3buttongroup.h> 
-#include <qevent.h> 
-//Added by qt3to4:
+#include <QWidget>
+#include <QLabel>
+#include <QPushButton>
+#include <QLayout>
+#include <QListWidget>
+#include <QMessagebox>
+#include <QLineedit>
+#include <QRadioButton>
+#include <QButtonGroup>
+#include <QEvent>
 #include <QShowEvent>
 #include <QHideEvent>
 #include <QCloseEvent>
@@ -50,7 +49,7 @@ class WordsEdit : public QWidget
     Q_OBJECT
 public:
     WordsEdit( QWidget *parent=0, const char *name=0, int winnum=0, ResourcesWin *res=0);
-    Q3ListBox *listgroup,*listwords;
+    QListWidget *listgroup,*listwords;
     ResourcesWin *resources_win;
     WordList *wordlist;
     void open();
@@ -62,8 +61,9 @@ public slots:
       void delete_word_cb(void);
       void change_group_number_cb(void);
       void find_cb(void);
+      void select_group();
       void select_group(int);
-      void select_word(int);      
+      void select_word();
       void update_group(int);
       void count_groups_cb(void);
       void count_words_cb(void);

@@ -114,7 +114,7 @@ extern char tmp[];
 //additional resource types
 #define OBJECT  4
 #define WORDS   5
-#define TEXT    6
+#define TEXTRES 6
 
 #define RESOURCES 7
 #define PREVIEW   8

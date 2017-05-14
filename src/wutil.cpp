@@ -19,11 +19,11 @@
  */
 
 #include <stdio.h>
-#include <qpainter.h>
-//Added by qt3to4:
-#include <Q3BoxLayout>
-#include <Q3HBoxLayout>
-#include <Q3VBoxLayout>
+
+#include <QPainter>
+#include <QBoxLayout>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
 #include <QLabel>
 #include <QMouseEvent>
 #include <QPaintEvent>
@@ -35,14 +35,14 @@ QColor egacolor[16];
 //**********************************************
 
 AskNumber::AskNumber( QWidget *parent, const char *name, const char *caption,const char *prompt)
-    : QDialog( parent, name ,TRUE)
+    : QDialog(parent)
 {
+  setWindowTitle(caption);
 
-  
-  setCaption(caption);
-  Q3BoxLayout *all =  new Q3VBoxLayout(this,20);  
+  QBoxLayout *all =  new QVBoxLayout(this);
 
-  Q3BoxLayout *top = new Q3HBoxLayout(all,4);
+  QBoxLayout *top = new QHBoxLayout(this);
+  all->addLayout(top);
   QLabel *label = new QLabel(prompt,this);
   top->addWidget(label);
   num = new QLineEdit(this);
@@ -50,7 +50,8 @@ AskNumber::AskNumber( QWidget *parent, const char *name, const char *caption,con
   connect( num, SIGNAL(returnPressed()), SLOT(accept()) );
   top->addWidget(num);
 
-  Q3BoxLayout *bottom = new Q3HBoxLayout(all,40);
+  QBoxLayout *bottom = new QHBoxLayout(this);
+  all->addLayout(bottom);
   QPushButton *ok = new QPushButton(this);
   ok->setText("OK");  
   connect( ok, SIGNAL(clicked()), SLOT(accept()) ); 
@@ -59,16 +60,14 @@ AskNumber::AskNumber( QWidget *parent, const char *name, const char *caption,con
   cancel->setText("Cancel");  
   connect( cancel, SIGNAL(clicked()), SLOT(reject()) ); 
   bottom->addWidget(cancel);
-
 }
 
 AskText::AskText( QWidget *parent, const char *name, const char *caption,const char *prompt)
-    : QDialog( parent, name ,TRUE)
+    : QDialog(parent)
 {
+  setWindowTitle(caption);
 
-  
-  setCaption(caption);
-  Q3BoxLayout *all =  new Q3VBoxLayout(this,20);  
+  QBoxLayout *all =  new QVBoxLayout(this);
 
   QLabel *label = new QLabel(prompt,this);
   all->addWidget(label);
@@ -77,7 +76,8 @@ AskText::AskText( QWidget *parent, const char *name, const char *caption,const c
   connect( text, SIGNAL(returnPressed()), SLOT(accept()) );
   all->addWidget(text);
 
-  Q3BoxLayout *bottom = new Q3HBoxLayout(all,40);
+  QBoxLayout *bottom = new QHBoxLayout(this);
+  all->addLayout(bottom);
   QPushButton *ok = new QPushButton(this);
   ok->setText("OK");  
   connect( ok, SIGNAL(clicked()), SLOT(accept()) ); 
@@ -122,12 +122,7 @@ void make_egacolors(void)
 
 /*******************************************************/
 Palette::Palette( QWidget *parent, const char *name )
-    : QWidget( parent, name )
-{
-
-  left=right=0;
-
-}
+    : QWidget(parent), left(0), right(0) {}
 
 
 void Palette::paintEvent( QPaintEvent * )

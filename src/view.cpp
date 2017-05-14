@@ -32,7 +32,8 @@
 #include <sys/stat.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include <qapplication.h>
+
+#include <QApplication>
 
 static int ResPos,DescPos,ResSize;
 //**************************************************

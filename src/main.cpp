@@ -21,8 +21,8 @@
 #include <cstdlib>
 #include <stdio.h>
 
-#include <qapplication.h>
-#include <q3mainwindow.h>
+#include <QApplication>
+#include <QMainWindow>
 
 #include "menu.h"
 #include "game.h"
@@ -66,7 +66,6 @@ int main( int argc, char **argv )
 
   app = new QApplication(argc,argv);
   menu = new Menu(NULL,NULL);
-  app->setMainWidget( menu );
 
   game = new Game();
 
