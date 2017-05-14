@@ -80,7 +80,7 @@ class View {
   View();
   int NumLoops,CurLoop,CurCel;
   bool opened;
-  string Description;
+  std::string Description;
   Loop *loops;
   void open();
   void init();

@@ -37,7 +37,7 @@ static int ResPos;
 static byte CurByte;
 static int NumMessages;
 
-static string Messages[MaxMessages];
+static std::string Messages[MaxMessages];
 
 static byte ThisCommand;
 bool ShowArgTypes = true;
@@ -55,7 +55,7 @@ static unsigned int ArgsStart;
 static TResource LabelIndex;
 static int LabelLoc,NumLabels;
 static bool DoGoto;
-static string ThisLine;
+static std::string ThisLine;
 
 static bool ErrorOccured;
 
@@ -93,7 +93,7 @@ void Logic::ReadMessages(void)
 {
 
   int MessageStart[256];
-  string ThisMessage;
+  std::string ThisMessage;
   int i;
 
   // NOTE: There is no message 0 (this is not supported by the file format).
@@ -189,7 +189,7 @@ int Logic::FindLabels_ReadIfs(void)
       if (BlockEnd[BlockDepth] > BlockEnd[BlockDepth-1]){
         sprintf(tmp,"Block too long (%d bytes longer than rest of previous block)",BlockEnd[BlockDepth]-BlockEnd[BlockDepth-1]);
         ErrorOccured=true; 
-        ErrorList.append(string(tmp)+"\n");
+        ErrorList.append(std::string(tmp)+"\n");
       }
       break;
     }
@@ -272,12 +272,12 @@ int Logic::FindLabels(void)
 void Logic::AddArg(byte Arg, byte ArgType)
 {
   int NumCharsToDisplay;
-  string ThisMessage;
+  std::string ThisMessage;
   if(ShowArgTypes){
     switch(ArgType){
     case atMsg:
       if (MessageExists[Arg]){
-        string ThisMessage = Messages[Arg];
+          std::string ThisMessage = Messages[Arg];
         do{
           if(ThisMessage.length() + ThisLine.length() > maxcol){
             NumCharsToDisplay = maxcol - ThisLine.length();
@@ -494,7 +494,7 @@ void Logic::ReadIfs(void)
         AddSpecialIFSyntaxCommand();
       else{
         if (NOTOn) ThisLine += '!';
-        ThisLine += string(TestCommand[ThisCommand].Name) + '(';
+        ThisLine += std::string(TestCommand[ThisCommand].Name) + '(';
         ArgsStart = ThisLine.length();
         if (ThisCommand == 14){   // said command
           NumSaidArgs = ReadByte();
@@ -513,7 +513,7 @@ void Logic::ReadIfs(void)
               }
             }
             else{
-              ThisLine += '"' + string(wordlist->WordGroup[ThisWordGroupIndex].Words.at(0)) + '"';
+              ThisLine += '"' + std::string(wordlist->WordGroup[ThisWordGroupIndex].Words.at(0)) + '"';
               if (CurArg < NumSaidArgs)ThisLine += ',';
             }
           }
@@ -577,7 +577,7 @@ int Logic::decode(int ResNum)
   objlist->ItemNames.toLower();
   // words already in lower case in file so we don't need to convert them
   for(i=0;i<objlist->ItemNames.num;i++){
-    if(objlist->ItemNames.at(i).find_first_of("\"")==string::npos)continue;
+    if(objlist->ItemNames.at(i).find_first_of("\"")== std::string::npos)continue;
     //replace " with \" 
     char *ptr=(char *)objlist->ItemNames.at(i).c_str();
     for(j=0;*ptr;ptr++){
@@ -625,7 +625,7 @@ int Logic::decode(int ResNum)
       ThisLine = MultStr("  ",BlockDepth);
       if (game->show_special_syntax && (ThisCommand>=0x01 && ThisCommand<=0x0B)||(ThisCommand>=0xA5&&ThisCommand<=0xA8))AddSpecialSyntaxCommand();
       else{
-        ThisLine+=(string(AGICommand[ThisCommand].Name) + "(");
+        ThisLine+=(std::string(AGICommand[ThisCommand].Name) + "(");
         ArgsStart = ThisLine.length();
         IndentPos = ThisLine.length();
         for(CurArg = 1;CurArg<=AGICommand[ThisCommand].NumArgs;CurArg++){

@@ -77,10 +77,10 @@ void TStringList::print(int n)
 
 
 }
-string TStringList::at(int n) const
+std::string TStringList::at(int n) const
 {
 
-  return (string(data[n].c_str()));
+  return (std::string(data[n].c_str()));
 
 
 }
@@ -99,23 +99,23 @@ void TStringList::del(int n)
 void TStringList::replace(int n, const char *str)
 {
 
-  data[n]=string(str);
+  data[n]= std::string(str);
 
 }
 
-void TStringList::replace(int n, const string& str)
+void TStringList::replace(int n, const std::string& str)
 {
 
-  data[n]=string(str);
+  data[n]= std::string(str);
 
 }
 
-void TStringList::add(const string& str)
+void TStringList::add(const std::string& str)
 {
 
   if(num>=max){
     max+=inc;
-    string *data1 = new string[max];
+    std::string *data1 = new std::string[max];
     for(int i=0;i<num;i++){
       data1[i]=data[i];
     }
@@ -124,7 +124,7 @@ void TStringList::add(const string& str)
   }
 
   // printf("add %d=%s\n",num,str.c_str());
-  data[num]=string(str);
+  data[num]= std::string(str);
   num++;
 
 
@@ -134,16 +134,16 @@ void TStringList::add(const string& str)
 void TStringList::addsorted(const char *str)
 {
 
-  addsorted(string(str));
+  addsorted(std::string(str));
 
 }
 
-void TStringList::addsorted(const string& s)
+void TStringList::addsorted(const std::string& s)
 {
 
   if(num>=max){
     max+=inc;
-    string *data1 = new string[max];
+    std::string *data1 = new std::string[max];
     for(int i=0;i<num;i++){
       data1[i]=data[i];
     }
@@ -172,7 +172,7 @@ void TStringList::copy(const TStringList& list)
   num=list.num;
   max=list.max;
   delete [] data;
-  data = new string[max];
+  data = new std::string[max];
   for(int i=0;i<num;i++){
     data[i]=list.data[i];
   }
@@ -193,7 +193,7 @@ void TStringList::lfree(void)
 
 //**************************************
 
-string MultStr(const char *str,int NumCopies)
+std::string MultStr(const char *str,int NumCopies)
 {
   char tmp[256];
 
@@ -201,27 +201,27 @@ string MultStr(const char *str,int NumCopies)
   for(int i=0;i<NumCopies;i++){
     strcat(tmp,str);
   }
-  return string(tmp);
+  return std::string(tmp);
 }
 
 
-string IntToStr(int n)
+std::string IntToStr(int n)
 {
   char tmp[256];
   sprintf(tmp,"%d",n);
-  return string(tmp);
+  return std::string(tmp);
 
 }
 
-string IntToStr(byte n)
+std::string IntToStr(byte n)
 {
   char tmp[256];
   sprintf(tmp,"%d",(int)n);
-  return string(tmp);
+  return std::string(tmp);
 
 }
 
-void toLower(string *str)
+void toLower(std::string *str)
 {
 
   for(int i=0;i<(int)str->length();i++){

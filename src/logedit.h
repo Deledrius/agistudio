@@ -76,7 +76,7 @@ public:
     RoomGen *roomgen;
     Logic *logic;
     LogicSyntaxHL *syntax_hl;
-    string filename;
+    std::string filename;
     unsigned int maxcol;
     int open();
     int open(int ResNum);
@@ -121,7 +121,7 @@ public:
     QTextEdit *editor;
     FindEdit *findedit;
     QStatusBar *status;
-    string filename;
+    std::string filename;
     int open(char *filename);
     void save(const char *filename);
 public slots:
@@ -133,7 +133,7 @@ public slots:
     void find_cb();
     void find_again();
  protected:
-    string OutputText;
+    std::string OutputText;
     int winnum;
     bool changed;
     void closeEvent( QCloseEvent *e );

@@ -22,7 +22,6 @@
 #define UTIL_H
 
 #include <string>
-using namespace std;
 
 #include "global.h"
 
@@ -34,9 +33,9 @@ class TStringList
 {
  public:
   TStringList();
-  void add(const string&);
+  void add(const std::string&);
   void addsorted(const char *);
-  void addsorted(const string&);
+  void addsorted(const std::string&);
   void copy(const TStringList&);
   void lfree(void);
   void print(int);
@@ -45,20 +44,20 @@ class TStringList
   void toLower(int);
   void del(int);
   void replace(int n, const char *str);
-  void replace(int n, const string& str);
-  string at(int) const;
+  void replace(int n, const std::string& str);
+  std::string at(int) const;
   int num;
-  string *data;
+  std::string *data;
   int max;
   int inc;
 
 };
 
 //*****************************************************
-extern string MultStr(const char *str,int NumCopies);
-extern string IntToStr(int n);
-extern string IntToStr(byte n);
-extern void toLower(string *str);
+extern std::string MultStr(const char *str,int NumCopies);
+extern std::string IntToStr(int n);
+extern std::string IntToStr(byte n);
+extern void toLower(std::string *str);
 extern void toLower(char *str);
 //*****************************************************
 #endif

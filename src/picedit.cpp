@@ -1404,7 +1404,7 @@ void ViewData::read()
 
   codes->clear();
   for(i=0;i<data.num;i++){
-	string str2 = data.at(i);
+	std::string str2 = data.at(i);
     str = (char *)str2.c_str();
     if(wr){     //wrap long lines
       k=0;

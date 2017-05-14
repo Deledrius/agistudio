@@ -92,7 +92,7 @@ class RoomGenEdge: public QDialog
   QCheckBox *m_edge[4];
   QPushButton *b_edge[4];
   RoomGenMessage *message;
-  string e_mes[4];
+  std::string e_mes[4];
   public slots:
     void left_message();
     void right_message();
@@ -116,7 +116,7 @@ class RoomGen: public QDialog
   QLineEdit *from[4],*x[4],*y[4];
   QLineEdit *edge[4];
   QLineEdit *title;
-  string text;
+  std::string text;
   bool incomplete_input();
   int rn[4],xn[4],yn[4];  //coming from room rn, position ego at xn,yn
   int en[4];  //edge controls (goto room)
@@ -126,8 +126,8 @@ class RoomGen: public QDialog
   int x1,y1;  //first room ego position
   bool empty_e[4];  //add empty edge controls
   bool display_e[4]; //display edge messages
-  string e_mes[4]; //edge messages
-  string entry_mes,look_mes; //room entry & look messages
+  std::string e_mes[4]; //edge messages
+  std::string entry_mes,look_mes; //room entry & look messages
   bool status,input;  //1st room - status bar, player input
 
   bool bad_int(QLineEdit *w,int *res,int nmin,int nmax,bool ignore,const char *text);

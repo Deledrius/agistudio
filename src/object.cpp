@@ -42,7 +42,7 @@ ObjList::ObjList()
 //****************************************************
 bool ObjList::GetItems()
 {
-  string ThisItemName;
+  std::string ThisItemName;
   int NamePos;
   int CurrentItem,ItemNamesStart,ThisNameStart;
   byte lsbyte,msbyte;

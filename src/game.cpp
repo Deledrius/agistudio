@@ -89,7 +89,7 @@ Game::Game()
 }
 
 //*******************************************
-int Game::open(string name)
+int Game::open(std::string name)
 {
   byte DirData[3080];
   int CurResType,CurResNum,NumDirEntries;
@@ -114,7 +114,7 @@ int Game::open(string name)
   if(!isV3){
     //for V2 game: open logdir, picdir, viewdir, snddir
     for(CurResType = 0;CurResType <= 3; CurResType++){
-      string DIRFilename = dir + "/"+ResTypeAbbrv[CurResType] + "dir";
+      std::string DIRFilename = dir + "/"+ResTypeAbbrv[CurResType] + "dir";
       fptr=fopen(DIRFilename.c_str(),"rb");
       if(fptr==NULL){
         menu->errmes("Error: can't open %s !",DIRFilename.c_str());
@@ -148,7 +148,7 @@ int Game::open(string name)
     }
   }
   else{  //V3 game: open [GAME_ID]dir (e.g. grdir, mhdir)
-    string DIRFilename = dir + "/"+ID + "dir";
+    std::string DIRFilename = dir + "/"+ID + "dir";
     fptr=fopen(DIRFilename.c_str(),"rb");
     if(fptr==NULL){
       menu->errmes("Error: can't open %s ! ",DIRFilename.c_str());
@@ -275,7 +275,7 @@ int copy(char *src,char *dest)
 
 //*******************************************
 
-int Game::from_template(string name)
+int Game::from_template(std::string name)
   //create a new game (in 'name' directory) from template
 {
 
@@ -387,7 +387,7 @@ void Game::make_source_dir()
 }
 
 //*******************************************
-int Game::newgame(string name)
+int Game::newgame(std::string name)
   //create an empty game in 'name' directory
 {
 
@@ -438,11 +438,11 @@ int Game::newgame(string name)
 }
 
 //*******************************************
-string Game::FindAGIV3GameID(const char *name)
+std::string Game::FindAGIV3GameID(const char *name)
   //compare the prefix for vol.0 and dir - if they are same and non-NULL
   //it is a V3 game
 {
-  string ID1;
+  std::string ID1;
   char *ptr;
   char *cfilename;
 
@@ -521,7 +521,7 @@ double Game::GetAGIVersionNumber(void)
   byte VerLen;
   bool ISVerNum;
   char VerNumText[16];
-  string InFileName = dir + "/agidata.ovl";
+  std::string InFileName = dir + "/agidata.ovl";
   char VersionNumBuffer[] = "A_CDE_GHI";
   double ret = 2.917;
   // This is what we use if we can't find the version number.
@@ -1427,16 +1427,16 @@ void Game::read_settings()
       reldir=(n==1);
     }
     else if(!strncmp(tmp,"command=",8)){
-      command=string(tmp+8);
+      command = std::string(tmp+8);
     }
     else if(!strncmp(tmp,"srcdirname=",11)){
-      srcdirname=string(tmp+11);
+      srcdirname = std::string(tmp+11);
     }
     else if(!strncmp(tmp,"template=",9)){
-      templatedir=string(tmp+9);
+      templatedir = std::string(tmp+9);
     }
     else if(!strncmp(tmp,"help=",5)){
-      helpdir=string(tmp+5);
+      helpdir = std::string(tmp+5);
     }
     else if(!strncmp(tmp,"picstyle=",9)){
       picstyle=atoi(tmp+9);
@@ -1555,9 +1555,9 @@ int Game::RecompileAll()
           continue;
         }
         InputLines.lfree();
-        string::size_type pos;
-        string str=logic.OutputText;
-        while((pos=str.find_first_of("\n"))!=string::npos){
+        std::string::size_type pos;
+        std::string str=logic.OutputText;
+        while((pos=str.find_first_of("\n"))!= std::string::npos){
           InputLines.add(str.substr(0,pos));
           str=str.substr(pos+1);
         }

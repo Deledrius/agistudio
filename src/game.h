@@ -24,8 +24,6 @@
 #include <stdio.h>
 #include "global.h"
 
-using namespace std;
-
 typedef struct {
   char Filename[12];    //[*]vol.*
   long Loc;             //location in vol file
@@ -44,9 +42,9 @@ class Game
 {
  public:
   Game();
-  int open(string name);
-  int newgame(string name);
-  int from_template(string name);
+  int open(std::string name);
+  int newgame(std::string name);
+  int from_template(std::string name);
   int close();
   void save_settings();
   void read_settings();
@@ -60,12 +58,12 @@ class Game
   int RecompileAll();
 
   TResourceInfo ResourceInfo[4][256];  //logic, picture, view, sound
-  string dir;  //game directory
-  string ID;   //game ID for V3 games (always 'V2' for V2 games)
-  string dirname;  //name of the 'directory' file
+  std::string dir;  //game directory
+  std::string ID;   //game ID for V3 games (always 'V2' for V2 games)
+  std::string dirname;  //name of the 'directory' file
                    //(e.g. picdir, snddir for V2, [ID]dir for V3)
 
-  string srcdir;   //dir for saving logic sources
+  std::string srcdir;   //dir for saving logic sources
   bool isOpen,isV3;
 
   //defaults; some GUI defauts are part of GAME object because it is the
@@ -78,14 +76,14 @@ class Game
   bool show_elses_as_gotos;
   bool show_special_syntax; //v30=4 vs assignn(v30,4)
   bool reldir;  //if the source dir is relative to the game dir or absolute
-  string command;  //interpreter command line
-  string srcdirname;  //source dir as entered in options
+  std::string command;  //interpreter command line
+  std::string srcdirname;  //source dir as entered in options
        //(i.e. either relative or absolute; srcdir is always absolute)
-  string templatedir;  //template game directory
-  string helpdir;      //help directory
+  std::string templatedir;  //template game directory
+  std::string helpdir;      //help directory
  private:
   double AGIVersionNumber;
-  string FindAGIV3GameID(const char *name);
+  std::string FindAGIV3GameID(const char *name);
   double GetAGIVersionNumber(void);
   int ReadV3Resource(char ResourceType,int ResourceID);
   FILE *OpenPatchVol(int PatchVol,int *filesize);

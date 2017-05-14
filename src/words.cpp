@@ -99,14 +99,14 @@ int WordList::GetWordGroupIndex(int GroupNum)
 
 }
 //************************************************
-static string GetWord(string s)
+static std::string GetWord(std::string s)
   //returns the part of a string before the last ' '
 {
   int pos = s.find_last_of(' ');
   return s.substr(0,pos);
 
 }
-static int GetGroupNum(string s)
+static int GetGroupNum(std::string s)
   //returns the number after the last ' ' in a string
 {
   int pos = s.find_last_of(' ');
@@ -117,8 +117,7 @@ static int GetGroupNum(string s)
 //************************************************
 int WordList::read(char *filename)
 {
-
-  string CurWord,PrevWord;
+  std::string CurWord,PrevWord;
   byte CurByte,CharsFromPrevWord;
   int CurIndex,CurAddGroup,GroupIndex,GroupNum;
   int LowestRemainingGroup,SecondLowestRemainingGroup,SecondLowestRemainingGroupIndex=0;
@@ -240,12 +239,12 @@ int WordList::save(char *filename)
   int CurWord,CurChar;
   byte CurByte;
   int LetterLoc[28];
-  string ThisWord,PrevWord;
+  std::string ThisWord,PrevWord;
   int CurFirstLetter;
   char FirstLetter;
   int ThisGroupNum;
-  byte CharsFromPrevWord;
-  string s;
+  size_t CharsFromPrevWord;
+  std::string s;
 
   for(CurGroupIndex=0,NumEmptyWordGroups=0;CurGroupIndex<NumGroups;CurGroupIndex++){
     if (WordGroup[CurGroupIndex].Words.num==0){
@@ -463,7 +462,7 @@ bool WordList::InsertWordGroup(int GroupNum)
 }
 //************************************************************
 
-int WordList::GroupIndexOfWord(string word)
+int WordList::GroupIndexOfWord(std::string word)
   //returns the group index of the group containing the specified word}
 {
 
@@ -483,7 +482,7 @@ int WordList::GroupIndexOfWord(string word)
 void WordList::merge(const WordList& NewWordList)
 {
   int CurIndex,CurWord,GroupIndex,NumWordsAdded,GroupIndexOfExistingWord;
-  string ThisWord;
+  std::string ThisWord;
 
   WhatToDoWithExistingWords = AskUser;
 
@@ -509,7 +508,7 @@ void WordList::merge(const WordList& NewWordList)
 }
 
 //************************************************************
-bool WordList::OKToReplaceWord(string TheWord,int OldGroupNum, int NewGroupNum)
+bool WordList::OKToReplaceWord(std::string TheWord,int OldGroupNum, int NewGroupNum)
 {
   
   if (WhatToDoWithExistingWords == AlwaysReplace)return true;      

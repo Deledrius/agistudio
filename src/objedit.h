@@ -64,7 +64,7 @@ public slots:
     QAction *encrypted;
     int CurObject;
     bool changed;
-    string filename;
+    std::string filename;
     ObjList *objlist;
 
     void open(char *);

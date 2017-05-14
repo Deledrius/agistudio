@@ -39,14 +39,14 @@ class Logic
   Logic();
   WordList *wordlist;
   ObjList *objlist;
-  string OutputText;    //result of the decoding
-  string ErrorList;     //compilation error messages
+  std::string OutputText;    //result of the decoding
+  std::string ErrorList;     //compilation error messages
   unsigned int maxcol;  //max number of columns in window - used in formatting 'print' strings
   int compile();
   int decode(int resnum);
 
  private:
-  void ShowError(int Line, string ErrorMsg);
+  void ShowError(int Line, std::string ErrorMsg);
   void DisplayMessages();
   void ReadMessages();
   int FindLabels_ReadIfs();
@@ -57,7 +57,7 @@ class Logic
   void AddSpecialIFSyntaxCommand();
   void ReadIfs();
 
-  string ReadString(string::size_type *pos, string& str);
+  std::string ReadString(std::string::size_type *pos, std::string& str);
   int RemoveComments(TStringList Lines);
   int AddIncludes();
   int ReadDefines();
@@ -65,22 +65,22 @@ class Logic
   int ReadLabels();
   void NextLine();
   void SkipSpaces();
-  byte MessageNum(string TheMessage);
-  byte AddMessage(string TheMessage);
-  string ReplaceDefine(string InText);
+  byte MessageNum(std::string TheMessage);
+  byte AddMessage(std::string TheMessage);
+  std::string ReplaceDefine(std::string InText);
   void ReadArgText();
   int ReadArgValue();
-  int Val(string str);
+  int Val(std::string str);
   void ReadArgs(bool CommandIsIf, byte CmdNum);
-  string ReadText();
-  string ReadPlainText();
-  string ReadExprText();
+  std::string ReadText();
+  std::string ReadPlainText();
+  std::string ReadExprText();
   void ReadCommandName();
-  byte FindCommandNum(bool CommandIsIf,string CmdName);
+  byte FindCommandNum(bool CommandIsIf, std::string CmdName);
   bool AddSpecialIFSyntax();
   bool AddSpecialSyntax();
-  int LabelNum(string LabelName);
-  bool LabelAtStartOfLine(string LabelName);
+  int LabelNum(std::string LabelName);
+  bool LabelAtStartOfLine(std::string LabelName);
   void WriteMessageSection();
   int CompileCommands();
 

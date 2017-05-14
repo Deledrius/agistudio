@@ -381,13 +381,13 @@ int LogEdit::open()
 }
 
 //***********************************************
-int LogEdit::open(char *filenam)
+int LogEdit::open(char *fname)
 {
   getmaxcol();
 
-  FILE *fptr = fopen(filenam,"rb");
+  FILE *fptr = fopen(fname,"rb");
   if(fptr!=NULL){
-    filename = string(filenam);
+    filename = std::string(fname);
     editor->clear();
     char *ptr;
     QString filecont;
@@ -533,7 +533,7 @@ int LogEdit::compile_logic()
   QString str;
   byte *s;
   int err,i;
-  string filename;
+  std::string filename;
   char name[128];
   char tmp1[16],*ptr,*ptr1;
 
@@ -599,7 +599,7 @@ int LogEdit::compile_logic()
         }
         if(i>=MAXWIN){
           char fullname[256];
-          string tmp1=tmp;          
+          std::string tmp1=tmp;
           sprintf(fullname,"%s/%s",game->srcdir.c_str(),name);
           for(i=0;i<MAXWIN;i++){
             if(winlist[i].type==-1){

@@ -51,7 +51,7 @@ public:
     ResourcesWin *resources_win;
     Preview *preview;
     int restype;
-    string file;
+    std::string file;
     void open(char *filename);
 public slots:
     void ok_cb();

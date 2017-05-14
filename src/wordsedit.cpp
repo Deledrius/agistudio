@@ -440,7 +440,7 @@ void WordsEdit::select_group(int num)
 
   listwords->clear();
   for(int k=0;k<wordlist->WordGroup[num].Words.num;k++){
-	string str2 = wordlist->WordGroup[num].Words.at(k);
+    std::string str2 = wordlist->WordGroup[num].Words.at(k);
     const char *str1 = str2.c_str();
     listwords->insertItem(k, str1);
   }
@@ -830,7 +830,7 @@ void WordsFind::cancel_cb()
 }
 
 //************************************************
-ReplaceWord::ReplaceWord(string word,int OldGroupNum, int NewGroupNum, QWidget *parent, QString name )
+ReplaceWord::ReplaceWord(std::string word,int OldGroupNum, int NewGroupNum, QWidget *parent, QString name )
   : QDialog(parent)
 {
   setAttribute(Qt::WA_DeleteOnClose);

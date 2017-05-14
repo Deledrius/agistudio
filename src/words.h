@@ -23,6 +23,8 @@
 
 #include "util.h"
 
+#include <string>
+
 typedef struct{
   TStringList Words;
   int GroupNum;
@@ -48,8 +50,8 @@ class WordList
   int GetWordGroupIndex(int GroupNum);
   int GetNew_GroupIndex(int GroupNum);
   void merge(const WordList& w);
-  int GroupIndexOfWord(string word);
-  bool OKToReplaceWord(string TheWord,int OldGroupNum, int NewGroupNum);
+  int GroupIndexOfWord(std::string word);
+  bool OKToReplaceWord(std::string TheWord,int OldGroupNum, int NewGroupNum);
   bool InsertWordGroup(int GroupNum);
   bool GroupExists(int GroupNum);
 };

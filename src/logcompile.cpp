@@ -35,16 +35,16 @@ extern TStringList InputLines;  //temporary -
 static bool UseTypeChecking = true;
 static int ResPos,LogicSize;
 static TStringList EditLines,IncludeFilenames;
-static string DefineNames[MaxDefines];
-static string DefineValues[MaxDefines];
+static std::string DefineNames[MaxDefines];
+static std::string DefineValues[MaxDefines];
 static int NumDefines;
 static int  RealLineNum[65535], LineFile[65535];
 static int DefineNameLength[MaxDefines];
-static string Messages[MaxMessages];
+static std::string Messages[MaxMessages];
 static bool MessageExists[MaxMessages];
 
 typedef struct{
-  string Name;
+  std::string Name;
   int Loc;
 }TLogicLabel;
 static TLogicLabel Labels[MaxLabels+1];
@@ -52,11 +52,11 @@ static int NumLabels;
 
 static bool ErrorOccured;
 static int CurLine;
-static string LowerCaseLine,ArgText,LowerCaseArgText;
-static string::size_type LinePos,LineLength,ArgTextLength,ArgTextPos;
+static std::string LowerCaseLine,ArgText,LowerCaseArgText;
+static std::string::size_type LinePos,LineLength,ArgTextLength,ArgTextPos;
 static bool FinishedReading;
 static int CommandNameStartPos;
-static string CommandName;
+static std::string CommandName;
 static int CommandNum;
 static bool NOTOn;
 
@@ -93,7 +93,7 @@ static void WriteLSMSWord(short word)
 
 }
 //*************************************************
-void Logic::ShowError(int Line, string ErrorMsg)
+void Logic::ShowError(int Line, std::string ErrorMsg)
 {
 
   int LineNum = RealLineNum[Line];
@@ -116,18 +116,18 @@ void Logic::ShowError(int Line, string ErrorMsg)
 }
 
 //***************************************************
-string Logic::ReadString(string::size_type *pos, string& str)
+std::string Logic::ReadString(std::string::size_type *pos, std::string& str)
   //returns string without quotes, starting from pos1
   //pos is set to the 1st char after string
 {
-  string::size_type pos1 = *pos;
-  string::size_type pos2 = pos1;
+  std::string::size_type pos1 = *pos;
+  std::string::size_type pos2 = pos1;
 
   //  printf ("ReadString: str=%s pos=%d\n",str.c_str(),*pos);
 
   do{
     pos2 = str.find_first_of("\"",pos2+1);
-    if(pos2 == string::npos){
+    if(pos2 == std::string::npos){
       ShowError(CurLine,"\" required at end of string.");
       printf("string: *%s*\n",str.c_str());
       return "";
@@ -146,8 +146,8 @@ int Logic::RemoveComments(TStringList Lines)
 {
   int CommentDepth = 0;
   for(CurLine=0;CurLine<Lines.num;CurLine++){
-    string Line = Lines.at(CurLine);
-    string NewLine;
+    std::string Line = Lines.at(CurLine);
+    std::string NewLine;
     bool InQuotes = false;
     for ( unsigned i=0; i<Line.size(); ++i ){
       if ( !InQuotes ){
@@ -183,9 +183,9 @@ int Logic::AddIncludes()
 {
   TStringList IncludeStrings,IncludeLines;
   int  CurInputLine,CurIncludeLine;
-  string filename;
+  std::string filename;
   int err=0;
-  string::size_type pos1,pos2;
+  std::string::size_type pos1,pos2;
   int CurLine;
   char *ptr;
 
@@ -206,7 +206,7 @@ int Logic::AddIncludes()
 #endif
       continue;
     }
-    string str = InputLines.at(CurInputLine).substr(8);
+    std::string str = InputLines.at(CurInputLine).substr(8);
     if(str.length()<4){
       ShowError(CurLine,"Missing include filename !");
       err=1;
@@ -219,13 +219,13 @@ int Logic::AddIncludes()
     }
     pos1 = str.find_first_of("\"",1);
     pos2 = str.find_first_of("\"",pos1+1);
-    if(pos1 == string::npos || pos2 == string::npos){
+    if(pos1 == std::string::npos || pos2 == std::string::npos){
       ShowError(CurLine,"Include filenames need quote marks around them.");
       err=1;
       continue;
     }
     filename = str.substr(pos1+1,pos2-pos1-1);
-    if(filename.find_first_of("/")!=string::npos){
+    if(filename.find_first_of("/")!= std::string::npos){
       ShowError(CurLine,"Only files in the src directory can be included.");
       err=1;
       continue;
@@ -268,8 +268,8 @@ int Logic::AddIncludes()
 int Logic::ReadDefines()
 {
   int err=0,i;
-  string::size_type pos1,pos2;
-  string ThisDefineName,ThisDefineValue;
+  std::string::size_type pos1,pos2;
+  std::string ThisDefineName,ThisDefineValue;
   int CurLine;
 
   NumDefines = 0;
@@ -281,7 +281,7 @@ int Logic::ReadDefines()
 #endif
       continue;
     }
-    string str = EditLines.at(CurLine).substr(7);
+    std::string str = EditLines.at(CurLine).substr(7);
     toLower(&str);
     if(str.length()<4){
       ShowError(CurLine,"Missing define name !");
@@ -300,13 +300,13 @@ int Logic::ReadDefines()
     }
     pos1 = str.find_first_not_of(" ",1);
     pos2 = str.find_first_of(" ",pos1);
-    if(pos1 == string::npos||pos2 == string::npos){
+    if(pos1 == std::string::npos||pos2 == std::string::npos){
       ShowError(CurLine,"Missing define name !");
       err=1;
       continue;
     }
     ThisDefineName = str.substr(pos1,pos2-1);
-    if(ThisDefineName.find_first_not_of("qwertyuiopasdfghjklzxcvbnm1234567890._") != string::npos){
+    if(ThisDefineName.find_first_not_of("qwertyuiopasdfghjklzxcvbnm1234567890._") != std::string::npos){
       ShowError(CurLine,"Define name can contain only characters from [a-z],'.' and '_'.");
       err=1;
       continue;
@@ -344,7 +344,7 @@ int Logic::ReadDefines()
     }
 
     pos1 = str.find_first_not_of(" ",pos2+1);
-    if(pos1 == string::npos){
+    if(pos1 == std::string::npos){
       ShowError(CurLine,"Missing define value !");
       err=1;
       continue;
@@ -352,7 +352,7 @@ int Logic::ReadDefines()
     if(str[pos1] == '"'){
       ThisDefineValue = "\"" + ReadString(&pos1,str) + "\"";
       if(ErrorOccured)continue;
-      if(str.find_first_not_of(" ",pos1) != string::npos){
+      if(str.find_first_not_of(" ",pos1) != std::string::npos){
         ShowError(CurLine,"Nothing allowed on line after define value.");
         err=1;
         continue;
@@ -360,18 +360,18 @@ int Logic::ReadDefines()
     }
     else{
       pos2 = str.find_first_of(" ",pos1+1);
-      if(pos2 == string::npos){
+      if(pos2 == std::string::npos){
         ThisDefineValue = str.substr(pos1);
       }
       else{
         ThisDefineValue = str.substr(pos1,pos2-pos1);
-        if(str.find_first_not_of(" ",pos2) != string::npos){
+        if(str.find_first_not_of(" ",pos2) != std::string::npos){
           ShowError(CurLine,"Nothing allowed on line after define value.");
           err=1;
           continue;
         }
       }
-      if(ThisDefineValue.find_first_not_of("qwertyuiopasdfghjklzxcvbnm1234567890._") != string::npos){
+      if(ThisDefineValue.find_first_not_of("qwertyuiopasdfghjklzxcvbnm1234567890._") != std::string::npos){
         ShowError(CurLine,"Non-string define value can contain only characters from [a-z],'.' and '_'.");
         err=1;
         continue;
@@ -392,7 +392,7 @@ int Logic::ReadDefines()
 int Logic::ReadPredefinedMessages()
 {
   int err=0,i;
-  string::size_type pos1;
+  std::string::size_type pos1;
   int MessageNum;
 
   for(i=0;i<MaxMessages;i++){
@@ -407,7 +407,7 @@ int Logic::ReadPredefinedMessages()
 #endif
       continue;
     }
-    string str = EditLines.at(CurLine).substr(8);
+    std::string str = EditLines.at(CurLine).substr(8);
     if(str[0] != ' '){
       ShowError(CurLine,"' ' expected after #message.");
       err=1;
@@ -420,14 +420,14 @@ int Logic::ReadPredefinedMessages()
       continue;
     }
     pos1 = str.find_first_of("\"");
-    if(pos1 == string::npos){
+    if(pos1 == std::string::npos){
       ShowError(CurLine,"\" required at start of string.");
       err=1;
       continue;
     }
     Messages[MessageNum]=ReadString(&pos1,str);
     if(ErrorOccured)continue;
-    if(Messages[MessageNum].find_first_not_of(" ",pos1) != string::npos){
+    if(Messages[MessageNum].find_first_not_of(" ",pos1) != std::string::npos){
       sprintf(tmp,"Nothing allowed on line after message. ");
       ShowError(CurLine,tmp);
       err=1;
@@ -444,18 +444,18 @@ int Logic::ReadPredefinedMessages()
 int Logic::ReadLabels()
 {
   int err=0,i;
-  string::size_type pos1,pos2;
-  string LabelName;
+  std::string::size_type pos1,pos2;
+  std::string LabelName;
   int CurLine;
 
   NumLabels = 0;
   for(CurLine = 0;CurLine<EditLines.num;CurLine++){
-    string str = EditLines.at(CurLine);
+    std::string str = EditLines.at(CurLine);
     toLower(&str);
     pos1 = str.find_first_not_of(" ");
-    if(pos1 == string::npos)continue;
+    if(pos1 == std::string::npos)continue;
     pos2 = str.find_first_not_of("qwertyuiopasdfghjklzxcvbnm1234567890._",pos1);
-    if(pos2 == string::npos)continue;
+    if(pos2 == std::string::npos)continue;
     if((pos1 == pos2) || (str[pos2]!=':'))continue;
     LabelName = str.substr(pos1,pos2-pos1);
     for(i=1;i<=NumLabels;i++){
@@ -501,7 +501,7 @@ void Logic::NextLine()
   }
   do{
     LowerCaseLine = EditLines.at(CurLine);
-    if(LowerCaseLine == empty_tmp || (LinePos=LowerCaseLine.find_first_not_of(" ")) == string::npos){
+    if(LowerCaseLine == empty_tmp || (LinePos=LowerCaseLine.find_first_not_of(" ")) == std::string::npos){
       CurLine++;
       continue;
     }
@@ -517,11 +517,11 @@ void Logic::NextLine()
 void Logic::SkipSpaces()
 {
   LinePos=LowerCaseLine.find_first_not_of(" ",LinePos);
-  if(LinePos==string::npos)NextLine();
+  if(LinePos== std::string::npos)NextLine();
 
 }
 //***************************************************
-byte Logic::MessageNum(string TheMessage)
+byte Logic::MessageNum(std::string TheMessage)
 {
   for(int i=1;i<MaxMessages;i++){
     if(MessageExists[i] && Messages[i] == TheMessage)return i;
@@ -530,7 +530,7 @@ byte Logic::MessageNum(string TheMessage)
 
 }
 //***************************************************
-byte Logic::AddMessage(string TheMessage)
+byte Logic::AddMessage(std::string TheMessage)
 {
   // Adds a message to the message list regardles of whether or not it
   // already exists. Returns the number of the added message, or 0 if
@@ -547,7 +547,7 @@ byte Logic::AddMessage(string TheMessage)
 
 }
 //***************************************************
-static string TrimEndWhitespaces( const string& str )
+static std::string TrimEndWhitespaces( const std::string& str )
 {
   int i=str.length();
   while( i>0 && (str[i-1]==' ' || str[i-1]=='\t'))
@@ -555,9 +555,9 @@ static string TrimEndWhitespaces( const string& str )
   return str.substr(0,i);
 }
 //***************************************************
-string Logic::ReplaceDefine(string InText)
+std::string Logic::ReplaceDefine(std::string InText)
 {
-  string str=InText;
+  std::string str=InText;
   toLower(&str);
   for(int i=0;i<NumDefines;i++){
     if(str == DefineNames[i]){
@@ -570,7 +570,7 @@ string Logic::ReplaceDefine(string InText)
 void Logic::ReadArgText()
  // do not use for string - does not take quotes into account
 {
-  string::size_type pos1,pos2;
+  std::string::size_type pos1,pos2;
 
   SkipSpaces();
   pos1 = pos2 = LinePos;
@@ -582,7 +582,7 @@ void Logic::ReadArgText()
   else{
     pos2 = LowerCaseLine.find_first_of(",)",pos1);
   }
-  if(pos2==string::npos){
+  if(pos2== std::string::npos){
     LinePos=LineLength;
     ArgText = ReplaceDefine(TrimEndWhitespaces(
       EditLines.at(CurLine).substr(pos1)));
@@ -602,7 +602,7 @@ void Logic::ReadArgText()
 int Logic::ReadArgValue()
 {
   char *ptr;
-  string str2 = ArgText.substr(ArgTextPos);
+  std::string str2 = ArgText.substr(ArgTextPos);
   const char *str = str2.c_str();
   long val = strtol(str,&ptr,10);
   ArgTextPos += (int)(ptr-str);
@@ -611,7 +611,7 @@ int Logic::ReadArgValue()
 
 }
 //***************************************************
-int Logic::Val(string str)
+int Logic::Val(std::string str)
 {
   char *ptr;
   const char *s = str.c_str();
@@ -630,14 +630,14 @@ void Logic::ReadArgs(bool CommandIsIf, byte CmdNum)
   char *ThisArgTypePrefix;
   bool FinishedReadingSaidArgs=false;
   int ArgValue,NumSaidArgs;
-  string ThisWord;
+  std::string ThisWord;
 #define MaxSaidArgs 40
   int SaidArgs[MaxSaidArgs];
   int CurArg;
   CommandStruct ThisCommand;
-  string ThisMessage;
+  std::string ThisMessage;
   int ThisMessageNum;
-  string ThisInvObjectName;
+  std::string ThisInvObjectName;
   int ThisInvObjectNum;
   int i;
 
@@ -717,7 +717,7 @@ void Logic::ReadArgs(bool CommandIsIf, byte CmdNum)
         do{
           if(ThisMessage != "" && ThisMessage[ThisMessage.length()-1]!=' ')ThisMessage += " ";
           ThisMessage += ReadString(&ArgTextPos,ArgText);
-          if(LinePos+1>=LineLength || LowerCaseLine.find_first_not_of(" ",LinePos+1)==string::npos){
+          if(LinePos+1>=LineLength || LowerCaseLine.find_first_not_of(" ",LinePos+1)== std::string::npos){
 
             NextLine();
             SkipSpaces();
@@ -800,11 +800,11 @@ void Logic::ReadArgs(bool CommandIsIf, byte CmdNum)
 
 }
 //***************************************************
-string Logic::ReadText()
+std::string Logic::ReadText()
 {
   int p = LinePos;
-  string::size_type pos = LowerCaseLine.find_first_of("( ,):",LinePos);
-  if(pos == string::npos){
+  std::string::size_type pos = LowerCaseLine.find_first_of("( ,):",LinePos);
+  if(pos == std::string::npos){
     LinePos = LineLength;
     return LowerCaseLine.substr(p);
   }
@@ -815,12 +815,12 @@ string Logic::ReadText()
 
 }
 //***************************************************
-string Logic::ReadPlainText()
+std::string Logic::ReadPlainText()
 {
   int p = LinePos;
-  string::size_type pos = LowerCaseLine.find_first_not_of("qwertyuiopasdfghjklzxcvbnm1234567890._",LinePos);
+  std::string::size_type pos = LowerCaseLine.find_first_not_of("qwertyuiopasdfghjklzxcvbnm1234567890._",LinePos);
 
-  if(pos == string::npos){
+  if(pos == std::string::npos){
     LinePos = LineLength;
     return LowerCaseLine.substr(p);
   }
@@ -831,11 +831,11 @@ string Logic::ReadPlainText()
 
 }
 //***************************************************
-string Logic::ReadExprText()
+std::string Logic::ReadExprText()
 {
   int p = LinePos;
-  string::size_type pos = LowerCaseLine.find_first_not_of("=+-*/><!",LinePos);
-  if(pos == string::npos){
+  std::string::size_type pos = LowerCaseLine.find_first_not_of("=+-*/><!",LinePos);
+  if(pos == std::string::npos){
     LinePos = LineLength;
     return LowerCaseLine.substr(p);
   }
@@ -855,7 +855,7 @@ void Logic::ReadCommandName()
   CommandName = ReadText();
 }
 //***************************************************
-byte Logic::FindCommandNum(bool CommandIsIf,string CmdName)
+byte Logic::FindCommandNum(bool CommandIsIf, std::string CmdName)
 {
   int i;
   const char *s;
@@ -882,7 +882,7 @@ bool Logic::AddSpecialIFSyntax()
   int OldLinePos;
   int arg1,arg2;
   bool arg2isvar,AddNOT;
-  string ArgText,expr;
+  std::string ArgText,expr;
 
   OldLinePos = LinePos;
   LinePos -= CommandName.length();
@@ -946,7 +946,7 @@ bool Logic::AddSpecialSyntax()
 {
   int arg1,arg2,arg3;
   bool arg2isvar=false,arg3isvar=false,arg2isstar=false;
-  string ArgText="",expr,expr2;
+  std::string ArgText="",expr,expr2;
   int OldLinePos;
 
   OldLinePos = LinePos;
@@ -1117,7 +1117,7 @@ bool Logic::AddSpecialSyntax()
   return false;
 }
 //***************************************************
-int Logic::LabelNum(string LabelName)
+int Logic::LabelNum(std::string LabelName)
 {
 
   for(int i=1;i<=NumLabels;i++){
@@ -1127,9 +1127,9 @@ int Logic::LabelNum(string LabelName)
 
 }
 //***************************************************
-bool Logic::LabelAtStartOfLine(string LabelName)
+bool Logic::LabelAtStartOfLine(std::string LabelName)
 {
-  string::size_type pos = LinePos - LabelName.length()-1;
+  std::string::size_type pos = LinePos - LabelName.length()-1;
   if(LowerCaseLine.find_first_not_of(" ")<pos){
     return false;
   }
@@ -1468,7 +1468,7 @@ int Logic::compile()
   objlist->ItemNames.toLower();
   // words already in lower case in file so we don't need to convert them
    for(i=0;i<objlist->ItemNames.num;i++){
-    if(objlist->ItemNames.at(i).find_first_of("\"")==string::npos)continue;
+    if(objlist->ItemNames.at(i).find_first_of("\"")== std::string::npos)continue;
     //replace " with \"
     char *ptr=(char *)objlist->ItemNames.at(i).c_str();
     for(j=0;*ptr;ptr++){

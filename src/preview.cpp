@@ -612,8 +612,8 @@ void PreviewView::show_description()
   maxcol = (W-20)/f.width('a');
 
   preview->description->clear();
-  string ThisLine = "";
-  string ThisMessage = view->Description;
+  std::string ThisLine = "";
+  std::string ThisMessage = view->Description;
 
   do{
     if(ThisMessage.length() + ThisLine.length() > maxcol){

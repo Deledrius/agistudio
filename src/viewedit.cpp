@@ -1595,8 +1595,8 @@ void Description::set()
     return;
   }
   
-  string ThisLine = "";
-  string ThisMessage = viewedit->view->Description;
+  std::string ThisLine = "";
+  std::string ThisMessage = viewedit->view->Description;
 
   do{
     if(ThisMessage.length() + ThisLine.length() > maxcol){
@@ -1637,7 +1637,7 @@ void Description::ok_cb()
   tmp[i]=0;
 
   if(strcmp(viewedit->view->Description.c_str(),tmp)){
-    viewedit->view->Description = string(tmp);
+    viewedit->view->Description = std::string(tmp);
     viewedit->changed=true;
   }
   hide();
