@@ -22,6 +22,6 @@
 #define MIDI_H
 
 class QWidget;
-void showSaveAsMidi( QWidget* parent, const byte* snd );
+void showSaveAsMidi(QWidget *parent, const byte *snd);
 
 #endif

@@ -42,8 +42,8 @@ class AddResource : public QWidget
 {
     Q_OBJECT
 public:
-    AddResource( QWidget *parent=0, const char *name=0 , ResourcesWin *res=0);
-    
+    AddResource(QWidget *parent = 0, const char *name = 0, ResourcesWin *res = 0);
+
     QLabel *filename;
     QLabel *resname;
     QLineEdit *number;
@@ -61,12 +61,11 @@ public slots:
 };
 
 
-
 class ResourcesWin : public QWidget
 {
     Q_OBJECT
 public:
-    ResourcesWin( QWidget* parent = 0, const char*  name=0, int winnum=0);
+    ResourcesWin(QWidget *parent = 0, const char  *name = 0, int winnum = 0);
     QListWidget *list;
     int selected;
     int ResourceNum;
@@ -74,11 +73,11 @@ public:
     unsigned char ResourceIndex[256];
     bool closing;
 public slots:
-    void select_resource_type( int i);
+    void select_resource_type(int i);
     void highlight_resource();
-    void highlight_resource( int i);
+    void highlight_resource(int i);
     void select_resource(QListWidgetItem *);
-    void select_resource( int i);
+    void select_resource(int i);
     void set_current(int i);
     void add_resource(void);
     void extract_resource(void);
@@ -88,21 +87,21 @@ public slots:
     void new_resource_window(void);
     void export_resource(void);
     void import_resource(void);
-    
- protected:
+
+protected:
     bool first;
     QLabel *msg;
     QComboBox *type;
     QWidget *previewPane;
     AddResource *addmenu;
-    
+
     QMenu *resourceMenu;
     QAction *importMenuItemAction;
-    
+
     int winnum;
-    void closeEvent( QCloseEvent *e );
-    void showEvent(  QShowEvent * );
-    void hideEvent(  QHideEvent * );  
+    void closeEvent(QCloseEvent *e);
+    void showEvent(QShowEvent *);
+    void hideEvent(QHideEvent *);
     void deinit();
 };
 

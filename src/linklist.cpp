@@ -36,176 +36,182 @@
 
 void Picture::dldelete()
 {
-   struct picCodeNode *temp;
+    struct picCodeNode *temp;
 
-   if (picPos == NULL) return;
+    if (picPos == NULL)
+        return;
 
-   if (picPos == picStart) picStart = picPos->next;
-   if (picPos == picLast) picLast = picPos->prior;
+    if (picPos == picStart)
+        picStart = picPos->next;
+    if (picPos == picLast)
+        picLast = picPos->prior;
 
-   if (picPos->prior != NULL) {
-      picPos->prior->next = picPos->next;
-   }
-   if (picPos->next != NULL) {
-      picPos->next->prior = picPos->prior;
-   }
+    if (picPos->prior != NULL)
+        picPos->prior->next = picPos->next;
+    if (picPos->next != NULL)
+        picPos->next->prior = picPos->prior;
 
-   temp = picPos->next;
-   free(picPos);
-   picPos = temp;
+    temp = picPos->next;
+    free(picPos);
+    picPos = temp;
 
-   bufLen--;
-   /* bufPos should still be the same */
+    bufLen--;
+    /* bufPos should still be the same */
 }
 
 void Picture::removeAction()
 {
-   if (picPos != NULL) {
-      dldelete();
-      while ((picPos != NULL) && (picPos->node < 0xF0)) dldelete();
-   }
+    if (picPos != NULL) {
+        dldelete();
+        while ((picPos != NULL) && (picPos->node < 0xF0))
+            dldelete();
+    }
 }
 
 void Picture::wipeAction()
 {
-   if (picPos != NULL) {
-      dldelete();
-      while (picPos != NULL) dldelete();
-   }
+    if (picPos != NULL) {
+        dldelete();
+        while (picPos != NULL)
+            dldelete();
+    }
 }
 
 void Picture::dlstore(struct picCodeNode *i)
 {
+    if ((picStart == NULL) && (picLast == NULL))   {
+        picStart = picLast = i;
+        i->next = NULL;
+        i->prior = NULL;
+        picPos = NULL;
+    } else if (picPos == NULL) { // End Node
+        i->next = NULL;
+        i->prior = picLast;
+        picLast->next = i;
+        picLast = i;
+        picPos = NULL;
+    } else {
+        switch (addMode) {
+            case INS_MODE:
+                i->prior = picPos->prior;   // works for picStart as well
+                i->next = picPos;
+                if (picPos != picStart)
+                    picPos->prior->next = i;
+                if (picPos == picStart)
+                    picStart = i;
+                picPos->prior = i;
+                // picPos = i;
+                break;
 
-
-  if ((picStart == NULL) && (picLast == NULL))   {
-    picStart = picLast = i;
-    i->next = NULL;
-    i->prior = NULL;
-    picPos = NULL;
-  }
-  else if (picPos == NULL) {   // End Node
-    i->next = NULL;
-    i->prior = picLast;
-    picLast->next = i;
-    picLast = i;
-    picPos = NULL;
-  }
-  else {
-    switch (addMode) {
-    case INS_MODE:
-      i->prior = picPos->prior;   // works for picStart as well
-      i->next = picPos;
-      if (picPos != picStart) picPos->prior->next = i;
-      if (picPos == picStart) picStart = i;
-      picPos->prior = i;
-      // picPos = i;
-      break;
-      
-    case OVR_MODE:
-      i->prior = picPos->prior;    // link from i
-      i->next = picPos->next;
-      if (picPos != picStart) picPos->prior->next = i;
-      if (picPos == picStart) picStart = i;
-      if (picPos != picLast) picPos->next->prior = i;
-      if (picPos == picLast) picLast = i;
-      free(picPos);
-      picPos = i->next;
-      break;
+            case OVR_MODE:
+                i->prior = picPos->prior;    // link from i
+                i->next = picPos->next;
+                if (picPos != picStart)
+                    picPos->prior->next = i;
+                if (picPos == picStart)
+                    picStart = i;
+                if (picPos != picLast)
+                    picPos->next->prior = i;
+                if (picPos == picLast)
+                    picLast = i;
+                free(picPos);
+                picPos = i->next;
+                break;
+        }
     }
-  }
-  
-  bufLen++;
-  bufPos++;
+
+    bufLen++;
+    bufPos++;
 }
 
 void Picture::displayList()
 {
-   struct picCodeNode *temp;
+    struct picCodeNode *temp;
 
-   temp = picStart;
-   printf("%02X ", temp->node);
+    temp = picStart;
+    printf("%02X ", temp->node);
 
-   do {
-      temp = temp->next;
-      printf("%X ", temp->node);
-   } while (temp->next != NULL);
+    do {
+        temp = temp->next;
+        printf("%X ", temp->node);
+    } while (temp->next != NULL);
 
-   printf("\n");
+    printf("\n");
 }
 
 void Picture::freeList()
 {
-   struct picCodeNode *temp, *store;
+    struct picCodeNode *temp, *store;
 
-   if ((picStart != NULL) && (picLast != NULL)) {
+    if ((picStart != NULL) && (picLast != NULL)) {
 
-      temp = picStart;
-      store = temp->next;
-      free(temp);
+        temp = picStart;
+        store = temp->next;
+        free(temp);
 
-      do {
-	 temp = store;
-	 store = temp->next;
-	 free(temp);
-      } while (store != NULL);
+        do {
+            temp = store;
+            store = temp->next;
+            free(temp);
+        } while (store != NULL);
 
-      picStart = picLast = picPos = NULL;
-   }
+        picStart = picLast = picPos = NULL;
+    }
 
-   bufPos = 0;
-   bufLen = 0;
+    bufPos = 0;
+    bufLen = 0;
 }
 
 void Picture::moveBack()
 {
-   if (picPos == NULL) {
-      picPos = picLast;
-      if (bufPos > 0) bufPos--;
-   }
-   else {
-      if (picPos->prior != NULL) {
-	 picPos = picPos->prior;
-	 bufPos--;
-      }
-   }
+    if (picPos == NULL) {
+        picPos = picLast;
+        if (bufPos > 0)
+            bufPos--;
+    } else {
+        if (picPos->prior != NULL) {
+            picPos = picPos->prior;
+            bufPos--;
+        }
+    }
 }
 
 void Picture::moveForward()
 {
-   if (picPos !=NULL) {
-      picPos = picPos->next;
-      bufPos++;
-   }
+    if (picPos != NULL) {
+        picPos = picPos->next;
+        bufPos++;
+    }
 }
 
 void Picture::moveToStart()
 {
-   picPos = picStart;
-   bufPos = 0;
-
+    picPos = picStart;
+    bufPos = 0;
 }
 
 void Picture::moveToEnd()
 {
-   picPos = NULL;
-   bufPos = bufLen;
+    picPos = NULL;
+    bufPos = bufLen;
 }
 
 void Picture::moveBackAction()
 {
-   do {
-      moveBack();
-      if (picPos == picStart) break;
-   } while (picPos->node < 0xF0);
+    do {
+        moveBack();
+        if (picPos == picStart)
+            break;
+    } while (picPos->node < 0xF0);
 }
 
 void Picture::moveForwardAction()
 {
-   do {
-      moveForward();
-      if (picPos == NULL) break;
-   } while (picPos->node < 0xF0);
+    do {
+        moveForward();
+        if (picPos == NULL)
+            break;
+    } while (picPos->node < 0xF0);
 }
 
 

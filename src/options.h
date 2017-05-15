@@ -47,15 +47,15 @@ class Options : public QDialog
 {
     Q_OBJECT
 public:
-    Options( QWidget *parent=0, const char *name=0);
+    Options(QWidget *parent = 0, const char *name = 0);
     QTabWidget *tabs;
     QComboBox *type, *picstyle;
-    QCheckBox *messages,*elses,*special;
-    QRadioButton *text,*binary;
-    QLineEdit *relname,*absname;
-    QRadioButton *reldir,*absdir;
-    QLineEdit *command,*templatedir,*helpdir;
-    QDialogButtonBox* bb;
+    QCheckBox *messages, *elses, *special;
+    QRadioButton *text, *binary;
+    QLineEdit *relname, *absname;
+    QRadioButton *reldir, *absdir;
+    QLineEdit *command, *templatedir, *helpdir;
+    QDialogButtonBox *bb;
 
 public slots:
     void set_general();

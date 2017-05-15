@@ -39,7 +39,7 @@ class AskNumber : public QDialog
 {
     Q_OBJECT
 public:
-    AskNumber( QWidget *parent=0, const char *name=0,const char *caption=0,const char *prompt=0);
+    AskNumber(QWidget *parent = 0, const char *name = 0, const char *caption = 0, const char *prompt = 0);
     QLineEdit *num;
 };
 
@@ -48,7 +48,7 @@ class AskText : public QDialog
 {
     Q_OBJECT
 public:
-    AskText( QWidget *parent=0, const char *name=0,const char *caption=0,const char *prompt=0);
+    AskText(QWidget *parent = 0, const char *name = 0, const char *caption = 0, const char *prompt = 0);
     QLineEdit *text;
 };
 
@@ -57,10 +57,10 @@ class Palette : public QWidget
 {
     Q_OBJECT
 public:
-    Palette( QWidget *parent=0, const char *name=0);
+    Palette(QWidget *parent = 0, const char *name = 0);
     void paintEvent(class QPaintEvent *);
-    void mousePressEvent(QMouseEvent* event);
-    int left,right;
+    void mousePressEvent(QMouseEvent *event);
+    int left, right;
 };
 
 //*****************************************************

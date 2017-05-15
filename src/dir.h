@@ -23,6 +23,6 @@
 
 #include <QWidget>
 
-void OpenGameDir( QWidget *parent=0, bool newgame=false );
+void OpenGameDir(QWidget *parent = 0, bool newgame = false);
 
 #endif

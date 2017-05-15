@@ -25,69 +25,69 @@
 #include "global.h"
 
 typedef struct {
-  char Filename[12];    //[*]vol.*
-  long Loc;             //location in vol file
-  bool Exists;
-}TResourceInfo ;
+    char Filename[12];    //[*]vol.*
+    long Loc;             //location in vol file
+    bool Exists;
+} TResourceInfo ;
 
 #define MaxResourceSize 65530
 
 typedef struct {
-  byte *Data;
-  int Size;
-}TResource;
+    byte *Data;
+    int Size;
+} TResource;
 
 
 class Game
 {
- public:
-  Game();
-  int open(std::string name);
-  int newgame(std::string name);
-  int from_template(std::string name);
-  int close();
-  void save_settings();
-  void read_settings();
-  void defaults();
-  void make_source_dir();
-  int GetResourceSize(char ResType,int ResNum);
-  int ReadResource(char ResourceType, int ResourceID);
-  int AddResource(int ResType,int ResNum);
-  int DeleteResource(int ResType,int ResNum);
-  int RebuildVOLfiles();
-  int RecompileAll();
+public:
+    Game();
+    int open(std::string name);
+    int newgame(std::string name);
+    int from_template(std::string name);
+    int close();
+    void save_settings();
+    void read_settings();
+    void defaults();
+    void make_source_dir();
+    int GetResourceSize(char ResType, int ResNum);
+    int ReadResource(char ResourceType, int ResourceID);
+    int AddResource(int ResType, int ResNum);
+    int DeleteResource(int ResType, int ResNum);
+    int RebuildVOLfiles();
+    int RecompileAll();
 
-  TResourceInfo ResourceInfo[4][256];  //logic, picture, view, sound
-  std::string dir;  //game directory
-  std::string ID;   //game ID for V3 games (always 'V2' for V2 games)
-  std::string dirname;  //name of the 'directory' file
-                   //(e.g. picdir, snddir for V2, [ID]dir for V3)
+    TResourceInfo ResourceInfo[4][256];  //logic, picture, view, sound
+    std::string dir;  //game directory
+    std::string ID;   //game ID for V3 games (always 'V2' for V2 games)
+    std::string dirname;  //name of the 'directory' file
+    //(e.g. picdir, snddir for V2, [ID]dir for V3)
 
-  std::string srcdir;   //dir for saving logic sources
-  bool isOpen,isV3;
+    std::string srcdir;   //dir for saving logic sources
+    bool isOpen, isV3;
 
-  //defaults; some GUI defauts are part of GAME object because it is the
-  //only object which is guaranteed to exist at the beginning of the program
-  int res_default;  //default resource type in resources window
-  int picstyle;     //Picedit style
-  bool save_logic_as_text;  //default for 'extract' function
-  bool show_all_messages;   //logic decompile - show all messages at end
-                            //or just unused ones
-  bool show_elses_as_gotos;
-  bool show_special_syntax; //v30=4 vs assignn(v30,4)
-  bool reldir;  //if the source dir is relative to the game dir or absolute
-  std::string command;  //interpreter command line
-  std::string srcdirname;  //source dir as entered in options
-       //(i.e. either relative or absolute; srcdir is always absolute)
-  std::string templatedir;  //template game directory
-  std::string helpdir;      //help directory
- private:
-  double AGIVersionNumber;
-  std::string FindAGIV3GameID(const char *name);
-  double GetAGIVersionNumber(void);
-  int ReadV3Resource(char ResourceType,int ResourceID);
-  FILE *OpenPatchVol(int PatchVol,int *filesize);
-  FILE *OpenDirUpdate(int *dirsize,int ResType);
+    //defaults; some GUI defauts are part of GAME object because it is the
+    //only object which is guaranteed to exist at the beginning of the program
+    int res_default;  //default resource type in resources window
+    int picstyle;     //Picedit style
+    bool save_logic_as_text;  //default for 'extract' function
+    bool show_all_messages;   //logic decompile - show all messages at end
+    //or just unused ones
+    bool show_elses_as_gotos;
+    bool show_special_syntax; //v30=4 vs assignn(v30,4)
+    bool reldir;  //if the source dir is relative to the game dir or absolute
+    std::string command;  //interpreter command line
+    std::string srcdirname;  //source dir as entered in options
+    //(i.e. either relative or absolute; srcdir is always absolute)
+    std::string templatedir;  //template game directory
+    std::string helpdir;      //help directory
+private:
+    double AGIVersionNumber;
+    std::string FindAGIV3GameID(const char *name);
+    double GetAGIVersionNumber(void);
+    int ReadV3Resource(char ResourceType, int ResourceID);
+    FILE *OpenPatchVol(int PatchVol, int *filesize);
+    FILE *OpenDirUpdate(int *dirsize, int ResType);
 };
 
 extern Game *game;

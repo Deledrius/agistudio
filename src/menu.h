@@ -47,10 +47,9 @@
 
 class WindowList : public QWidget
 {
-
     Q_OBJECT
 public:
-    WindowList( QWidget *parent=0, const char *name=0 );
+    WindowList(QWidget *parent = 0, const char *name = 0);
     QListWidget *win;
 public slots:
     void draw();
@@ -64,7 +63,7 @@ class About: public QWidget
 {
     Q_OBJECT
 public:
-    About( QWidget *parent=0, const char *name=0);
+    About(QWidget *parent = 0, const char *name = 0);
 };
 
 
@@ -72,12 +71,12 @@ class Menu : public QMainWindow
 {
     Q_OBJECT
 public:
-    Menu( QWidget *parent=0, const char *name=0);
+    Menu(QWidget *parent = 0, const char *name = 0);
     QStatusBar *status;
     ResourcesWin *resources_win;
-    void errmes(const char *, const char *,...);
-    void errmes(const char *,...);
-    void warnmes(const char *,...);
+    void errmes(const char *, const char *, ...);
+    void errmes(const char *, ...);
+    void warnmes(const char *, ...);
 
     void enable(void);
     void disable(void);
@@ -91,71 +90,70 @@ public:
     bool imgext;
     void load_imgext();
 #endif
-    public slots:
-      void open_game(void);
-      void close_game(void);
-      void quit_cb(void);
-      void run_game(void);
-      void settings(void);
+public slots:
+    void open_game(void);
+    void close_game(void);
+    void quit_cb(void);
+    void run_game(void);
+    void settings(void);
 
-      void from_template(void);
-      void blank(void);
+    void from_template(void);
+    void blank(void);
 
-      void add_resource(void);
-      void extract_resource(void);
-      void delete_resource(void);
-      void renumber_resource(void);
-      void rebuild_vol(void);
-      void recompile_all(void);
-      void new_resource_window();
+    void add_resource(void);
+    void extract_resource(void);
+    void delete_resource(void);
+    void renumber_resource(void);
+    void rebuild_vol(void);
+    void recompile_all(void);
+    void new_resource_window();
 
-      void view_editor(void);
-      void logic_editor(void);
-      void text_editor(void);
-      void object_editor(void);
-      void words_editor(void);
-      void picture_editor(void);
-      void sound_player(void);
+    void view_editor(void);
+    void logic_editor(void);
+    void text_editor(void);
+    void object_editor(void);
+    void words_editor(void);
+    void picture_editor(void);
+    void sound_player(void);
 
-      void help_contents(void);
-      void help_index(void);
-      bool help_topic( const QString& topic );
-      void about_it(void);
-      void about_qt(void);
-      void closeEvent( QCloseEvent *e );
+    void help_contents(void);
+    void help_index(void);
+    bool help_topic(const QString &topic);
+    void about_it(void);
+    void about_qt(void);
+    void closeEvent(QCloseEvent *e);
 
-      int save_all(void);
-      void save_and_run(void);
-      void window_list_cb(void);
+    int save_all(void);
+    void save_and_run(void);
+    void window_list_cb(void);
 protected:
     QMenuBar *menubar;
-    QMessageBox *err,*warn;
+    QMessageBox *err, *warn;
     QPushButton *create;
     QFileDialog *f;
-    QAction *open,*close_,*run,*view,*logic,*text,*obj,*words,*pic;
+    QAction *open, *close_, *run, *view, *logic, *text, *obj, *words, *pic;
     int num_res;
     int n_res;
     QAction *id[24];
     int max_disabled;
-
 };
 
 extern Menu *menu;
 
 typedef struct {
-  union {
-    LogEdit *l;
-    ViewEdit *v;
-    WordsEdit *w;
-    ObjEdit *o;
-    PicEdit *p;
-    TextEdit *t;
-    ResourcesWin *r;
-    Preview *pr;
-    HelpWindow *h;
-  }w;
-  int type;
-}WinList;
+    union {
+        LogEdit *l;
+        ViewEdit *v;
+        WordsEdit *w;
+        ObjEdit *o;
+        PicEdit *p;
+        TextEdit *t;
+        ResourcesWin *r;
+        Preview *pr;
+        HelpWindow *h;
+    } w;
+    int type;
+} WinList;
 
 #define MAXWIN 64
 extern WinList winlist[MAXWIN];

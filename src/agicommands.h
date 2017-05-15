@@ -36,10 +36,10 @@ extern const char *ArgTypePrefix[9] ;
 extern const char *ArgTypeName[9] ;
 
 typedef struct {
-  const char *Name;
-  char NumArgs;
-  char argTypes[7];
-}CommandStruct;
+    const char *Name;
+    char NumArgs;
+    char argTypes[7];
+} CommandStruct;
 
 #define NumTestCommands 18
 extern int NumAGICommands;   //changes in different AGI interpreter versions

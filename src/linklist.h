@@ -29,9 +29,9 @@
 #define    OVR_MODE   1
 
 struct picCodeNode {
-   unsigned char node;
-   struct picCodeNode *next;
-   struct picCodeNode *prior;
+    unsigned char node;
+    struct picCodeNode *next;
+    struct picCodeNode *prior;
 };
 
 #endif  /* _LINKLIST_H_ */

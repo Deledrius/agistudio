@@ -23,15 +23,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-Logic::Logic() 
+Logic::Logic()
 {
-  
-  wordlist = new WordList();
-  objlist = new ObjList();
-  maxcol=80;
-  OutputText = "";
+    wordlist = new WordList();
+    objlist = new ObjList();
+    maxcol = 80;
+    OutputText = "";
 }
-
-
-
-

@@ -41,25 +41,25 @@ class ObjEdit : public QWidget
 {
     Q_OBJECT
 public:
-    ObjEdit( QWidget *parent=0, const char *name=0, int winnum=0);
+    ObjEdit(QWidget *parent = 0, const char *name = 0, int winnum = 0);
     void open();
 public slots:
-      void open_file();
-      void save_file();
-      void save_as_file();
-      void new_file();
-      void select_object();
-      void add_cb();
-      void del_cb();
-      void left_cb();
-      void right_cb();
-      void num_cb();
-      void name_cb();
- protected:
+    void open_file();
+    void save_file();
+    void save_as_file();
+    void new_file();
+    void select_object();
+    void add_cb();
+    void del_cb();
+    void left_cb();
+    void right_cb();
+    void num_cb();
+    void name_cb();
+protected:
     int winnum;
     QListWidget *list;
-    QLineEdit *objname,*num;
-    QPushButton *add,*del,*left,*right;
+    QLineEdit *objname, *num;
+    QPushButton *add, *del, *left, *right;
     QMenu *options;
     QAction *encrypted;
     int CurObject;
@@ -70,9 +70,9 @@ public slots:
     void open(char *);
     void save(char *);
     void deinit();
-    void closeEvent( QCloseEvent *e );
-    void showEvent(  QShowEvent * );
-    void hideEvent(  QHideEvent * );    
+    void closeEvent(QCloseEvent *e);
+    void showEvent(QShowEvent *);
+    void hideEvent(QHideEvent *);
 };
 
 #endif

@@ -60,46 +60,45 @@ class ViewIcon : public QWidget
 {
     Q_OBJECT
 public:
-    ViewIcon( QWidget *parent=0, const char *name=0,ViewEdit *v=0);
- protected:
+    ViewIcon(QWidget *parent = 0, const char *name = 0, ViewEdit *v = 0);
+protected:
     ViewEdit *viewedit;
     void paintEvent(QPaintEvent *);
-
 };
+
 //********************************************************
 class Canvas : public QScrollArea
 //view drawing area
 {
     Q_OBJECT
 public:
-    Canvas( QWidget *parent=0, const char *name=0, ViewEdit *v=0);
-    int x0,y0;
+    Canvas(QWidget *parent = 0, const char *name = 0, ViewEdit *v = 0);
+    int x0, y0;
     int pixsize;
-    int cur_w,cur_h;
-    void DrawCel(int w,int h,byte *data,bool mirror);
-    void DrawCel(int w,int h,byte *data,bool mirror,int pixsize);
-    void setSize(int w,int h);
-    void UpdateCel(int x,int y);
- protected:
+    int cur_w, cur_h;
+    void DrawCel(int w, int h, byte *data, bool mirror);
+    void DrawCel(int w, int h, byte *data, bool mirror, int pixsize);
+    void setSize(int w, int h);
+    void UpdateCel(int x, int y);
+protected:
     int CurColor;
     QPixmap pixmap;
     bool cur_mirror;
     byte *data;
     ViewEdit *viewedit;
-    void keyPressEvent( QKeyEvent * );
-    void viewportMousePressEvent(QMouseEvent* e);
-    void viewportMouseMoveEvent(QMouseEvent* e);
-    void drawContents ( QPainter * p,int,int,int,int);
-    bool focusNextPrevChild ( bool next ) ;    
+    void keyPressEvent(QKeyEvent *);
+    void viewportMousePressEvent(QMouseEvent *e);
+    void viewportMouseMoveEvent(QMouseEvent *e);
+    void drawContents(QPainter *p, int, int, int, int);
+    bool focusNextPrevChild(bool next) ;
 };
 
 //********************************************************
 class Description: public QWidget
 {
-
     Q_OBJECT
 public:
-    Description( QWidget *parent=0, const char *name=0, ViewEdit *v=0);
+    Description(QWidget *parent = 0, const char *name = 0, ViewEdit *v = 0);
 public slots:
     void set();
     void ok_cb();
@@ -110,26 +109,25 @@ protected:
     ViewEdit *viewedit;
     QTextEdit *desc;
     unsigned int maxcol;
-    void resizeEvent( QResizeEvent * );
+    void resizeEvent(QResizeEvent *);
 };
 
 //********************************************************
 class Animate: public QWidget
 {
-
     Q_OBJECT
 public:
-    Animate( QWidget *parent=0, const char *name=0, Preview *p=0, ViewEdit *v=0);
+    Animate(QWidget *parent = 0, const char *name = 0, Preview *p = 0, ViewEdit *v = 0);
     QTimer *timer;
 public slots:
-    void start_stop(); 
+    void start_stop();
     void next_cel();
     void closeall();
     void fb_cb();
- protected:    
+protected:
     QLineEdit *delay;
     QPushButton *button;
-    QRadioButton *forward,*backward;
+    QRadioButton *forward, *backward;
     int num;
     ViewEdit *viewedit;
     Preview *preview;
@@ -141,7 +139,7 @@ class ViewEdit : public QWidget
 {
     Q_OBJECT
 public:
-    ViewEdit( QWidget *parent=0, const char *name=0,int winnum=0, ResourcesWin *res=0);
+    ViewEdit(QWidget *parent = 0, const char *name = 0, int winnum = 0, ResourcesWin *res = 0);
     Description *description;
     Palette *palette;
     View *view;
@@ -149,7 +147,7 @@ public:
     int drawing_mode;
     bool changed;
     void open(int ResNum);
-    void fillCel(int x,int y,byte color);
+    void fillCel(int x, int y, byte color);
     void change_mode1(int);
 public slots:
     void open();
@@ -209,25 +207,25 @@ public slots:
     void animate_cb();
     void next_cel_cycle();
     void prev_cel_cycle();
- protected:
+protected:
 
     QWidget *transcolor;
     QPushButton *edit_descriptor;
     QCheckBox *is_descriptor;
     Canvas *canvas;
-    QLabel *loopnum,*celnum;
-    QLineEdit *width,*height;
+    QLabel *loopnum, *celnum;
+    QLineEdit *width, *height;
     QComboBox *mirror_loop;
-    QRadioButton *view_draw,*view_fill;
+    QRadioButton *view_draw, *view_fill;
     Animate *animate;
-    int ViewNum;    
+    int ViewNum;
     int transcol;
     Cel undoCel;
     bool undo;
     int winnum;
-    void closeEvent( QCloseEvent *e );
-    void showEvent(  QShowEvent * );
-    void hideEvent(  QHideEvent * );    
+    void closeEvent(QCloseEvent *e);
+    void showEvent(QShowEvent *);
+    void hideEvent(QHideEvent *);
     void open(char *filename);
     void save(char *filename);
     void do_open();
@@ -240,9 +238,8 @@ public slots:
     void showlooppar();
     void showcelpar();
     int curIndex();
-    void saveundo();    
-    bool focusNextPrevChild ( bool next ) ;
-
+    void saveundo();
+    bool focusNextPrevChild(bool next) ;
 };
 
 #endif

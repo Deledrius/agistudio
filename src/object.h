@@ -28,16 +28,16 @@
 //the list of inventory objects
 class ObjList
 {
- public:
-  ObjList();
-  TStringList ItemNames;
-  byte RoomNum[MaxItems];
-  byte MaxScreenObjects; //what this is for ?
-  void XORData();
-  int read(char *filename,bool FileIsEncrypted);
-  int save(char *filename,bool FileIsEncrypted);
-  bool GetItems();
-  void clear();
+public:
+    ObjList();
+    TStringList ItemNames;
+    byte RoomNum[MaxItems];
+    byte MaxScreenObjects; //what this is for ?
+    void XORData();
+    int read(char *filename, bool FileIsEncrypted);
+    int save(char *filename, bool FileIsEncrypted);
+    bool GetItems();
+    void clear();
 };
 
 

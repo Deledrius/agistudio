@@ -25,35 +25,35 @@
 
 #include <string>
 
-typedef struct{
-  TStringList Words;
-  int GroupNum;
-}TWordGroup;
+typedef struct {
+    TStringList Words;
+    int GroupNum;
+} TWordGroup;
 
 #define MaxGroupNum 65535
 #define MaxWordGroups 10000
 
 class WordList
 {
- public:
-  WordList();
-  TWordGroup WordGroup[MaxWordGroups];
-  int NumGroups;
-  char WhatToDoWithExistingWords;
-  void clear();  
-  int read(char *filename);
-  int save(char *filename);
-  int add_group(int num);
-  int delete_group(int num);
-  int delete_word(char *word,int SelectedGroup);
-  int change_number(int oldnum, int newnum);
-  int GetWordGroupIndex(int GroupNum);
-  int GetNew_GroupIndex(int GroupNum);
-  void merge(const WordList& w);
-  int GroupIndexOfWord(std::string word);
-  bool OKToReplaceWord(std::string TheWord,int OldGroupNum, int NewGroupNum);
-  bool InsertWordGroup(int GroupNum);
-  bool GroupExists(int GroupNum);
+public:
+    WordList();
+    TWordGroup WordGroup[MaxWordGroups];
+    int NumGroups;
+    char WhatToDoWithExistingWords;
+    void clear();
+    int read(char *filename);
+    int save(char *filename);
+    int add_group(int num);
+    int delete_group(int num);
+    int delete_word(char *word, int SelectedGroup);
+    int change_number(int oldnum, int newnum);
+    int GetWordGroupIndex(int GroupNum);
+    int GetNew_GroupIndex(int GroupNum);
+    void merge(const WordList &w);
+    int GroupIndexOfWord(std::string word);
+    bool OKToReplaceWord(std::string TheWord, int OldGroupNum, int NewGroupNum);
+    bool InsertWordGroup(int GroupNum);
+    bool GroupExists(int GroupNum);
 };
 
 

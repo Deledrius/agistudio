@@ -55,13 +55,13 @@ class Palette1 : public QWidget
 {
     Q_OBJECT
 public:
-    Palette1( QWidget *parent=0, const char *name=0, PicEdit *w=0);
-    int left,right;
- protected:
+    Palette1(QWidget *parent = 0, const char *name = 0, PicEdit *w = 0);
+    int left, right;
+protected:
     PicEdit *picedit;
 
     void paintEvent(class QPaintEvent *);
-    void mousePressEvent(QMouseEvent* event);
+    void mousePressEvent(QMouseEvent *event);
 };
 
 //************************************************
@@ -69,33 +69,33 @@ class PCanvas : public QScrollArea
 {
     Q_OBJECT
 public:
-    PCanvas( QWidget *parent=0, const char *name=0, PicEdit *w=0);
+    PCanvas(QWidget *parent = 0, const char *name = 0, PicEdit *w = 0);
     int pixsize;
-    int cur_w,cur_h;
-    bool bg_loaded,bg_on;
+    int cur_w, cur_h;
+    bool bg_loaded, bg_on;
     bool linedraw;
     bool pri_lines;
-    int x0,y0,x1,y1;
+    int x0, y0, x1, y1;
     void line(bool mode);
     void load_bg(char *filename);
     void draw(int ResNum);
     void update();
-    void setSize(int w,int h);
+    void setSize(int w, int h);
     void setPixsize(int pixsize);
-  protected:
+protected:
     int CurColor;
     Picture *picture;
     QPixmap pixmap;
     QImage bgpix;
     PicEdit *picedit;
-    void closeEvent( QCloseEvent *e );
-    void showEvent( QShowEvent *);
-    void hideEvent( QHideEvent *);
-    void keyPressEvent( QKeyEvent * );
-    void viewportMousePressEvent(QMouseEvent* e);
-    void viewportMouseMoveEvent(QMouseEvent* e);
-    void drawContents ( QPainter * p, int clipx, int clipy, int clipw, int cliph ) ;
-    bool focusNextPrevChild ( bool next ) ;    
+    void closeEvent(QCloseEvent *e);
+    void showEvent(QShowEvent *);
+    void hideEvent(QHideEvent *);
+    void keyPressEvent(QKeyEvent *);
+    void viewportMousePressEvent(QMouseEvent *e);
+    void viewportMouseMoveEvent(QMouseEvent *e);
+    void drawContents(QPainter *p, int clipx, int clipy, int clipw, int cliph) ;
+    bool focusNextPrevChild(bool next) ;
 };
 
 //************************************************
@@ -103,19 +103,19 @@ class ViewData: public QWidget
 {
     Q_OBJECT
 public:
-    ViewData( QWidget *parent=0, const char *name=0,Picture *p=0);
+    ViewData(QWidget *parent = 0, const char *name = 0, Picture *p = 0);
 public slots:
     void read();
- protected:
-    QCheckBox *comments,*wrap;
+protected:
+    QCheckBox *comments, *wrap;
     QTextEdit *codes;
     TStringList data;
     Picture *picture;
     int maxcol;
 
     void getmaxcol();
-    void resizeEvent( QResizeEvent * );
-    void KeyPressEvent( QKeyEvent * );
+    void resizeEvent(QResizeEvent *);
+    void KeyPressEvent(QKeyEvent *);
 };
 
 //************************************************
@@ -123,18 +123,18 @@ class PicEdit : public QWidget
 {
     Q_OBJECT
 public:
-    PicEdit( QWidget *parent=0, const char *name=0,int winnum=0,ResourcesWin *res=0);
+    PicEdit(QWidget *parent = 0, const char *name = 0, int winnum = 0, ResourcesWin *res = 0);
     void open(int ResNum);
     Picture *picture;
     QButtonGroup *tool;
-    QRadioButton *line,*step,*pen,*fill,*brush;
-    QRadioButton *pic,*pri;
+    QRadioButton *line, *step, *pen, *fill, *brush;
+    QRadioButton *pic, *pri;
     QStatusBar *status;
     QWidget *pricolor;
-    QCheckBox *bg,*prilines;
+    QCheckBox *bg, *prilines;
     ResourcesWin *resources_win;
     bool changed;
-    bool closing,hiding,showing;
+    bool closing, hiding, showing;
     int pri_mode;
 public slots:
     void open();
@@ -168,22 +168,22 @@ public slots:
 
     void editor_help();
 
- protected:
+protected:
     int PicNum;
     int winnum;
     PCanvas *canvas;
     Palette1 *palette;
-    QLineEdit *pos,*codeline,*comments;
+    QLineEdit *pos, *codeline, *comments;
     ViewData *viewdata;
     void open(char *filename);
     void save(char *filename);
     void deinit();
-    void closeEvent( QCloseEvent *e );
-    void showEvent( QShowEvent *);
-    void hideEvent( QHideEvent *);
+    void closeEvent(QCloseEvent *e);
+    void showEvent(QShowEvent *);
+    void hideEvent(QHideEvent *);
     void update_palette();
     void update_tools();
-    bool focusNextPrevChild ( bool next ) ;    
+    bool focusNextPrevChild(bool next) ;
 };
 
 

@@ -30,8 +30,8 @@
 QApplication *app;
 char tmp[MAX_TMP]; //global temporary buffer
 
-static char help[]=
-"QT AGI Studio v1.1.\n\
+static char help[] =
+    "QT AGI Studio v1.1.\n\
 A Sierra On-Line(tm) adventure game creator and editor.\n\
 \n\
 Usage: agistudio [switches] \n\
@@ -43,37 +43,36 @@ where [switches] are optionally:\n\
 \n";
 
 //***************************************************
-int main( int argc, char **argv )
+int main(int argc, char **argv)
 {
-  char *gamedir=NULL;
-  
-  tmp[0]=0;
+    char *gamedir = NULL;
 
-  for(int i=1;i<argc;i++){
-    if(argv[i][0] == '-'){
-      if(!strcmp(argv[i]+1,"dir")){
-        gamedir = argv[i+1];
-      }
-      else
-      {
-        if(strcmp(argv[i]+1,"help")!=0 && strcmp(argv[i]+1,"-help")!=0)
-          printf( "Unknown parameter.\n\n" );
-        printf(help);
-        exit(-2);
-      }
+    tmp[0] = 0;
+
+    for (int i = 1; i < argc; i++) {
+        if (argv[i][0] == '-') {
+            if (!strcmp(argv[i] + 1, "dir"))
+                gamedir = argv[i + 1];
+            else {
+                if (strcmp(argv[i] + 1, "help") != 0 && strcmp(argv[i] + 1, "-help") != 0)
+                    printf("Unknown parameter.\n\n");
+                printf(help);
+                exit(-2);
+            }
+        }
     }
-  }
 
-  app = new QApplication(argc,argv);
-  menu = new Menu(NULL,NULL);
+    app = new QApplication(argc, argv);
+    menu = new Menu(NULL, NULL);
 
-  game = new Game();
+    game = new Game();
 
-  menu->show();
-  
-  if(gamedir){
-    int err = game->open(gamedir);
-    if(!err)menu->show_resources();
-  }
-  return app->exec();
+    menu->show();
+
+    if (gamedir) {
+        int err = game->open(gamedir);
+        if (!err)
+            menu->show_resources();
+    }
+    return app->exec();
 }

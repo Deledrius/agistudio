@@ -31,30 +31,29 @@
 //*****************************************************
 class TStringList
 {
- public:
-  TStringList();
-  void add(const std::string&);
-  void addsorted(const char *);
-  void addsorted(const std::string&);
-  void copy(const TStringList&);
-  void lfree(void);
-  void print(int);
-  void print(void);
-  void toLower(void);
-  void toLower(int);
-  void del(int);
-  void replace(int n, const char *str);
-  void replace(int n, const std::string& str);
-  std::string at(int) const;
-  int num;
-  std::string *data;
-  int max;
-  int inc;
-
+public:
+    TStringList();
+    void add(const std::string &);
+    void addsorted(const char *);
+    void addsorted(const std::string &);
+    void copy(const TStringList &);
+    void lfree(void);
+    void print(int);
+    void print(void);
+    void toLower(void);
+    void toLower(int);
+    void del(int);
+    void replace(int n, const char *str);
+    void replace(int n, const std::string &str);
+    std::string at(int) const;
+    int num;
+    std::string *data;
+    int max;
+    int inc;
 };
 
 //*****************************************************
-extern std::string MultStr(const char *str,int NumCopies);
+extern std::string MultStr(const char *str, int NumCopies);
 extern std::string IntToStr(int n);
 extern std::string IntToStr(byte n);
 extern void toLower(std::string *str);

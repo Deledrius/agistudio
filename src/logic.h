@@ -35,55 +35,54 @@
 //Logic class used both for decode and compile
 class Logic
 {
- public:
-  Logic();
-  WordList *wordlist;
-  ObjList *objlist;
-  std::string OutputText;    //result of the decoding
-  std::string ErrorList;     //compilation error messages
-  unsigned int maxcol;  //max number of columns in window - used in formatting 'print' strings
-  int compile();
-  int decode(int resnum);
+public:
+    Logic();
+    WordList *wordlist;
+    ObjList *objlist;
+    std::string OutputText;    //result of the decoding
+    std::string ErrorList;     //compilation error messages
+    unsigned int maxcol;  //max number of columns in window - used in formatting 'print' strings
+    int compile();
+    int decode(int resnum);
 
- private:
-  void ShowError(int Line, std::string ErrorMsg);
-  void DisplayMessages();
-  void ReadMessages();
-  int FindLabels_ReadIfs();
-  void AddBlockEnds();
-  int FindLabels();
-  void AddArg(byte Arg, byte ArgType);
-  void AddSpecialSyntaxCommand();
-  void AddSpecialIFSyntaxCommand();
-  void ReadIfs();
+private:
+    void ShowError(int Line, std::string ErrorMsg);
+    void DisplayMessages();
+    void ReadMessages();
+    int FindLabels_ReadIfs();
+    void AddBlockEnds();
+    int FindLabels();
+    void AddArg(byte Arg, byte ArgType);
+    void AddSpecialSyntaxCommand();
+    void AddSpecialIFSyntaxCommand();
+    void ReadIfs();
 
-  std::string ReadString(std::string::size_type *pos, std::string& str);
-  int RemoveComments(TStringList Lines);
-  int AddIncludes();
-  int ReadDefines();
-  int ReadPredefinedMessages();
-  int ReadLabels();
-  void NextLine();
-  void SkipSpaces();
-  byte MessageNum(std::string TheMessage);
-  byte AddMessage(std::string TheMessage);
-  std::string ReplaceDefine(std::string InText);
-  void ReadArgText();
-  int ReadArgValue();
-  int Val(std::string str);
-  void ReadArgs(bool CommandIsIf, byte CmdNum);
-  std::string ReadText();
-  std::string ReadPlainText();
-  std::string ReadExprText();
-  void ReadCommandName();
-  byte FindCommandNum(bool CommandIsIf, std::string CmdName);
-  bool AddSpecialIFSyntax();
-  bool AddSpecialSyntax();
-  int LabelNum(std::string LabelName);
-  bool LabelAtStartOfLine(std::string LabelName);
-  void WriteMessageSection();
-  int CompileCommands();
-
+    std::string ReadString(std::string::size_type *pos, std::string &str);
+    int RemoveComments(TStringList Lines);
+    int AddIncludes();
+    int ReadDefines();
+    int ReadPredefinedMessages();
+    int ReadLabels();
+    void NextLine();
+    void SkipSpaces();
+    byte MessageNum(std::string TheMessage);
+    byte AddMessage(std::string TheMessage);
+    std::string ReplaceDefine(std::string InText);
+    void ReadArgText();
+    int ReadArgValue();
+    int Val(std::string str);
+    void ReadArgs(bool CommandIsIf, byte CmdNum);
+    std::string ReadText();
+    std::string ReadPlainText();
+    std::string ReadExprText();
+    void ReadCommandName();
+    byte FindCommandNum(bool CommandIsIf, std::string CmdName);
+    bool AddSpecialIFSyntax();
+    bool AddSpecialSyntax();
+    int LabelNum(std::string LabelName);
+    bool LabelAtStartOfLine(std::string LabelName);
+    void WriteMessageSection();
+    int CompileCommands();
 };
 
 extern char tmp[];

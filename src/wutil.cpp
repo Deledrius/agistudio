@@ -34,147 +34,142 @@ QColor egacolor[16];
 
 //**********************************************
 
-AskNumber::AskNumber( QWidget *parent, const char *name, const char *caption,const char *prompt)
+AskNumber::AskNumber(QWidget *parent, const char *name, const char *caption, const char *prompt)
     : QDialog(parent)
 {
-  setWindowTitle(caption);
+    setWindowTitle(caption);
 
-  QBoxLayout *all =  new QVBoxLayout(this);
+    QBoxLayout *all =  new QVBoxLayout(this);
 
-  QBoxLayout *top = new QHBoxLayout(this);
-  all->addLayout(top);
-  QLabel *label = new QLabel(prompt,this);
-  top->addWidget(label);
-  num = new QLineEdit(this);
-  num->setMinimumWidth(80);
-  connect( num, SIGNAL(returnPressed()), SLOT(accept()) );
-  top->addWidget(num);
+    QBoxLayout *top = new QHBoxLayout(this);
+    all->addLayout(top);
+    QLabel *label = new QLabel(prompt, this);
+    top->addWidget(label);
+    num = new QLineEdit(this);
+    num->setMinimumWidth(80);
+    connect(num, SIGNAL(returnPressed()), SLOT(accept()));
+    top->addWidget(num);
 
-  QBoxLayout *bottom = new QHBoxLayout(this);
-  all->addLayout(bottom);
-  QPushButton *ok = new QPushButton(this);
-  ok->setText("OK");  
-  connect( ok, SIGNAL(clicked()), SLOT(accept()) ); 
-  bottom->addWidget(ok);
-  QPushButton *cancel = new QPushButton(this);
-  cancel->setText("Cancel");  
-  connect( cancel, SIGNAL(clicked()), SLOT(reject()) ); 
-  bottom->addWidget(cancel);
+    QBoxLayout *bottom = new QHBoxLayout(this);
+    all->addLayout(bottom);
+    QPushButton *ok = new QPushButton(this);
+    ok->setText("OK");
+    connect(ok, SIGNAL(clicked()), SLOT(accept()));
+    bottom->addWidget(ok);
+    QPushButton *cancel = new QPushButton(this);
+    cancel->setText("Cancel");
+    connect(cancel, SIGNAL(clicked()), SLOT(reject()));
+    bottom->addWidget(cancel);
 }
 
-AskText::AskText( QWidget *parent, const char *name, const char *caption,const char *prompt)
+AskText::AskText(QWidget *parent, const char *name, const char *caption, const char *prompt)
     : QDialog(parent)
 {
-  setWindowTitle(caption);
+    setWindowTitle(caption);
 
-  QBoxLayout *all =  new QVBoxLayout(this);
+    QBoxLayout *all =  new QVBoxLayout(this);
 
-  QLabel *label = new QLabel(prompt,this);
-  all->addWidget(label);
-  text = new QLineEdit(this);
-  text->setMinimumWidth(120);
-  connect( text, SIGNAL(returnPressed()), SLOT(accept()) );
-  all->addWidget(text);
+    QLabel *label = new QLabel(prompt, this);
+    all->addWidget(label);
+    text = new QLineEdit(this);
+    text->setMinimumWidth(120);
+    connect(text, SIGNAL(returnPressed()), SLOT(accept()));
+    all->addWidget(text);
 
-  QBoxLayout *bottom = new QHBoxLayout(this);
-  all->addLayout(bottom);
-  QPushButton *ok = new QPushButton(this);
-  ok->setText("OK");  
-  connect( ok, SIGNAL(clicked()), SLOT(accept()) ); 
-  bottom->addWidget(ok);
-  QPushButton *cancel = new QPushButton(this);
-  cancel->setText("Cancel");  
-  connect( cancel, SIGNAL(clicked()), SLOT(reject()) ); 
-  bottom->addWidget(cancel);
-
+    QBoxLayout *bottom = new QHBoxLayout(this);
+    all->addLayout(bottom);
+    QPushButton *ok = new QPushButton(this);
+    ok->setText("OK");
+    connect(ok, SIGNAL(clicked()), SLOT(accept()));
+    bottom->addWidget(ok);
+    QPushButton *cancel = new QPushButton(this);
+    cancel->setText("Cancel");
+    connect(cancel, SIGNAL(clicked()), SLOT(reject()));
+    bottom->addWidget(cancel);
 }
-
 
 
 //**********************************************
 void make_egacolors(void)
 {
-  static bool ok=false;
-  
-  if(ok)return;
+    static bool ok = false;
 
-  egacolor[0]= QColor(0,0,0);        //black
-  egacolor[1]= QColor(0,0,0xa0);     //blue
-  egacolor[2]= QColor(0,0xa0,0);     //green
-  egacolor[3]= QColor(0,0xa0,0xa0);  //cyan
-  egacolor[4]= QColor(0xa0,0,0);     //red 
-  egacolor[5]= QColor(0xa0,0,0xa0);  //magenta
-  egacolor[6]= QColor(0xa0,0x50,0);  //brown
-  egacolor[7]= QColor(0xa0,0xa0,0xa0); //lightgray
-  egacolor[8]= QColor(0x50,0x50,0x50); //gray
-  egacolor[9]= QColor(0x50,0x50,0xff); //lightblue          
-  egacolor[10]=QColor(0x50,0xff,0x50); //lightgreen
-  egacolor[11]=QColor(0x50,0xff,0xff); //lightcyan
-  egacolor[12]=QColor(0xff,0x50,0x50); //lightred
-  egacolor[13]=QColor(0xff,0x50,0xff); //lightmagenta
-  egacolor[14]=QColor(0xff,0xff,0x50); //yellow
-  egacolor[15]=QColor(0xff,0xff,0xff); //white
+    if (ok)
+        return;
 
-  ok=true;
+    egacolor[0] = QColor(0, 0, 0);     //black
+    egacolor[1] = QColor(0, 0, 0xa0);  //blue
+    egacolor[2] = QColor(0, 0xa0, 0);  //green
+    egacolor[3] = QColor(0, 0xa0, 0xa0); //cyan
+    egacolor[4] = QColor(0xa0, 0, 0);  //red
+    egacolor[5] = QColor(0xa0, 0, 0xa0); //magenta
+    egacolor[6] = QColor(0xa0, 0x50, 0); //brown
+    egacolor[7] = QColor(0xa0, 0xa0, 0xa0); //lightgray
+    egacolor[8] = QColor(0x50, 0x50, 0x50); //gray
+    egacolor[9] = QColor(0x50, 0x50, 0xff); //lightblue
+    egacolor[10] = QColor(0x50, 0xff, 0x50); //lightgreen
+    egacolor[11] = QColor(0x50, 0xff, 0xff); //lightcyan
+    egacolor[12] = QColor(0xff, 0x50, 0x50); //lightred
+    egacolor[13] = QColor(0xff, 0x50, 0xff); //lightmagenta
+    egacolor[14] = QColor(0xff, 0xff, 0x50); //yellow
+    egacolor[15] = QColor(0xff, 0xff, 0xff); //white
+
+    ok = true;
 }
 
 //*********************************************
 
 /*******************************************************/
-Palette::Palette( QWidget *parent, const char *name )
+Palette::Palette(QWidget *parent, const char *name)
     : QWidget(parent), left(0), right(0) {}
 
 
-void Palette::paintEvent( QPaintEvent * )
+void Palette::paintEvent(QPaintEvent *)
 {
-    QPainter p (this );
-    int w,h,x,y,dx,dy,i;
+    QPainter p(this);
+    int w, h, x, y, dx, dy, i;
 
     w = this->width();
     h = this->height();
-    dx=w/8;
-    dy=h/2;
-    w=dx*8;
-    h=dy*2;
+    dx = w / 8;
+    dy = h / 2;
+    w = dx * 8;
+    h = dy * 2;
 
-    for(y=0,i=0;y<h;y+=dy){
-      for(x=0;x<w;x+=dx,i++){
-        p.fillRect(x,y,dx,dy,egacolor[i]);      
-        if(i==left){          
-          p.setPen(i<10?egacolor[15]:egacolor[0]);    //set font !
-          p.drawText(x+dx/4,y+dy/2,"L");
+    for (y = 0, i = 0; y < h; y += dy) {
+        for (x = 0; x < w; x += dx, i++) {
+            p.fillRect(x, y, dx, dy, egacolor[i]);
+            if (i == left) {
+                p.setPen(i < 10 ? egacolor[15] : egacolor[0]); //set font !
+                p.drawText(x + dx / 4, y + dy / 2, "L");
+            }
+            if (i == right) {
+                p.setPen(i < 10 ? egacolor[15] : egacolor[0]);
+                p.drawText(x + dx * 2 / 3, y + dy / 2, "R");
+            }
         }
-        if(i==right){
-          p.setPen(i<10?egacolor[15]:egacolor[0]);
-          p.drawText(x+dx*2/3,y+dy/2,"R");          
-        }      
-      }
     }
 }
 
-void Palette::mousePressEvent(QMouseEvent* event)
+void Palette::mousePressEvent(QMouseEvent *event)
 {
+    int w, h, x, y, dx, dy, i;
 
-  int w,h,x,y,dx,dy,i;
+    w = this->width();
+    h = this->height();
+    dx = w / 8;
+    dy = h / 2;
+    w = dx * 8;
+    h = dy * 2;
 
-  w = this->width();
-  h = this->height();
-  dx=w/8;
-  dy=h/2;
-  w=dx*8;
-  h=dy*2;
-    
-  x=event->x() / dx;
-  y=event->y() / dy;
-  i=y*8+x;
+    x = event->x() / dx;
+    y = event->y() / dy;
+    i = y * 8 + x;
 
-  if (event->button() & Qt::LeftButton){
-    left = i;    
-  }  
-  else if (event->button() & Qt::RightButton){
-    right = i;    
-  }
-  
-  repaint(); 
+    if (event->button() & Qt::LeftButton)
+        left = i;
+    else if (event->button() & Qt::RightButton)
+        right = i;
+
+    repaint();
 }
-

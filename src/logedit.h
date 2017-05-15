@@ -47,18 +47,18 @@ class FindEdit : public QWidget
 {
     Q_OBJECT
 public:
-    FindEdit( QWidget *parent=0, const char *name=0, QTextEdit *edit=0,QStatusBar *s=0);
+    FindEdit(QWidget *parent = 0, const char *name = 0, QTextEdit *edit = 0, QStatusBar *s = 0);
     QStatusBar *status;
-    QPushButton *find_first,*find_next,*cancel;
-    QRadioButton *up,*down,*start,*current;
-    QCheckBox *match_whole,*match_case;
+    QPushButton *find_first, *find_next, *cancel;
+    QRadioButton *up, *down, *start, *current;
+    QCheckBox *match_whole, *match_case;
     QLineEdit *find_field;
     QTextEdit *editor;
     int curline;
 public slots:
-      void find_first_cb();
-      void find_next_cb();
-      void cancel_cb();
+    void find_first_cb();
+    void find_next_cb();
+    void cancel_cb();
 };
 
 class LogicSyntaxHL;
@@ -68,7 +68,7 @@ class LogEdit : public QWidget
 {
     Q_OBJECT
 public:
-    LogEdit( QWidget *parent=0, const char *name=0,int winnum=0,ResourcesWin *res=0, bool readonly=false );
+    LogEdit(QWidget *parent = 0, const char *name = 0, int winnum = 0, ResourcesWin *res = 0, bool readonly = false);
     QTextEdit *editor;
     FindEdit *findedit;
     ResourcesWin *resources_win;
@@ -81,7 +81,7 @@ public:
     int open();
     int open(int ResNum);
 public slots:
-      void new_room();
+    void new_room();
     void read_logic();
     void save_logic();
     void save_as();
@@ -96,8 +96,8 @@ public slots:
     void goto_cb();
     void context_help();
     void command_help();
-    void update_line_num( int para, int pos );
- protected:
+    void update_line_num(int para, int pos);
+protected:
     int LogicNum;
     int winnum;
     bool changed;
@@ -106,10 +106,10 @@ public slots:
     void deinit();
     void delete_file(int num);
     void getmaxcol();
-    void resizeEvent( QResizeEvent * );
-    void closeEvent( QCloseEvent *e );
-    void showEvent(  QShowEvent * );
-    void hideEvent(  QHideEvent * );    
+    void resizeEvent(QResizeEvent *);
+    void closeEvent(QCloseEvent *e);
+    void showEvent(QShowEvent *);
+    void hideEvent(QHideEvent *);
 };
 
 //a simple text editor
@@ -117,7 +117,7 @@ class TextEdit : public QWidget
 {
     Q_OBJECT
 public:
-    TextEdit( QWidget *parent=0, const char *name=0,int winnum=0);
+    TextEdit(QWidget *parent = 0, const char *name = 0, int winnum = 0);
     QTextEdit *editor;
     FindEdit *findedit;
     QStatusBar *status;
@@ -132,13 +132,13 @@ public slots:
     void save_as();
     void find_cb();
     void find_again();
- protected:
+protected:
     std::string OutputText;
     int winnum;
     bool changed;
-    void closeEvent( QCloseEvent *e );
-    void showEvent(  QShowEvent * );
-    void hideEvent(  QHideEvent * );    
+    void closeEvent(QCloseEvent *e);
+    void showEvent(QShowEvent *);
+    void hideEvent(QHideEvent *);
     void deinit();
 };
 

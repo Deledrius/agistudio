@@ -31,30 +31,30 @@ class HelpWindow : public QMainWindow
 {
     Q_OBJECT
 public:
-    HelpWindow( const QString& home_,  const QString& path, QWidget* parent = 0, const char *name=0 );
+    HelpWindow(const QString &home_,  const QString &path, QWidget *parent = 0, const char *name = 0);
     ~HelpWindow();
     void setSource(char *filename);
 private slots:
-    void setBackwardAvailable( bool );
-    void setForwardAvailable( bool );
+    void setBackwardAvailable(bool);
+    void setForwardAvailable(bool);
 
     void textChanged();
     void openFile();
     void newWindow();
 
-    void pathSelected( const QString & );
-    void histChosen( int );
-    void bookmChosen( int );
+    void pathSelected(const QString &);
+    void histChosen(int);
+    void bookmChosen(int);
     void addBookmark();
-    void showEvent(  QShowEvent * );
-    void hideEvent(  QHideEvent * );  
-    
+    void showEvent(QShowEvent *);
+    void hideEvent(QHideEvent *);
+
 private:
-    bool eventFilter( QObject * o, QEvent * e );
+    bool eventFilter(QObject *o, QEvent *e);
     void readHistory();
     void readBookmarks();
-    
-    QTextBrowser* browser;
+
+    QTextBrowser *browser;
     QComboBox *pathCombo;
     QAction *backwardAction, *forwardAction;
     QString selectedURL;
@@ -65,7 +65,7 @@ private:
 };
 
 
-extern HelpWindow *helpwindow,*helpwindow1;
+extern HelpWindow *helpwindow, *helpwindow1;
 
 
 #endif
