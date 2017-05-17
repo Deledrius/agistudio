@@ -133,7 +133,7 @@ public:
         commentEndExpression = QRegExp("\\*/");
     }
 
-    void LogicSyntaxHL::highlightBlock(const QString &text) override
+    void highlightBlock(const QString &text) override
     {
         foreach (const HighlightingRule &rule, highlightingRules) {
             QRegExp expression(rule.pattern);
