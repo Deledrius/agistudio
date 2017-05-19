@@ -141,7 +141,7 @@ void ResourcesWin::select_resource_type(int ResType)
     list->clear();
     for (i = 0, k = 0; i < 256; i++) {
         if (game->ResourceInfo[ResType][i].Exists) {
-            str.sprintf("%s.%3d", ResTypeName[ResType], i);
+            str.sprintf("%s.%03d", ResTypeName[ResType], i);
             list->addItem(str);
             ResourceIndex[k++] = i;
         }
@@ -299,7 +299,7 @@ void ResourcesWin::delete_resource()
     int k = list->currentRow();
     int resnum = ResourceIndex[k];
 
-    sprintf(tmp, "Really delete %s.%d ?", ResTypeName[restype], resnum);
+    sprintf(tmp, "Really delete %s.%03d?", ResTypeName[restype], resnum);
     switch (QMessageBox::warning(this, "Delete resource", tmp,
                                  "Delete", "Cancel",
                                  0,      // Enter == button 0
@@ -335,7 +335,7 @@ void ResourcesWin::renumber_resource()
     int restype = selected;
     int resnum = ResourceIndex[k];
     if (game->ResourceInfo[restype][newnum].Exists)
-        sprintf(tmp, "Resource %s.%d already exists. Replace it ?", ResTypeName[restype], newnum);
+        sprintf(tmp, "Resource %s.%03d already exists. Replace it ?", ResTypeName[restype], newnum);
     switch (QMessageBox::warning(this, "Renumber resource", tmp,
                                  "Replace", "Cancel",
                                  0,      // Enter == button 0
@@ -388,7 +388,7 @@ void ResourcesWin::import_resource()
 
     int replace = 0;
     if (game->ResourceInfo[restype][newnum].Exists) {
-        sprintf(tmp, "Resource %s.%d already exists. Replace it ?", ResTypeName[restype], newnum);
+        sprintf(tmp, "Resource %s.%03d already exists. Replace it ?", ResTypeName[restype], newnum);
         replace = QMessageBox::warning(this, "Overwrite resource", tmp, "Replace", "Cancel", 0, 1);
     }
     switch (replace) {
@@ -605,7 +605,7 @@ void AddResource::open(char *file_name)
 void AddResource::edit_cb(const QString &str)
 {
     int num = str.toInt();
-    sprintf(tmp, "%s.%d", ResTypeName[restype], num);
+    sprintf(tmp, "%s.%03d", ResTypeName[restype], num);
     resname->setText(tmp);
 }
 
@@ -678,7 +678,7 @@ void AddResource::ok_cb()
     }
 
     if (game->ResourceInfo[restype][num].Exists) {
-        sprintf(tmp, "Resource %s.%d already exists. Replace it ?", ResTypeName[restype], num);
+        sprintf(tmp, "Resource %s.%03d already exists. Replace it ?", ResTypeName[restype], num);
 
         switch (QMessageBox::warning(this, "Add resource", tmp,
                                      "Replace", "Cancel",
@@ -715,6 +715,6 @@ void AddResource::select_type(int type)
     QString str = number->text();
     int num = str.toInt();
 
-    sprintf(tmp, "%s.%d", ResTypeName[restype], num);
+    sprintf(tmp, "%s.%03d", ResTypeName[restype], num);
     resname->setText(tmp);
 }
