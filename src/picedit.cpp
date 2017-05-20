@@ -1164,24 +1164,9 @@ bool PCanvas::focusNextPrevChild(bool)
 //*****************************************
 void PCanvas::load_bg(char *filename)
 {
-    if (!bgpix.load(filename)) { //loads all formats supported by QT
-#ifdef IMGEXT
-        //if can't load - try image extensions
-        //(currently only jpeg; loads with colors all wrong)
-        if (!menu->imgext) {
-            menu->load_imgext();
-            if (!bgpix.load(filename)) {
-                menu->errmes("Can't open file %s !", filename);
-                return;
-            }
-        } else {
-            menu->errmes("Can't open file %s !", filename);
-            return;
-        }
-#else
+    if (!bgpix.load(filename)) {
         menu->errmes("Can't open file %s !", filename);
         return;
-#endif
     }
     bg_loaded = true;
 

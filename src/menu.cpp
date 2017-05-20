@@ -203,9 +203,7 @@ Menu::Menu(QWidget *parent, const char *name)
     for (int i = 0; i < MAXWIN; i++)
         winlist[i].type = -1;
     make_egacolors();
-#ifdef IMGEXT
-    imgext = false;
-#endif
+
     window_list = NULL;
     resources_win = NULL;
     num_res = 0;
@@ -774,18 +772,6 @@ void Menu::warnmes(const char *fmt, ...)
     warn->adjustSize();
     warn->show();
 }
-
-
-//**********************************************
-#ifdef IMGEXT
-void Menu::load_imgext()
-//QT image extensions - to handle more image formats
-//currently it is only jpg and it doesn't work well anyway
-{
-    qInitImageIO() ;
-    imgext = true;
-}
-#endif
 
 //**********************************************
 

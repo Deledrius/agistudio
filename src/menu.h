@@ -86,10 +86,7 @@ public:
     void inc_res(ResourcesWin *res);
     void dec_res();
     bool templ;
-#ifdef IMGEXT
-    bool imgext;
-    void load_imgext();
-#endif
+
 public slots:
     void open_game(void);
     void close_game(void);
