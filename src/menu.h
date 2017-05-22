@@ -41,7 +41,6 @@
 #include "viewedit.h"
 #include "logedit.h"
 #include "picedit.h"
-#include "dir.h"
 #include "resources.h"
 #include "helpwindow.h"
 
@@ -157,5 +156,6 @@ extern WinList winlist[MAXWIN];
 extern int get_win();
 extern WindowList *window_list;
 
-#endif  //MENU_H
+void OpenGameDir(QWidget *parent = 0, bool newgame = false);
 
+#endif  //MENU_H

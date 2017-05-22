@@ -13,7 +13,6 @@ endif(APPLE)
 
 set(AGIStudio_HEADERS
     agicommands.h
-    dir.h
     game.h
     global.h
     helpwindow.h
@@ -82,7 +81,6 @@ set(AGIStudio_SOURCES
     agicommands.cpp
     agiplay.cpp
     bpicture.cpp
-    dir.cpp
     game.cpp
     helpwindow.cpp
     linklist.cpp

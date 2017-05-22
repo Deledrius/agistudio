@@ -28,7 +28,6 @@
 #include "wutil.h"
 #include "preview.h"
 #include "picedit.h"
-#include "dir.h"
 #include "options.h"
 #include "helpwindow.h"
 
@@ -1076,4 +1075,51 @@ void WindowList::del_cb()
         n++;
     }
     draw();
+}
+
+
+//*********************************************************
+void OpenGameDir(QWidget *parent, bool newgame)
+{
+    QString title("Open game");
+    if (newgame)
+        title = "New game";
+    QString dir = QFileDialog::getExistingDirectory(parent, title);
+    if (dir.isNull())
+        return;
+
+    // Close the currently edited game.
+    if (game->isOpen) {
+        menu->close_game();
+        if (game->isOpen)  // Closing was canceled.
+            return;
+    }
+
+    if (newgame) {
+        QDir dir_search(dir);
+        if (!dir_search.entryList(QStringList("*vol.?"), QDir::Files).isEmpty()) {
+            auto prompt = QString("The folder '%1' already contains an AGI game.  Continuing will erase the existing game.\n\nDo you wish to proceed?").arg(dir);
+            switch (QMessageBox::warning(parent,
+                                         "AGI Studio",
+                                         prompt,
+                                         QMessageBox::Yes | QMessageBox::No,
+                                         QMessageBox::No)) {
+            case QMessageBox::Yes:
+                break;
+            default:
+                return;
+            }
+        }
+    }
+
+    int err = 0;
+    if (newgame) {
+        if (menu->templ)
+            err = game->from_template(dir.toStdString());
+        else
+            err = game->newgame(dir.toStdString());
+    } else
+        err = game->open(dir.toStdString());
+    if (!err)
+        menu->show_resources();
 }
