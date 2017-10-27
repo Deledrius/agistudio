@@ -505,7 +505,7 @@ void ViewEdit::open(int ResNum)
     if (view->open(ResNum))
         return ;
     ViewNum = ResNum;
-    sprintf(tmp, "View editor: view.%d", ViewNum);
+    sprintf(tmp, "View editor: view.%03d", ViewNum);
     setWindowTitle(tmp);
     changed = false;
     display();
@@ -644,7 +644,7 @@ void ViewEdit::closeEvent(QCloseEvent *e)
 {
     if (changed) {
         if (ViewNum != -1)
-            sprintf(tmp, "Save changes to view.%d ?", ViewNum);
+            sprintf(tmp, "Save changes to view.%03d ?", ViewNum);
         else
             sprintf(tmp, "Save changes to view ?");
         strcat(tmp, "\n(view will be saved to game)");
@@ -738,7 +738,7 @@ void ViewEdit::save_to_game_as()
         return ;
     }
     if (game->ResourceInfo[VIEW][num].Exists) {
-        sprintf(tmp, "Resource view.%d already exists. Replace it ?", num);
+        sprintf(tmp, "Resource view.%03d already exists. Replace it ?", num);
 
         switch (QMessageBox::warning(this, "View", tmp,
                                      "Replace", "Cancel",
@@ -777,7 +777,7 @@ void ViewEdit::delete_view()
     if (ViewNum == -1)
         return;
 
-    sprintf(tmp, "Really delete view %d ?", ViewNum);
+    sprintf(tmp, "Really delete view %03d ?", ViewNum);
     switch (QMessageBox::warning(this, "View", tmp,
                                  "Delete", "Cancel",
                                  0,      // Enter == button 0

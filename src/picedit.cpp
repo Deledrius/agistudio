@@ -328,7 +328,7 @@ void PicEdit::open(int ResNum)
     if (picture->open(ResNum))
         return;
     PicNum = ResNum;
-    sprintf(tmp, "Picture editor: picture.%d", PicNum);
+    sprintf(tmp, "Picture editor: picture.%03d", PicNum);
     setWindowTitle(tmp);
     if (canvas->isTopLevel())
         canvas->setWindowTitle(tmp);
@@ -416,7 +416,7 @@ void PicEdit::closeEvent(QCloseEvent *e)
 {
     if (changed) {
         if (PicNum != -1)
-            sprintf(tmp, "Save changes to picture.%d ?", PicNum);
+            sprintf(tmp, "Save changes to picture.%03d ?", PicNum);
         else
             sprintf(tmp, "Save changes to picture ?");
         strcat(tmp, "\n(picture will be saved to game)");
@@ -477,7 +477,7 @@ void PicEdit::save_to_game_as()
         return ;
     }
     if (game->ResourceInfo[PICTURE][num].Exists) {
-        sprintf(tmp, "Resource picture.%d already exists. Replace it ?", num);
+        sprintf(tmp, "Resource picture.%03d already exists. Replace it ?", num);
 
         switch (QMessageBox::warning(this, "Picture", tmp,
                                      "Replace", "Cancel",
@@ -514,7 +514,7 @@ void PicEdit::delete_picture()
     int k;
     if (PicNum == -1)
         return;
-    sprintf(tmp, "Really delete picture %d ?", PicNum);
+    sprintf(tmp, "Really delete picture %03d ?", PicNum);
     switch (QMessageBox::warning(this, "Picture", tmp,
                                  "Delete", "Cancel",
                                  0,      // Enter == button 0
@@ -552,7 +552,7 @@ void PicEdit::view_data()
     if (viewdata == NULL)
         viewdata = new ViewData(0, 0, picture);
     if (PicNum != -1) {
-        sprintf(tmp, "View data: picture %d", PicNum);
+        sprintf(tmp, "View data: picture %03d", PicNum);
         viewdata->setWindowTitle(tmp);
     } else
         viewdata->setWindowTitle("View data: picture");
