@@ -609,6 +609,7 @@ void PreviewView::show_description()
     maxcol = (W - 20) / f.width('a');
 
     preview->description->clear();
+    preview->description->setAlignment(Qt::AlignCenter);
     std::string ThisLine = "";
     std::string ThisMessage = view->Description;
 
@@ -623,6 +624,7 @@ void PreviewView::show_description()
             ThisLine += ThisMessage.substr(0, n);
             ThisMessage = (n < (int)ThisMessage.length()) ? ThisMessage.substr(n + 1) : "";
             preview->description->insertPlainText(ThisLine.c_str());
+            preview->description->insertPlainText("\n");
             ThisLine = "";
         } else {
             ThisLine += ThisMessage;
