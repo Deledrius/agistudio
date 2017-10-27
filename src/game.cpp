@@ -339,15 +339,12 @@ void Game::make_source_dir()
     if (reldir)
         srcdir = dir + "/" + srcdirname; //srcdir is inside the game directory
     else
-        srcdir = srcdirname;         //srcdir can be anywhere
+        srcdir = srcdirname;             //srcdir can be anywhere
 
-#ifdef _WIN32
-    int ret = _mkdir(srcdir.c_str());
-#else
-    int ret = mkdir(srcdir.c_str(), 0xfff);
-#endif
-    if (ret == -1 && errno != EEXIST)
-        menu->errmes("Can't create the source directory %s !\nlogic text files will not be saved.", srcdirname.c_str());
+    QDir dir;
+    bool ret = dir.mkpath(srcdir.c_str());
+    if (ret == false)
+        menu->errmes("Can't create the source directory %s!\nLogic text files will not be saved.", srcdirname.c_str());
 }
 
 //*******************************************
