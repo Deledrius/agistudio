@@ -35,7 +35,7 @@
 #include <ctype.h>
 
 #include <QApplication>
-#include <QRegexp>
+#include <QRegExp>
 #include <QLabel>
 #include <QHideEvent>
 #include <QResizeEvent>

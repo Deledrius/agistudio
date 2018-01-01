@@ -27,8 +27,8 @@
 #include <QPushButton>
 #include <QLayout>
 #include <QListWidget>
-#include <QMessagebox>
-#include <QLineedit>
+#include <QMessageBox>
+#include <QLineEdit>
 #include <QRadioButton>
 #include <QButtonGroup>
 #include <QEvent>

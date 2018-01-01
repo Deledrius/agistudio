@@ -190,8 +190,9 @@ void play_song(unsigned char *song, int size)
     }
 
     int step = 0;
-    QProgressDialog progress("Playing...", "Cancel", (size + 16) / 5, 0, 0, true);
+    QProgressDialog progress("Playing...", "Cancel", 0, (size + 16) / 5);
     progress.setMinimumDuration(0);
+    progress.setModal(true);
 
     for (playing = 1; playing;) {
         int freq;
@@ -220,8 +221,8 @@ void play_song(unsigned char *song, int size)
                 }
                 chn[i].ptr++;
 
-                progress.setProgress(step++);
-                if (progress.wasCancelled()) {
+                progress.setValue(step++);
+                if (progress.wasCanceled()) {
                     playing = false;
                     break;
                 }

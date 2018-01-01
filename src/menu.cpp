@@ -46,7 +46,7 @@
 #include <QApplication>
 #include <QPixmap>
 #include <QToolButton>
-#include <QTooltip>
+#include <QToolTip>
 #include <QLabel>
 #include <QCloseEvent>
 #include <QToolBar>

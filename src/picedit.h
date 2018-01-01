@@ -25,8 +25,8 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QLayout>
-#include <QNamespace.h>
-#include <QMessagebox>
+#include <qnamespace.h>
+#include <QMessageBox>
 #include <QTextEdit>
 #include <QEvent>
 #include <QPixmap>
