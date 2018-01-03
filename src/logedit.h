@@ -29,7 +29,7 @@
 #include <QMessageBox>
 #include <QTextEdit>
 #include <QEvent>
-#include <QStatusbar>
+#include <QStatusBar>
 #include <QCheckBox>
 #include <QResizeEvent>
 #include <QShowEvent>

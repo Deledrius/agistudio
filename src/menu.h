@@ -24,16 +24,16 @@
 #include <stdarg.h>
 #include <string>
 #include <QWidget>
-#include <QMenubar>
+#include <QMenuBar>
 #include <QLabel>
-#include <QPushbutton>
+#include <QPushButton>
 #include <QLayout>
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QLineEdit>
 #include <QRadioButton>
 #include <QMainWindow>
-#include <QStatusbar>
+#include <QStatusBar>
 #include <QCloseEvent>
 
 #include "wordsedit.h"

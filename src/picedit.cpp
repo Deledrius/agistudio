@@ -29,7 +29,7 @@
 #include <QSpinBox>
 #include <QApplication>
 #include <QPainter>
-#include <QTooltip>
+#include <QToolTip>
 #include <QKeyEvent>
 #include <QLabel>
 #include <QPixmap>
