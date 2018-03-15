@@ -85,6 +85,7 @@ public:
 protected:
     int CurColor;
     Picture *picture;
+    QLabel *imagecontainer;
     QPixmap pixmap;
     QImage bgpix;
     PicEdit *picedit;
@@ -92,8 +93,8 @@ protected:
     void showEvent(QShowEvent *);
     void hideEvent(QHideEvent *);
     void keyPressEvent(QKeyEvent *);
-    void viewportMousePressEvent(QMouseEvent *e);
-    void viewportMouseMoveEvent(QMouseEvent *e);
+    void mousePressEvent(QMouseEvent *e);
+    void mouseMoveEvent(QMouseEvent *e);
     void drawContents(QPainter *p, int clipx, int clipy, int clipw, int cliph) ;
     bool focusNextPrevChild(bool next) ;
 };
@@ -151,6 +152,8 @@ public slots:
     void zoom_plus();
 
     void change_drawmode(int);
+    void toggle_bgmode(bool);
+    void toggle_prilinemode(bool);
     void change_tool(int);
     void change_size(int);
     void change_shape(int);

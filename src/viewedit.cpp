@@ -359,7 +359,7 @@ ViewEdit::ViewEdit(QWidget *parent, const char *name, int win_num, ResourcesWin 
     bg->setExclusive(true);
     bg->addButton(view_draw);
     bg->addButton(view_fill, 1);
-    connect(bg, SIGNAL(clicked(int)), SLOT(change_mode(int)));
+    connect(bg, SIGNAL(buttonClicked(int)), SLOT(change_mode(int)));
 
 
     QGridLayout *grid3 = new QGridLayout();
@@ -408,7 +408,6 @@ ViewEdit::ViewEdit(QWidget *parent, const char *name, int win_num, ResourcesWin 
     QBoxLayout *right = new QVBoxLayout(this);
     frame3->setLayout(right);
 
-    //  QScrollArea *canvas = new QScrollArea(frame3);
     canvas = new Canvas(frame3, 0, this);
     canvas->setMinimumSize(400, 200);
     right->addWidget(canvas, 1);
@@ -1565,20 +1564,31 @@ Canvas::Canvas(QWidget *parent, const char *name, ViewEdit *v)
     cur_mirror = false;
     pixmap = QPixmap();
     cur_w = cur_h = 0;
+
+    imagecontainer = new QLabel;
+    this->setWidget(imagecontainer);
+    imagecontainer->resize(cur_w, cur_h);
+    imagecontainer->setPixmap(pixmap);
 }
 
 //*********************************************
 void Canvas::setSize(int w, int h)
 {
     if (cur_w != w || cur_h != h) {
-        pixmap = pixmap.scaled(w * pixsize * 2, h * pixsize);
+        if (!pixmap)
+            pixmap = QPixmap(w * pixsize * 2, h * pixsize);
+        else
+            pixmap = pixmap.scaled(w * pixsize * 2, h * pixsize);
         cur_w = w;
         cur_h = h;
+
+        imagecontainer->resize(w * pixsize * 2, h * pixsize);
+        imagecontainer->setPixmap(pixmap);
     }
 }
 
 //*********************************************
-void Canvas::viewportMousePressEvent(QMouseEvent *event)
+void Canvas::mousePressEvent(QMouseEvent *event)
 {
     int x = event->x(), y = event->y();
 
@@ -1591,7 +1601,7 @@ void Canvas::viewportMousePressEvent(QMouseEvent *event)
 }
 
 //*********************************************
-void Canvas::viewportMouseMoveEvent(QMouseEvent *event)
+void Canvas::mouseMoveEvent(QMouseEvent *event)
 {
     int x = event->x(), y = event->y();
     UpdateCel(x - x0, y - y0);
@@ -1635,6 +1645,9 @@ void Canvas::DrawCel(int w, int h, byte *celdata, bool mirror, int size)
         }
     }
     repaint(x0, y0, MAX(ww, ww0), MAX(hh, hh0));
+
+    imagecontainer->resize(cur_w * pixsize * 2, cur_h * pixsize);
+    imagecontainer->setPixmap(pixmap);
 }
 
 //*********************************************
@@ -1678,6 +1691,9 @@ void Canvas::DrawCel(int w, int h, byte *celdata, bool mirror)
         repaint(x0, y0, MAX(ww, ww0), MAX(hh, hh0));
     else
         repaint(x0, y0, ww, hh);
+
+    imagecontainer->resize(cur_w * pixsize * 2, cur_h * pixsize);
+    imagecontainer->setPixmap(pixmap);
 }
 
 //*********************************************
@@ -1710,6 +1726,7 @@ void Canvas::UpdateCel(int x, int y)
                 viewedit->fillCel(xn, yn, CurColor);
         }
     }
+    imagecontainer->setPixmap(pixmap);
 }
 
 //*********************************************

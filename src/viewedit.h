@@ -82,13 +82,14 @@ public:
     void UpdateCel(int x, int y);
 protected:
     int CurColor;
+    QLabel *imagecontainer;
     QPixmap pixmap;
     bool cur_mirror;
     byte *data;
     ViewEdit *viewedit;
     void keyPressEvent(QKeyEvent *);
-    void viewportMousePressEvent(QMouseEvent *e);
-    void viewportMouseMoveEvent(QMouseEvent *e);
+    void mousePressEvent(QMouseEvent *e);
+    void mouseMoveEvent(QMouseEvent *e);
     void drawContents(QPainter *p, int, int, int, int);
     bool focusNextPrevChild(bool next) ;
 };

@@ -170,6 +170,7 @@ PicEdit::PicEdit(QWidget *parent, const char *name, int win_num, ResourcesWin *r
 
     QVBoxLayout *shapebox = new QVBoxLayout();
     QGroupBox *shape = new QGroupBox("Shape", this);
+    QButtonGroup *shapeGrp = new QButtonGroup(this);
     QRadioButton *circle = new QRadioButton("Circle", shape);
     QRadioButton *square = new QRadioButton("Square", shape);
     circle->setChecked(true);
@@ -177,11 +178,13 @@ PicEdit::PicEdit(QWidget *parent, const char *name, int win_num, ResourcesWin *r
     shapebox->addWidget(square);
     b2->addWidget(shape);
     shape->setLayout(shapebox);
-    connect(shape, SIGNAL(clicked(int)), SLOT(change_shape(int)));
-
+    shapeGrp->addButton(circle, 0);
+    shapeGrp->addButton(square, 1);
+    connect(shapeGrp, SIGNAL(buttonClicked(int)), SLOT(change_shape(int)));
 
     QVBoxLayout *typebox = new QVBoxLayout();
     QGroupBox *type = new QGroupBox("Type", this);
+    QButtonGroup *typeGrp = new QButtonGroup(this);
     QRadioButton *spray = new QRadioButton("Spray", type);
     QRadioButton *solid = new QRadioButton("Solid", type);
     spray->setChecked(true);
@@ -189,7 +192,9 @@ PicEdit::PicEdit(QWidget *parent, const char *name, int win_num, ResourcesWin *r
     typebox->addWidget(solid);
     b2->addWidget(type);
     type->setLayout(typebox);
-    connect(type, SIGNAL(clicked(int)), SLOT(change_type(int)));
+    typeGrp->addButton(spray, 0);
+    typeGrp->addButton(solid, 1);
+    connect(typeGrp, SIGNAL(buttonClicked(int)), SLOT(change_type(int)));
 
     QVBoxLayout *sizebox = new QVBoxLayout();
     QGroupBox *lsize = new QGroupBox(tr("Size"), this); //vert
@@ -261,6 +266,7 @@ PicEdit::PicEdit(QWidget *parent, const char *name, int win_num, ResourcesWin *r
 
     QVBoxLayout *drawbox = new QVBoxLayout();
     QGroupBox *drawmode = new QGroupBox("Show", this);
+    QButtonGroup *dmgrp = new QButtonGroup(this);
     pic = new QRadioButton("Visual", drawmode);
     pri = new QRadioButton("Priority", drawmode);
     bg = new QCheckBox("Background", drawmode);
@@ -274,7 +280,11 @@ PicEdit::PicEdit(QWidget *parent, const char *name, int win_num, ResourcesWin *r
     picture->set_mode(0);
     b4->addWidget(drawmode);
     drawmode->setLayout(drawbox);
-    connect(drawmode, SIGNAL(clicked(int)), SLOT(change_drawmode(int)));
+    dmgrp->addButton(pic, 0);
+    dmgrp->addButton(pri, 1);
+    connect(dmgrp, SIGNAL(buttonClicked(int)), SLOT(change_drawmode(int)));
+    connect(bg, SIGNAL(clicked(bool)), SLOT(toggle_bgmode(bool)));
+    connect(prilines, SIGNAL(clicked(bool)), SLOT(toggle_prilinemode(bool)));
 
     status = new QStatusBar(this);
     QLabel *msg = new QLabel(status);
@@ -290,14 +300,13 @@ PicEdit::PicEdit(QWidget *parent, const char *name, int win_num, ResourcesWin *r
     if (game->picstyle == P_TWO) {
         canvas = new PCanvas(0, 0, this);
         canvas->setMinimumSize(canvas->pixsize * MAX_W + canvas->x0 + 10, canvas->pixsize * MAX_HH + canvas->x0 + 10);
-        //canvas->resizeContents(canvas->pixsize*MAX_W+canvas->x0,canvas->pixsize*MAX_HH+canvas->x0);
         canvas->resize(canvas->pixsize * MAX_W + canvas->x0, canvas->pixsize * MAX_HH + canvas->x0);
 
     } else {
         canvas = new PCanvas(this, 0, this);
         canvas->setMinimumSize(canvas->pixsize * MAX_W + canvas->x0 + 10, canvas->pixsize * MAX_HH + canvas->x0 + 10);
-        //canvas->resizeContents(canvas->pixsize*MAX_W+canvas->x0,canvas->pixsize*MAX_HH+canvas->x0);
-        all->addWidget(canvas, 1);
+        canvas->resize(canvas->pixsize*MAX_W+canvas->x0,canvas->pixsize*MAX_HH+canvas->x0);
+        all->addWidget(canvas);
         setFocusProxy(canvas);
     }
 
@@ -607,17 +616,28 @@ void PicEdit::change_drawmode(int mode)
             pic->setChecked(false);
             pri->setChecked(true);
             break;
-        case 2: //draw (also) background
-            canvas->bg_on = bg->isChecked();
-            if (canvas->bg_on && canvas->bg_loaded)
-                picture->bg_on = true;
-            else
-                picture->bg_on = false;
-            break;
-        case 3: //priority lines
-            canvas->pri_lines = prilines->isChecked();
-            break;
     }
+    canvas->linedraw = false;
+    canvas->update();
+}
+
+//*********************************************
+void PicEdit::toggle_bgmode(bool checked)
+{
+    canvas->bg_on = checked;
+    if (canvas->bg_on && canvas->bg_loaded)
+        picture->bg_on = true;
+    else
+        picture->bg_on = false;
+
+    canvas->linedraw = false;
+    canvas->update();
+}
+
+//*********************************************
+void PicEdit::toggle_prilinemode(bool checked)
+{
+    canvas->pri_lines = checked;
     canvas->linedraw = false;
     canvas->update();
 }
@@ -837,11 +857,15 @@ PCanvas::PCanvas(QWidget *parent, const char *name, PicEdit *w)
     cur_w = MAX_W * pixsize;
     cur_h = MAX_HH * pixsize;
     pixmap = QPixmap(cur_w, cur_h);
-    viewport()->setMouseTracking(true);
     bg_loaded = false;
     bg_on = false;
     pri_lines = false;
     bgpix = QImage();
+
+    imagecontainer = new QLabel;
+    this->setWidget(imagecontainer);
+    imagecontainer->resize(cur_w, cur_h);
+    imagecontainer->setPixmap(pixmap);
 }
 
 //*********************************************
@@ -863,11 +887,13 @@ void PCanvas::setPixsize(int s)
     pixmap = pixmap.scaled(cur_w, cur_h);
     QPainter p(&pixmap);
     p.eraseRect(0, 0, cur_w, cur_h);
+    p.end();
     update();
+    imagecontainer->resize(cur_w, cur_h);
 }
 
 //*********************************************
-void PCanvas::viewportMousePressEvent(QMouseEvent *event)
+void PCanvas::mousePressEvent(QMouseEvent *event)
 {
     int x = event->x(), y = event->y();
     int xx = x, yy = y;
@@ -903,7 +929,7 @@ void PCanvas::viewportMousePressEvent(QMouseEvent *event)
 }
 
 //*********************************************
-void PCanvas::viewportMouseMoveEvent(QMouseEvent *event)
+void PCanvas::mouseMoveEvent(QMouseEvent *event)
 {
     int x = event->x(), y = event->y();
     int xx = x, yy = y;
@@ -999,6 +1025,7 @@ void PCanvas::update()
         }
     }
     repaint(x0, y0, x0 + MAX_W * pixsize, y0 + MAX_HH * pixsize);
+    imagecontainer->setPixmap(pixmap);
 }
 
 //*********************************************
@@ -1090,6 +1117,7 @@ void PCanvas::line(bool mode)
     }
 #endif
     repaint(x0, y0, x0 + MAX_W * pixsize, y0 + MAX_HH * pixsize);
+    imagecontainer->setPixmap(pixmap);
 }
 
 //*********************************************
