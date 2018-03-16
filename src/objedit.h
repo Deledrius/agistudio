@@ -33,7 +33,6 @@
 #include <QCloseEvent>
 #include <QListWidget>
 
-#include "util.h"
 #include "object.h"
 
 //inventory objects editor

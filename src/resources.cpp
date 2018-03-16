@@ -44,6 +44,7 @@
 #endif
 #include <sys/stat.h>
 #include <stdlib.h>
+#include <algorithm>
 
 
 //**********************************************************
@@ -612,7 +613,7 @@ void AddResource::edit_cb(const QString &str)
 //**********************************************
 static int load_resource(const char *filename, int restype)
 {
-    extern TStringList InputLines;
+    extern QStringList InputLines;
     char *ptr;
     byte b;
     FILE *fptr = fopen(filename, "rb");
@@ -631,8 +632,8 @@ static int load_resource(const char *filename, int restype)
 
     if (restype == LOGIC) {
         //check if file is binary or ascii
-        fread(ResourceData.Data, MIN(size, 64), 1, fptr);
-        for (int i = 0; i < MIN(size, 64); i++) {
+        fread(ResourceData.Data, std::min(size, 64), 1, fptr);
+        for (int i = 0; i < std::min(size, 64); i++) {
             b = ResourceData.Data[i];
             if (b > 0x80 || (b < 0x20 && b != 0x0a && b != 0x0d && b != 0x09)) { //file is binary
                 fseek(fptr, 0, SEEK_SET);
@@ -645,13 +646,13 @@ static int load_resource(const char *filename, int restype)
         //file is ascii - trying to compile
         fseek(fptr, 0, SEEK_SET);
         Logic *logic = new Logic();
-        InputLines.lfree();
+        InputLines.clear();
         while (fgets(tmp, 1024, fptr) != NULL) {
             if ((ptr = strchr(tmp, 0x0a)))
                 * ptr = 0;
             if ((ptr = strchr(tmp, 0x0d)))
                 * ptr = 0;
-            InputLines.add(tmp);
+            InputLines.append(tmp);
         }
         fclose(fptr);
         int err = logic->compile();

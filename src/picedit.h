@@ -44,7 +44,6 @@
 #include <QScrollArea>
 #include <QGroupBox>
 
-#include "util.h"
 #include "wutil.h"
 #include "picture.h"
 #include "resources.h"
@@ -110,7 +109,7 @@ public slots:
 protected:
     QCheckBox *comments, *wrap;
     QTextEdit *codes;
-    TStringList data;
+    QStringList data;
     Picture *picture;
     int maxcol;
 

@@ -36,7 +36,6 @@
 #include <QEvent>
 #include <QDialogButtonBox>
 
-#include "util.h"
 #include "wutil.h"
 #include "view.h"
 

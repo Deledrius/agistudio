@@ -46,7 +46,7 @@
 #include <QFileDialog>
 #include <QGroupBox>
 
-TStringList InputLines;  //temporary buffer for reading the text from editor
+QStringList InputLines;  //temporary buffer for reading the text from editor
 //and sending to compilation
 
 //***********************************************
@@ -529,15 +529,15 @@ int LogEdit::compile_logic()
     char name[128];
     char tmp1[16], *ptr, *ptr1;
 
-    InputLines.lfree();
+    InputLines.clear();
     for (i = 0; i < editor->document()->lineCount(); i++) {
         str = editor->document()->findBlockByLineNumber(i).text();
         if (!str.isNull() && str.length() > 0) {
             s = (byte *)str.toLatin1().data();
             if (s[0] < 0x80) //i'm getting \221\005 at the last line...
-                InputLines.add((char *)str.toLatin1().data());
+                InputLines.append((char *)str.toLatin1().data());
         } else
-            InputLines.add("");
+            InputLines.append("");
     }
 
     for (i = 0; i < MAXWIN; i++) {

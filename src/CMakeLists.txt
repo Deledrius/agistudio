@@ -29,7 +29,6 @@ set(AGIStudio_HEADERS
     preview.h
     resources.h
     roomgen.h
-    util.h
     view.h
     viewedit.h
     words.h
@@ -99,7 +98,6 @@ set(AGIStudio_SOURCES
     preview.cpp
     resources.cpp
     roomgen.cpp
-    util.cpp
     view.cpp
     viewedit.cpp
     words.cpp

@@ -29,8 +29,6 @@
 #include <QColor>
 
 #include "linklist.h"
-#include "util.h"
-
 
 #define MAX_W 320
 #define MAX_H 200
@@ -144,7 +142,7 @@ public:
     int move_action(int newX, int newY);
     char *showPos(int *code, int *val);
     int setBufPos(int);
-    void viewData(TStringList *data);
+    void viewData(QStringList *data);
     void status(int mode);
     void refill(struct picCodeNode *temp_fill_start, struct picCodeNode *temp_fill_end, int mode);
     int drawing_mode;

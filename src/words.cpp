@@ -169,7 +169,7 @@ int WordList::read(char *filename)
             //in this way, no duplicates are added
             GroupIndex = GetNew_GroupIndex(GroupNum);
             if (GroupIndex >= 0)    //group exists
-                NewWordGroup[GroupIndex].Words.add(CurWord);
+                NewWordGroup[GroupIndex].Words.append(CurWord.c_str());
             else {
                 if (NumGroups >= MaxWordGroups) {
                     menu->errmes("Error ! Too many groups !");
@@ -177,8 +177,8 @@ int WordList::read(char *filename)
                 }
                 NumGroups++;
                 NewWordGroup[NumGroups - 1].GroupNum = GroupNum;
-                NewWordGroup[NumGroups - 1].Words = TStringList();
-                NewWordGroup[NumGroups - 1].Words.add(CurWord);
+                NewWordGroup[NumGroups - 1].Words = QStringList();
+                NewWordGroup[NumGroups - 1].Words.append(CurWord.c_str());
             }//group doesn't exist - create new one
             PrevWord = CurWord;
         }
@@ -204,9 +204,9 @@ int WordList::read(char *filename)
     }
     for (CurIndex = 0; CurIndex < NumGroups; CurIndex++) {
         WordGroup[CurIndex].GroupNum = NewWordGroup[GroupAddOrder[CurIndex]].GroupNum;
-        WordGroup[CurIndex].Words.lfree();
-        WordGroup[CurIndex].Words.copy(NewWordGroup[GroupAddOrder[CurIndex]].Words);
-        NewWordGroup[GroupAddOrder[CurIndex]].Words.lfree();
+        WordGroup[CurIndex].Words.clear();
+        WordGroup[CurIndex].Words = NewWordGroup[GroupAddOrder[CurIndex]].Words;
+        NewWordGroup[GroupAddOrder[CurIndex]].Words.clear();
     }
     return 0;
 }
@@ -215,18 +215,18 @@ int WordList::read(char *filename)
 void WordList::clear()
 {
     for (int i = 0; i < NumGroups; i++)
-        WordGroup[i].Words.lfree();
+        WordGroup[i].Words.clear();
     NumGroups = 3;
 
     WordGroup[0].GroupNum = 0;
-    WordGroup[0].Words = TStringList();
-    WordGroup[0].Words.add("a");
+    WordGroup[0].Words = QStringList();
+    WordGroup[0].Words.append("a");
     WordGroup[1].GroupNum = 1;
-    WordGroup[1].Words = TStringList();
-    WordGroup[1].Words.add("anyword");
+    WordGroup[1].Words = QStringList();
+    WordGroup[1].Words.append("anyword");
     WordGroup[2].GroupNum = 9999;
-    WordGroup[2].Words = TStringList();
-    WordGroup[2].Words.add("rol");
+    WordGroup[2].Words = QStringList();
+    WordGroup[2].Words.append("rol");
 }
 
 //**************************************************
@@ -245,7 +245,7 @@ int WordList::save(char *filename)
     std::string s;
 
     for (CurGroupIndex = 0, NumEmptyWordGroups = 0; CurGroupIndex < NumGroups; CurGroupIndex++) {
-        if (WordGroup[CurGroupIndex].Words.num == 0)
+        if (WordGroup[CurGroupIndex].Words.count() == 0)
             NumEmptyWordGroups++;
     }
     if (NumEmptyWordGroups > 0) {
@@ -258,12 +258,13 @@ int WordList::save(char *filename)
         return 1;
     }
 
-    TStringList AllWords = TStringList();
+    QStringList AllWords = QStringList();
     for (CurGroupIndex = 0; CurGroupIndex < NumGroups; CurGroupIndex++) {
-        if (WordGroup[CurGroupIndex].Words.num > 0) {
-            for (CurWord = 0; CurWord < WordGroup[CurGroupIndex].Words.num; CurWord++) {
-                s = WordGroup[CurGroupIndex].Words.at(CurWord) + " " + IntToStr(WordGroup[CurGroupIndex].GroupNum);
-                AllWords.addsorted((char *)s.c_str());
+        if (WordGroup[CurGroupIndex].Words.count() > 0) {
+            for (CurWord = 0; CurWord < WordGroup[CurGroupIndex].Words.count(); CurWord++) {
+                s = WordGroup[CurGroupIndex].Words.at(CurWord).toStdString() + " " + std::to_string(WordGroup[CurGroupIndex].GroupNum);
+                AllWords.append((char *)s.c_str());
+                AllWords.sort();
             }
         }
     }
@@ -274,13 +275,13 @@ int WordList::save(char *filename)
         LetterLoc[CurFirstLetter] = 0;
     FirstLetter = 'a';
     LetterLoc[1] = ftell(fptr);
-    for (CurWord = 0; CurWord < AllWords.num; CurWord++) {
-        ThisWord = GetWord(AllWords.at(CurWord));
+    for (CurWord = 0; CurWord < AllWords.count(); CurWord++) {
+        ThisWord = GetWord(AllWords.at(CurWord).toStdString());
         if (ThisWord[0] != FirstLetter && ThisWord[0] >= 97 && ThisWord[0] <= 122) {
             FirstLetter = ThisWord[0];
             LetterLoc[FirstLetter - 96] = ftell(fptr);
         }
-        ThisGroupNum = GetGroupNum(AllWords.at(CurWord));
+        ThisGroupNum = GetGroupNum(AllWords.at(CurWord).toStdString());
         //work out # chars from prev word
         CharsFromPrevWord = 0;
         CurChar = 0;
@@ -321,7 +322,7 @@ int WordList::save(char *filename)
         CurByte = LetterLoc[CurFirstLetter] % 256;
         fwrite(&CurByte, 1, 1, fptr);
     }
-    AllWords.lfree();
+    AllWords.clear();
     fclose(fptr);
     return 0;
 }
@@ -343,7 +344,7 @@ int WordList::add_group(int num)
     NumGroups++;
     for (int k = NumGroups; k > i; k--)
         WordGroup[k] = WordGroup[k - 1];
-    WordGroup[i].Words = TStringList();
+    WordGroup[i].Words = QStringList();
     WordGroup[i].GroupNum = num;
     return i;
 }
@@ -363,9 +364,9 @@ int WordList::delete_word(char *word, int SelectedGroup)
     if (SelectedGroup < 0)
         return -1;
 
-    for (int k = 0; k < WordGroup[SelectedGroup].Words.num; k++) {
-        if (!strcmp(word, WordGroup[SelectedGroup].Words.at(k).c_str())) {
-            WordGroup[SelectedGroup].Words.del(k);
+    for (int k = 0; k < WordGroup[SelectedGroup].Words.count(); k++) {
+        if (!QString::compare(word, WordGroup[SelectedGroup].Words.at(k))) {
+            WordGroup[SelectedGroup].Words.removeAt(k);
             return k;
         }
     }
@@ -387,8 +388,8 @@ int WordList::change_number(int oldnum, int newnum)
     }
 
 
-    TStringList cur_g = TStringList();
-    cur_g.copy(WordGroup[oldnum].Words);
+    QStringList cur_g = QStringList();
+    cur_g = WordGroup[oldnum].Words;
     if (oldnum < i) {
         i--;
         for (int k = oldnum; k < i; k++)
@@ -437,17 +438,17 @@ bool WordList::InsertWordGroup(int GroupNum)
     } while (!InsertPositionFound && (CurGroupIndex < NumGroups));
     if (CurGroupIndex > NumGroups - 1)
         InsertPosition = NumGroups;
-    WordGroup[NumGroups].Words = TStringList();
+    WordGroup[NumGroups].Words = QStringList();
     if (NumGroups > 0) {
         for (CurGroupIndex = NumGroups - 1; CurGroupIndex >= InsertPosition; CurGroupIndex--) {
             WordGroup[CurGroupIndex + 1].GroupNum = WordGroup[CurGroupIndex].GroupNum;
-            WordGroup[CurGroupIndex + 1].Words.lfree();
-            WordGroup[CurGroupIndex + 1].Words.copy(WordGroup[CurGroupIndex].Words);
+            WordGroup[CurGroupIndex + 1].Words.clear();
+            WordGroup[CurGroupIndex + 1].Words = WordGroup[CurGroupIndex].Words;
         }
     }
     NumGroups++;
     WordGroup[InsertPosition].GroupNum = GroupNum;
-    WordGroup[InsertPosition].Words.lfree();
+    WordGroup[InsertPosition].Words.clear();
     return true;
 }
 
@@ -456,8 +457,8 @@ int WordList::GroupIndexOfWord(std::string word)
 //returns the group index of the group containing the specified word}
 {
     for (int i = 0; i < NumGroups; i++) {
-        for (int k = 0; k < WordGroup[i].Words.num; k++) {
-            if (WordGroup[i].Words.at(k) == word)
+        for (int k = 0; k < WordGroup[i].Words.count(); k++) {
+            if (WordGroup[i].Words.at(k).toStdString() == word)
                 return i;
         }
     }
@@ -480,13 +481,14 @@ void WordList::merge(const WordList &NewWordList)
         if (!GroupExists(NewWordList.WordGroup[CurIndex].GroupNum))
             InsertWordGroup(NewWordList.WordGroup[CurIndex].GroupNum);
         GroupIndex = GetWordGroupIndex(NewWordList.WordGroup[CurIndex].GroupNum);
-        if (GroupIndex >= 0 && NewWordList.WordGroup[CurIndex].Words.num > 0) {
-            for (CurWord = 0; CurWord < NewWordList.WordGroup[CurIndex].Words.num; CurWord++) {
-                GroupIndexOfExistingWord = GroupIndexOfWord(NewWordList.WordGroup[CurIndex].Words.at(CurWord));
-                if ((GroupIndexOfExistingWord < 0) || ((GroupIndexOfExistingWord >= 0) && (OKToReplaceWord(NewWordList.WordGroup[CurIndex].Words.at(CurWord), WordGroup[GroupIndexOfExistingWord].GroupNum, WordGroup[GroupIndex].GroupNum)))) {
+        if (GroupIndex >= 0 && NewWordList.WordGroup[CurIndex].Words.count() > 0) {
+            for (CurWord = 0; CurWord < NewWordList.WordGroup[CurIndex].Words.count(); CurWord++) {
+                GroupIndexOfExistingWord = GroupIndexOfWord(NewWordList.WordGroup[CurIndex].Words.at(CurWord).toStdString());
+                if ((GroupIndexOfExistingWord < 0) || ((GroupIndexOfExistingWord >= 0) && (OKToReplaceWord(NewWordList.WordGroup[CurIndex].Words.at(CurWord).toStdString(), WordGroup[GroupIndexOfExistingWord].GroupNum, WordGroup[GroupIndex].GroupNum)))) {
 
-                    delete_word((char *)NewWordList.WordGroup[CurIndex].Words.at(CurWord).c_str(), GroupIndexOfExistingWord);
-                    WordGroup[GroupIndex].Words.addsorted(NewWordList.WordGroup[CurIndex].Words.at(CurWord));
+                    delete_word((char *)NewWordList.WordGroup[CurIndex].Words.at(CurWord).toStdString().c_str(), GroupIndexOfExistingWord);
+                    WordGroup[GroupIndex].Words.append(NewWordList.WordGroup[CurIndex].Words.at(CurWord));
+                    WordGroup[GroupIndex].Words.sort();
                     NumWordsAdded++;
                 }
             }

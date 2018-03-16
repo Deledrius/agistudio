@@ -21,12 +21,12 @@
 #ifndef WORDS_H
 #define WORDS_H
 
-#include "util.h"
-
 #include <string>
 
+#include <QStringList>
+
 typedef struct {
-    TStringList Words;
+    QStringList Words;
     int GroupNum;
 } TWordGroup;
 

@@ -32,6 +32,7 @@
 #include <sys/stat.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <algorithm>
 
 #include <QApplication>
 #include <QSplitter>
@@ -1644,7 +1645,7 @@ void Canvas::DrawCel(int w, int h, byte *celdata, bool mirror, int size)
                 p.fillRect(x * pixsize, y * pixsize, pixsize * 2, pixsize, egacolor[data[y * w * 2 + x]]);
         }
     }
-    repaint(x0, y0, MAX(ww, ww0), MAX(hh, hh0));
+    repaint(x0, y0, std::max(ww, ww0), std::max(hh, hh0));
 
     imagecontainer->resize(cur_w * pixsize * 2, cur_h * pixsize);
     imagecontainer->setPixmap(pixmap);
@@ -1688,7 +1689,7 @@ void Canvas::DrawCel(int w, int h, byte *celdata, bool mirror)
     }
 
     if (changed)
-        repaint(x0, y0, MAX(ww, ww0), MAX(hh, hh0));
+        repaint(x0, y0, std::max(ww, ww0), std::max(hh, hh0));
     else
         repaint(x0, y0, ww, hh);
 

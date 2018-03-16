@@ -233,10 +233,10 @@ void WordsEdit::update_all()
     if (wordlist->NumGroups > 0) {
         for (int i = 0; i < wordlist->NumGroups; i++) {
             sprintf(tmp, "%d. ", wordlist->WordGroup[i].GroupNum);
-            for (int k = 0; k < wordlist->WordGroup[i].Words.num; k++) {
+            for (int k = 0; k < wordlist->WordGroup[i].Words.count(); k++) {
                 if (k > 0)
                     strcat(tmp, " | ");
-                strcat(tmp, wordlist->WordGroup[i].Words.at(k).c_str());
+                strcat(tmp, wordlist->WordGroup[i].Words.at(k).toStdString().c_str());
             }
             QString str = tmp;
             listgroup->insertItem(i, str);
@@ -311,10 +311,10 @@ void WordsEdit::delete_group_cb(void)
 void WordsEdit::print_group(int curgroup)
 {
     sprintf(tmp, "%d. ", wordlist->WordGroup[curgroup].GroupNum);
-    for (int i = 0; i < wordlist->WordGroup[curgroup].Words.num; i++) {
+    for (int i = 0; i < wordlist->WordGroup[curgroup].Words.count(); i++) {
         if (i > 0)
             strcat(tmp, " | ");
-        strcat(tmp, wordlist->WordGroup[curgroup].Words.at(i).c_str());
+        strcat(tmp, wordlist->WordGroup[curgroup].Words.at(i).toStdString().c_str());
     }
 }
 
@@ -381,8 +381,8 @@ void WordsEdit::find_cb(void)
 int WordsEdit::find_down(char *word)
 {
     for (int i = FindLastGroup; i < wordlist->NumGroups; i++) {
-        for (int k = FindLastWord; k < wordlist->WordGroup[i].Words.num; k++) {
-            if (!strcmp(wordlist->WordGroup[i].Words.at(k).c_str(), word)) {
+        for (int k = FindLastWord; k < wordlist->WordGroup[i].Words.count(); k++) {
+            if (!QString::compare(wordlist->WordGroup[i].Words.at(k), word)) {
                 FindLastWord = k;
                 FindLastGroup = i;
                 return 1;
@@ -391,7 +391,7 @@ int WordsEdit::find_down(char *word)
         FindLastWord = 0;
     }
     FindLastGroup = wordlist->NumGroups - 1;
-    FindLastWord = wordlist->WordGroup[FindLastGroup].Words.num - 1;
+    FindLastWord = wordlist->WordGroup[FindLastGroup].Words.count() - 1;
     return 0;
 }
 
@@ -400,14 +400,14 @@ int WordsEdit::find_up(char *word)
 {
     for (int i = FindLastGroup; i >= 0; i--) {
         for (int k = FindLastWord; k >= 0; k--) {
-            if (!strcmp(wordlist->WordGroup[i].Words.at(k).c_str(), word)) {
+            if (!QString::compare(wordlist->WordGroup[i].Words.at(k), word)) {
                 FindLastWord = k;
                 FindLastGroup = i;
                 return 1;
             }
         }
         if (i > 0)
-            FindLastWord = wordlist->WordGroup[i - 1].Words.num - 1;
+            FindLastWord = wordlist->WordGroup[i - 1].Words.count() - 1;
     }
     FindLastWord = 0;
     FindLastGroup = 0;
@@ -434,8 +434,8 @@ void WordsEdit::select_group(int num)
     SelectedGroup = num;
 
     listwords->clear();
-    for (int k = 0; k < wordlist->WordGroup[num].Words.num; k++) {
-        std::string str2 = wordlist->WordGroup[num].Words.at(k);
+    for (int k = 0; k < wordlist->WordGroup[num].Words.count(); k++) {
+        std::string str2 = wordlist->WordGroup[num].Words.at(k).toStdString();
         const char *str1 = str2.c_str();
         listwords->insertItem(k, str1);
     }
@@ -449,7 +449,7 @@ void WordsEdit::select_group(int num)
 void WordsEdit::select_word()
 {
     if (!listwords->selectedItems().isEmpty()) {
-        lineword->setText(wordlist->WordGroup[SelectedGroup].Words.at(listwords->currentRow()).c_str());
+        lineword->setText(wordlist->WordGroup[SelectedGroup].Words.at(listwords->currentRow()));
         delete_word->setEnabled(true);
     }
 }
@@ -481,7 +481,7 @@ void WordsEdit::do_add_word(void)
                                          0,      // Enter == button 0
                                          1)) {   // Escape == button 1
             case 0: //yes
-                wordlist->WordGroup[FindLastGroup].Words.del(FindLastWord);
+                wordlist->WordGroup[FindLastGroup].Words.removeAt(FindLastWord);
                 update_group(FindLastGroup);
                 changed = true;
                 break;
@@ -490,7 +490,8 @@ void WordsEdit::do_add_word(void)
         }
     }
 
-    wordlist->WordGroup[curgroup].Words.addsorted(word);
+    wordlist->WordGroup[curgroup].Words.append(word);
+    wordlist->WordGroup[curgroup].Words.sort();
     changed = true;
     select_group(curgroup);
     update_group(curgroup);
@@ -511,7 +512,7 @@ void WordsEdit::count_words_cb(void)
 {
     int n = 0;
     for (int i = 0; i < wordlist->NumGroups; i++)
-        n += wordlist->WordGroup[i].Words.num;
+        n += wordlist->WordGroup[i].Words.count();
     sprintf(tmp, "There are %d words.", n);
     QMessageBox::information(this, "AGI studio",
                              tmp,
@@ -659,9 +660,9 @@ int WordsFind::find_down(char *word)
     bool sub = substring->isChecked();
 
     for (int i = FindLastGroup; i < wordlist->NumGroups; i++) {
-        for (int k = FindLastWord; k < wordlist->WordGroup[i].Words.num; k++) {
-            if ((sub && strstr(wordlist->WordGroup[i].Words.at(k).c_str(), word)) ||
-                    !strcmp(wordlist->WordGroup[i].Words.at(k).c_str(), word)) {
+        for (int k = FindLastWord; k < wordlist->WordGroup[i].Words.count(); k++) {
+            if ((sub && wordlist->WordGroup[i].Words.at(k).contains(word)) ||
+                    !QString::compare(wordlist->WordGroup[i].Words.at(k), word)) {
                 FindLastWord = k;
                 FindLastGroup = i;
                 return 1;
@@ -670,7 +671,7 @@ int WordsFind::find_down(char *word)
         FindLastWord = 0;
     }
     FindLastGroup = wordlist->NumGroups - 1;
-    FindLastWord = wordlist->WordGroup[FindLastGroup].Words.num - 1;
+    FindLastWord = wordlist->WordGroup[FindLastGroup].Words.count() - 1;
     return 0;
 }
 
@@ -681,15 +682,15 @@ int WordsFind::find_up(char *word)
 
     for (int i = FindLastGroup; i >= 0; i--) {
         for (int k = FindLastWord; k >= 0; k--) {
-            if ((sub && strstr(wordlist->WordGroup[i].Words.at(k).c_str(), word)) ||
-                    !strcmp(wordlist->WordGroup[i].Words.at(k).c_str(), word)) {
+            if ((sub && wordlist->WordGroup[i].Words.at(k).contains(word)) ||
+                    !QString::compare(wordlist->WordGroup[i].Words.at(k), word)) {
                 FindLastWord = k;
                 FindLastGroup = i;
                 return 1;
             }
         }
         if (i > 0)
-            FindLastWord = wordlist->WordGroup[i - 1].Words.num - 1;
+            FindLastWord = wordlist->WordGroup[i - 1].Words.count() - 1;
     }
     FindLastWord = 0;
     FindLastGroup = 0;
@@ -721,7 +722,7 @@ void WordsFind::find_first_cb()
     } else {
         if (start->isChecked()) {
             FindLastGroup = wordlist->NumGroups - 1;
-            FindLastWord = wordlist->WordGroup[FindLastGroup].Words.num - 1;
+            FindLastWord = wordlist->WordGroup[FindLastGroup].Words.count() - 1;
         } else {
             if (wordsedit->listgroup->currentRow() != -1)
                 FindLastGroup = wordsedit->listgroup->currentRow();
@@ -730,7 +731,7 @@ void WordsFind::find_first_cb()
             if (wordsedit->listwords->currentRow() != -1)
                 FindLastWord = wordsedit->listwords->currentRow();
             else
-                FindLastWord = wordlist->WordGroup[FindLastGroup].Words.num - 1;
+                FindLastWord = wordlist->WordGroup[FindLastGroup].Words.count() - 1;
         }
         ret = find_up(word);
     }
@@ -755,7 +756,7 @@ void WordsFind::find_next_cb()
     }
 
     if (down->isChecked()) {
-        if (FindLastWord + 1 >= wordlist->WordGroup[FindLastGroup].Words.num) {
+        if (FindLastWord + 1 >= wordlist->WordGroup[FindLastGroup].Words.count()) {
             if (FindLastGroup + 1 >= wordlist->NumGroups) {
                 menu->errmes("Find", "'%s' not found !", word);
                 return ;
@@ -773,7 +774,7 @@ void WordsFind::find_next_cb()
                 return;
             } else {
                 FindLastGroup--;
-                FindLastWord = wordlist->WordGroup[FindLastGroup].Words.num - 1;
+                FindLastWord = wordlist->WordGroup[FindLastGroup].Words.count() - 1;
             }
         } else
             FindLastWord--;

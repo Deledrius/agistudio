@@ -34,7 +34,6 @@
 #include <QStatusBar>
 #include <QCheckBox>
 
-#include "util.h"
 #include "wutil.h"
 #include "logic.h"
 

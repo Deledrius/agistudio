@@ -21,7 +21,9 @@
 #ifndef OBJECT_H
 #define OBJECT_H
 
-#include "util.h"
+#include "global.h"
+
+#include <QStringList>
 
 #define MaxItems   256
 
@@ -30,7 +32,7 @@ class ObjList
 {
 public:
     ObjList();
-    TStringList ItemNames;
+    QStringList ItemNames;
     byte RoomNum[MaxItems];
     byte MaxScreenObjects; //what this is for ?
     void XORData();

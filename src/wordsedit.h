@@ -36,7 +36,6 @@
 #include <QHideEvent>
 #include <QCloseEvent>
 
-#include "util.h"
 #include "wutil.h"
 #include "words.h"
 #include "resources.h"

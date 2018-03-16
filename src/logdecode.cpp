@@ -144,13 +144,13 @@ void Logic::DisplayMessages(void)
         OutputText.append("// Messages\n");
         for (i = 1; i <= 255; i++) {
             if (MessageExists[i])
-                OutputText.append("#message " + IntToStr(i) + " \"" + Messages[i] + "\"\n");
+                OutputText.append("#message " + std::to_string(i) + " \"" + Messages[i] + "\"\n");
         }
     } else { //(only those not used elsewhere in the logic are here)
         OutputText.append("// Messages\n");
         for (i = 1; i <= 255; i++) {
             if (MessageExists[i] && !MessageUsed[i])
-                OutputText.append("#message " + IntToStr(i) + " \"" + Messages[i] + "\"\n");
+                OutputText.append("#message " + std::to_string(i) + " \"" + Messages[i] + "\"\n");
         }
     }
 }
@@ -207,7 +207,7 @@ void Logic::AddBlockEnds(void)
 {
     for (int CurBlock = BlockDepth; CurBlock >= 1; CurBlock--) {
         if (BlockEnd[CurBlock] <= ResPos) {
-            OutputText.append(MultStr("  ", CurBlock - 1) + "}\n");
+            OutputText.append(QString("  ").repeated(CurBlock - 1).toStdString() + "}\n");
             BlockDepth--;
         }
     }
@@ -297,14 +297,14 @@ void Logic::AddArg(byte Arg, byte ArgType)
                             }
                             if (ArgsStart >= maxcol - 20)
                                 ArgsStart = maxcol - 20;
-                            ThisLine = MultStr(" ", ArgsStart);
+                            ThisLine = QString(" ").repeated(ArgsStart).toStdString();
                         } else {
                             ThisLine +=  "\"" + ThisMessage +  "\"" ;
                             ThisMessage = "";
                         }
                     } while (ThisMessage.length() > 0);
                 } else if (ShowNonExistingValues)
-                    ThisLine += ArgTypePrefix[atMsg] + IntToStr(Arg);
+                    ThisLine += ArgTypePrefix[atMsg] + std::to_string(Arg);
                 else {
                     sprintf(tmp, "Unknown message (%d)\n", Arg);
                     ErrorList.append(tmp);
@@ -313,10 +313,10 @@ void Logic::AddArg(byte Arg, byte ArgType)
                 MessageUsed[Arg] = true;
                 break;
             case atIObj:
-                if (Arg <= objlist->ItemNames.num - 1)
-                    ThisLine += "\"" + objlist->ItemNames.at(Arg) + "\"";
+                if (Arg <= objlist->ItemNames.count() - 1)
+                    ThisLine += "\"" + objlist->ItemNames.at(Arg).toStdString() + "\"";
                 else if (ShowNonExistingValues)
-                    ThisLine += ArgTypePrefix[atIObj] + IntToStr(Arg);
+                    ThisLine += ArgTypePrefix[atIObj] + std::to_string(Arg);
                 else {
                     sprintf(tmp, "Unknown inventory item (%d)\n", Arg);
                     ErrorList.append(tmp);
@@ -325,13 +325,13 @@ void Logic::AddArg(byte Arg, byte ArgType)
                 break;
             default:
                 if (ArgType != 0)
-                    ThisLine += ArgTypePrefix[ArgType] + IntToStr(Arg);
+                    ThisLine += ArgTypePrefix[ArgType] + std::to_string(Arg);
                 else
-                    ThisLine += IntToStr(Arg);
+                    ThisLine += std::to_string(Arg);
                 break;
         }
     } else
-        ThisLine += IntToStr(Arg);
+        ThisLine += std::to_string(Arg);
 }
 
 //***************************************************
@@ -343,87 +343,87 @@ void Logic::AddSpecialSyntaxCommand(void)
     switch (ThisCommand) {
         // increment
         case 0x01:
-            ThisLine += "v" + IntToStr(arg1) + "++";
+            ThisLine += "v" + std::to_string(arg1) + "++";
             break;
         // decrement
         case 0x02:
-            ThisLine += "v" + IntToStr(arg1) + "--";
+            ThisLine += "v" + std::to_string(arg1) + "--";
             break;
         // assignn
         case 0x03:
-            ThisLine += "v" + IntToStr(arg1) + " = " + IntToStr(ReadByte());
+            ThisLine += "v" + std::to_string(arg1) + " = " + std::to_string(ReadByte());
             break;
         // assignv
         case 0x04:
-            ThisLine += "v" + IntToStr(arg1) + " = v" + IntToStr(ReadByte());
+            ThisLine += "v" + std::to_string(arg1) + " = v" + std::to_string(ReadByte());
             break;
         // addn
         case 0x05:
             if (SpecialSyntaxType == 0)
-                ThisLine += "v" + IntToStr(arg1) + " = v" + IntToStr(arg1) + " + " + IntToStr(ReadByte());
+                ThisLine += "v" + std::to_string(arg1) + " = v" + std::to_string(arg1) + " + " + std::to_string(ReadByte());
             else
-                ThisLine += "v" + IntToStr(arg1) + " += " + IntToStr(ReadByte());
+                ThisLine += "v" + std::to_string(arg1) + " += " + std::to_string(ReadByte());
             break;
         // addv
         case 0x06:
             if (SpecialSyntaxType == 0)
-                ThisLine += "v" + IntToStr(arg1) + " = v" + IntToStr(arg1) + " + v" + IntToStr(ReadByte());
+                ThisLine += "v" + std::to_string(arg1) + " = v" + std::to_string(arg1) + " + v" + std::to_string(ReadByte());
             else
-                ThisLine += "v" + IntToStr(arg1) + " += v" + IntToStr(ReadByte());
+                ThisLine += "v" + std::to_string(arg1) + " += v" + std::to_string(ReadByte());
             break;
         // subn
         case 0x07:
             if (SpecialSyntaxType == 0)
-                ThisLine += "v" + IntToStr(arg1) + " = v" + IntToStr(arg1) + " - " + IntToStr(ReadByte());
+                ThisLine += "v" + std::to_string(arg1) + " = v" + std::to_string(arg1) + " - " + std::to_string(ReadByte());
             else
-                ThisLine += "v" + IntToStr(arg1) + " -= " + IntToStr(ReadByte());
+                ThisLine += "v" + std::to_string(arg1) + " -= " + std::to_string(ReadByte());
             break;
         // subv
         case 0x08:
             if (SpecialSyntaxType == 0)
-                ThisLine += "v" + IntToStr(arg1) + " = v" + IntToStr(arg1) + " - v" + IntToStr(ReadByte());
+                ThisLine += "v" + std::to_string(arg1) + " = v" + std::to_string(arg1) + " - v" + std::to_string(ReadByte());
             else
-                ThisLine += "v" + IntToStr(arg1) + " -= v" + IntToStr(ReadByte());
+                ThisLine += "v" + std::to_string(arg1) + " -= v" + std::to_string(ReadByte());
             break;
         // lindirectv
         case 0x09:
-            ThisLine += "*v" + IntToStr(arg1) + " = v" + IntToStr(ReadByte());
+            ThisLine += "*v" + std::to_string(arg1) + " = v" + std::to_string(ReadByte());
             break;
         // rindirect
         case 0x0A:
-            ThisLine += "v" + IntToStr(arg1) + " = *v" + IntToStr(ReadByte());
+            ThisLine += "v" + std::to_string(arg1) + " = *v" + std::to_string(ReadByte());
             break;
         // lindirectn
         case 0x0B:
-            ThisLine += "*v" + IntToStr(arg1) + " = " + IntToStr(ReadByte());
+            ThisLine += "*v" + std::to_string(arg1) + " = " + std::to_string(ReadByte());
             break;
         // mul.n
         case 0xA5:
             if (SpecialSyntaxType == 0)
-                ThisLine += "v" + IntToStr(arg1) + " = v" + IntToStr(arg1) + " * " + IntToStr(ReadByte());
+                ThisLine += "v" + std::to_string(arg1) + " = v" + std::to_string(arg1) + " * " + std::to_string(ReadByte());
             else
-                ThisLine += "v" + IntToStr(arg1) + " *= " + IntToStr(ReadByte());
+                ThisLine += "v" + std::to_string(arg1) + " *= " + std::to_string(ReadByte());
             break;
         // mul.v
         case 0xA6:
             if (SpecialSyntaxType == 0)
-                ThisLine += "v" + IntToStr(arg1) + " = v" + IntToStr(arg1) + " * v" + IntToStr(ReadByte());
+                ThisLine += "v" + std::to_string(arg1) + " = v" + std::to_string(arg1) + " * v" + std::to_string(ReadByte());
             else
-                ThisLine += "v" + IntToStr(arg1) + " *= v" + IntToStr(ReadByte());
+                ThisLine += "v" + std::to_string(arg1) + " *= v" + std::to_string(ReadByte());
             break;
         // div.n
         case 0xA7:
             if (SpecialSyntaxType == 0)
-                ThisLine += "v" + IntToStr(arg1) + " = v" + IntToStr(arg1) + " / " + IntToStr(ReadByte());
+                ThisLine += "v" + std::to_string(arg1) + " = v" + std::to_string(arg1) + " / " + std::to_string(ReadByte());
             else
-                ThisLine += "v" + IntToStr(arg1) + " /= " + IntToStr(ReadByte());
+                ThisLine += "v" + std::to_string(arg1) + " /= " + std::to_string(ReadByte());
             break;
         // div.v
         case 0xA8:
             if (SpecialSyntaxType == 0)
-                ThisLine += "v" + IntToStr(arg1) + " = v" + IntToStr(arg1) + " / v" + IntToStr(ReadByte());
+                ThisLine += "v" + std::to_string(arg1) + " = v" + std::to_string(arg1) + " / v" + std::to_string(ReadByte());
             else
-                ThisLine += "v" + IntToStr(arg1) + " /= v" + IntToStr(ReadByte());
+                ThisLine += "v" + std::to_string(arg1) + " /= v" + std::to_string(ReadByte());
             break;
     }
 }
@@ -433,52 +433,52 @@ void Logic::AddSpecialIFSyntaxCommand(void)
 {
     switch (ThisCommand) {
         case 1: // equaln
-            ThisLine += 'v' + IntToStr(ReadByte());
+            ThisLine += 'v' + std::to_string(ReadByte());
             if (NOTOn)
                 ThisLine += " != ";
             else
                 ThisLine += " == ";
-            ThisLine += IntToStr(ReadByte());
+            ThisLine += std::to_string(ReadByte());
             break;
         case 2: // equalv
-            ThisLine += 'v' + IntToStr(ReadByte());
+            ThisLine += 'v' + std::to_string(ReadByte());
             if (NOTOn)
                 ThisLine += " != v";
             else
                 ThisLine += " == v";
-            ThisLine += IntToStr(ReadByte());
+            ThisLine += std::to_string(ReadByte());
             break;
         case 3: // lessn
-            ThisLine += 'v' + IntToStr(ReadByte());
+            ThisLine += 'v' + std::to_string(ReadByte());
             if (NOTOn)
                 ThisLine += " >= ";
             else
                 ThisLine += " < ";
-            ThisLine += IntToStr(ReadByte());
+            ThisLine += std::to_string(ReadByte());
             break;
         case 4: // lessv
-            ThisLine += 'v' + IntToStr(ReadByte());
+            ThisLine += 'v' + std::to_string(ReadByte());
             if (NOTOn)
                 ThisLine += " >= v";
             else
                 ThisLine += " < v";
-            ThisLine += IntToStr(ReadByte());
+            ThisLine += std::to_string(ReadByte());
             break;
         case 5: // greatern
-            ThisLine += 'v' + IntToStr(ReadByte());
+            ThisLine += 'v' + std::to_string(ReadByte());
             if (NOTOn)
                 ThisLine += " <= ";
             else
                 ThisLine += " > ";
-            ThisLine += IntToStr(ReadByte());
+            ThisLine += std::to_string(ReadByte());
             break;
         case 6: // greaterv
-            ThisLine += 'v' + IntToStr(ReadByte());
+            ThisLine += 'v' + std::to_string(ReadByte());
             if (NOTOn)
                 ThisLine += " <= v";
             else
                 ThisLine += " > v";
-            ThisLine += IntToStr(ReadByte());
+            ThisLine += std::to_string(ReadByte());
             break;
     }
 }
@@ -490,7 +490,7 @@ void Logic::ReadIfs(void)
 
     FirstCommand = true;
     OROn = false;
-    ThisLine = MultStr("  ", BlockDepth) + "if (";
+    ThisLine = QString("  ").repeated(BlockDepth).toStdString() + "if (";
     do {
         NOTOn = false;
         CurByte = ReadByte();
@@ -500,7 +500,7 @@ void Logic::ReadIfs(void)
                 if (!FirstCommand) {
                     ThisLine += " &&";
                     OutputText.append(ThisLine + "\n");
-                    ThisLine = MultStr("  ", BlockDepth) + "    ";
+                    ThisLine = QString("  ").repeated(BlockDepth).toStdString() + "    ";
                     FirstCommand = true;
                 }
                 ThisLine += '(';
@@ -511,7 +511,7 @@ void Logic::ReadIfs(void)
         if (CurByte == 0xFC && !OROn) { // we may have 2 0xFCs in a row, e.g. (a || b) && (c || d)
             ThisLine += " &&";
             OutputText.append(ThisLine + "\n");
-            ThisLine = MultStr("  ", BlockDepth) + "    ";
+            ThisLine = QString("  ").repeated(BlockDepth).toStdString() + "    ";
             FirstCommand = true;
             ThisLine += "(";
             OROn = true;
@@ -528,7 +528,7 @@ void Logic::ReadIfs(void)
                 else
                     ThisLine += " &&";
                 OutputText.append(ThisLine + "\n");
-                ThisLine = MultStr("  ", BlockDepth) + "    ";
+                ThisLine = QString("  ").repeated(BlockDepth).toStdString() + "    ";
             }
             ThisCommand = CurByte;
             if (game->show_special_syntax && ThisCommand >= 1 && ThisCommand <= 6)
@@ -545,7 +545,7 @@ void Logic::ReadIfs(void)
                         ThisWordGroupIndex = wordlist->GetWordGroupIndex(ThisWordGroupNum);
                         if (ThisWordGroupIndex < 0) {
                             if (ShowNonExistingValues)
-                                ThisLine += IntToStr(ThisWordGroupNum);
+                                ThisLine += std::to_string(ThisWordGroupNum);
                             else {
                                 sprintf(tmp, "Unknown word group (%d)\n", ThisWordGroupNum);
                                 ErrorList.append(tmp);
@@ -553,7 +553,7 @@ void Logic::ReadIfs(void)
                                 break;
                             }
                         } else {
-                            ThisLine += '"' + std::string(wordlist->WordGroup[ThisWordGroupIndex].Words.at(0)) + '"';
+                            ThisLine += '"' + wordlist->WordGroup[ThisWordGroupIndex].Words.at(0).toStdString() + '"';
                             if (CurArg < NumSaidArgs)
                                 ThisLine += ',';
                         }
@@ -590,7 +590,7 @@ void Logic::ReadIfs(void)
                 }
             }
             OutputText.append(ThisLine + "\n");
-            ThisLine = MultStr("  ", BlockDepth);
+            ThisLine = QString("  ").repeated(BlockDepth).toStdString();
             break;
         }// if CurByte = 0xFF
         else {
@@ -617,13 +617,16 @@ int Logic::decode(int ResNum)
     ret = objlist->read(tmp, false);
     if (ret)
         return 1;
-    objlist->ItemNames.toLower();
+
+    for (auto iter = objlist->ItemNames.begin(); iter < objlist->ItemNames.end(); iter++) {
+        *iter = iter->toLower();
+    }
     // words already in lower case in file so we don't need to convert them
-    for (i = 0; i < objlist->ItemNames.num; i++) {
-        if (objlist->ItemNames.at(i).find_first_of("\"") == std::string::npos)
+    for (i = 0; i < objlist->ItemNames.count(); i++) {
+        if (!objlist->ItemNames.at(i).contains("\""))
             continue;
         //replace " with \"
-        char *ptr = (char *)objlist->ItemNames.at(i).c_str();
+        char *ptr = (char *)objlist->ItemNames.at(i).toStdString().c_str();
         for (j = 0; *ptr; ptr++) {
             if (*ptr == '"') {
                 tmp[j++] = '\\';
@@ -661,13 +664,13 @@ int Logic::decode(int ResNum)
     do {
         AddBlockEnds();
         if (LabelIndex.Data[ResPos] > 0)
-            OutputText.append("Label" + IntToStr(LabelIndex.Data[ResPos]) + ":\n");
+            OutputText.append("Label" + std::to_string(LabelIndex.Data[ResPos]) + ":\n");
         CurByte = ReadByte();
         if (CurByte == 0xFF)
             ReadIfs();
         else if (CurByte <= NumAGICommands) {
             ThisCommand = CurByte;
-            ThisLine = MultStr("  ", BlockDepth);
+            ThisLine = QString("  ").repeated(BlockDepth).toStdString();
             if (game->show_special_syntax && (ThisCommand >= 0x01 && ThisCommand <= 0x0B) || (ThisCommand >= 0xA5 && ThisCommand <= 0xA8))
                 AddSpecialSyntaxCommand();
             else {
@@ -693,8 +696,8 @@ int Logic::decode(int ResNum)
                 if (TempBlockLength + ResPos > BlockEnd[BlockDepth - 1] || TempBlockLength & 0x8000 || BlockLength[BlockDepth] <= 3)
                     DoGoto = true;
                 else {
-                    OutputText.append(MultStr("  ", BlockDepth - 1) + "}\n");
-                    OutputText.append(MultStr("  ", BlockDepth - 1) + "else {\n");
+                    OutputText.append(QString("  ").repeated(BlockDepth - 1).toStdString() + "}\n");
+                    OutputText.append(QString("  ").repeated(BlockDepth - 1).toStdString() + "else {\n");
                     BlockLength[BlockDepth] = TempBlockLength;
                     BlockEnd[BlockDepth] = BlockLength[BlockDepth] + ResPos;
                 }
@@ -709,7 +712,7 @@ int Logic::decode(int ResNum)
                     ErrorOccured = true;
                     break;
                 } else
-                    OutputText.append(MultStr("  ", BlockDepth) + "goto(Label" + IntToStr(LabelIndex.Data[LabelLoc]) + ");\n");
+                    OutputText.append(QString("  ").repeated(BlockDepth).toStdString() + "goto(Label" + std::to_string(LabelIndex.Data[LabelLoc]) + ");\n");
             }
         } else {
             sprintf(tmp, "Unknown action command (%d)\n", CurByte);

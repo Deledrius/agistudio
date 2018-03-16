@@ -1345,7 +1345,7 @@ ViewData::ViewData(QWidget *parent, const char *name, Picture *p)
     connect(close, SIGNAL(clicked()), SLOT(close()));
     right->addWidget(close);
 
-    data.lfree();
+    data.clear();
 }
 
 //************************************************
@@ -1379,8 +1379,8 @@ void ViewData::read()
     getmaxcol();
 
     codes->clear();
-    for (i = 0; i < data.num; i++) {
-        std::string str2 = data.at(i);
+    for (i = 0; i < data.count(); i++) {
+        std::string str2 = data.at(i).toStdString();
         str = (char *)str2.c_str();
         if (wr) {   //wrap long lines
             k = 0;

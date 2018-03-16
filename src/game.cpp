@@ -23,7 +23,6 @@
  */
 
 #include "menu.h"
-#include "util.h"
 #include "resources.h"
 #include "agicommands.h"
 #include "game.h"
@@ -1445,7 +1444,7 @@ int Game::RecompileAll()
     FILE *fptr;
     Logic logic;
     char tmp1[16], *ptr;
-    extern TStringList InputLines;
+    extern QStringList InputLines;
 
     for (i = 0; i < MAXWIN; i++) {
         if (winlist[i].type == TEXTRES) {
@@ -1486,14 +1485,14 @@ int Game::RecompileAll()
                 fptr = fopen(tmp, "rb");
             }
             if (fptr != NULL) {
-                InputLines.lfree();
+                InputLines.clear();
                 while (fgets(tmp, MAX_TMP, fptr) != NULL) {
                     if ((ptr = strchr(tmp, 0x0a)))
                         * ptr = 0;
                     if ((ptr = strchr(tmp, 0x0d)))
                         * ptr = 0;
                     //strcat(tmp,"\n");
-                    InputLines.add(tmp);
+                    InputLines.append(tmp);
                 }
                 fclose(fptr);
             } else { //source file not found - reading from the game
@@ -1503,15 +1502,15 @@ int Game::RecompileAll()
                     menu->errmes(tmp, "Errors:\n%s", logic.ErrorList.c_str());
                     continue;
                 }
-                InputLines.lfree();
+                InputLines.clear();
                 std::string::size_type pos;
                 std::string str = logic.OutputText;
                 while ((pos = str.find_first_of("\n")) != std::string::npos) {
-                    InputLines.add(str.substr(0, pos));
+                    InputLines.append(str.substr(0, pos).c_str());
                     str = str.substr(pos + 1);
                 }
                 if (str != "")
-                    InputLines.add(str);
+                    InputLines.append(str.c_str());
             }
             err = logic.compile();
             if (!err)

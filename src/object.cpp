@@ -65,7 +65,7 @@ bool ObjList::GetItems()
                 NamePos++;
             }
         } while (ResourceData.Data[NamePos] != 0 && NamePos < ResourceData.Size);
-        ItemNames.add(ThisItemName);
+        ItemNames.append(ThisItemName.c_str());
         CurrentItem++;
 
     } while ((CurrentItem + 1) * 3 < ItemNamesStart && CurrentItem < MaxItems);
@@ -96,7 +96,7 @@ int ObjList::read(char *filename, bool FileIsEncrypted)
         return 1;
     }
 
-    ItemNames.lfree();
+    ItemNames.clear();
     ResourceData.Size = size;
     fread(ResourceData.Data, ResourceData.Size, 1, fptr);
     fclose(fptr);
@@ -110,7 +110,7 @@ int ObjList::read(char *filename, bool FileIsEncrypted)
             return 1;
         }
     }
-    if (ItemNames.num == 0) {
+    if (ItemNames.count() == 0) {
         menu->errmes("Error! 0 objects in file.");
         return 1;
     }
@@ -126,15 +126,15 @@ int ObjList::save(char *filename, bool FileIsEncrypted)
     int CurrentItem, CurrentChar;
     FILE *fptr;
 
-    ResourceData.Size = ItemNames.num * 3 + 5;
+    ResourceData.Size = ItemNames.count() * 3 + 5;
     //3 bytes for each index entry, 3 bytes for header, 2 for '?' object
-    for (CurrentItem = 1; CurrentItem <= ItemNames.num; CurrentItem++) {
+    for (CurrentItem = 1; CurrentItem <= ItemNames.count(); CurrentItem++) {
         if (ItemNames.at(CurrentItem - 1) != "?")
             ResourceData.Size += ItemNames.at(CurrentItem - 1).length() + 1;
     }
 
     //create data
-    ItemNamesStart = ItemNames.num * 3 + 3;
+    ItemNamesStart = ItemNames.count() * 3 + 3;
     msbyte = (ItemNamesStart - 3) / 256;
     lsbyte = (ItemNamesStart - 3) % 256;
     ResourceData.Data[0] = lsbyte;
@@ -146,7 +146,7 @@ int ObjList::save(char *filename, bool FileIsEncrypted)
     ResourceData.Data[ItemNamesStart] = '?';
     ResourceData.Data[ItemNamesStart + 1] = 0;
     ObjectFilePos = ItemNamesStart + 2;
-    for (CurrentItem = 1; CurrentItem <= ItemNames.num; CurrentItem++) {
+    for (CurrentItem = 1; CurrentItem <= ItemNames.count(); CurrentItem++) {
         if (ItemNames.at(CurrentItem - 1) == "?") {
             ResourceData.Data[CurrentItem * 3] = ResourceData.Data[0];
             ResourceData.Data[CurrentItem * 3 + 1] = ResourceData.Data[1];
@@ -158,7 +158,7 @@ int ObjList::save(char *filename, bool FileIsEncrypted)
             ResourceData.Data[CurrentItem * 3 + 1] = msbyte;
             ResourceData.Data[CurrentItem * 3 + 2] = RoomNum[CurrentItem - 1];
             for (CurrentChar = 0; CurrentChar < (int)ItemNames.at(CurrentItem - 1).length(); CurrentChar++) {
-                ResourceData.Data[ObjectFilePos] = ItemNames.at(CurrentItem - 1)[CurrentChar];
+                ResourceData.Data[ObjectFilePos] = ItemNames.at(CurrentItem - 1)[CurrentChar].toLatin1();
                 ObjectFilePos++;
             }
             ResourceData.Data[ObjectFilePos] = 0;
@@ -181,7 +181,7 @@ int ObjList::save(char *filename, bool FileIsEncrypted)
 //*****************************************
 void ObjList::clear()
 {
-    ItemNames.lfree();
-    ItemNames.add("?");
+    ItemNames.clear();
+    ItemNames.append("?");
     memset(RoomNum, 0, sizeof(RoomNum));
 }

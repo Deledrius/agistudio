@@ -44,7 +44,6 @@
 #include <QKeyEvent>
 #include <QScrollArea>
 
-#include "util.h"
 #include "wutil.h"
 #include "view.h"
 #include "preview.h"

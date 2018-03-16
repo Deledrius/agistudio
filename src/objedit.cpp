@@ -185,8 +185,8 @@ void ObjEdit::open(char *name)
     filename = name;
 
     list->clear();
-    for (int i = 0; i < objlist->ItemNames.num; i++) {
-        sprintf(tmp, "%d. %s", i, objlist->ItemNames.at(i).c_str());
+    for (int i = 0; i < objlist->ItemNames.count(); i++) {
+        sprintf(tmp, "%d. %s", i, objlist->ItemNames.at(i).toStdString().c_str());
         list->addItem(tmp);
     }
     list->show();
@@ -238,7 +238,7 @@ void ObjEdit::new_file()
 void ObjEdit::select_object()
 {
     int n = list->currentRow();
-    objname->setText(objlist->ItemNames.at(n).c_str());
+    objname->setText(objlist->ItemNames.at(n));
     sprintf(tmp, "%d", objlist->RoomNum[n]);
     num->setText(tmp);
     CurObject = n;
@@ -247,8 +247,8 @@ void ObjEdit::select_object()
 //*****************************************
 void ObjEdit::add_cb()
 {
-    objlist->ItemNames.add("?");
-    CurObject = objlist->ItemNames.num - 1;
+    objlist->ItemNames.append("?");
+    CurObject = objlist->ItemNames.count() - 1;
     objlist->RoomNum[CurObject] = 0;
     sprintf(tmp, "%d. ?", CurObject);
     list->addItem(tmp);

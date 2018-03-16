@@ -1544,16 +1544,16 @@ void Picture::normline2(int x1, int y1, int x2, int y2)
 }
 
 //***************************************************
-void Picture::viewData(TStringList *data)
+void Picture::viewData(QStringList *data)
 {
     struct picCodeNode *temp;
     byte c;
     char tmp1[6];
 
-    data->lfree();
+    data->clear();
 
     if (picStart == NULL) {   /* Black picture */
-        data->add("ff");
+        data->append("ff");
         return ;
     }
 
@@ -1562,7 +1562,7 @@ void Picture::viewData(TStringList *data)
     for (temp = picStart; temp != NULL; temp = temp->next) {
         c = temp->node;
         if (c >= 0xf0 && tmp[0]) {
-            data->add(tmp);
+            data->append(tmp);
             sprintf(tmp, "%02x ", c);
         } else {
             sprintf(tmp1, "%02x ", c);
@@ -1571,9 +1571,9 @@ void Picture::viewData(TStringList *data)
     }
     if (tmp1[0] != 0) {
         strcat(tmp, tmp1);
-        data->add(tmp);
+        data->append(tmp);
     }
-    data->add("ff");
+    data->append("ff");
 }
 
 //***************************************************

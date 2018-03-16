@@ -29,12 +29,12 @@
 #include <stdlib.h>
 #include <limits.h>
 
-extern TStringList InputLines;  //temporary -
+extern QStringList InputLines;  //temporary -
 //input text from the editor window or file
 
 static bool UseTypeChecking = true;
 static int ResPos, LogicSize;
-static TStringList EditLines, IncludeFilenames;
+static QStringList EditLines, IncludeFilenames;
 static std::string DefineNames[MaxDefines];
 static std::string DefineValues[MaxDefines];
 static int NumDefines;
@@ -95,14 +95,14 @@ static void WriteLSMSWord(short word)
 void Logic::ShowError(int Line, std::string ErrorMsg)
 {
     int LineNum = RealLineNum[Line];
-    if (LineFile[Line] == 0 || Line > EditLines.num) {
+    if (LineFile[Line] == 0 || Line > EditLines.count()) {
         // error is in logic in editor window
         sprintf(tmp, "Line %d: %s\n", RealLineNum[Line], ErrorMsg.c_str());
     } else { //error in include file
-        if (LineFile[Line] > IncludeFilenames.num)
+        if (LineFile[Line] > IncludeFilenames.count())
             sprintf(tmp, "[unknown include file] Line ???: %s\n", ErrorMsg.c_str());
         else
-            sprintf(tmp, "File %s Line %d: %s\n", IncludeFilenames.at(LineFile[Line] - 1).c_str(), LineNum, ErrorMsg.c_str());
+            sprintf(tmp, "File %s Line %d: %s\n", IncludeFilenames.at(LineFile[Line] - 1).toStdString().c_str(), LineNum, ErrorMsg.c_str());
     }
 
     ErrorList.append(tmp);
@@ -136,11 +136,11 @@ std::string Logic::ReadString(std::string::size_type *pos, std::string &str)
 }
 
 //***************************************************
-int Logic::RemoveComments(TStringList Lines)
+int Logic::RemoveComments(QStringList Lines)
 {
     int CommentDepth = 0;
-    for (CurLine = 0; CurLine < Lines.num; CurLine++) {
-        std::string Line = Lines.at(CurLine);
+    for (CurLine = 0; CurLine < Lines.count(); CurLine++) {
+        std::string Line = Lines.at(CurLine).toStdString();
         std::string NewLine;
         bool InQuotes = false;
         for (unsigned i = 0; i < Line.size(); ++i) {
@@ -167,7 +167,7 @@ int Logic::RemoveComments(TStringList Lines)
                 NewLine += Line[i];
             }
         }
-        Lines.replace(CurLine, NewLine);
+        Lines.replace(CurLine, NewLine.c_str());
     }
     return 0;
 }
@@ -175,7 +175,7 @@ int Logic::RemoveComments(TStringList Lines)
 //***************************************************
 int Logic::AddIncludes()
 {
-    TStringList IncludeStrings, IncludeLines;
+    QStringList IncludeStrings, IncludeLines;
     int  CurInputLine, CurIncludeLine;
     std::string filename;
     int err = 0;
@@ -183,24 +183,21 @@ int Logic::AddIncludes()
     int CurLine;
     char *ptr;
 
-    IncludeFilenames = TStringList();
-    IncludeStrings = TStringList();
-    EditLines = TStringList();
-    IncludeLines = TStringList();
+    IncludeFilenames = QStringList();
+    IncludeStrings = QStringList();
+    EditLines = QStringList();
+    IncludeLines = QStringList();
     CurLine = 0;
-    for (CurInputLine = 0; CurInputLine < InputLines.num; CurInputLine++) {
-        EditLines.add(InputLines.at(CurInputLine));
-        CurLine = EditLines.num - 1;
+    for (CurInputLine = 0; CurInputLine < InputLines.count(); CurInputLine++) {
+        EditLines.append(InputLines.at(CurInputLine));
+        CurLine = EditLines.count() - 1;
         RealLineNum[CurLine] = CurInputLine;
         LineFile[CurLine] = 0;
-#ifdef _WIN32
-        if (_strnicmp(InputLines.at(CurInputLine).c_str(), "#include", 8)) {
-#else
-        if (strncasecmp(InputLines.at(CurInputLine).c_str(), "#include", 8)) {
-#endif
+
+        if (InputLines.at(CurInputLine).startsWith("#include", Qt::CaseInsensitive)) {
             continue;
         }
-        std::string str = InputLines.at(CurInputLine).substr(8);
+        std::string str = InputLines.at(CurInputLine).right(8).toStdString();
         if (str.length() < 4) {
             ShowError(CurLine, "Missing include filename !");
             err = 1;
@@ -232,31 +229,31 @@ int Logic::AddIncludes()
             err = 1;
             continue;
         }
-        IncludeLines.lfree();
+        IncludeLines.clear();
 
         while (fgets(tmp, MAX_TMP, fptr) != NULL) {
             if ((ptr = strchr(tmp, 0x0a)))
                 * ptr = 0;
             if ((ptr = strchr(tmp, 0x0d)))
                 * ptr = 0;
-            IncludeLines.add(tmp);
+            IncludeLines.append(tmp);
         }
         fclose(fptr);
-        if (IncludeLines.num == 0)
+        if (IncludeLines.count() == 0)
             continue;
-        IncludeFilenames.add(filename);
+        IncludeFilenames.append(filename.c_str());
         RemoveComments(IncludeLines);
         EditLines.replace(CurLine, empty_tmp);
-        for (CurIncludeLine = 0; CurIncludeLine < IncludeLines.num; CurIncludeLine++) {
-            EditLines.add(IncludeLines.at(CurIncludeLine));
-            CurLine = EditLines.num - 1;
+        for (CurIncludeLine = 0; CurIncludeLine < IncludeLines.count(); CurIncludeLine++) {
+            EditLines.append(IncludeLines.at(CurIncludeLine));
+            CurLine = EditLines.count() - 1;
             RealLineNum[CurLine] = CurIncludeLine;
-            LineFile[CurLine] = IncludeFilenames.num;
+            LineFile[CurLine] = IncludeFilenames.count();
         }
     }
 
-    IncludeLines.lfree();
-    InputLines.lfree();
+    IncludeLines.clear();
+    InputLines.clear();
     return err;
 }
 
@@ -269,16 +266,12 @@ int Logic::ReadDefines()
     int CurLine;
 
     NumDefines = 0;
-    for (CurLine = 0; CurLine < EditLines.num; CurLine++) {
-#ifdef _WIN32
-        if (_strnicmp(EditLines.at(CurLine).c_str(), "#define", 7)) {
-#else
-        if (strncasecmp(EditLines.at(CurLine).c_str(), "#define", 7)) {
-#endif
+    for (CurLine = 0; CurLine < EditLines.count(); CurLine++) {
+        if (EditLines.at(CurLine).startsWith("#define", Qt::CaseInsensitive)) {
             continue;
         }
-        std::string str = EditLines.at(CurLine).substr(7);
-        toLower(&str);
+        std::string str = EditLines.at(CurLine).right(7).toStdString();
+        std::transform(str.begin(), str.end(), str.begin(), ::tolower);
         if (str.length() < 4) {
             ShowError(CurLine, "Missing define name !");
             err = 1;
@@ -290,7 +283,7 @@ int Logic::ReadDefines()
             continue;
         }
         if (NumDefines >= MaxDefines) {
-            ShowError(CurLine, "Too many defines (max " + IntToStr(MaxDefines) + ")");
+            ShowError(CurLine, "Too many defines (max " + std::to_string(MaxDefines) + ")");
             err = 1;
             continue;
         }
@@ -398,15 +391,11 @@ int Logic::ReadPredefinedMessages()
         Messages[i] = "";
         MessageExists[i] = false;
     }
-    for (CurLine = 0; CurLine < EditLines.num; CurLine++) {
-#ifdef _WIN32
-        if (_strnicmp(EditLines.at(CurLine).c_str(), "#message", 8)) {
-#else
-        if (strncasecmp(EditLines.at(CurLine).c_str(), "#message", 8)) {
-#endif
+    for (CurLine = 0; CurLine < EditLines.count(); CurLine++) {
+        if (EditLines.at(CurLine).startsWith("#message", Qt::CaseInsensitive)) {
             continue;
         }
-        std::string str = EditLines.at(CurLine).substr(8);
+        std::string str = EditLines.at(CurLine).right(8).toStdString();
         if (str[0] != ' ') {
             ShowError(CurLine, "' ' expected after #message.");
             err = 1;
@@ -450,9 +439,9 @@ int Logic::ReadLabels()
     int CurLine;
 
     NumLabels = 0;
-    for (CurLine = 0; CurLine < EditLines.num; CurLine++) {
-        std::string str = EditLines.at(CurLine);
-        toLower(&str);
+    for (CurLine = 0; CurLine < EditLines.count(); CurLine++) {
+        std::string str = EditLines.at(CurLine).toStdString();
+        std::transform(str.begin(), str.end(), str.begin(), ::tolower);
         pos1 = str.find_first_not_of(" ");
         if (pos1 == std::string::npos)
             continue;
@@ -472,7 +461,7 @@ int Logic::ReadLabels()
         if (err)
             continue;
         if (NumLabels > MaxLabels) {
-            ShowError(CurLine, "Too many labels (max " + IntToStr(MaxLabels) + ")");
+            ShowError(CurLine, "Too many labels (max " + std::to_string(MaxLabels) + ")");
             err = 1;
             continue;
         }
@@ -501,7 +490,7 @@ int Logic::ReadLabels()
 //***************************************************
 void Logic::NextLine()
 {
-    int NumLines = EditLines.num;
+    int NumLines = EditLines.count();
 
     CurLine++;
     if (CurLine > NumLines) {
@@ -509,13 +498,12 @@ void Logic::NextLine()
         return;
     }
     do {
-        LowerCaseLine = EditLines.at(CurLine);
+        LowerCaseLine = EditLines.at(CurLine).toStdString();
         if (LowerCaseLine == empty_tmp || (LinePos = LowerCaseLine.find_first_not_of(" ")) == std::string::npos) {
             CurLine++;
             continue;
         }
-        //printf("Line %d: %s\n",CurLine,LowerCaseLine.c_str());
-        toLower(&LowerCaseLine);
+        std::transform(LowerCaseLine.begin(), LowerCaseLine.end(), LowerCaseLine.begin(), ::tolower);
         LineLength = LowerCaseLine.length();
         return;
     } while (CurLine < NumLines);
@@ -570,7 +558,7 @@ static std::string TrimEndWhitespaces(const std::string &str)
 std::string Logic::ReplaceDefine(std::string InText)
 {
     std::string str = InText;
-    toLower(&str);
+    std::transform(str.begin(), str.end(), str.begin(), ::tolower);
     for (int i = 0; i < NumDefines; i++) {
         if (str == DefineNames[i])
             return DefineValues[i];
@@ -595,15 +583,15 @@ void Logic::ReadArgText()
     if (pos2 == std::string::npos) {
         LinePos = LineLength;
         ArgText = ReplaceDefine(TrimEndWhitespaces(
-                                    EditLines.at(CurLine).substr(pos1)));
+                                    EditLines.at(CurLine).right(pos1).toStdString()));
     } else {
         LinePos = pos2;
         ArgText = ReplaceDefine(TrimEndWhitespaces(
-                                    EditLines.at(CurLine).substr(pos1, pos2 - pos1)));
+                                    EditLines.at(CurLine).mid(pos1, pos2 - pos1).toStdString()));
     }
 
     LowerCaseArgText = ArgText;
-    toLower(&LowerCaseArgText);
+    std::transform(LowerCaseArgText.begin(), LowerCaseArgText.end(), LowerCaseArgText.begin(), ::tolower);
     ArgTextLength = ArgText.length();
     ArgTextPos = 0;
 }
@@ -677,8 +665,8 @@ void Logic::ReadArgs(bool CommandIsIf, byte CmdNum)
                     //find word group number
                     bool found = false;
                     for (int k = 0; k < wordlist->NumGroups; k++) {
-                        for (int i = 0; i < wordlist->WordGroup[k].Words.num; i++) {
-                            if (wordlist->WordGroup[k].Words.at(i) == ThisWord) {
+                        for (int i = 0; i < wordlist->WordGroup[k].Words.count(); i++) {
+                            if (wordlist->WordGroup[k].Words.at(i).toStdString() == ThisWord) {
                                 ArgValue = wordlist->WordGroup[k].GroupNum;
                                 found = true;
                                 break;
@@ -696,7 +684,7 @@ void Logic::ReadArgs(bool CommandIsIf, byte CmdNum)
                 ArgValue = ReadArgValue();
             SaidArgs[NumSaidArgs] = ArgValue;
             if (SaidArgs[NumSaidArgs] < 0 || SaidArgs[NumSaidArgs] > 65535) {
-                ShowError(CurLine, "Invalid word number for argument " + IntToStr(NumSaidArgs) + " (must be 0-65535).");
+                ShowError(CurLine, "Invalid word number for argument " + std::to_string(NumSaidArgs) + " (must be 0-65535).");
                 SaidArgs[NumSaidArgs] = 0;
             }
             if ((LinePos < LineLength) & (LowerCaseLine[LinePos] == ',')) {
@@ -707,7 +695,7 @@ void Logic::ReadArgs(bool CommandIsIf, byte CmdNum)
             } else if (LinePos < LineLength && LowerCaseLine[LinePos] == ')')
                 FinishedReadingSaidArgs = true;
             else
-                ShowError(CurLine, "',' or ')' expected after argument " + IntToStr(NumSaidArgs) + ".");
+                ShowError(CurLine, "',' or ')' expected after argument " + std::to_string(NumSaidArgs) + ".");
             LinePos++;
         } while (!FinishedReadingSaidArgs || ErrorOccured);
         WriteByte(NumSaidArgs + 1);
@@ -759,21 +747,21 @@ void Logic::ReadArgs(bool CommandIsIf, byte CmdNum)
                 if (ThisInvObjectName == "")
                     ShowError(CurLine, "Object name must be at least one character.");
                 else {
-                    for (i = 0; i < objlist->ItemNames.num; i++) {
-                        if (objlist->ItemNames.at(i) == ThisInvObjectName) {
+                    for (i = 0; i < objlist->ItemNames.count(); i++) {
+                        if (objlist->ItemNames.at(i).toStdString() == ThisInvObjectName) {
                             ThisInvObjectNum = i;
                             WriteByte(i);
                             break;
                         }
                     }
-                    if (i >= objlist->ItemNames.num)
+                    if (i >= objlist->ItemNames.count())
                         ShowError(CurLine, "Unknown inventory object " + ThisInvObjectName);
                 }
             }// argument is inventory object and given as string
             else { //normal argument
                 ThisArgTypePrefix = (char *)ArgTypePrefix[(int)ThisCommand.argTypes[CurArg]];
                 if (UseTypeChecking && (strcmp(LowerCaseArgText.substr(0, strlen(ThisArgTypePrefix)).c_str(), ThisArgTypePrefix)))
-                    ShowError(CurLine, "Invalid or unknown argument type for argument " + IntToStr(CurArg) + " (should be a " + ArgTypeName[(int)ThisCommand.argTypes[CurArg]] + ").");
+                    ShowError(CurLine, "Invalid or unknown argument type for argument " + std::to_string(CurArg) + " (should be a " + ArgTypeName[(int)ThisCommand.argTypes[CurArg]] + ").");
                 else {
                     if (UseTypeChecking)
                         ArgTextPos += strlen(ThisArgTypePrefix);
@@ -782,20 +770,20 @@ void Logic::ReadArgs(bool CommandIsIf, byte CmdNum)
                             ArgTextPos++;
                     ArgValue = ReadArgValue();
                     if (ArgValue < 0 || ArgValue > 255)
-                        ShowError(CurLine, "Invalid or missing value for argument " + IntToStr(CurArg) + " (must be 0-255)");
+                        ShowError(CurLine, "Invalid or missing value for argument " + std::to_string(CurArg) + " (must be 0-255)");
                     else
                         WriteByte(ArgValue);
                 }
             }//normal argument
             if (CurArg < ThisCommand.NumArgs - 1) {
                 if (ArgTextPos < ArgTextLength)
-                    ShowError(CurLine, "',' expected after argument " + IntToStr(CurArg) + ".");
+                    ShowError(CurLine, "',' expected after argument " + std::to_string(CurArg) + ".");
                 else if (LinePos >= LineLength || LowerCaseLine[LinePos] != ',')
-                    ShowError(CurLine, "',' expected after argument " + IntToStr(CurArg) + ".");
+                    ShowError(CurLine, "',' expected after argument " + std::to_string(CurArg) + ".");
                 else
                     LinePos++;
             } else if (ArgTextPos < ArgTextLength) {
-                ShowError(CurLine, "(1) ')' expected after argument " + IntToStr(CurArg) + ".");
+                ShowError(CurLine, "(1) ')' expected after argument " + std::to_string(CurArg) + ".");
                 printf("Line %s argtextpos=%d arglen=%d\n", LowerCaseLine.c_str(), (int)ArgTextPos, (int)ArgTextLength);
             }
         }
@@ -803,7 +791,7 @@ void Logic::ReadArgs(bool CommandIsIf, byte CmdNum)
         if (LinePos >= LineLength || LowerCaseLine[LinePos] != ')') {
 
             if (ThisCommand.NumArgs > 0) {
-                ShowError(CurLine, "(2) ')' expected after argument " + IntToStr(ThisCommand.NumArgs) + ".");
+                ShowError(CurLine, "(2) ')' expected after argument " + std::to_string(ThisCommand.NumArgs) + ".");
                 printf("Line %s argtextpos=%d arglen=%d\n", LowerCaseLine.c_str(), (int)ArgTextPos, (int)ArgTextLength);
             } else
                 ShowError(CurLine, "')' expected.");
@@ -1284,7 +1272,7 @@ int Logic::CompileCommands()
                     WriteByteAtLoc((BlockLength[BlockDepth] >> 8) & 0xff, BlockStartDataLoc[BlockDepth] + 1);
                     BlockDepth--;
                     SkipSpaces();
-                    if (LinePos >= LineLength && CurLine < EditLines.num - 1)
+                    if (LinePos >= LineLength && CurLine < EditLines.count() - 1)
                         NextLine();
                     if (LowerCaseLine.substr(LinePos, 4) == "else") {
                         LinePos += 4;
@@ -1336,7 +1324,7 @@ int Logic::CompileCommands()
                         if (LabelNum(CommandName) == 0)
                             ShowError(CurLine, "Unknown label " + CommandName + ".");
                         else if (NumGotos >= MaxGotos)
-                            ShowError(CurLine, "Too many labels (max " + IntToStr(MaxLabels) + ").");
+                            ShowError(CurLine, "Too many labels (max " + std::to_string(MaxLabels) + ").");
                         else {
                             NumGotos++;
                             Gotos[NumGotos].LabelNum = LabelNum(CommandName);
@@ -1366,7 +1354,7 @@ int Logic::CompileCommands()
                     else {
                         if (CommandNum == 255) { // not found
                             if (!AddSpecialSyntax())
-                                ShowError(CurLine, "Unknown action command " + EditLines.at(CurLine).substr(CommandNameStartPos, CommandName.length()) + ".");
+                                ShowError(CurLine, "Unknown action command " + EditLines.at(CurLine).mid(CommandNameStartPos, CommandName.length()).toStdString() + ".");
                         } else {
                             WriteByte(CommandNum);
                             ReadArgs(false, CommandNum);
@@ -1413,7 +1401,7 @@ int Logic::CompileCommands()
                         WriteByte(0xFD);
                     if (CommandNum == 255) { // not found
                         if (!AddSpecialIFSyntax())
-                            ShowError(CurLine, "Unknown test command " + EditLines.at(CurLine).substr(CommandNameStartPos, CommandName.length()) + ".");
+                            ShowError(CurLine, "Unknown test command " + EditLines.at(CurLine).mid(CommandNameStartPos, CommandName.length()).toStdString() + ".");
                     } else {
                         WriteByte(CommandNum);
                         ReadArgs(true, CommandNum);
@@ -1443,7 +1431,7 @@ int Logic::CompileCommands()
                             LinePos++;
                             WriteByte(0xFF);
                             if (BlockDepth > MaxBlockDepth)
-                                ShowError(CurLine, "Too many nested blocks (max " + IntToStr(MaxBlockDepth) + ").");
+                                ShowError(CurLine, "Too many nested blocks (max " + std::to_string(MaxBlockDepth) + ").");
                             else {
                                 BlockDepth++;
                                 BlockStartDataLoc[BlockDepth] = ResPos;
@@ -1522,13 +1510,16 @@ int Logic::compile()
     if (ret)
         return 1;
 
-    objlist->ItemNames.toLower();
+    for (auto iter = objlist->ItemNames.begin(); iter < objlist->ItemNames.end(); iter++) {
+        *iter = iter->toLower();
+    }
+
     // words already in lower case in file so we don't need to convert them
-    for (i = 0; i < objlist->ItemNames.num; i++) {
-        if (objlist->ItemNames.at(i).find_first_of("\"") == std::string::npos)
+    for (i = 0; i < objlist->ItemNames.count(); i++) {
+        if (!objlist->ItemNames.at(i).contains("\""))
             continue;
         //replace " with \"
-        char *ptr = (char *)objlist->ItemNames.at(i).c_str();
+        char *ptr = (char *)objlist->ItemNames.at(i).toStdString().c_str();
         for (j = 0; *ptr; ptr++) {
             if (*ptr == '"') {
                 tmp[j++] = '\\';
@@ -1562,7 +1553,7 @@ int Logic::compile()
 
     WriteMessageSection();
 
-    EditLines.lfree();
+    EditLines.clear();
 
     if (ErrorOccured)
         return 1;

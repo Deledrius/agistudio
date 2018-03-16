@@ -33,6 +33,7 @@
 
 #include <stdio.h>
 #ifdef _WIN32
+#define NOMINMAX
 #include <direct.h>
 #include <process.h>
 #include <windows.h>

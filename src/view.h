@@ -21,8 +21,6 @@
 #ifndef VIEW_H
 #define VIEW_H
 
-#include "util.h"
-
 #define MaxLoops 16
 #define MaxCels  32
 
