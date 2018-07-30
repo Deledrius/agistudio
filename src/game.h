@@ -82,9 +82,9 @@ public:
     std::string templatedir;  //template game directory
     std::string helpdir;      //help directory
 private:
-    double AGIVersionNumber;
+    long AGIVersionNumber;
     std::string FindAGIV3GameID(const char *name);
-    double GetAGIVersionNumber(void);
+    long GetAGIVersionNumber(void);
     int ReadV3Resource(char ResourceType, int ResourceID);
     FILE *OpenPatchVol(int PatchVol, int *filesize);
     FILE *OpenDirUpdate(int *dirsize, int ResType);

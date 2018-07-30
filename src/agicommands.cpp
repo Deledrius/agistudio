@@ -240,28 +240,28 @@ CommandStruct AGICommand[182] = {
 
 int NumAGICommands  = 181; // not counting return()
 
-void CorrectCommands(double VerNum)
+void CorrectCommands(long VerNum)
 {
-    if (VerNum <= 2.089) {
+    if (VerNum <= 2089000) {
         AGICommand[134].NumArgs = 0;  //quit
     }
-    if (VerNum < 2.400) {
+    if (VerNum < 2400000) {
         AGICommand[151].NumArgs = 3;  // print.at
         AGICommand[152].NumArgs = 3;  // print.at.v
     }
-    if (VerNum <= 3.002086)
+    if (VerNum <= 3002086)
         AGICommand[176].NumArgs = 1;
-    if (VerNum <= 2.089)
+    if (VerNum <= 2089000)
         NumAGICommands = 155;
-    else if (VerNum <= 2.272)
+    else if (VerNum <= 2272000)
         NumAGICommands = 161;
-    else if (VerNum <= 2.440)
+    else if (VerNum <= 2440000)
         NumAGICommands = 169;
-    else if (VerNum <= 2.917)
+    else if (VerNum <= 2917000)
         NumAGICommands = 173;
-    else if (VerNum <= 2.936)
+    else if (VerNum <= 2936000)
         NumAGICommands = 175;
-    else if (VerNum <= 3.002086)
+    else if (VerNum <= 3002086)
         NumAGICommands = 177;
     else
         NumAGICommands = 181;

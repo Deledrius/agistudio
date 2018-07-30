@@ -48,6 +48,6 @@ extern CommandStruct TestCommand[19];  //tests for different flags, etc
 extern CommandStruct AGICommand[182];  //all the other
 
 
-extern void  CorrectCommands(double VerNum);
+extern void  CorrectCommands(long VerNum);
 
 #endif

@@ -215,7 +215,7 @@ int Game::open(std::string name)
 
     if (!ErrorOccured) {
         AGIVersionNumber = GetAGIVersionNumber();
-        //printf("AGIVersion = %f\n",AGIVersionNumber);
+        //printf("AGIVersion = %lu\n",AGIVersionNumber);
         CorrectCommands(AGIVersionNumber);
         isOpen = true;
         make_source_dir();
@@ -388,7 +388,7 @@ int Game::newgame(std::string name)
     isOpen = true;
     isV3 = false;
     ID = "";
-    AGIVersionNumber = 2.917;
+    AGIVersionNumber = 2917000;
     for (int _i = 0; _i <= 3; _i++) {
         for (j = 0; j <= 255; j++)
             ResourceInfo[_i][j].Exists = false;
@@ -478,16 +478,15 @@ std::string Game::FindAGIV3GameID(const char *name)
 }
 
 //*******************************************************
-double Game::GetAGIVersionNumber(void)
+long Game::GetAGIVersionNumber(void)
 {
-    double VerNum;
     int ResPos, x;
     byte VerLen;
     bool ISVerNum;
-    char VerNumText[16];
+    long VerNum;
     std::string InFileName = dir + "/agidata.ovl";
     char VersionNumBuffer[] = "A_CDE_GHI";
-    double ret = 2.917;
+    int ret = 2917000;
     // This is what we use if we can't find the version number.
     // Version 2.917 is the most common interpreter and
     // the one that all the "new" AGI games should be based on.
@@ -532,14 +531,15 @@ double Game::GetAGIVersionNumber(void)
             } else
                 ISVerNum = false;
             if (VerLen > 0) {
+                VerNum = (VersionNumBuffer[0] - '0') * 1000000;
+                VerNum += (VersionNumBuffer[2] - '0') * 100000;
+                VerNum += (VersionNumBuffer[3] - '0') * 10000;
+                VerNum += (VersionNumBuffer[4] - '0') * 1000;
                 if (VersionNumBuffer[5] == '.') {
-                    strcpy(VerNumText, VersionNumBuffer);
-                    strcpy(VerNumText + 5, VersionNumBuffer + 6); // remove second .
-                } else {
-                    strncpy(VerNumText, VersionNumBuffer, VerLen);
-                    VerNumText[VerLen] = 0;
+                    VerNum += (VersionNumBuffer[6] - '0') * 100;
+                    VerNum += (VersionNumBuffer[7] - '0') * 10;
+                    VerNum += (VersionNumBuffer[8] - '0');
                 }
-                VerNum = atof(VerNumText);
                 if (VerNum != 0) {
                     ret = VerNum;
                     break;
