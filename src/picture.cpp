@@ -1301,6 +1301,7 @@ int Picture::button_action(int newX, int newY)
                     addCode(clickX >> 1);
                     addCode(clickY);
                     ret = 1;
+                    [[fallthrough]];
                 default:
                     addCode(newX >> 1);
                     addCode(newY);
@@ -1326,6 +1327,7 @@ int Picture::button_action(int newX, int newY)
                     addCode(0xF7);
                     addCode(clickX >> 1);
                     addCode(clickY);
+                    [[fallthrough]];
                 default:
                     if (dX < 0)
                         disp = (0x80 | ((((-1) * dX) - 0) << 4));
