@@ -116,3 +116,7 @@ add_executable(AGIStudio WIN32 ${AGIStudio_HEADERS} ${AGIStudio_SOURCES} ${AGISt
 target_link_libraries(AGIStudio PRIVATE Qt6::Core5Compat Qt6::Widgets Qt6::Multimedia)
 
 install(TARGETS AGIStudio RUNTIME DESTINATION .)
+
+# Deployment configuration
+set(CPACK_COMPONENT_AGISTUDIO_DISPLAY_NAME "AGIStudio")
+set(CPACK_COMPONENTS_ALL AGIStudio)
