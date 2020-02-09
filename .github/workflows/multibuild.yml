@@ -1,0 +1,40 @@
+name: Build
+
+on: [push]
+
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest, macOS-latest]
+
+    steps:
+    - uses: actions/checkout@v3
+      # We use tags to determine versioning, so we need the entire history
+      # (fetching tags post-checkout is insufficient)
+      with:
+        fetch-depth: 0
+
+    - name: Create Build Environment
+      run: cmake -E make_directory ${{runner.workspace}}/build
+
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v3
+
+    - name: Configure CMake
+      shell: bash
+      # Run cmake's configuration from inside the source tree, allowing
+      # the versioning scripts to find the git history.
+      working-directory: ${{github.workspace}}
+      run: cmake -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_INSTALL_PREFIX="${{runner.workspace}}/install" -S "${{github.workspace}}" -B "${{runner.workspace}}/build"
+
+    - name: Build
+      shell: bash
+      working-directory: ${{runner.workspace}}/build
+      run: cmake --build . --config $BUILD_TYPE
