@@ -1686,8 +1686,8 @@ void Canvas::UpdateCel(int x, int y)
 
     if (xn >= 0 && xn < cur_w && yn >= 0 && yn < cur_h) {
 
-        QPainter p(&pixmap);
         if (viewedit->drawing_mode == V_DRAW) {
+            QPainter p(&pixmap);
 
             x = xn * 2 * pixsize;
             y = yn * pixsize;
