@@ -26,52 +26,41 @@
  *
  */
 
-
-#ifndef _WIN32
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/ioctl.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-
-#include <QProgressDialog>
-#endif
-
-#include "game.h"
 #include "menu.h"
 
+#include <QtMultimedia/QAudioOutput>
+#include <QProgressDialog>
+#include <QBuffer>
+#include <QEventLoop>
 
-#ifdef __linux__
-#include <sys/soundcard.h>
 
-#define WAVEFORM_SIZE 64
-#define ENV_DECAY 800
-#define ENV_SUSTAIN 160
+#define NUM_CHANNELS    4
+#define WAVEFORM_SIZE   64
+#define ENV_DECAY       800
+#define ENV_SUSTAIN     160
 
 struct agi_note {
-    unsigned char dur_lo;
-    unsigned char dur_hi;
-    unsigned char frq_0;
-    unsigned char frq_1;
-    unsigned char vol;
+    uint8_t dur_lo;
+    uint8_t dur_hi;
+    uint8_t frq_0;
+    uint8_t frq_1;
+    uint8_t vol;
 };
 
 struct channel_info {
     struct agi_note *ptr;
-    int end;
-    int freq;
-    int phase;
-    int vol;
-    int env;
-    int timer;
+    int32_t end;
+    int32_t freq;
+    int32_t phase;
+    int32_t vol;
+    int32_t env;
+    int32_t timer;
 };
 
 
-static int audio_fd;
+static QAudioOutput *audio_out;
 static short *buffer;
+static QBuffer *qbuffer;
 static struct channel_info chn[4];
 
 static int waveform[WAVEFORM_SIZE] = {
@@ -86,24 +75,29 @@ static int waveform[WAVEFORM_SIZE] = {
 };
 
 
-
 int init_sound()
 {
-    int i;
-
     /* Set sound device to 16 bit, 22 kHz mono */
 
-    if ((audio_fd = open("/dev/audio", O_WRONLY)) == -1)
+    QAudioFormat format;
+    format.setSampleRate(22000);
+    format.setChannelCount(1);
+    format.setSampleSize(16);
+    format.setCodec("audio/pcm");
+    format.setByteOrder(QAudioFormat::LittleEndian);
+    format.setSampleType(QAudioFormat::SignedInt);
+
+    QAudioDeviceInfo info(QAudioDeviceInfo::defaultOutputDevice());
+    if (!info.isFormatSupported(format)) {
+        menu->errmes("Cannot play audio", "Raw audio format not supported by backend.");
         return -1;
+    }
 
-    i = AFMT_S16_NE;  /* Native endian */
-    ioctl(audio_fd, SNDCTL_DSP_SETFMT, &i);
-    i = 0;
-    ioctl(audio_fd, SNDCTL_DSP_STEREO, &i);
-    i = 22000;
-    ioctl(audio_fd, SNDCTL_DSP_SPEED, &i);
+    audio_out = new QAudioOutput(format);
+    qbuffer = new QBuffer();
+    qbuffer->open(QIODevice::ReadWrite);
 
-    buffer = (short *)calloc(2, 2048);
+    buffer = (short*)calloc(2, 2048);
 
     return 0;
 }
@@ -112,20 +106,20 @@ int init_sound()
 void close_sound()
 {
     free(buffer);
-    close(audio_fd);
+    delete qbuffer;
+    delete audio_out;
 }
 
 
-void mix_channels(int s)
+void mix_channels(uint16_t num_samples)
 {
-    register int i, p;
-    int c, b, m;
+    int32_t c, b, m, i, p;
 
     /* Size is in 16-bit samples */
-    memset(buffer, 0, s << 1);
+    memset(buffer, 0, num_samples << 1);
 
     /* Now build the sound for each channel */
-    for (c = 0; c < 3; c++) {
+    for (c = 0; c < (NUM_CHANNELS - 1); c++) {
         if (!chn[c].vol)
             continue;
 
@@ -134,7 +128,7 @@ void mix_channels(int s)
 
         /* Build a sound buffer. The format is signed 16 bit mono,
          * native-endian samples */
-        for (i = 0; i < s; i++) {
+        for (i = 0; i < num_samples; i++) {
 
             /* Interpolate to get a sample from the waveform */
             b = waveform[p >> 8] + (((waveform[((p >> 8) + 1) % WAVEFORM_SIZE] -
@@ -157,87 +151,91 @@ void mix_channels(int s)
 }
 
 
-void dump_buffer(int i)
+void dump_buffer(uint32_t i)
 {
-    for (i <<= 1; i -= write(audio_fd, buffer, i);) {}
+    qbuffer->write((const char *)buffer, i*2);
 }
 
 
-void stop_note(int i)
+void stop_note(uint8_t c)
 {
-    chn[i].vol = 0;
+    chn[c].vol = 0;
 }
 
 
-void play_note(int i, int freq, int vol)
+void play_note(uint8_t c, int freq, int vol)
 {
-    chn[i].freq = freq;
-    chn[i].phase = 0;
-    chn[i].vol = vol;
-    chn[i].env = 0x10000;
+    chn[c].freq = freq;
+    chn[c].phase = 0;
+    chn[c].vol = vol;
+    chn[c].env = 0x10000;
 }
-
 
 void play_song(unsigned char *song, int size)
 {
-    int i, playing;
-
     /* Initialize channel pointers */
-    for (i = 0; i < 4; i++) {
-        chn[i].ptr = (struct agi_note *)(song + (song[i << 1] | (song[(i << 1) + 1] << 8)));
-        chn[i].timer = 0;
-        chn[i].end = 0;
+    for (uint8_t c = 0; c < NUM_CHANNELS; c++) {
+        chn[c].ptr = (struct agi_note *)(song + (song[c << 1] | (song[(c << 1) + 1] << 8)));
+        chn[c].timer = 0;
+        chn[c].end = 0;
     }
 
-    int step = 0;
-    QProgressDialog progress("Playing...", "Cancel", 0, (size + 16) / 5);
+    QProgressDialog progress("Playing...", "Cancel", 0, 100);
     progress.setMinimumDuration(0);
     progress.setModal(true);
+    progress.setValue(0);
 
+    uint8_t playing;
     for (playing = 1; playing;) {
         int freq;
 
-        for (playing = i = 0; i < 4; i++) {
-            playing |= !chn[i].end;
+        for (uint8_t c = playing = 0; c < NUM_CHANNELS; c++) {
+            playing |= !chn[c].end;
 
-            if (chn[i].end)
+            if (chn[c].end)
                 continue;
 
-            if ((--chn[i].timer) <= 0) {
-                if (chn[i].ptr >= (struct agi_note *)song + size)
+            if ((--chn[c].timer) <= 0) {
+                if (chn[c].ptr >= (struct agi_note *)song + size)
                     break;
-                stop_note(i);
-                freq = ((chn[i].ptr->frq_0 & 0x3f) << 4)
-                       | (int)(chn[i].ptr->frq_1 & 0x0f);
+                stop_note(c);
+                freq = ((chn[c].ptr->frq_0 & 0x3f) << 4) | (int)(chn[c].ptr->frq_1 & 0x0f);
                 if (freq) {
-                    unsigned char v = chn[i].ptr->vol & 0x0f;
-                    play_note(i, freq, v == 0xf ? 0 : 0xff - (v << 1));
+                    uint8_t v = chn[c].ptr->vol & 0x0f;
+                    play_note(c, freq, v == 0xf ? 0 : 0xff - (v << 1));
                 }
-                chn[i].timer = ((int)chn[i].ptr->dur_hi << 8) |
-                               chn[i].ptr->dur_lo;
-                if (chn[i].timer == 0xffff) {
-                    chn[i].end = 1;
-                    chn[i].vol = 0;
+                chn[c].timer = ((int)chn[c].ptr->dur_hi << 8) | chn[c].ptr->dur_lo;
+                if (chn[c].timer == 0xffff) {
+                    chn[c].end = 1;
+                    chn[c].vol = 0;
                 }
-                chn[i].ptr++;
-
-                progress.setValue(step++);
-                if (progress.wasCanceled()) {
-                    playing = false;
-                    break;
-                }
+                chn[c].ptr++;
             }
         }
 
         mix_channels(400);
         dump_buffer(400);
     }
+
+    progress.setMaximum(qbuffer->size());
+    qbuffer->seek(0);
+    audio_out->start(qbuffer);
+    while (!qbuffer->atEnd()) {
+        QEventLoop loop(audio_out);
+        loop.processEvents();
+
+        progress.setValue(qbuffer->pos());
+        if (progress.wasCanceled()) {
+            audio_out->stop();
+            break;
+        }
+    }
+    progress.close();
 }
-#endif
+
 
 void play_sound(int ResNum)
 {
-#ifdef __linux__
     if (init_sound() != 0) {
         menu->errmes("Can't initialize sound !");
         return;
@@ -250,15 +248,10 @@ void play_sound(int ResNum)
     play_song(ResourceData.Data, ResourceData.Size);
 
     close_sound();
-#else
-    menu->errmes("Sound currently works only under Linux !");
-    return;
-#endif
 }
 
 void play_sound(char *filename)
 {
-#ifdef __linux__
     if (init_sound() != 0) {
         menu->errmes("Can't initialize sound !");
         return;
@@ -278,8 +271,4 @@ void play_sound(char *filename)
     play_song(ResourceData.Data, ResourceData.Size);
 
     close_sound();
-#else
-    menu->errmes("Sound currently works only under Linux !");
-    return;
-#endif
 }

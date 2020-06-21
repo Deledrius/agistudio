@@ -1,4 +1,4 @@
-find_package(Qt5 REQUIRED COMPONENTS Core Widgets)
+find_package(Qt5 REQUIRED COMPONENTS Core Widgets Multimedia)
 
 set(CMAKE_AUTOMOC ON)
 
@@ -113,4 +113,4 @@ source_group("Source Files" FILES ${AGIStudio_SOURCES})
 
 add_executable(AGIStudio WIN32 ${AGIStudio_HEADERS} ${AGIStudio_SOURCES} ${AGIStudio_RESOURCES})
 
-target_link_libraries(AGIStudio Qt5::Widgets)
+target_link_libraries(AGIStudio Qt5::Widgets Qt5::Multimedia)
