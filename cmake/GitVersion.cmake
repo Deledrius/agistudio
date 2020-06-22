@@ -1,7 +1,7 @@
 include(GetGitRevisionDescription)
 git_describe(GIT_VERSION --tags --dirty=-d)
 
-if (NOT ${GIT_VERSION} EQUAL "GIT-NOTFOUND")
+if (NOT ${GIT_VERSION} MATCHES "NOTFOUND")
 	string(REGEX REPLACE "^v([0-9]+)\\..*" "\\1" PROJECT_VERSION_MAJOR "${GIT_VERSION}")
 	string(REGEX REPLACE "^v[0-9]+\\.([0-9]+).*" "\\1" PROJECT_VERSION_MINOR "${GIT_VERSION}")
 	string(REGEX REPLACE "^v[0-9]+\\.[0-9]+\\.([0-9]+).*" "\\1" PROJECT_VERSION_PATCH "${GIT_VERSION}")
