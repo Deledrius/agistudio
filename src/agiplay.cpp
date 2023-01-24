@@ -32,7 +32,7 @@
 #include <QProgressDialog>
 #include <QBuffer>
 #include <QEventLoop>
-
+#include <sys/stat.h>
 
 #define NUM_CHANNELS    4
 #define WAVEFORM_SIZE   64
