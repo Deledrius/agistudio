@@ -37,4 +37,10 @@ jobs:
     - name: Build
       shell: bash
       working-directory: ${{runner.workspace}}/build
-      run: cmake --build . --config $BUILD_TYPE
+      run: cmake --build . --config $BUILD_TYPE --target install
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: AGIStudio-${{matrix.os}}-${{github.sha}}
+        path: ${{runner.workspace}}/install/
