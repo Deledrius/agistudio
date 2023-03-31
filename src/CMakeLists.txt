@@ -111,11 +111,14 @@ source_group("Header Files" FILES ${AGIStudio_HEADERS})
 source_group("Resource Files" FILES ${AGIStudio_RESOURCES})
 source_group("Source Files" FILES ${AGIStudio_SOURCES})
 
-add_executable(AGIStudio WIN32 ${AGIStudio_HEADERS} ${AGIStudio_SOURCES} ${AGIStudio_RESOURCES})
+add_executable(AGIStudio WIN32 MACOSX_BUNDLE
+               ${AGIStudio_HEADERS} ${AGIStudio_SOURCES} ${AGIStudio_RESOURCES})
 
 target_link_libraries(AGIStudio PRIVATE Qt6::Core5Compat Qt6::Widgets Qt6::Multimedia)
 
-install(TARGETS AGIStudio RUNTIME DESTINATION .)
+install(TARGETS AGIStudio
+        RUNTIME DESTINATION .
+        BUNDLE DESTINATION .)
 
 # Deployment configuration
 set(CPACK_COMPONENT_AGISTUDIO_DISPLAY_NAME "AGIStudio")
