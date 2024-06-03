@@ -1,10 +1,11 @@
 name: Build
 
-on: [push]
+on: [ push ]
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Release
+  MACOSX_DEPLOYMENT_TARGET: 10.15
 
 jobs:
   build:
@@ -12,10 +13,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-latest, ubuntu-latest, macOS-latest]
+        os: [ windows-latest, ubuntu-latest, macOS-latest ]
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       # We use tags to determine versioning, so we need the entire history
       # (fetching tags post-checkout is insufficient)
       with:
@@ -25,7 +26,11 @@ jobs:
       run: cmake -E make_directory ${{runner.workspace}}/build
 
     - name: Install Qt
-      uses: jurplel/install-qt-action@v3
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: "6.7.1"
+        modules: "qtmultimedia qt5compat"
+        cache: true
 
     - name: Configure CMake
       shell: bash
@@ -40,7 +45,7 @@ jobs:
       run: cmake --build . --config $BUILD_TYPE --target install
 
     - name: Upload artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: AGIStudio-${{matrix.os}}-${{github.sha}}
         path: ${{runner.workspace}}/install/
