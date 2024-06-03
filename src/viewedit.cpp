@@ -294,7 +294,7 @@ ViewEdit::ViewEdit(QWidget *parent, const char *name, int win_num, ResourcesWin 
     col = 0;
 
 
-    QLabel *mirrorloop = new QLabel("This loop mirrors: ", frame1, 0);
+    QLabel *mirrorloop = new QLabel("This loop mirrors: ", frame1, Qt::Widget);
     grid1->addWidget(mirrorloop, row, 0, 1, (maxcol1 - 1), Qt::AlignCenter);
 
 
@@ -1479,7 +1479,7 @@ void Description::getmaxcol()
 //to wrap the long lines
 {
     QFontMetrics f = fontMetrics();
-    maxcol = desc->width() / f.width('a');
+    maxcol = desc->width() / f.averageCharWidth();
 }
 
 //*********************************************

@@ -120,7 +120,7 @@ RoomGen::RoomGen(QWidget *parent, const char *name)
 
     QGridLayout *ego_pos = new QGridLayout(ego_pos_b);
     ego_pos->setSpacing(4);
-    ego_pos->setMargin(10);
+    ego_pos->setContentsMargins(10, 10, 10, 10);
 
     QLabel *ll = new QLabel("Ego Positioning (-1 = ignore)", ego_pos_b);
     ego_pos->addWidget(ll, 0, 0, 1, 6, Qt::AlignCenter);
@@ -184,7 +184,7 @@ RoomGen::RoomGen(QWidget *parent, const char *name)
 
     QGridLayout *edge_control = new QGridLayout(edge_control_b);
     edge_control->setSpacing(1);
-    edge_control->setMargin(10);
+    edge_control->setContentsMargins(10, 10, 10, 10);
 
     QLabel *ll1 = new QLabel("Edge Controls (-1 = ignore)", edge_control_b);
     edge_control->addWidget(ll1, 0, 0, 1, 2, Qt::AlignCenter);

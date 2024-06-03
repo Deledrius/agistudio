@@ -82,7 +82,7 @@ Preview::Preview(QWidget *parent, const char  *name, ResourcesWin *res):
 
     QVBoxLayout *d1 =  new QVBoxLayout(w_sound);
     d1->addSpacing(10);
-    QLabel *l1 = new QLabel("Preview is not available!\nDouble-click to listen, or click the 'Listen' button.", w_sound, 0);
+    QLabel *l1 = new QLabel("Preview is not available!\nDouble-click to listen, or click the 'Listen' button.", w_sound, Qt::Widget);
     d1->addWidget(l1);
 
     QPushButton *listen = new QPushButton("Listen", w_sound);
@@ -145,7 +145,7 @@ Preview::Preview(QWidget *parent, const char  *name, ResourcesWin *res):
 
     // View
 
-    w_view = new QWidget(this, 0);
+    w_view = new QWidget(this, Qt::Widget);
     w_view->setMinimumSize(340, 240);
 
     QVBoxLayout *vbox = new QVBoxLayout(w_view);
@@ -606,7 +606,7 @@ void PreviewView::show_description()
     preview->description->setGeometry(10, y + h + 10, W - 20, H - (y + h + 20));
 
     QFontMetrics f = fontMetrics();
-    maxcol = (W - 20) / f.width('a');
+    maxcol = (W - 20) / f.averageCharWidth();
 
     preview->description->clear();
     preview->description->setAlignment(Qt::AlignCenter);

@@ -441,7 +441,7 @@ int LogEdit::open(int ResNum)
             sprintf(tmp, "logic.%d", ResNum);
             menu->errmes(tmp, "Errors:\n%s", logic->ErrorList.c_str());
         }
-        str.sprintf("logic.%d", ResNum);
+        str = QString("logic.%1").arg(QString::number(ResNum), 3, QChar('0'));
         setWindowTitle(str);
         LogicNum = ResNum;
         show();

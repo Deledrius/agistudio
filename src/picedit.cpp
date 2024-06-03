@@ -962,7 +962,7 @@ void PCanvas::mouseMoveEvent(QMouseEvent *event)
         sprintf(tmp, "X=%d  Y=%d  Pri=%d", x / 2, y, pri);
         picedit->status->showMessage(tmp);
         auto pal = picedit->pricolor->palette();
-        pal.setColor(QPalette::Background, egacolor[pri + 1]);
+        pal.setColor(QPalette::Window, egacolor[pri + 1]);
         picedit->pricolor->setPalette(pal);
     }
 }
@@ -1360,7 +1360,7 @@ void ViewData::resizeEvent(QResizeEvent *)
 void ViewData::getmaxcol()
 {
     QFontMetrics f = fontMetrics();
-    maxcol = codes->width() / f.width('a');
+    maxcol = codes->width() / f.averageCharWidth();
 }
 
 //************************************************

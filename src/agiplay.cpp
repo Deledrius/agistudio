@@ -32,7 +32,12 @@
 #include <QProgressDialog>
 #include <QBuffer>
 #include <QEventLoop>
+#include <QAudioFormat>
+#include <QAudioSink>
+#include <QMediaDevices>
+
 #include <sys/stat.h>
+
 
 #define NUM_CHANNELS    4
 #define WAVEFORM_SIZE   64
@@ -58,7 +63,7 @@ struct channel_info {
 };
 
 
-static QAudioOutput *audio_out;
+static QAudioSink *audio_out;
 static short *buffer;
 static QBuffer *qbuffer;
 static struct channel_info chn[4];
@@ -82,18 +87,15 @@ int init_sound()
     QAudioFormat format;
     format.setSampleRate(22000);
     format.setChannelCount(1);
-    format.setSampleSize(16);
-    format.setCodec("audio/pcm");
-    format.setByteOrder(QAudioFormat::LittleEndian);
-    format.setSampleType(QAudioFormat::SignedInt);
+    format.setSampleFormat(QAudioFormat::Int16);
 
-    QAudioDeviceInfo info(QAudioDeviceInfo::defaultOutputDevice());
+    QAudioDevice info(QMediaDevices::defaultAudioOutput());
     if (!info.isFormatSupported(format)) {
         menu->errmes("Cannot play audio", "Raw audio format not supported by backend.");
         return -1;
     }
 
-    audio_out = new QAudioOutput(format);
+    audio_out = new QAudioSink(format);
     qbuffer = new QBuffer();
     qbuffer->open(QIODevice::ReadWrite);
 

@@ -190,7 +190,7 @@ void HelpWindow::textChanged()
             hist->addAction(selectedURL);
         } else
             pathCombo->setCurrentIndex(i);
-        selectedURL = QString::null;
+        selectedURL = QString();
     }
 }
 

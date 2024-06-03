@@ -128,7 +128,7 @@ ResourcesWin::ResourcesWin(QWidget *parent, const char  *name, int win_num):
 void ResourcesWin::select_resource_type(int ResType)
 {
     QString str;
-    int i, k;
+    uint i, k;
 
     type->setCurrentIndex(ResType);
     selected = ResType;
@@ -141,7 +141,7 @@ void ResourcesWin::select_resource_type(int ResType)
     list->clear();
     for (i = 0, k = 0; i < 256; i++) {
         if (game->ResourceInfo[ResType][i].Exists) {
-            str.sprintf("%s.%03d", ResTypeName[ResType], i);
+            str = QString("%1.%2").arg(ResTypeName[ResType]).arg(QString::number(i), 3, QChar('0'));
             list->addItem(str);
             ResourceIndex[k++] = i;
         }
@@ -165,7 +165,7 @@ void ResourcesWin::highlight_resource(int k)
     int size = game->GetResourceSize(selected, i);
 
     QString str;
-    str.sprintf("%d bytes", size);
+    str = QString("%1 bytes").arg(QString::number(size));
     msg->setText(str);
 
     if (preview == NULL)
@@ -191,7 +191,7 @@ void ResourcesWin::select_resource(int k)
     extern void play_sound(int ResNum);
 
     QString str;
-    str.sprintf("%d bytes", size);
+    str = QString("%1 bytes").arg(QString::number(size));
     msg->setText(str);
 
     if ((n = get_win()) == -1)

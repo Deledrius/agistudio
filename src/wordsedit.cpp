@@ -284,7 +284,7 @@ void WordsEdit::add_group_cb(void)
     if ((i = wordlist->add_group(num)) == -1)
         return;
 
-    str.sprintf("%d. ", num);
+    str = QString("%1. ").arg(QString::number(num));
     listgroup->insertItem(i, str);
     listgroup->setCurrentRow(i);
     changed = true;
@@ -428,7 +428,7 @@ void WordsEdit::select_group()
 void WordsEdit::select_group(int num)
 {
     QString str;
-    str.sprintf("Word group %d", wordlist->WordGroup[num].GroupNum);
+    str = QString("Word group %1").arg(QString::number(wordlist->WordGroup[num].GroupNum));
     labelword->setText(str);
 
     SelectedGroup = num;
