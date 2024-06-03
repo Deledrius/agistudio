@@ -1,4 +1,5 @@
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets Multimedia Core5Compat)
+qt_standard_project_setup()
 
 set(CMAKE_AUTOMOC ON)
 
@@ -114,12 +115,19 @@ source_group("Source Files" FILES ${AGIStudio_SOURCES})
 add_executable(AGIStudio WIN32 MACOSX_BUNDLE
                ${AGIStudio_HEADERS} ${AGIStudio_SOURCES} ${AGIStudio_RESOURCES})
 
-target_link_libraries(AGIStudio PRIVATE Qt6::Core5Compat Qt6::Widgets Qt6::Multimedia)
+target_link_libraries(AGIStudio PRIVATE Qt6::Core Qt6::Widgets Qt6::Multimedia Qt6::Core5Compat)
 
 install(TARGETS AGIStudio
-        RUNTIME DESTINATION .
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
         BUNDLE DESTINATION .)
 
 # Deployment configuration
 set(CPACK_COMPONENT_AGISTUDIO_DISPLAY_NAME "AGIStudio")
 set(CPACK_COMPONENTS_ALL AGIStudio)
+
+qt_generate_deploy_app_script(
+    TARGET AGIStudio
+    OUTPUT_SCRIPT deploy_script
+    NO_UNSUPPORTED_PLATFORM_ERROR
+)
+install(SCRIPT ${deploy_script})
