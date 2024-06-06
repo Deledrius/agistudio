@@ -552,14 +552,13 @@ void Menu::renumber_resource()
 //**********************************************
 void Menu::rebuild_vol()
 {
-    switch (QMessageBox::warning(this, "Rebuild VOL files", "Are you sure ?",
-                                 "Yes", "No",
-                                 0,      // Enter == button 0
-                                 1)) {   // Escape == button 1
-        case 0:
+    switch (QMessageBox::warning(this, tr("Rebuild VOL files"), tr("Are you sure?"),
+                                 QMessageBox::Yes | QMessageBox::No,
+                                 QMessageBox::No )) {
+        case QMessageBox::Yes:
             game->RebuildVOLfiles();
             break;
-        case 1:
+        default:
             break;
     }
 }
@@ -567,14 +566,13 @@ void Menu::rebuild_vol()
 //**********************************************
 void Menu::recompile_all()
 {
-    switch (QMessageBox::warning(this, "Recompile all", "Do you really want to recompile all logics ?",
-                                 "Yes", "No",
-                                 0,      // Enter == button 0
-                                 1)) {   // Escape == button 1
-        case 0:
+    switch (QMessageBox::warning(this, tr("Recompile all"), tr("Do you really want to recompile all logic scripts?"),
+                                 QMessageBox::Yes | QMessageBox::No,
+                                 QMessageBox::No)) {
+        case QMessageBox::Yes:
             game->RecompileAll();
             break;
-        case 1:
+        default:
             break;
     }
 }
@@ -1100,9 +1098,7 @@ void OpenGameDir(QWidget *parent, bool newgame)
         QDir dir_search(dir);
         if (!dir_search.entryList(QStringList("*vol.?"), QDir::Files).isEmpty()) {
             auto prompt = QString("The folder '%1' already contains an AGI game.  Continuing will erase the existing game.\n\nDo you wish to proceed?").arg(dir);
-            switch (QMessageBox::warning(parent,
-                                         "AGI Studio",
-                                         prompt,
+            switch (QMessageBox::warning(parent, "AGI Studio", prompt,
                                          QMessageBox::Yes | QMessageBox::No,
                                          QMessageBox::No)) {
             case QMessageBox::Yes:

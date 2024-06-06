@@ -196,26 +196,19 @@ void WordsEdit::showEvent(QShowEvent *)
 void WordsEdit::closeEvent(QCloseEvent *e)
 {
     if (changed) {
-
-        switch (QMessageBox::warning(this, "WORDS.TOK edit",
-                                     "Save changes to WORDS.TOK ?",
-                                     "Yes",
-                                     "No",
-                                     "Cancel",
-                                     0, 2)) {
-            case 0: // yes
+        switch (QMessageBox::warning(this, tr("WORDS.TOK Editor"), tr("Save changes to WORDS.TOK?"),
+                                    QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel,
+                                    QMessageBox::Cancel)) {
+            case QMessageBox::Save:
                 save_file() ;
                 deinit();
                 e->accept();
-
-                //      else
-                // e->ignore();
                 break;
-            case 1: // no
+            case QMessageBox::Discard:
                 deinit();
                 e->accept();
                 break;
-            default: // cancel
+            default: // Cancel
                 e->ignore();
                 break;
         }
@@ -473,19 +466,18 @@ void WordsEdit::do_add_word(void)
     FindLastGroup = 0;
     int curgroup = listgroup->currentRow();
     if (find_down(word)) {
-        sprintf(tmp, "This word already exists (in group %d).\nDo you wish to remove this occurance and add it to this group ?", wordlist->WordGroup[FindLastGroup].GroupNum);
+        auto prompt = tr("This word already exists (in group %1).\nDo you wish to remove this occurance and add it to this group?").arg(wordlist->WordGroup[FindLastGroup].GroupNum);
 
-        switch (QMessageBox::information(this, "Remove duplicate word ?",
-                                         tmp,
-                                         "Yes", "No",
-                                         0,      // Enter == button 0
-                                         1)) {   // Escape == button 1
-            case 0: //yes
+        switch (QMessageBox::warning(this, tr("Remove duplicate word?"),
+                                    prompt,
+                                    QMessageBox::Yes | QMessageBox::No,
+                                    QMessageBox::No)) {
+            case QMessageBox::Yes:
                 wordlist->WordGroup[FindLastGroup].Words.removeAt(FindLastWord);
                 update_group(FindLastGroup);
                 changed = true;
                 break;
-            case 1: //no
+            default:
                 return;
         }
     }
@@ -500,11 +492,7 @@ void WordsEdit::do_add_word(void)
 //********************************************************
 void WordsEdit::count_groups_cb(void)
 {
-    sprintf(tmp, "There are %d word groups.", wordlist->NumGroups);
-    QMessageBox::information(this, "AGI studio",
-                             tmp,
-                             "OK",
-                             0, 0);
+    QMessageBox::information(this, tr("AGI studio"), tr("There are %1 word groups.").arg(QString::number(wordlist->NumGroups)));
 }
 
 //********************************************************
@@ -513,11 +501,7 @@ void WordsEdit::count_words_cb(void)
     int n = 0;
     for (int i = 0; i < wordlist->NumGroups; i++)
         n += wordlist->WordGroup[i].Words.count();
-    sprintf(tmp, "There are %d words.", n);
-    QMessageBox::information(this, "AGI studio",
-                             tmp,
-                             "OK",
-                             0, 0);
+    QMessageBox::information(this, tr("AGI studio"), tr("There are %1 words.").arg(QString::number(n)));
 }
 
 //********************************************************

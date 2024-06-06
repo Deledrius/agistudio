@@ -356,10 +356,9 @@ void PicEdit::open(char *filename)
     if (picture->open(filename))
         return;
     PicNum = -1;
-    sprintf(tmp, "Picture editor");
-    setWindowTitle(tmp);
+    setWindowTitle(tr("Picture Editor"));
     if (canvas->isTopLevel())
-        canvas->setWindowTitle(tmp);
+        canvas->setWindowTitle(tr("Picture Editor"));
     canvas->update();
     show_pos();
     changed = false;
@@ -424,28 +423,19 @@ void PicEdit::hideEvent(QHideEvent *)
 void PicEdit::closeEvent(QCloseEvent *e)
 {
     if (changed) {
-        if (PicNum != -1)
-            sprintf(tmp, "Save changes to picture.%03d ?", PicNum);
-        else
-            sprintf(tmp, "Save changes to picture ?");
-        strcat(tmp, "\n(picture will be saved to game)");
-
-        switch (QMessageBox::warning(this, "Picture editor",
-                                     tmp,
-                                     "Yes",
-                                     "No",
-                                     "Cancel",
-                                     0, 2)) {
-            case 0: // yes
+        switch (QMessageBox::warning(this, tr("Picture Editor"), tr("Save changes to picture?"),
+                                    QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel,
+                                    QMessageBox::Cancel)) {
+            case QMessageBox::Save:
                 save_to_game();
                 deinit();
                 e->accept();
                 break;
-            case 1: // no
+            case QMessageBox::Discard:
                 deinit();
                 e->accept();
                 break;
-            default: // cancel
+            default: // Cancel
                 e->ignore();
                 break;
         }
@@ -486,13 +476,11 @@ void PicEdit::save_to_game_as()
         return ;
     }
     if (game->ResourceInfo[PICTURE][num].Exists) {
-        sprintf(tmp, "Resource picture.%03d already exists. Replace it ?", num);
-
-        switch (QMessageBox::warning(this, "Picture", tmp,
-                                     "Replace", "Cancel",
-                                     0,      // Enter == button 0
-                                     1)) {   // Escape == button 1
-            case 0:
+        switch (QMessageBox::warning(this, tr("Picture Editor"),
+                                    tr("Resource picture.%1 already exists. Replace it?").arg(QString::number(num), 3, QChar('0')),
+                                    QMessageBox::Yes | QMessageBox::No,
+                                    QMessageBox::No)) {
+            case QMessageBox::Yes:
                 picture->save(num);
                 PicNum = num;
                 if (resources_win) {
@@ -502,7 +490,7 @@ void PicEdit::save_to_game_as()
                 }
                 changed = false;
                 break;
-            case 1:
+            default:
                 break;
         }
     } else {
@@ -523,12 +511,11 @@ void PicEdit::delete_picture()
     int k;
     if (PicNum == -1)
         return;
-    sprintf(tmp, "Really delete picture %03d ?", PicNum);
-    switch (QMessageBox::warning(this, "Picture", tmp,
-                                 "Delete", "Cancel",
-                                 0,      // Enter == button 0
-                                 1)) {   // Escape == button 1
-        case 0:
+    switch (QMessageBox::warning(this, tr("Picture Editor"),
+                                tr("Really delete picture %1?").arg(QString::number(PicNum), 3, QChar('0')),
+                                QMessageBox::Yes | QMessageBox::No,
+                                QMessageBox::No)) {
+        case QMessageBox::Yes:
             game->DeleteResource(PICTURE, PicNum);
             if (resources_win) {
                 k = resources_win->list->currentRow();
@@ -536,7 +523,7 @@ void PicEdit::delete_picture()
                 resources_win->list->setCurrentRow(k);
             }
             break;
-        case 1:
+        default:
             break;
     }
 }

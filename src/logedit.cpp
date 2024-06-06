@@ -331,30 +331,22 @@ void LogEdit::closeEvent(QCloseEvent *e)
             return;
         }
 
-        if (LogicNum != -1)
-            sprintf(tmp, "Save changes to logic.%d ?", LogicNum);
-        else
-            sprintf(tmp, "Save changes to logic ?");
-        switch (QMessageBox::warning(this, "Logic editor",
-                                     tmp,
-                                     "Yes",
-                                     "No",
-                                     "Cancel",
-                                     0, 2)) {
-            case 0: // yes
+        switch (QMessageBox::warning(this, tr("Logic Editor"), tr("Save changes to Logic script?"), 
+                                    QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel,
+                                    QMessageBox::Cancel)) {
+            case QMessageBox::Save:
                 save_logic();
                 deinit();
                 e->accept();
                 break;
-            case 1: // no
+            case QMessageBox::Discard:
                 deinit();
                 e->accept();
                 break;
-            default: // cancel
+            default: // Cancel
                 e->ignore();
                 break;
         }
-
     } else {
         deinit();
         e->accept();
@@ -643,14 +635,13 @@ void LogEdit::change_logic_number()
         return ;
     }
     if (game->ResourceInfo[LOGIC][num].Exists) {
-        sprintf(tmp, "Resource logic.%d already exists. Replace it ?", num);
-        switch (QMessageBox::warning(this, "Logic", tmp,
-                                     "Replace", "Cancel",
-                                     0,      // Enter == button 0
-                                     1)) {   // Escape == button 1
-            case 0:
+        switch (QMessageBox::warning(this, tr("Logic Editor"),
+                                    tr("Resource logic.%1 already exists. Replace it?").arg(QString::number(num), 3, QChar('0')),
+                                    QMessageBox::Yes | QMessageBox::No,
+                                    QMessageBox::No)) {
+            case QMessageBox::Yes:
                 break;
-            case 1:
+            case QMessageBox::No:
                 return;
         }
     }
@@ -674,12 +665,10 @@ void LogEdit::delete_logic()
     if (LogicNum == -1)
         return;
 
-    sprintf(tmp, "Really delete logic %d ?", LogicNum);
-    switch (QMessageBox::warning(this, "Logic", tmp,
-                                 "Delete", "Cancel",
-                                 0,      // Enter == button 0
-                                 1)) {   // Escape == button 1
-        case 0:
+    switch (QMessageBox::warning(this, tr("Logic Editor"), tr("Really delete logic %1?").arg(QString::number(LogicNum), 3, QChar('0')),
+                                QMessageBox::Yes | QMessageBox::No,
+                                QMessageBox::No)) {
+        case QMessageBox::Yes:
             game->DeleteResource(LOGIC, LogicNum);
             delete_file(LogicNum);
             if (resources_win) {
@@ -690,7 +679,7 @@ void LogEdit::delete_logic()
             changed = false;
             close();
             break;
-        case 1:
+        default:
             break;
     }
 }
@@ -714,15 +703,14 @@ void LogEdit::delete_file(int ResNum)
 //***********************************************
 void LogEdit::clear_all()
 {
-    switch (QMessageBox::warning(this, "Logic", "Really clear all ?",
-                                 "Clear", "Cancel",
-                                 0,      // Enter == button 0
-                                 1)) {   // Escape == button 1
-        case 0:
+    switch (QMessageBox::warning(this, tr("Logic Editor"), tr("Really clear all?"),
+                                QMessageBox::Yes | QMessageBox::No,
+                                QMessageBox::No)) {
+        case QMessageBox::Yes:
             editor->clear();
             logic->OutputText = "";
             break;
-        case 1:
+        default:
             break;
     }
 }
@@ -732,27 +720,10 @@ void LogEdit::new_room()
 {
     //  FILE *fptr;
 
-    switch (QMessageBox::warning(this, "Logic", "Replace the editor contents\nwith the new room template ?",
-                                 "Replace", "Cancel",
-                                 0,      // Enter == button 0
-                                 1)) {   // Escape == button 1
-        case 0:
-            /*
-            sprintf(tmp,"%s/src/newroom.txt",game->templatedir.c_str());
-            fptr = fopen(tmp,"rb");
-            if(fptr==NULL){
-              menu->errmes("Can't open "+string(tmp)+"!");
-              return;
-            }
-            editor->clear();
-            char *ptr;
-            while(fgets(tmp,MAX_TMP,fptr)!=NULL){
-              if((ptr=strchr(tmp,0x0a)))*ptr=0;
-              if((ptr=strchr(tmp,0x0d)))*ptr=0;
-              editor->insertPlainText(tmp);
-            }
-            fclose(fptr);
-            */
+    switch (QMessageBox::warning(this, tr("Logic Editor"), tr("Replace the editor contents\nwith the new room template?"),
+                                QMessageBox::Yes | QMessageBox::No,
+                                QMessageBox::No)) {
+        case QMessageBox::Yes:
             if (roomgen == NULL)
                 roomgen = new RoomGen();
             if (roomgen->exec()) {
@@ -761,7 +732,7 @@ void LogEdit::new_room()
                 changed = true;
             }
             break;
-        case 1:
+        default:
             break;
     }
 
@@ -946,26 +917,19 @@ void TextEdit::closeEvent(QCloseEvent *e)
             return;
         }
 
-        if (filename != "")
-            sprintf(tmp, "Do you want to save changes to\n%s ?", filename.c_str());
-        else
-            strcpy(tmp, "Do you want to save changes ?");
-        switch (QMessageBox::warning(this, "Text editor",
-                                     tmp,
-                                     "Yes",
-                                     "No",
-                                     "Cancel",
-                                     0, 2)) {
-            case 0: // yes
+        switch (QMessageBox::warning(this, tr("Text Editor"), tr("Do you want to save changes?"),
+                                    QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel,
+                                    QMessageBox::Cancel)) {
+            case QMessageBox::Save:
                 save();
                 deinit();
                 e->accept();
                 break;
-            case 1: // no
+            case QMessageBox::Discard:
                 deinit();
                 e->accept();
                 break;
-            default: // cancel
+            default: // Cancel
                 e->ignore();
                 break;
         }
@@ -979,20 +943,15 @@ void TextEdit::closeEvent(QCloseEvent *e)
 void TextEdit::new_text()
 {
     if (filename.length() > 0) {
-        //if (changed)
-        sprintf(tmp, "Do you want to save changes to\n%s ?", filename.c_str());
-        switch (QMessageBox::warning(this, "Text editor",
-                                     tmp,
-                                     "Yes",
-                                     "No",
-                                     "Cancel",
-                                     0, 2)) {
-            case 0: // yes
-                save(); //???????????????
+        switch (QMessageBox::warning(this, tr("Text Editor"), tr("Do you want to save changes to\n%1?").arg(filename.c_str()),
+                                    QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel,
+                                    QMessageBox::Cancel)) {
+            case QMessageBox::Save:
+                save();
                 break;
-            case 1: // no
+            case QMessageBox::Discard:
                 break;
-            default: // cancel
+            default: // Cancel
                 break;
         }
     }
@@ -1071,14 +1030,13 @@ void TextEdit::save(const char *fname)
 //***********************************************
 void TextEdit::clear_all()
 {
-    switch (QMessageBox::warning(this, "Text", "Really clear all ?",
-                                 "Clear", "Cancel",
-                                 0,      // Enter == button 0
-                                 1)) {   // Escape == button 1
-        case 0:
+    switch (QMessageBox::warning(this, tr("Text Editor"), tr("Really clear all?"),
+                                 QMessageBox::Yes | QMessageBox::No,
+                                 QMessageBox::No)) {
+        case QMessageBox::Yes:
             editor->clear();
             break;
-        case 1:
+        default:
             break;
     }
 }

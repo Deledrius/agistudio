@@ -643,35 +643,22 @@ void ViewEdit::showEvent(QShowEvent *)
 void ViewEdit::closeEvent(QCloseEvent *e)
 {
     if (changed) {
-        if (ViewNum != -1)
-            sprintf(tmp, "Save changes to view.%03d ?", ViewNum);
-        else
-            sprintf(tmp, "Save changes to view ?");
-        strcat(tmp, "\n(view will be saved to game)");
-
-        switch (QMessageBox::warning(this, "View editor",
-                                     tmp,
-                                     "Yes",
-                                     "No",
-                                     "Cancel",
-                                     0, 2)) {
-            case 0: // yes
+        switch (QMessageBox::warning(this, tr("View Editor"), tr("Save changes to view?"),
+                                    QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel,
+                                    QMessageBox::Cancel)) {
+            case QMessageBox::Save:
                 save_to_game();
                 deinit();
                 e->accept();
-
-                //     else
-                //e->ignore();
                 break;
-            case 1: // no
+            case QMessageBox::Discard:
                 deinit();
                 e->accept();
                 break;
-            default: // cancel
+            default: // Cancel
                 e->ignore();
                 break;
         }
-
     } else {
         deinit();
         e->accept();
@@ -738,13 +725,10 @@ void ViewEdit::save_to_game_as()
         return ;
     }
     if (game->ResourceInfo[VIEW][num].Exists) {
-        sprintf(tmp, "Resource view.%03d already exists. Replace it ?", num);
-
-        switch (QMessageBox::warning(this, "View", tmp,
-                                     "Replace", "Cancel",
-                                     0,      // Enter == button 0
-                                     1)) {   // Escape == button 1
-            case 0:
+        switch (QMessageBox::warning(this, tr("View Editor"), tr("Resource view.%1 already exists. Replace it?").arg(QString::number(num), 3, QChar('0')),
+                                    QMessageBox::Yes | QMessageBox::No,
+                                    QMessageBox::No)) {
+            case QMessageBox::Yes:
                 view->save(num);
                 changed = false;
                 ViewNum = num;
@@ -754,7 +738,7 @@ void ViewEdit::save_to_game_as()
                     resources_win->preview->open(ViewNum, VIEW);
                 }
                 break;
-            case 1:
+            default:
                 break;
         }
     } else {
@@ -776,13 +760,10 @@ void ViewEdit::delete_view()
 
     if (ViewNum == -1)
         return;
-
-    sprintf(tmp, "Really delete view %03d ?", ViewNum);
-    switch (QMessageBox::warning(this, "View", tmp,
-                                 "Delete", "Cancel",
-                                 0,      // Enter == button 0
-                                 1)) {   // Escape == button 1
-        case 0:
+    switch (QMessageBox::warning(this, tr("View Editor"), tr("Really delete view.%1?").arg(QString::number(ViewNum), 3, QChar('0')),
+                                QMessageBox::Yes | QMessageBox::No,
+                                QMessageBox::No)) {
+        case QMessageBox::Yes:
             game->DeleteResource(VIEW, ViewNum);
             if (resources_win) {
                 k = resources_win->list->currentRow();
@@ -790,7 +771,7 @@ void ViewEdit::delete_view()
                 resources_win->list->setCurrentRow(k);
             }
             break;
-        case 1:
+        default:
             break;
     }
 }

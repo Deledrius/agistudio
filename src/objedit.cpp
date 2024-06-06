@@ -150,22 +150,19 @@ void ObjEdit::showEvent(QShowEvent *)
 void ObjEdit::closeEvent(QCloseEvent *e)
 {
     if (changed) {
-        switch (QMessageBox::warning(this, "ObjEdit",
-                                     "Save changes to OBJECT file ?",
-                                     "Yes",
-                                     "No",
-                                     "Cancel",
-                                     0, 2)) {
-            case 0: // yes
+        switch (QMessageBox::warning(this, tr("Object Editor"), tr("Save changes to OBJECT file?"),
+                                    QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel,
+                                    QMessageBox::Cancel)) {
+            case QMessageBox::Save:
                 save_file();
                 deinit();
                 e->accept();
                 break;
-            case 1: // no
+            case QMessageBox::Discard:
                 deinit();
                 e->accept();
                 break;
-            default: // cancel
+            default: // Cancel
                 e->ignore();
                 break;
         }
