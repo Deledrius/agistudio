@@ -155,7 +155,7 @@ PicEdit::PicEdit(QWidget *parent, const char *name, int win_num, ResourcesWin *r
     tool->addButton(brush, T_BRUSH);
     leftb->addWidget(toolbox);
     toolbox->setLayout(toollay);
-    connect(tool, SIGNAL(buttonClicked(int)), SLOT(change_tool(int)));
+    connect(tool, SIGNAL(idClicked(int)), SLOT(change_tool(int)));
 
     QBoxLayout *b1 = new QHBoxLayout(this);
     leftb->addLayout(b1);
@@ -180,7 +180,7 @@ PicEdit::PicEdit(QWidget *parent, const char *name, int win_num, ResourcesWin *r
     shape->setLayout(shapebox);
     shapeGrp->addButton(circle, 0);
     shapeGrp->addButton(square, 1);
-    connect(shapeGrp, SIGNAL(buttonClicked(int)), SLOT(change_shape(int)));
+    connect(shapeGrp, SIGNAL(idClicked(int)), SLOT(change_shape(int)));
 
     QVBoxLayout *typebox = new QVBoxLayout();
     QGroupBox *type = new QGroupBox("Type", this);
@@ -194,7 +194,7 @@ PicEdit::PicEdit(QWidget *parent, const char *name, int win_num, ResourcesWin *r
     type->setLayout(typebox);
     typeGrp->addButton(spray, 0);
     typeGrp->addButton(solid, 1);
-    connect(typeGrp, SIGNAL(buttonClicked(int)), SLOT(change_type(int)));
+    connect(typeGrp, SIGNAL(idClicked(int)), SLOT(change_type(int)));
 
     QVBoxLayout *sizebox = new QVBoxLayout();
     QGroupBox *lsize = new QGroupBox(tr("Size"), this); //vert
@@ -282,7 +282,7 @@ PicEdit::PicEdit(QWidget *parent, const char *name, int win_num, ResourcesWin *r
     drawmode->setLayout(drawbox);
     dmgrp->addButton(pic, 0);
     dmgrp->addButton(pri, 1);
-    connect(dmgrp, SIGNAL(buttonClicked(int)), SLOT(change_drawmode(int)));
+    connect(dmgrp, SIGNAL(idClicked(int)), SLOT(change_drawmode(int)));
     connect(bg, SIGNAL(clicked(bool)), SLOT(toggle_bgmode(bool)));
     connect(prilines, SIGNAL(clicked(bool)), SLOT(toggle_prilinemode(bool)));
 

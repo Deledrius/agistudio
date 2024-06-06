@@ -272,8 +272,7 @@ LogEdit::LogEdit(QWidget *parent, const char *name, int win_num, ResourcesWin *r
         status->addWidget(msg, 4);
         all->addWidget(status);
 
-        connect(editor, SIGNAL(cursorPositionChanged(int, int)),
-                this, SLOT(update_line_num(int, int)));
+        connect(editor, SIGNAL(cursorPositionChanged()), this, SLOT(update_line_num()));
     }
 
     getmaxcol();
@@ -807,10 +806,10 @@ void LogEdit::command_help()
 }
 
 //***********************************************
-void LogEdit::update_line_num(int para, int pos)
+void LogEdit::update_line_num()
 {
     QString str;
-    QTextStream(&str) << pos << ", " << para;
+    QTextStream(&str) << editor->textCursor().positionInBlock() << ", " << editor->textCursor().blockNumber();
     status->showMessage(str);
 }
 

@@ -358,9 +358,9 @@ ViewEdit::ViewEdit(QWidget *parent, const char *name, int win_num, ResourcesWin 
 
     QButtonGroup *bg = new QButtonGroup(frame2);
     bg->setExclusive(true);
-    bg->addButton(view_draw);
-    bg->addButton(view_fill, 1);
-    connect(bg, SIGNAL(buttonClicked(int)), SLOT(change_mode(int)));
+    bg->addButton(view_draw, V_DRAW);
+    bg->addButton(view_fill, V_FILL);
+    connect(bg, SIGNAL(idClicked(int)), SLOT(change_mode(int)));
 
 
     QGridLayout *grid3 = new QGridLayout();

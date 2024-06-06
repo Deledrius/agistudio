@@ -95,7 +95,7 @@ public slots:
     void goto_cb();
     void context_help();
     void command_help();
-    void update_line_num(int para, int pos);
+    void update_line_num();
 protected:
     int LogicNum;
     int winnum;
