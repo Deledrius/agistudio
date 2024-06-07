@@ -91,11 +91,11 @@ Menu::Menu(QWidget *parent, const char *name)
     game->addMenu(new_game);
     game->addAction("&Open", this, SLOT(open_game()));
     id[n++] = game->addAction("&Close", this, SLOT(close_game()));
-    id[n++] = game->addAction("&Run", this, SLOT(run_game()), Qt::CTRL + Qt::Key_R);
+    id[n++] = game->addAction("&Run", Qt::CTRL | Qt::Key_R, this, SLOT(run_game()));
     game->addSeparator();
     game->addAction("&Settings...", this, SLOT(settings()));
     game->addSeparator();
-    game->addAction("E&xit", this, SLOT(quit_cb()), Qt::ALT + Qt::Key_F4);
+    game->addAction("E&xit", Qt::ALT | Qt::Key_F4, this, SLOT(quit_cb()));
 
     QMenu *resource = new QMenu(this);
     Q_CHECK_PTR(resource);
@@ -126,7 +126,7 @@ Menu::Menu(QWidget *parent, const char *name)
     Q_CHECK_PTR(help);
     help->setTitle("&Help");
     help->addAction("&Contents", this, SLOT(help_contents()));
-    help->addAction("&Index", this, SLOT(help_index()), Qt::Key_F1);
+    help->addAction("&Index", Qt::Key_F1, this, SLOT(help_index()));
     help->addSeparator();
     help->addAction("About", this, SLOT(about_it()));
     help->addAction("About QT", this, SLOT(about_qt()));

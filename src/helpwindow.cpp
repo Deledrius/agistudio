@@ -72,15 +72,15 @@ HelpWindow::HelpWindow(const QString &home_, const QString &_path, QWidget *pare
 
     QMenu *file = new QMenu(this);
     file->setTitle("&File");
-    file->addAction("&New Window", this, SLOT(newWindow()), Qt::ALT | Qt::Key_N);
-    file->addAction("&Open File", this, SLOT(openFile()), Qt::ALT | Qt::Key_O);
+    file->addAction("&New Window", Qt::ALT | Qt::Key_N, this, SLOT(newWindow()));
+    file->addAction("&Open File", Qt::ALT | Qt::Key_O, this, SLOT(openFile()));
     file->addSeparator();
-    file->addAction("&Close", this, SLOT(hide()), Qt::ALT | Qt::Key_Q);
+    file->addAction("&Close", Qt::ALT | Qt::Key_Q, this, SLOT(hide()));
 
     QMenu *go = new QMenu(this);
     go->setTitle("&Go");
-    backwardAction = go->addAction(QPixmap(back), "&Backward", browser, SLOT(backward()), Qt::ALT | Qt::Key_Left);
-    forwardAction = go->addAction(QPixmap(forward), "&Forward", browser, SLOT(forward()), Qt::ALT | Qt::Key_Right);
+    backwardAction = go->addAction(QPixmap(back), "&Backward", Qt::ALT | Qt::Key_Left, browser, SLOT(backward()));
+    forwardAction = go->addAction(QPixmap(forward), "&Forward", Qt::ALT | Qt::Key_Right, browser, SLOT(forward()));
     go->addAction(QPixmap(home), "&Home", browser, SLOT(home()));
 
     hist = new QMenu(this);

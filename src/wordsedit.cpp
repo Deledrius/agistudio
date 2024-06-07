@@ -82,7 +82,7 @@ WordsEdit::WordsEdit(QWidget *parent, const char *name, int win_num, ResourcesWi
     words->addSeparator();
     words->addAction("Count word groups", this, SLOT(count_groups_cb()));
     words->addAction("Count words", this, SLOT(count_words_cb()));
-    words->addAction("&Find...", this, SLOT(find_cb()), Qt::CTRL + Qt::Key_F);
+    words->addAction("&Find...", Qt::CTRL | Qt::Key_F, this, SLOT(find_cb()));
 
 
     QMenuBar *menu = new QMenuBar(this);

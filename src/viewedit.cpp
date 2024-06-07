@@ -97,8 +97,8 @@ ViewEdit::ViewEdit(QWidget *parent, const char *name, int win_num, ResourcesWin 
     edit->setTitle("&Edit");
     edit->addAction("&Undo", this, SLOT(undo_cel()));
     edit->addSeparator();
-    edit->addAction("&Copy cel", this, SLOT(copy_cel()), Qt::CTRL + Qt::Key_C);
-    edit->addAction("&Paste cel", this, SLOT(paste_cel()), Qt::CTRL + Qt::Key_V);
+    edit->addAction("&Copy cel", Qt::CTRL | Qt::Key_C, this, SLOT(copy_cel()));
+    edit->addAction("&Paste cel", Qt::CTRL | Qt::Key_V, this, SLOT(paste_cel()));
 
     QMenu *loop = new QMenu(this);
     Q_CHECK_PTR(loop);

@@ -227,11 +227,11 @@ LogEdit::LogEdit(QWidget *parent, const char *name, int win_num, ResourcesWin *r
         Q_CHECK_PTR(file);
         file->setTitle("&File");
         file->addAction("&Read from file", this, SLOT(read_logic()));
-        file->addAction("&Save", this, SLOT(save_logic()), Qt::CTRL + Qt::Key_S);
+        file->addAction("&Save", Qt::CTRL | Qt::Key_S, this, SLOT(save_logic()));
         file->addAction("Save &as", this, SLOT(save_as()));
-        file->addAction("&Compile", this, SLOT(compile_logic()), Qt::Key_F9);
+        file->addAction("&Compile", Qt::Key_F9, this, SLOT(compile_logic()));
         file->addAction("Compile all", this, SLOT(compile_all_logic()));
-        file->addAction("Compile all and run", this, SLOT(compile_and_run()), Qt::Key_F10);
+        file->addAction("Compile all and run", Qt::Key_F10, this, SLOT(compile_and_run()));
         file->addAction("Change logic number", this, SLOT(change_logic_number()));
         file->addSeparator();
         file->addAction("&Delete", this, SLOT(delete_logic()));
@@ -242,21 +242,21 @@ LogEdit::LogEdit(QWidget *parent, const char *name, int win_num, ResourcesWin *r
         QMenu *edit = new QMenu(this);
         Q_CHECK_PTR(edit);
         edit->setTitle("&Edit");
-        edit->addAction("Cu&t", editor, SLOT(cut()), Qt::CTRL + Qt::Key_X);
-        edit->addAction("&Copy", editor, SLOT(copy()), Qt::CTRL + Qt::Key_C);
-        edit->addAction("&Paste", editor, SLOT(paste()), Qt::CTRL + Qt::Key_V);
+        edit->addAction("Cu&t", Qt::CTRL | Qt::Key_X, editor, SLOT(cut()));
+        edit->addAction("&Copy", Qt::CTRL | Qt::Key_C, editor, SLOT(copy()));
+        edit->addAction("&Paste", Qt::CTRL | Qt::Key_V, editor, SLOT(paste()));
         edit->addSeparator();
         edit->addAction("Clear &all", this, SLOT(clear_all()));
         edit->addSeparator();
-        edit->addAction("&Find", this, SLOT(find_cb()), Qt::CTRL + Qt::Key_F);
-        edit->addAction("Fi&nd again", this, SLOT(find_again()), Qt::Key_F3);
+        edit->addAction("&Find", Qt::CTRL | Qt::Key_F, this, SLOT(find_cb()));
+        edit->addAction("Fi&nd again", Qt::Key_F3, this, SLOT(find_again()));
         edit->addSeparator();
-        edit->addAction("&Go to line", this, SLOT(goto_cb()), Qt::ALT + Qt::Key_G);
+        edit->addAction("&Go to line", Qt::ALT | Qt::Key_G, this, SLOT(goto_cb()));
 
         QMenu *help = new QMenu(this);
         Q_CHECK_PTR(help);
         help->setTitle("&Help");
-        help->addAction("&Context help", this, SLOT(context_help()), Qt::Key_F1);
+        help->addAction("&Context help", Qt::Key_F1, this, SLOT(context_help()));
         help->addAction("&All commands", this, SLOT(command_help()));
 
         QMenuBar *menu = new QMenuBar(this);
@@ -836,7 +836,7 @@ TextEdit::TextEdit(QWidget *parent, const char *name, int win_num)
     file->setTitle("&File");
     file->addAction("&New", this, SLOT(new_text()));
     file->addAction("&Open", this, SLOT(open()));
-    file->addAction("&Save", this, SLOT(save()), Qt::CTRL + Qt::Key_S);
+    file->addAction("&Save", Qt::CTRL | Qt::Key_S, this, SLOT(save()));
     file->addAction("Save &as", this, SLOT(save_as()));
     file->addSeparator();
     file->addAction("&Close", this, SLOT(close()));
@@ -844,14 +844,14 @@ TextEdit::TextEdit(QWidget *parent, const char *name, int win_num)
     QMenu *edit = new QMenu(this);
     Q_CHECK_PTR(edit);
     edit->setTitle("&Edit");
-    edit->addAction("Cu&t", editor, SLOT(cut()), Qt::CTRL + Qt::Key_X);
-    edit->addAction("&Copy", editor, SLOT(copy()), Qt::CTRL + Qt::Key_C);
-    edit->addAction("&Paste", editor, SLOT(paste()), Qt::CTRL + Qt::Key_V);
+    edit->addAction("Cu&t", Qt::CTRL | Qt::Key_X, editor, SLOT(cut()));
+    edit->addAction("&Copy", Qt::CTRL | Qt::Key_C, editor, SLOT(copy()));
+    edit->addAction("&Paste", Qt::CTRL | Qt::Key_V, editor, SLOT(paste()));
     edit->addSeparator();
     edit->addAction("Clea&r all", this, SLOT(clear_all()));
     edit->addSeparator();
-    edit->addAction("&Find", this, SLOT(find_cb()), Qt::CTRL + Qt::Key_F);
-    edit->addAction("Fi&nd again", this, SLOT(find_again()), Qt::Key_F3);
+    edit->addAction("&Find", Qt::CTRL | Qt::Key_F, this, SLOT(find_cb()));
+    edit->addAction("Fi&nd again", Qt::Key_F3, this, SLOT(find_again()));
 
     QMenuBar *menu = new QMenuBar(this);
     Q_CHECK_PTR(menu);
