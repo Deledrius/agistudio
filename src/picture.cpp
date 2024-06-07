@@ -39,7 +39,8 @@ static bool picDrawEnabled0, priDrawEnabled0;
 static int picColour0, priColour0;
 
 //*********************************************************
-Picture::Picture()
+Picture::Picture() :
+    brushSize(1), brushTexture(), brushShape()
 {
     picPos = picStart = picLast = NULL;
     this->freeList();

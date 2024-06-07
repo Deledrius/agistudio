@@ -202,7 +202,7 @@ PicEdit::PicEdit(QWidget *parent, const char *name, int win_num, ResourcesWin *r
 
     QSpinBox *size = new QSpinBox(lsize);
     size->setMinimum(1);
-    size->setMinimum(7);
+    size->setMaximum(7);
     size->setValue(1);
     sizebox->addWidget(size);
     lsize->setLayout(sizebox);
@@ -1279,8 +1279,8 @@ void Palette1::mousePressEvent(QMouseEvent *event)
     w = dx * 9;
     h = dy * 2;
 
-    x = event->x() / dx;
-    y = event->y() / dy;
+    x = event->pos().x() / dx;
+    y = event->pos().y() / dy;
 
     if (x >= 8) //choose "off"
         i = -1;
