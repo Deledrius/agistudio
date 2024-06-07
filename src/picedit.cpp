@@ -839,8 +839,8 @@ PCanvas::PCanvas(QWidget *parent, const char *name, PicEdit *w)
     picedit = w;
     picture = picedit->picture;
     pixsize = 2;
-    x0 = 5;
-    y0 = 5;
+    x0 = 0;
+    y0 = 0;
     cur_w = MAX_W * pixsize;
     cur_h = MAX_HH * pixsize;
     pixmap = QPixmap(cur_w, cur_h);
@@ -882,7 +882,7 @@ void PCanvas::setPixsize(int s)
 //*********************************************
 void PCanvas::mousePressEvent(QMouseEvent *event)
 {
-    int x = event->x(), y = event->y();
+    int x = event->pos().x(), y = event->pos().y();
     int xx = x, yy = y;
 
     x -= x0;
@@ -918,7 +918,7 @@ void PCanvas::mousePressEvent(QMouseEvent *event)
 //*********************************************
 void PCanvas::mouseMoveEvent(QMouseEvent *event)
 {
-    int x = event->x(), y = event->y();
+    int x = event->pos().x(), y = event->pos().y();
     int xx = x, yy = y;
 
     x -= x0;
