@@ -89,8 +89,8 @@ protected:
     void picPSet(word x, word y);
     void priPSet(word x, word y);
     void pset(word x, word y);
-    byte picGetPixel(word x, word y);
-    byte priGetPixel(word x, word y);
+    byte picGetPixel(word x, word y) const;
+    byte priGetPixel(word x, word y) const;
     int round(float aNumber, float dirn);
     void drawline(word x1, word y1, word x2, word y2);
     bool okToFill(byte x, byte y);
@@ -188,8 +188,8 @@ protected:
     void picPSet(word x, word y);
     void priPSet(word x, word y);
     void pset(word x, word y);
-    byte picGetPixel(word x, word y);
-    byte priGetPixel(word x, word y);
+    byte picGetPixel(word x, word y) const;
+    byte priGetPixel(word x, word y) const;
     int round(float aNumber, float dirn);
     void drawline(word x1, word y1, word x2, word y2);
     bool okToFill(byte x, byte y);

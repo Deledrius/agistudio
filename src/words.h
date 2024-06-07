@@ -47,13 +47,13 @@ public:
     int delete_group(int num);
     int delete_word(char *word, int SelectedGroup);
     int change_number(int oldnum, int newnum);
-    int GetWordGroupIndex(int GroupNum);
-    int GetNew_GroupIndex(int GroupNum);
+    int GetWordGroupIndex(int GroupNum) const;
+    int GetNew_GroupIndex(int GroupNum) const;
     void merge(const WordList &w);
-    int GroupIndexOfWord(std::string word);
+    int GroupIndexOfWord(std::string word) const;
     bool OKToReplaceWord(std::string TheWord, int OldGroupNum, int NewGroupNum);
     bool InsertWordGroup(int GroupNum);
-    bool GroupExists(int GroupNum);
+    bool GroupExists(int GroupNum) const;
 };
 
 

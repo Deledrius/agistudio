@@ -69,7 +69,7 @@ static int ReadMSLSWord(void)
 }
 
 //***************************************************
-int WordList::GetNew_GroupIndex(int GroupNum)
+int WordList::GetNew_GroupIndex(int GroupNum) const
 {
     int CurIndex;
 
@@ -83,7 +83,7 @@ int WordList::GetNew_GroupIndex(int GroupNum)
 }
 
 //************************************************
-int WordList::GetWordGroupIndex(int GroupNum)
+int WordList::GetWordGroupIndex(int GroupNum) const
 {
     int CurIndex;
 
@@ -404,7 +404,7 @@ int WordList::change_number(int oldnum, int newnum)
 }
 
 //************************************************************
-bool WordList::GroupExists(int GroupNum)
+bool WordList::GroupExists(int GroupNum) const
 {
     int CurGroupIndex;
     if (NumGroups > 0) {
@@ -453,7 +453,7 @@ bool WordList::InsertWordGroup(int GroupNum)
 }
 
 //************************************************************
-int WordList::GroupIndexOfWord(std::string word)
+int WordList::GroupIndexOfWord(std::string word) const
 //returns the group index of the group containing the specified word}
 {
     for (int i = 0; i < NumGroups; i++) {

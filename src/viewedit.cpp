@@ -1229,7 +1229,7 @@ void ViewEdit::undo_cel()
 }
 
 /*************************************************/
-int ViewEdit::curIndex()
+int ViewEdit::curIndex() const
 {
     int i = view->loops[view->CurLoop].mirror;
     if (i == -1)
@@ -1590,7 +1590,7 @@ void Canvas::mouseMoveEvent(QMouseEvent *event)
 }
 
 //*********************************************
-void Canvas::drawContents(QPainter *p, int, int, int, int)
+void Canvas::drawContents(QPainter *p, int, int, int, int) const
 {
     if (cur_w == 0 || cur_h == 0)
         return;

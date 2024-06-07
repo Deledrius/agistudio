@@ -92,7 +92,7 @@ public slots:
     void clear_all();
     void find_cb();
     void find_again();
-    void goto_cb();
+    void goto_cb() const;
     void context_help();
     void command_help();
     void update_line_num();

@@ -89,7 +89,7 @@ protected:
     void keyPressEvent(QKeyEvent *);
     void mousePressEvent(QMouseEvent *e);
     void mouseMoveEvent(QMouseEvent *e);
-    void drawContents(QPainter *p, int, int, int, int);
+    void drawContents(QPainter *p, int, int, int, int) const;
     bool focusNextPrevChild(bool next) ;
 };
 
@@ -237,7 +237,7 @@ protected:
     void showmirror();
     void showlooppar();
     void showcelpar();
-    int curIndex();
+    int curIndex() const;
     void saveundo();
     bool focusNextPrevChild(bool next) ;
 };

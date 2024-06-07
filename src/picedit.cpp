@@ -955,7 +955,7 @@ void PCanvas::mouseMoveEvent(QMouseEvent *event)
 }
 
 //*********************************************
-void PCanvas::drawContents(QPainter *p, int, int, int, int)
+void PCanvas::drawContents(QPainter *p, int, int, int, int) const
 {
     if (cur_w == 0 || cur_h == 0)
         return;

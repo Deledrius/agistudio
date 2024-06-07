@@ -737,7 +737,7 @@ void LogEdit::new_room()
 
 }
 //***********************************************
-void LogEdit::goto_cb()
+void LogEdit::goto_cb() const
 {
     AskNumber *ask_number = new AskNumber(0, 0, "Go to line",
                                           "Go to line: ");

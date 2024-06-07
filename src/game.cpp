@@ -477,7 +477,7 @@ std::string Game::FindAGIV3GameID(const char *name)
 }
 
 //*******************************************************
-long Game::GetAGIVersionNumber(void)
+long Game::GetAGIVersionNumber(void) const
 {
     int ResPos, x;
     byte VerLen;
@@ -628,7 +628,7 @@ int Game::ReadResource(char ResType_c, int ResNum)
 }
 
 //***************************************
-FILE *Game::OpenPatchVol(int PatchVol, int *filesize)
+FILE *Game::OpenPatchVol(int PatchVol, int *filesize) const
 {
     FILE *fptr;
 

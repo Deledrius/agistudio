@@ -131,7 +131,7 @@ void BPicture::pset(word x, word y)
 **
 ** Get colour at x,y on the picture page.
 **************************************************************************/
-byte BPicture::picGetPixel(word x, word y)
+byte BPicture::picGetPixel(word x, word y) const
 {
     word vx, vy;
 
@@ -150,7 +150,7 @@ byte BPicture::picGetPixel(word x, word y)
 **
 ** Get colour at x,y on the priority page.
 **************************************************************************/
-byte BPicture::priGetPixel(word x, word y)
+byte BPicture::priGetPixel(word x, word y) const
 {
     word vx, vy;
 

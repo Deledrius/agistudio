@@ -94,7 +94,7 @@ protected:
     void keyPressEvent(QKeyEvent *);
     void mousePressEvent(QMouseEvent *e);
     void mouseMoveEvent(QMouseEvent *e);
-    void drawContents(QPainter *p, int clipx, int clipy, int clipw, int cliph) ;
+    void drawContents(QPainter *p, int clipx, int clipy, int clipw, int cliph) const;
     bool focusNextPrevChild(bool next) ;
 };
 

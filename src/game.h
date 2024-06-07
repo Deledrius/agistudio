@@ -84,9 +84,9 @@ public:
 private:
     long AGIVersionNumber;
     std::string FindAGIV3GameID(const char *name);
-    long GetAGIVersionNumber(void);
+    long GetAGIVersionNumber(void) const;
     int ReadV3Resource(char ResourceType, int ResourceID);
-    FILE *OpenPatchVol(int PatchVol, int *filesize);
+    FILE *OpenPatchVol(int PatchVol, int *filesize) const;
     FILE *OpenDirUpdate(int *dirsize, int ResType);
 };
 
