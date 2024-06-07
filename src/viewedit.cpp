@@ -1537,11 +1537,11 @@ void Description::cancel_cb()
 
 //**********************************************
 Canvas::Canvas(QWidget *parent, const char *name, ViewEdit *v)
-    : QScrollArea(parent)
+    : QScrollArea(parent), CurColor(), data()
 {
     viewedit = v;
-    x0 = 10;
-    y0 = 10;
+    x0 = 0;
+    y0 = 0;
     pixsize = 2;
     cur_mirror = false;
     pixmap = QPixmap();
@@ -1572,7 +1572,7 @@ void Canvas::setSize(int w, int h)
 //*********************************************
 void Canvas::mousePressEvent(QMouseEvent *event)
 {
-    int x = event->x(), y = event->y();
+    int x = event->pos().x(), y = event->pos().y();
 
     if (event->button() & Qt::LeftButton)
         CurColor = viewedit->palette->left;
@@ -1585,7 +1585,7 @@ void Canvas::mousePressEvent(QMouseEvent *event)
 //*********************************************
 void Canvas::mouseMoveEvent(QMouseEvent *event)
 {
-    int x = event->x(), y = event->y();
+    int x = event->pos().x(), y = event->pos().y();
     UpdateCel(x - x0, y - y0);
 }
 
