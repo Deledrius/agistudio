@@ -30,7 +30,6 @@
 #endif
 #include <sys/stat.h>
 
-#include "linklist.h"
 #include "picture.h"
 #include "menu.h"
 
@@ -40,63 +39,50 @@ static int picColour0, priColour0;
 
 //*********************************************************
 Picture::Picture() :
-    brushSize(1), brushTexture(), brushShape()
-{
-    picPos = picStart = picLast = NULL;
-    this->freeList();
-    bg_on = false;
-}
+    brushSize(1), brushTexture(), brushShape(), picPos(picCodes.begin()),
+    bg_on(false)
+{ }
 
 //*********************************************************
-char  *Picture::showPos(int *code, int *val)
+const QString Picture::showPos(byte *code, byte *val) const
 //show current picture buffer position
 {
-    char tmp1[6];
-    tmp[0] = 0;
-    struct picCodeNode *temp;
+    QString codestring;
     int count;
+    actionListIter tempIter;
 
-    if (picPos) {
-        *code = picPos->node;
-        if (picPos->next)
-            *val = picPos->next->node;
+    if (picPos != picCodes.end()) {
+        *code = *picPos;
+        if (std::next(picPos) != picCodes.end())
+            *val = *std::next(picPos);
     }
-    for (temp = picPos, count = 0; ((count < 6) && (temp != NULL)); count++, temp = temp->next) {
-        sprintf(tmp1, "%02X", temp->node);
-        strcat(tmp, tmp1);
+    for (tempIter = picPos, count = 0; ((count < 6) && (tempIter != picCodes.end())); count++, tempIter++) {
+        codestring += QString("%1").arg(QString::number(*tempIter, 16), 2, QChar('0'));
     }
-    return tmp;
+    return codestring;
+}
+
+const size_t Picture::getPos() const {
+    return std::distance(picCodes.begin(), (actionList::const_iterator)picPos);
 }
 
 //*********************************************************
 int Picture::setBufPos(int inputValue)
 //set current picture buffer position to inputValue
 {
-    if ((inputValue < 0) || (inputValue > bufLen))
+    if ((inputValue < 0) || (inputValue > picCodes.size()))
         return 1;
 
-    if (inputValue == bufLen) {
-        picPos = NULL;
-        bufPos = inputValue;
+    if (inputValue == picCodes.size()) {
+        picPos = picCodes.end();
     } else {
-        /* Find given location */
-        while (bufPos != inputValue) {
-            if (inputValue < bufPos) {
-                if (picPos == NULL)
-                    picPos = picLast;
-                else
-                    picPos = picPos->prior;
-                bufPos--;
-            } else {
-                picPos = picPos->next;
-                bufPos++;
-            }
-        }
+        /* Advance to requested location */
+        picPos = picCodes.begin();
+        std::advance(picPos, inputValue);
 
-        /* Find current action position */
-        while (picPos->node < 0xF0) {
-            picPos = picPos->prior;
-            bufPos--;
+        /* Walk backward to the beginning of the current action position */
+        while (*picPos < 0xF0) {
+            picPos--;
         }
     }
     draw();
@@ -131,29 +117,25 @@ byte Picture::qretrieve()
 **
 ** Gets the next picture code from the linked list.
 **************************************************************************/
-byte Picture::getCode(struct picCodeNode **temp)
+byte Picture::getCode(actionListIter *pos) const
 {
     byte retVal;
 
-    if (*temp == NULL)
-        return 0xFF;
+    if (*pos == picCodes.end())
+        return DrawEnd;
 
-    retVal = (*temp)->node;
-    *temp = (*temp)->next;
+    retVal = **pos;
+    (*pos)++;
 
     return retVal;
 }
 
-byte Picture::testCode(struct picCodeNode **temp)
+byte Picture::testCode(actionListIter *pos) const
 {
-    byte retVal;
-
-    if (*temp == NULL)
+    if (*pos == picCodes.end())
         return 0xFF;
 
-    retVal = (*temp)->node;
-
-    return retVal;
+    return **pos;
 }
 
 
@@ -350,31 +332,30 @@ void Picture::agiFill(word x, word y)
 **
 ** Draws an xCorner  (drawing action 0xF5)
 **************************************************************************/
-void Picture::xCorner(struct picCodeNode **temp)
+void Picture::xCorner(actionListIter *pos)
 {
     byte x1, x2, y1, y2;
 
-    x1 = getCode(temp);
-    y1 = getCode(temp);
+    x1 = getCode(pos);
+    y1 = getCode(pos);
 
     pset(x1, y1);
 
     for (;;) {
-        x2 = getCode(temp);
-        if (x2 >= 0xF0)
+        x2 = getCode(pos);
+        if (x2 >= action_codes_start)
             break;
         drawline(x1, y1, x2, y1);
         x1 = x2;
-        y2 = getCode(temp);
-        if (y2 >= 0xF0)
+        y2 = getCode(pos);
+        if (y2 >= action_codes_start)
             break;
         drawline(x1, y1, x1, y2);
         y1 = y2;
     }
 
-    if (*temp == NULL)
-        *temp = NULL;
-    else *temp = (*temp)->prior;
+    if (*pos != picCodes.begin())
+        (*pos)--;
 }
 
 /**************************************************************************
@@ -382,31 +363,30 @@ void Picture::xCorner(struct picCodeNode **temp)
 **
 ** Draws an yCorner  (drawing action 0xF4)
 **************************************************************************/
-void Picture::yCorner(struct picCodeNode **temp)
+void Picture::yCorner(actionListIter *pos)
 {
     byte x1, x2, y1, y2;
 
-    x1 = getCode(temp);
-    y1 = getCode(temp);
+    x1 = getCode(pos);
+    y1 = getCode(pos);
 
     pset(x1, y1);
 
     for (;;) {
-        y2 = getCode(temp);
-        if (y2 >= 0xF0)
+        y2 = getCode(pos);
+        if (y2 >= action_codes_start)
             break;
         drawline(x1, y1, x1, y2);
         y1 = y2;
-        x2 = getCode(temp);
-        if (x2 >= 0xF0)
+        x2 = getCode(pos);
+        if (x2 >= action_codes_start)
             break;
         drawline(x1, y1, x2, y1);
         x1 = x2;
     }
 
-    if (*temp == NULL)
-        *temp = NULL;
-    else *temp = (*temp)->prior;
+    if (*pos != picCodes.begin())
+        (*pos)--;
 }
 
 /**************************************************************************
@@ -414,19 +394,19 @@ void Picture::yCorner(struct picCodeNode **temp)
 **
 ** Draws short lines relative to last position.  (drawing action 0xF7)
 **************************************************************************/
-void Picture::relativeDraw(struct picCodeNode **temp)
+void Picture::relativeDraw(actionListIter *pos)
 {
     byte x1, y1, disp;
     char dx, dy;
 
-    x1 = getCode(temp);
-    y1 = getCode(temp);
+    x1 = getCode(pos);
+    y1 = getCode(pos);
 
     pset(x1, y1);
 
     for (;;) {
-        disp = getCode(temp);
-        if (disp >= 0xF0)
+        disp = getCode(pos);
+        if (disp >= action_codes_start)
             break;
         dx = ((disp & 0xF0) >> 4) & 0x0F;
         dy = (disp & 0x0F);
@@ -439,9 +419,8 @@ void Picture::relativeDraw(struct picCodeNode **temp)
         y1 += dy;
     }
 
-    if (*temp == NULL)
-        *temp = NULL;
-    else *temp = (*temp)->prior;
+    if (*pos != picCodes.begin())
+        (*pos)--;
 }
 
 /**************************************************************************
@@ -449,21 +428,20 @@ void Picture::relativeDraw(struct picCodeNode **temp)
 **
 ** Agi flood fill.  (drawing action 0xF8)
 **************************************************************************/
-void Picture::fill(struct picCodeNode **temp)
+void Picture::fill(actionListIter *pos)
 {
     byte x1, y1;
 
     for (;;) {
-        if ((x1 = getCode(temp)) >= 0xF0)
+        if ((x1 = getCode(pos)) >= action_codes_start)
             break;
-        if ((y1 = getCode(temp)) >= 0xF0)
+        if ((y1 = getCode(pos)) >= action_codes_start)
             break;
         agiFill(x1, y1);
     }
 
-    if (*temp == NULL)
-        *temp = NULL;
-    else *temp = (*temp)->prior;
+    if (*pos != picCodes.end())
+        (*pos)--;
 }
 
 /**************************************************************************
@@ -471,28 +449,27 @@ void Picture::fill(struct picCodeNode **temp)
 **
 ** Draws long lines to actual locations (cf. relative) (drawing action 0xF6)
 **************************************************************************/
-void Picture::absoluteLine(struct picCodeNode **temp)
+void Picture::absoluteLine(actionListIter *pos)
 {
     byte x1, y1, x2, y2;
 
-    x1 = getCode(temp);
-    y1 = getCode(temp);
+    x1 = getCode(pos);
+    y1 = getCode(pos);
 
     pset(x1, y1);
 
     for (;;) {
-        if ((x2 = getCode(temp)) >= 0xF0)
+        if ((x2 = getCode(pos)) >= action_codes_start)
             break;
-        if ((y2 = getCode(temp)) >= 0xF0)
+        if ((y2 = getCode(pos)) >= action_codes_start)
             break;
         drawline(x1, y1, x2, y2);
         x1 = x2;
         y1 = y2;
     }
 
-    if (*temp == NULL)
-        *temp = NULL;
-    else *temp = (*temp)->prior;
+    if (*pos != picCodes.begin())
+        (*pos)--;
 }
 
 
@@ -581,64 +558,44 @@ void Picture::plotPattern(byte x, byte y)
 **
 ** Plots points and various brush patterns.
 **************************************************************************/
-void Picture::plotBrush(struct picCodeNode **temp)
+void Picture::plotBrush(actionListIter *pos)
 {
     byte x1, y1;
 
     for (;;) {
         if (patCode & 0x20) {
-            if ((patNum = getCode(temp)) >= 0xF0)
+            if ((patNum = getCode(pos)) >= action_codes_start)
                 break;
             patNum = (patNum >> 1 & 0x7f);
         }
-        if ((x1 = getCode(temp)) >= 0xF0)
+        if ((x1 = getCode(pos)) >= action_codes_start)
             break;
-        if ((y1 = getCode(temp)) >= 0xF0)
+        if ((y1 = getCode(pos)) >= action_codes_start)
             break;
         plotPattern(x1, y1);
     }
 
-    if (*temp == NULL)
-        *temp = NULL;
-    else *temp = (*temp)->prior;
+    if (*pos != picCodes.begin())
+        (*pos)--;
 }
 
 //********************************************************************
 void Picture::load(byte *picdata, int picsize)
 {
     byte nodeData;
-    struct picCodeNode *temp = NULL;
-    bool stillLoading = true;
 
-    //init link list
-    picPos = picStart = picLast = NULL;
-    addMode = INS_MODE;
-    bufPos = bufLen = 0;
+    picCodes.clear();
 
     do {
         nodeData = *picdata++;
         picsize--;
-        if (nodeData != 0xFF) {
-            temp = (struct picCodeNode *)malloc(sizeof(picCodes));
-            if (temp == NULL) {
-                printf("Error allocating memory while loading picture.\n");
-                exit(1);
-            }
-            /*  was in the original code but doesn't work
-            if (isFirst) {
-                picStart = temp;
-                isFirst = false;
-             }
-                   */
-            temp->node = nodeData;
-            dlstore(temp);
-        } else
-            stillLoading = false;
+        if (nodeData != DrawEnd) {
+            picCodes.emplace_back(nodeData);
+        }
+        else
+            break;
 
-    } while (picsize && stillLoading);
-
-    picLast = temp;
-    picPos = NULL;
+    } while (picsize);
 }
 
 //*************************************************
@@ -703,30 +660,30 @@ int Picture::save(char *filename)
 void Picture::save()
 {
     byte *ptr = ResourceData.Data;
-    struct picCodeNode *temp;
+    actionListIter pos;
 
-    if (picStart == NULL) {   /* Black picture */
-        *ptr = 0xFF; /* End of picture marker */
+    if (picCodes.empty()) {   /* Black picture */
+        *ptr = action_codes_end; /* End of picture marker */
         ResourceData.Size = 1;
-        return ;
+        return;
     }
 
-    temp = picStart;
-    *ptr++ = temp->node;
+    pos = picCodes.begin();
+    *ptr++ = *pos;
 
     do {
-        temp = temp->next;
-        *ptr++ = temp->node;
-    } while (temp->next != NULL);
+        pos++;
+        *ptr++ = *pos;
+    } while (pos != picCodes.end());
 
-    *ptr++ = 0xFF; /* End of picture marker */
+    *ptr++ = action_codes_end; /* End of picture marker */
     ResourceData.Size = (int)(ptr - ResourceData.Data);
 }
 
 //*************************************************
-void Picture::refill(struct picCodeNode *temp_fill_start, struct picCodeNode *temp_fill_end, int refmode)
+void Picture::refill(actionListIter pos_fill_start, actionListIter pos_fill_end, int refmode)
 {
-    struct picCodeNode *temp, *picPos0, *temp_pic = 0, *temp_pri = 0;
+    actionListIter pos, picPos0, temp_pic, temp_pri;
     int col_pic_orig, col_pri_orig, col_pic_new, col_pri_new;
     bool picDrawEnabled_orig, priDrawEnabled_orig;
     bool picDrawEnabled_new, priDrawEnabled_new;
@@ -734,42 +691,42 @@ void Picture::refill(struct picCodeNode *temp_fill_start, struct picCodeNode *te
 
     picDrawEnabled_orig = priDrawEnabled_orig = false;
     col_pic_orig = col_pri_orig = -1;
-    temp = temp_fill_start;
+    pos = pos_fill_start;
     draw_pic_orig = draw_pri_orig = false;
 
     do {
-        temp = temp->prior;
-        if (temp == NULL)
+        if (pos == picCodes.begin())
             break;
-        switch (temp->node) {
-            case 0xf0:
+        pos--;
+        switch (*pos) {
+            case SetPicColor:
                 if (col_pic_orig == -1) {
-                    col_pic_orig = (temp->next)->node;
+                    col_pic_orig = *std::next(pos);
                     picDrawEnabled_orig = true;
-                    temp_pic = temp;
+                    temp_pic = pos;
                 }
                 break;
-            case 0xf1:
+            case EnablePriority:
                 if (col_pic_orig == -1) {
                     col_pic_orig = -2;
-                    temp_pic = temp;
+                    temp_pic = pos;
                 }
                 break;
-            case 0xf2:
+            case SetPriColor:
                 if (col_pri_orig == -1) {
-                    col_pri_orig = (temp->next)->node;
+                    col_pri_orig = *std::next(pos);
                     priDrawEnabled_orig = true;
-                    temp_pri = temp;
+                    temp_pri = pos;
                 }
                 break;
-            case 0xf3:
+            case EnableVisual:
                 if (col_pri_orig == -1) {
                     col_pri_orig = -2;
-                    temp_pri = temp;
+                    temp_pri = pos;
                 }
                 break;
             default:
-                if (temp->node >= 0xf4 && temp->node < 0xff) {
+                if (*pos >= YCorner && *pos < DrawEnd) {
                     if (col_pic_orig == -1)
                         draw_pic_orig = true;
                     if (col_pri_orig == -1)
@@ -780,30 +737,30 @@ void Picture::refill(struct picCodeNode *temp_fill_start, struct picCodeNode *te
     } while (col_pic_orig == -1 || col_pri_orig == -1); //find the fill original color
 
     picPos0 = picPos;
-    picPos = temp_fill_start;
+    picPos = pos_fill_start;
 
     if ((refmode | 1) && picDrawEnabled0) {
         if (picDrawEnabled_orig) {
             if (col_pic != col_pic_orig) {
                 if (col_pic == 15) {
                     if (draw_pic_orig)
-                        addCode(0xf1);
+                        addCode(EnablePriority);
                     else {
-                        temp_pic->node = 0xf1;
-                        picPos = temp_pic->next;
+                        *temp_pic = EnablePriority;
+                        picPos = std::next(temp_pic);
                         dldelete();
                     }
                 } else { //col_pic != 15
                     if (draw_pic_orig) {
-                        addCode(0xf0);
+                        addCode(SetPicColor);
                         addCode(col_pic);
                     } else
-                        (temp_pic->next)->node = col_pic;
+                        *std::next(temp_pic) = col_pic;
                 }
             }
         } else { //!picDrawEnabled_orig
             if (col_pic != 15) {
-                addCode(0xf0);
+                addCode(SetPicColor);
                 addCode(col_pic);
             }
         }
@@ -814,52 +771,51 @@ void Picture::refill(struct picCodeNode *temp_fill_start, struct picCodeNode *te
             if (col_pri != col_pri_orig) {
                 if (col_pri == 4) {
                     if (draw_pri_orig)
-                        addCode(0xf3);
+                        addCode(EnableVisual);
                     else {
-                        temp_pri->node = 0xf3;
-                        picPos = temp_pri->next;
+                        *temp_pri = EnableVisual;
+                        picPos = std::next(temp_pri);
                         dldelete();
                     }
                 } else { //col_pri != 4
                     if (draw_pri_orig) {
-                        addCode(0xf2);
+                        addCode(SetPriColor);
                         addCode(col_pri);
                     } else
-                        (temp_pri->next)->node = col_pri;
+                        *std::next(temp_pri) = col_pri;
                 }
             }
         } else { //!priDrawEnabled_orig
             if (col_pri != 4) {
-                addCode(0xf2);
+                addCode(SetPriColor);
                 addCode(col_pri);
             }
         }
     }
 
-
-    temp = temp_fill_end;
+    pos = pos_fill_end;
     picDrawEnabled_new = priDrawEnabled_new = false;
     col_pic_new = col_pri_new = -1;
     draw_pic_new = draw_pri_new = false;
-    if (temp) {
+    if (pos != picCodes.end()) {
         do {
-            switch (temp->node) {
-                case 0xf0:
-                    col_pic_new = (temp->next)->node;
+            switch (*pos) {
+                case SetPicColor:
+                    col_pic_new = *std::next(pos);
                     picDrawEnabled_new = true;
                     break;
-                case 0xf1:
+                case EnablePriority:
                     col_pic_new = -2;
                     break;
-                case 0xf2:
-                    col_pri_new = (temp->next)->node;
+                case SetPriColor:
+                    col_pri_new = *std::next(pos);
                     priDrawEnabled_new = true;
                     break;
-                case 0xf3:
+                case EnableVisual:
                     col_pri_new = -2;
                     break;
                 default:
-                    if (temp->node >= 0xf4 && temp->node < 0xff) {
+                    if (*pos >= YCorner && *pos < DrawEnd) {
                         if (col_pic_new == -1)
                             draw_pic_new = true;
                         if (col_pri_new == -1)
@@ -867,11 +823,11 @@ void Picture::refill(struct picCodeNode *temp_fill_start, struct picCodeNode *te
                     }
                     break;
             }
-            temp = temp->next;
-        } while (temp && (col_pic_orig == -1 || col_pri_orig == -1));
+            pos++;
+        } while ((pos != picCodes.end()) && (col_pic_orig == -1 || col_pri_orig == -1));
 
 
-        picPos = temp_fill_end;
+        picPos = pos_fill_end;
         if ((refmode | 1) && picDrawEnabled0) {
             if (col_pic != col_pic_orig) {
                 if (draw_pic_new) {
@@ -880,7 +836,7 @@ void Picture::refill(struct picCodeNode *temp_fill_start, struct picCodeNode *te
                         addCode(col_pic_orig);
                     } else {
                         if (col_pic != 0x15)
-                            addCode(0xf1);
+                            addCode(EnablePriority);
                     }
                 }
             }
@@ -894,7 +850,7 @@ void Picture::refill(struct picCodeNode *temp_fill_start, struct picCodeNode *te
                         addCode(col_pri_orig);
                     } else {
                         if (col_pri != 0x4)
-                            addCode(0xf3);
+                            addCode(EnableVisual);
                     }
                 }
             }
@@ -909,7 +865,7 @@ void Picture::refill(struct picCodeNode *temp_fill_start, struct picCodeNode *te
 void Picture::draw()
 {
     byte action;
-    struct picCodeNode *temp, *temp_fill_start, *temp_fill_end;
+    actionListIter pos, pos_fill_start, pos_fill_end;
     int refmode;
     bool finishedPic = false;
     int pC, pN;
@@ -923,55 +879,55 @@ void Picture::draw()
     picColour = priColour = 0;
     tool = -1;
 
-    if ((picStart != NULL) && (picLast != NULL)) {
+    if (!picCodes.empty()) {
 
         pC = patCode;
         pN = patNum;
         patCode = patNum = 0;
 
-        temp = picStart;
+        pos = picCodes.begin();
 
-        if (picPos != picStart)
+        if (picPos != picCodes.begin())
             do {
-                action = getCode(&temp);
+                action = getCode(&pos);
 
                 switch (action) {
 
-                    case 0xF0:
-                        picColour = getCode(&temp);
+                    case SetPicColor:
+                        picColour = getCode(&pos);
                         picDrawEnabled = true;
                         break;
-                    case 0xF1:
+                    case EnablePriority:
                         picDrawEnabled = false;
                         break;
-                    case 0xF2:
-                        priColour = getCode(&temp);
+                    case SetPriColor:
+                        priColour = getCode(&pos);
                         priDrawEnabled = true;
                         break;
-                    case 0xF3:
+                    case EnableVisual:
                         priDrawEnabled = false;
                         break;
-                    case 0xF4:
+                    case YCorner:
                         tool = T_STEP;
-                        yCorner(&temp);
+                        yCorner(&pos);
                         break;
-                    case 0xF5:
+                    case XCorner:
                         tool = T_STEP;
-                        xCorner(&temp);
+                        xCorner(&pos);
                         break;
-                    case 0xF6:
+                    case AbsoluteLine:
                         tool = T_LINE;
-                        absoluteLine(&temp);
+                        absoluteLine(&pos);
                         break;
-                    case 0xF7:
+                    case RelativeLine:
                         tool = T_PEN;
-                        relativeDraw(&temp);
+                        relativeDraw(&pos);
                         break;
-                    case 0xF8:
+                    case Fill:
                         tool = T_FILL;
-                        temp_fill_start = temp->prior;
-                        fill(&temp);
-                        temp_fill_end = temp;
+                        pos_fill_start = std::prev(pos);
+                        fill(&pos);
+                        pos_fill_end = pos;
                         if (refill_pic || refill_pri) {
                             //find which FILL filled the selected area
                             refmode = 0;
@@ -984,32 +940,94 @@ void Picture::draw()
                                 refmode |= 2;
                             }
                             if (refmode)
-                                refill(temp_fill_start, temp_fill_end, refmode);
+                                refill(pos_fill_start, pos_fill_end, refmode);
                             if (!refill_pic && !refill_pri)
                                 return;
                         }
                         break;
-                    case 0xF9:
-                        patCode = getCode(&temp);
+                    case SetPattern:
+                        patCode = getCode(&pos);
                         break;
-                    case 0xFA:
+                    case Brush:
                         tool = T_BRUSH;
-                        plotBrush(&temp);
+                        plotBrush(&pos);
                         break;
-                    case 0xFF:
+                    case DrawEnd:
                         finishedPic = true;
                         break;
                     default:
-                        printf("Unknown picture code : %X\n", action);
-                        printf("%p %p %p\n", picLast, picPos, temp);
+                        printf("Unknown picture code : %X", action);
                         break;
                 }
 
-            } while ((temp != picPos) && !finishedPic);
+            } while ((pos != picPos) && !finishedPic);
 
         patCode = pC;
         patNum = pN;
     }
+}
+
+//**************************************************
+
+void Picture::dldelete()
+{
+    // Remove the node currently pointed to by picPos.
+
+    if (picPos == picCodes.end())
+        return;
+    picPos = picCodes.erase(picPos);
+}
+
+void Picture::removeAction()
+{
+    // Remove all nodes up to, but not including, the next action.
+
+    if (picPos != picCodes.end()) {
+        dldelete();
+        while ((picPos != picCodes.end()) && (*picPos < action_codes_start))
+            dldelete();
+    }
+}
+
+void Picture::wipeAction()
+{
+    // Remove all nodes up to the end of the list.
+
+    if (picPos != picCodes.end()) {
+        dldelete();
+        while (picPos != picCodes.end())
+            dldelete();
+    }
+}
+
+void Picture::moveBackAction()
+{
+    if (picCodes.empty() || (picPos == picCodes.begin()))
+        return;
+
+    // Back up until we find the previous Action code.
+    do {
+        if (picPos != picCodes.begin()) {
+            picPos--;
+        } else
+            break;
+    } while (*picPos < action_codes_start);
+}
+
+void Picture::moveForwardAction()
+{
+    if (picCodes.empty() || (picPos == picCodes.end()))
+        return;
+
+    // Look ahead until we find the next Action code.
+    auto searchPos = std::next(picPos);
+    while (searchPos != picCodes.end()) {
+        if (*searchPos >= action_codes_start) {
+            break;
+        }
+        searchPos++;
+    }
+    picPos = searchPos;
 }
 
 //**************************************************
@@ -1018,7 +1036,6 @@ void Picture::init()
     clear_tools();
 
     priDrawEnabled = picDrawEnabled = false;
-    addMode = INS_MODE;
     curp = &points0;
     points0.n = points1.n = 0;
     newp = &points;
@@ -1028,39 +1045,23 @@ void Picture::init()
 //**************************************************
 void Picture::newpic()
 {
-    freeList();
+    picCodes.clear();
+    picPos = picCodes.begin();
     draw();
     init();
 }
 
 //**************************************************
-void Picture::addCode(byte code)   /* To the list */
+void Picture::addCode(byte code)
 {
-    struct picCodeNode *temp;
-
-    temp = (struct picCodeNode *)malloc(sizeof(picCodes));
-    if (temp == 0) {
-        printf("Memory allocation problem.");
-        exit(0);
-    }
-    temp->node = code;
-    dlstore(temp);
+    picCodes.insert(picPos, code);
 }
 
 //**************************************************
 void Picture::replaceCode(byte code)
 {
-    struct picCodeNode *temp;
-
-    temp = (struct picCodeNode *)malloc(sizeof(picCodes));
-    if (temp == 0) {
-        printf("Memory allocation problem.");
-        exit(0);
-    }
-    temp->node = code;
-    addMode = OVR_MODE;
-    dlstore(temp);
-    addMode = INS_MODE;
+    picCodes.insert(picPos, code);
+    picPos = picCodes.erase(picPos);
 }
 
 //**************************************************
@@ -1111,7 +1112,7 @@ void Picture::init_tool()
 //**************************************************
 void Picture::home_proc()
 {
-    moveToStart();
+    picPos = picCodes.begin();
     draw();
     init_tool();
 }
@@ -1135,7 +1136,7 @@ void Picture::right_proc()
 //**************************************************
 void Picture::end_proc()
 {
-    moveToEnd();
+    picPos = picCodes.end();
     draw();
     init_tool();
 }
@@ -1549,32 +1550,30 @@ void Picture::normline2(int x1, int y1, int x2, int y2)
 //***************************************************
 void Picture::viewData(QStringList *data)
 {
-    struct picCodeNode *temp;
-    byte c;
-    char tmp1[6];
+    QString line, temp;
 
     data->clear();
 
-    if (picStart == NULL) {   /* Black picture */
+    if (picCodes.empty()) {   /* Black picture */
         data->append("ff");
-        return ;
+        return;
     }
 
-    temp = picStart;
-    tmp[0] = 0;
-    for (temp = picStart; temp != NULL; temp = temp->next) {
-        c = temp->node;
-        if (c >= 0xf0 && tmp[0]) {
-            data->append(tmp);
-            sprintf(tmp, "%02x ", c);
-        } else {
-            sprintf(tmp1, "%02x ", c);
-            strcat(tmp, tmp1);
+    for (auto const& node : picCodes) {
+        if (node >= action_codes_start && !line.isEmpty()) {
+            data->append(line);
+            line.clear();
+            line = QString("%1 ").arg(QString::number(node, 16), 2, QChar('0'));
+        }
+        else {
+            temp = QString("%1 ").arg(QString::number(node, 16), 2, QChar('0'));
+            line += temp;
         }
     }
-    if (tmp1[0] != 0) {
-        strcat(tmp, tmp1);
-        data->append(tmp);
+
+    if (!temp.isEmpty()) {
+        line += temp;
+        data->append(line);
     }
     data->append("ff");
 }

@@ -11,6 +11,7 @@ project(AGIStudio
 		HOMEPAGE_URL https://deledrius.github.io/agistudio/)
 message(STATUS "Project version: " ${PROJECT_VERSION_FULL})
 
+set(CMAKE_CXX_STANDARD 20)
 include(GNUInstallDirs)
 
 # Create a group for the help files
