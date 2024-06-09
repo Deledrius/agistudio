@@ -16,7 +16,6 @@ set(AGIStudio_HEADERS
     game.h
     global.h
     helpwindow.h
-    linklist.h
     logedit.h
     logic.h
     menu.h
@@ -82,7 +81,6 @@ set(AGIStudio_SOURCES
     bpicture.cpp
     game.cpp
     helpwindow.cpp
-    linklist.cpp
     logcompile.cpp
     logdecode.cpp
     logedit.cpp

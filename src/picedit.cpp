@@ -89,7 +89,7 @@ static const char *colname[] = {
 
 //***************************************
 PicEdit::PicEdit(QWidget *parent, const char *name, int win_num, ResourcesWin *res)
-    : QWidget(parent)
+    : QWidget(parent), PicNum(-1)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle("Picture Editor");
@@ -659,16 +659,13 @@ void PicEdit::change_type(int k)
 void PicEdit::show_pos()
 //show current picture buffer position
 {
-    char *t;
-    int code = 0, val = -1;
-    sprintf(tmp, "%5d", picture->bufPos);
-    pos->setText(tmp);
-    t = picture->showPos(&code, &val);
-    codeline->setText(t);
-    if (code >= 0xf0 && code <= 0xff) { //action: can add comments
-        if (code == 0xf0 || code == 0xf2) { //add color name
-            sprintf(tmp, "%s %s", comment[code - 0xf0], colname[val]);
-            comments->setText(tmp);
+    unsigned char code = 0, val = -1;
+    pos->setText(QString("%1").arg(QString::number(picture->getPos())));
+    codeline->setText(picture->showPos(&code, &val));
+
+    if (code >= 0xf0 && code <= 0xff) {         // Action: can add comments
+        if (code == 0xf0 || code == 0xf2) {     // Add color name
+            comments->setText(QString("%1 %2").arg(comment[code - 0xf0]).arg(colname[val]));
         } else
             comments->setText(comment[code - 0xf0]);
     } else

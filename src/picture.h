@@ -21,14 +21,10 @@
 #ifndef PICTURE_H
 #define PICTURE_H
 
-#ifndef __GNUCPP__
-#include <stdint.h>
-#endif
-
 #include <QImage>
 #include <QColor>
 
-#include "linklist.h"
+#include <list>
 
 #define MAX_W 320
 #define MAX_H 200
@@ -54,6 +50,25 @@ typedef uint8_t byte;
 
 #define QUMAX 4000
 #define EMPTY 0xFF
+
+enum draw_code {
+    SetPicColor     = 0xF0,
+    EnablePriority  = 0xF1,
+    SetPriColor     = 0xF2,
+    EnableVisual    = 0xF3,
+    YCorner         = 0xF4,
+    XCorner         = 0xF5,
+    AbsoluteLine    = 0xF6,
+    RelativeLine    = 0xF7,
+    Fill            = 0xF8,
+    SetPattern      = 0xF9,
+    Brush           = 0xFA,
+
+    ActionEnd       = 0xFF
+};
+
+constexpr uint8_t action_codes_start = draw_code::SetPicColor;
+constexpr uint8_t action_codes_end = draw_code::ActionEnd;
 
 
 typedef struct {
@@ -104,6 +119,8 @@ protected:
     void plotBrush(byte **data);
 };
 
+typedef std::list<byte> actionList;
+typedef std::list<byte>::iterator actionListIter;
 
 //'list' format picture - for edit
 class Picture
@@ -140,48 +157,36 @@ public:
     void set_brush(int mode, int val);
     int button_action(int newX, int newY);
     int move_action(int newX, int newY);
-    char *showPos(int *code, int *val);
+    const QString showPos(byte *code, byte *val) const;
+    const size_t getPos() const;
     int setBufPos(int);
     void viewData(QStringList *data);
     void status(int mode);
-    void refill(struct picCodeNode *temp_fill_start, struct picCodeNode *temp_fill_end, int mode);
+    void refill(actionListIter pos_fill_start, actionListIter pos_fill_end, int mode);
     int drawing_mode;
     int tool;
     int brushSize, brushShape, brushTexture;
     byte picColour, priColour, patCode, patNum, curcol;
     bool picDrawEnabled, priDrawEnabled;
-    int bufPos;    /* This variable holds current offset into buffer */
-    int bufLen;
     bool refill_pic, refill_pri;
     int refill_x, refill_y;
 protected:
-
-    struct picCodeNode picCodes;
-    struct picCodeNode *picPos;
-    struct picCodeNode *picStart;
-    struct picCodeNode *picLast;
+    actionList picCodes;
+    actionListIter picPos;
 
     byte buf[QUMAX + 1];
     word rpos, spos;
-    int addMode;
     bool add_pic, add_pri;
     int code_pic, col_pic, code_pri, col_pri;
 
     void dldelete();
     void removeAction();
     void wipeAction();
-    void dlstore(struct picCodeNode *i);
-    void displayList();
-    void freeList();
-    void moveBack();
-    void moveForward();
-    void moveToStart();
-    void moveToEnd();
     void moveBackAction();
     void moveForwardAction();
 
-    byte getCode(struct picCodeNode **temp);
-    byte testCode(struct picCodeNode **temp);
+    byte getCode(actionListIter *pos) const;
+    byte testCode(actionListIter *pos) const;
 
     void qstore(byte q);
     byte qretrieve();
@@ -194,13 +199,13 @@ protected:
     void drawline(word x1, word y1, word x2, word y2);
     bool okToFill(byte x, byte y);
     void agiFill(word x, word y);
-    void xCorner(struct picCodeNode **temp);
-    void yCorner(struct picCodeNode **temp);
-    void relativeDraw(struct picCodeNode **temp);
-    void fill(struct picCodeNode **temp);
-    void absoluteLine(struct picCodeNode **temp);
+    void xCorner(actionListIter *pos);
+    void yCorner(actionListIter *pos);
+    void relativeDraw(actionListIter *pos);
+    void fill(actionListIter *pos);
+    void absoluteLine(actionListIter *pos);
     void plotPattern(byte x, byte y);
-    void plotBrush(struct picCodeNode **temp);
+    void plotBrush(actionListIter *pos);
     void addCode(byte code);
     void replaceCode(byte code);
     void addPatCode();
