@@ -214,7 +214,6 @@ int Game::open(std::string name)
 
     if (!ErrorOccured) {
         AGIVersionNumber = GetAGIVersionNumber();
-        //printf("AGIVersion = %lu\n",AGIVersionNumber);
         CorrectCommands(AGIVersionNumber);
         isOpen = true;
         make_source_dir();
@@ -236,11 +235,11 @@ int Game::from_template(std::string name)
     dir = name;
     make_source_dir();
 
-    //check if template directory contains *dir files and vol.0
+    // Check if template directory contains *dir files and vol.0
     for (i = 0; i < 5; i++) {
         sprintf(tmp, "%s/%s", templatedir.c_str(), files[i]);
         if (stat(tmp, &buf)) {
-            menu->errmes("AGI Studio error", "Can't read %s in template directory %s !", files[i], templatedir.c_str());
+            menu->errmes("AGI Studio error", "Can't read %s in template directory %s!", files[i], templatedir.c_str());
             return 1;
         }
     }
@@ -1394,7 +1393,7 @@ void Game::read_settings()
 
 //*********************************************************
 void Game::save_settings()
-//save ~/.agistudio file
+// Save ~/.agistudio file
 {
     char *home;
     FILE *fptr;
@@ -1413,14 +1412,14 @@ void Game::save_settings()
     if (!home)
         home = getenv("home");
     if (!home) {
-        menu->errmes("Can't determine HOME environment variable !\nSettings were not saved.");
+        menu->errmes("Can't determine HOME environment variable!\nSettings were not saved.");
         return;
     }
 
     sprintf(tmp, "%s/.agistudio", home);
     fptr = fopen(tmp, "wb");
     if (!fptr) {
-        menu->errmes("Can't open file %s for writing !\nSettings were not saved.", tmp);
+        menu->errmes("Can't open file %s for writing!\nSettings were not saved.", tmp);
         return;
     }
     fprintf(fptr, "res_default=%d\n", res_default);

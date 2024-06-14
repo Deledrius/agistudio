@@ -675,7 +675,7 @@ void AddResource::ok_cb()
 
     if (num < 0 || num > 255) {
         menu->errmes("Resource number must be between 0 and 255 !");
-        return ;
+        return;
     }
 
     if (game->ResourceInfo[restype][num].Exists) {

@@ -97,22 +97,22 @@ void make_egacolors(void)
     if (ok)
         return;
 
-    egacolor[0] = QColor(0, 0, 0);     //black
-    egacolor[1] = QColor(0, 0, 0xa0);  //blue
-    egacolor[2] = QColor(0, 0xa0, 0);  //green
-    egacolor[3] = QColor(0, 0xa0, 0xa0); //cyan
-    egacolor[4] = QColor(0xa0, 0, 0);  //red
-    egacolor[5] = QColor(0xa0, 0, 0xa0); //magenta
-    egacolor[6] = QColor(0xa0, 0x50, 0); //brown
-    egacolor[7] = QColor(0xa0, 0xa0, 0xa0); //lightgray
-    egacolor[8] = QColor(0x50, 0x50, 0x50); //gray
-    egacolor[9] = QColor(0x50, 0x50, 0xff); //lightblue
-    egacolor[10] = QColor(0x50, 0xff, 0x50); //lightgreen
-    egacolor[11] = QColor(0x50, 0xff, 0xff); //lightcyan
-    egacolor[12] = QColor(0xff, 0x50, 0x50); //lightred
-    egacolor[13] = QColor(0xff, 0x50, 0xff); //lightmagenta
-    egacolor[14] = QColor(0xff, 0xff, 0x50); //yellow
-    egacolor[15] = QColor(0xff, 0xff, 0xff); //white
+    egacolor[0] =  QColor(0x00, 0x00, 0x00);    // black
+    egacolor[1] =  QColor(0x00, 0x00, 0xa0);    // blue
+    egacolor[2] =  QColor(0x00, 0xa0, 0x00);    // green
+    egacolor[3] =  QColor(0x00, 0xa0, 0xa0);    // cyan
+    egacolor[4] =  QColor(0xa0, 0x00, 0x00);    // red
+    egacolor[5] =  QColor(0xa0, 0x00, 0xa0);    // magenta
+    egacolor[6] =  QColor(0xa0, 0x50, 0x00);    // brown
+    egacolor[7] =  QColor(0xa0, 0xa0, 0xa0);    // lightgray
+    egacolor[8] =  QColor(0x50, 0x50, 0x50);    // gray
+    egacolor[9] =  QColor(0x50, 0x50, 0xff);    // lightblue
+    egacolor[10] = QColor(0x50, 0xff, 0x50);    // lightgreen
+    egacolor[11] = QColor(0x50, 0xff, 0xff);    // lightcyan
+    egacolor[12] = QColor(0xff, 0x50, 0x50);    // lightred
+    egacolor[13] = QColor(0xff, 0x50, 0xff);    // lightmagenta
+    egacolor[14] = QColor(0xff, 0xff, 0x50);    // yellow
+    egacolor[15] = QColor(0xff, 0xff, 0xff);    // white
 
     ok = true;
 }

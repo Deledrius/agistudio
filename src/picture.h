@@ -177,7 +177,7 @@ protected:
     byte buf[QUMAX + 1];
     word rpos, spos;
     bool add_pic, add_pri;
-    int code_pic, col_pic, code_pri, col_pri;
+    int  code_pic, col_pic, code_pri, col_pri;
 
     void dldelete();
     void removeAction();
@@ -211,7 +211,7 @@ protected:
     void addPatCode();
     void adjustDisp(int *dX, int *dY);
     int  clickX, clickY, dX, dY;
-    int stepClicks, numClicks;
+    int  stepClicks, numClicks;
     bool firstClick;
     void normline2(int x1, int y1, int x2, int y2);
     void putpix2(int x, int y);
