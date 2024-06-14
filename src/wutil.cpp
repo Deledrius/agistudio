@@ -162,8 +162,8 @@ void Palette::mousePressEvent(QMouseEvent *event)
     w = dx * 8;
     h = dy * 2;
 
-    x = event->x() / dx;
-    y = event->y() / dy;
+    x = event->position().x() / dx;
+    y = event->position().y() / dy;
     i = y * 8 + x;
 
     if (event->button() & Qt::LeftButton)
