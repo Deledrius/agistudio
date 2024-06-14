@@ -54,7 +54,7 @@ struct agi_note {
 
 struct channel_info {
     struct agi_note *ptr;
-    int32_t end;
+    bool end;
     int32_t freq;
     int32_t phase;
     int32_t vol;
@@ -179,7 +179,7 @@ void play_song(unsigned char *song, int size)
     for (uint8_t c = 0; c < NUM_CHANNELS; c++) {
         chn[c].ptr = (struct agi_note *)(song + (song[c << 1] | (song[(c << 1) + 1] << 8)));
         chn[c].timer = 0;
-        chn[c].end = 0;
+        chn[c].end = false;
     }
 
     QProgressDialog progress("Playing...", "Cancel", 0, 100);
@@ -208,7 +208,7 @@ void play_song(unsigned char *song, int size)
                 }
                 chn[c].timer = ((int)chn[c].ptr->dur_hi << 8) | chn[c].ptr->dur_lo;
                 if (chn[c].timer == 0xffff) {
-                    chn[c].end = 1;
+                    chn[c].end = true;
                     chn[c].vol = 0;
                 }
                 chn[c].ptr++;
