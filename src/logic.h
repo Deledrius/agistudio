@@ -21,6 +21,8 @@
 #ifndef LOGIC_H
 #define LOGIC_H
 
+#include <string>
+
 #include "words.h"
 #include "object.h"
 #include "agicommands.h"
@@ -39,9 +41,9 @@ public:
     Logic();
     WordList *wordlist;
     ObjList *objlist;
-    std::string OutputText;    //result of the decoding
-    std::string ErrorList;     //compilation error messages
-    unsigned int maxcol;  //max number of columns in window - used in formatting 'print' strings
+    std::string OutputText;     //result of the decoding
+    std::string ErrorList;      //compilation error messages
+    unsigned int maxcol;        //max number of columns in window - used in formatting 'print' strings
     int compile();
     int decode(int resnum);
 
