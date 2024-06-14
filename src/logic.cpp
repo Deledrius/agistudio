@@ -20,9 +20,6 @@
 
 #include "logic.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-
 Logic::Logic()
 {
     wordlist = new WordList();
