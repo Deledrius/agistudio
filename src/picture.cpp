@@ -997,6 +997,9 @@ void Picture::wipeAction()
 
 void Picture::moveBackAction()
 {
+    if (picCodes.empty() || (picPos == picCodes.begin()))
+        return;
+
     // Back up until we find the previous Action code.
     do {
         if (picPos != picCodes.begin()) {
@@ -1008,13 +1011,18 @@ void Picture::moveBackAction()
 
 void Picture::moveForwardAction()
 {
-    if (picCodes.empty())
+    if (picCodes.empty() || (picPos == picCodes.end()))
         return;
 
-    // Find the next Action code and move our iterator to it, if found.
-    auto is_action_code = [](unsigned char code) { return code >= action_codes_start; };
-    if (auto next_action = std::find_if(std::next(picPos), picCodes.end(), is_action_code); next_action != picCodes.end())
-        picPos = next_action;
+    // Look ahead until we find the next Action code.
+    auto searchPos = std::next(picPos);
+    while (searchPos != picCodes.end()) {
+        if (*searchPos >= action_codes_start) {
+            picPos = searchPos;
+            break;
+        }
+        searchPos++;
+    }
 }
 
 //**************************************************
