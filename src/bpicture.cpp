@@ -20,20 +20,16 @@
  *
  */
 
-#include "game.h"
-#include "menu.h"
-#include "picture.h"
-
-
 #include <stdio.h>
 #include <sys/types.h>
-#ifndef _WIN32
-#include <unistd.h>
-#endif
 #include <sys/stat.h>
 #include <stdlib.h>
 #include <ctype.h>
 #include <math.h>
+
+#include "game.h"
+#include "menu.h"
+#include "picture.h"
 
 BPicture *ppicture;
 
@@ -167,7 +163,7 @@ byte BPicture::priGetPixel(word x, word y) const
 /**************************************************************************
 ** round
 **
-** Rounds a float to the closest int. Takes into actions which direction
+** Rounds a float to the closest int. Takes into account which direction
 ** the current line is being drawn when it has a 50:50 decision about
 ** where to put a pixel.
 **************************************************************************/
@@ -296,12 +292,12 @@ void BPicture::xCorner(byte **data)
 
     for (;;) {
         x2 = *((*data)++);
-        if (x2 >= 0xF0)
+        if (x2 >= action_codes_start)
             break;
         drawline(x1, y1, x2, y1);
         x1 = x2;
         y2 = *((*data)++);
-        if (y2 >= 0xF0)
+        if (y2 >= action_codes_start)
             break;
         drawline(x1, y1, x1, y2);
         y1 = y2;
@@ -326,12 +322,12 @@ void BPicture::yCorner(byte **data)
 
     for (;;) {
         y2 = *((*data)++);
-        if (y2 >= 0xF0)
+        if (y2 >= action_codes_start)
             break;
         drawline(x1, y1, x1, y2);
         y1 = y2;
         x2 = *((*data)++);
-        if (x2 >= 0xF0)
+        if (x2 >= action_codes_start)
             break;
         drawline(x1, y1, x2, y1);
         x1 = x2;
@@ -357,7 +353,7 @@ void BPicture::relativeDraw(byte **data)
 
     for (;;) {
         disp = *((*data)++);
-        if (disp >= 0xF0)
+        if (disp >= action_codes_start)
             break;
         dx = ((disp & 0xF0) >> 4) & 0x0F;
         dy = (disp & 0x0F);
@@ -383,9 +379,9 @@ void BPicture::fill(byte **data)
     byte x1, y1;
 
     for (;;) {
-        if ((x1 = *((*data)++)) >= 0xF0)
+        if ((x1 = *((*data)++)) >= action_codes_start)
             break;
-        if ((y1 = *((*data)++)) >= 0xF0)
+        if ((y1 = *((*data)++)) >= action_codes_start)
             break;
         agiFill(x1, y1);
     }
@@ -408,9 +404,9 @@ void BPicture::absoluteLine(byte **data)
     pset(x1, y1);
 
     for (;;) {
-        if ((x2 = *((*data)++)) >= 0xF0)
+        if ((x2 = *((*data)++)) >= action_codes_start)
             break;
-        if ((y2 = *((*data)++)) >= 0xF0)
+        if ((y2 = *((*data)++)) >= action_codes_start)
             break;
         drawline(x1, y1, x2, y2);
         x1 = x2;
@@ -511,13 +507,13 @@ void BPicture::plotBrush(byte **data)
 
     for (;;) {
         if (patCode & 0x20) {
-            if ((patNum = *((*data)++)) >= 0xF0)
+            if ((patNum = *((*data)++)) >= action_codes_start)
                 break;
             patNum = (patNum >> 1 & 0x7f);
         }
-        if ((x1 = *((*data)++)) >= 0xF0)
+        if ((x1 = *((*data)++)) >= action_codes_start)
             break;
-        if ((y1 = *((*data)++)) >= 0xF0)
+        if ((y1 = *((*data)++)) >= action_codes_start)
             break;
         plotPattern(x1, y1);
     }
@@ -545,43 +541,43 @@ void BPicture::show(byte *picdata, int picsize)
     do {
         action = *(data++);
         switch (action) {
-            case 0xFF:
-                stillDrawing = 0;
-                break;
-            case 0xF0:
+            case SetPicColor:
                 picColour = *(data++);
                 picDrawEnabled = true;
                 break;
-            case 0xF1:
+            case EnablePriority:
                 picDrawEnabled = false;
                 break;
-            case 0xF2:
+            case SetPriColor:
                 priColour = *(data++);
                 priDrawEnabled = true;
                 break;
-            case 0xF3:
+            case EnableVisual:
                 priDrawEnabled = false;
                 break;
-            case 0xF4:
+            case YCorner:
                 yCorner(&data);
                 break;
-            case 0xF5:
+            case XCorner:
                 xCorner(&data);
                 break;
-            case 0xF6:
+            case AbsoluteLine:
                 absoluteLine(&data);
                 break;
-            case 0xF7:
+            case RelativeLine:
                 relativeDraw(&data);
                 break;
-            case 0xF8:
+            case Fill:
                 fill(&data);
                 break;
-            case 0xF9:
+            case SetPattern:
                 patCode = *(data++);
                 break;
-            case 0xFA:
+            case Brush:
                 plotBrush(&data);
+                break;
+            case DrawEnd:
+                stillDrawing = 0;
                 break;
             default:
                 printf("Unknown picture code : %X\n", action);
