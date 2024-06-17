@@ -64,11 +64,11 @@ enum draw_code {
     SetPattern      = 0xF9,
     Brush           = 0xFA,
 
-    ActionEnd       = 0xFF
+    DrawEnd         = 0xFF
 };
 
 constexpr uint8_t action_codes_start = draw_code::SetPicColor;
-constexpr uint8_t action_codes_end = draw_code::ActionEnd;
+constexpr uint8_t action_codes_end = draw_code::DrawEnd;
 
 
 typedef struct {
