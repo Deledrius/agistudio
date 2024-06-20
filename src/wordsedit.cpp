@@ -358,11 +358,11 @@ void WordsEdit::find_cb(void)
 }
 
 //********************************************************
-int WordsEdit::find_down(char *word)
+int WordsEdit::find_down(QString* word)
 {
     for (int i = FindLastGroup; i < wordlist->NumGroups; i++) {
         for (int k = FindLastWord; k < wordlist->WordGroup[i].Words.count(); k++) {
-            if (!QString::compare(wordlist->WordGroup[i].Words.at(k), word)) {
+            if (!QString::compare(wordlist->WordGroup[i].Words.at(k), *word)) {
                 FindLastWord = k;
                 FindLastGroup = i;
                 return 1;
@@ -376,11 +376,11 @@ int WordsEdit::find_down(char *word)
 }
 
 //********************************************************
-int WordsEdit::find_up(char *word)
+int WordsEdit::find_up(QString* word)
 {
     for (int i = FindLastGroup; i >= 0; i--) {
         for (int k = FindLastWord; k >= 0; k--) {
-            if (!QString::compare(wordlist->WordGroup[i].Words.at(k), word)) {
+            if (!QString::compare(wordlist->WordGroup[i].Words.at(k), *word)) {
                 FindLastWord = k;
                 FindLastGroup = i;
                 return 1;
@@ -446,13 +446,12 @@ void WordsEdit::add_word_cb(void)
 //********************************************************
 void WordsEdit::do_add_word(void)
 {
-    QString str = lineword->text();
-    char *word = str.toLatin1().data();
+    QString word = lineword->text();
 
     FindLastWord = 0;
     FindLastGroup = 0;
     int curgroup = listgroup->currentRow();
-    if (find_down(word)) {
+    if (find_down(&word)) {
         auto prompt = tr("This word already exists (in group %1).\nDo you wish to remove this occurance and add it to this group?").arg(wordlist->WordGroup[FindLastGroup].GroupNum);
 
         switch (QMessageBox::warning(this, tr("Remove duplicate word?"),
@@ -626,14 +625,14 @@ WordsFind::WordsFind(QWidget *parent, const char *name, WordsEdit *w)
 }
 
 //********************************************************
-int WordsFind::find_down(char *word)
+int WordsFind::find_down(QString* word)
 {
     bool sub = substring->isChecked();
 
     for (int i = FindLastGroup; i < wordlist->NumGroups; i++) {
         for (int k = FindLastWord; k < wordlist->WordGroup[i].Words.count(); k++) {
-            if ((sub && wordlist->WordGroup[i].Words.at(k).contains(word)) ||
-                    !QString::compare(wordlist->WordGroup[i].Words.at(k), word)) {
+            if ((sub && wordlist->WordGroup[i].Words.at(k).contains(*word)) ||
+                    !QString::compare(wordlist->WordGroup[i].Words.at(k), *word)) {
                 FindLastWord = k;
                 FindLastGroup = i;
                 return 1;
@@ -647,14 +646,14 @@ int WordsFind::find_down(char *word)
 }
 
 //********************************************************
-int WordsFind::find_up(char *word)
+int WordsFind::find_up(QString* word)
 {
     bool sub = substring->isChecked();
 
     for (int i = FindLastGroup; i >= 0; i--) {
         for (int k = FindLastWord; k >= 0; k--) {
-            if ((sub && wordlist->WordGroup[i].Words.at(k).contains(word)) ||
-                    !QString::compare(wordlist->WordGroup[i].Words.at(k), word)) {
+            if ((sub && wordlist->WordGroup[i].Words.at(k).contains(*word)) ||
+                    !QString::compare(wordlist->WordGroup[i].Words.at(k), *word)) {
                 FindLastWord = k;
                 FindLastGroup = i;
                 return 1;
@@ -672,8 +671,7 @@ int WordsFind::find_up(char *word)
 void WordsFind::find_first_cb()
 {
     int ret;
-    QString str = find_field->text();
-    char *word = str.toLatin1().data();
+    QString word = find_field->text();
 
     if (down->isChecked()) {
         if (start->isChecked()) {
@@ -689,7 +687,7 @@ void WordsFind::find_first_cb()
             else
                 FindLastWord = 0;
         }
-        ret = find_down(word);
+        ret = find_down(&word);
     } else {
         if (start->isChecked()) {
             FindLastGroup = wordlist->NumGroups - 1;
@@ -704,7 +702,7 @@ void WordsFind::find_first_cb()
             else
                 FindLastWord = wordlist->WordGroup[FindLastGroup].Words.count() - 1;
         }
-        ret = find_up(word);
+        ret = find_up(&word);
     }
 
     if (ret) {
@@ -718,8 +716,7 @@ void WordsFind::find_first_cb()
 void WordsFind::find_next_cb()
 {
     int ret;
-    QString str = find_field->text();
-    char *word = str.toLatin1().data();
+    QString word = find_field->text();
 
     if (FindLastGroup == -1 || FindLastWord == -1) {
         find_first_cb();
@@ -737,7 +734,7 @@ void WordsFind::find_next_cb()
             }
         } else
             FindLastWord++;
-        ret = find_down(word);
+        ret = find_down(&word);
     } else {
         if (FindLastWord - 1 < 0) {
             if (FindLastGroup - 1 < 0) {
@@ -749,7 +746,7 @@ void WordsFind::find_next_cb()
             }
         } else
             FindLastWord--;
-        ret = find_up(word);
+        ret = find_up(&word);
     }
 
     if (ret) {
