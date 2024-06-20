@@ -26,6 +26,7 @@
 #include "menu.h"
 #include "midi.h"
 #include "bmp2agipic.h"
+#include "picedit.h"
 
 #include <QHBoxLayout>
 #include <QLabel>

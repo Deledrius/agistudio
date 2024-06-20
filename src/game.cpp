@@ -22,34 +22,36 @@
  *
  */
 
-#include "menu.h"
-#include "resources.h"
-#include "agicommands.h"
-#include "game.h"
 
 #include <string>
+#include <filesystem>
 #include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <errno.h>
 #include <sys/types.h>
+#include <sys/stat.h>
+
 #ifdef _WIN32
 #include <io.h>
 #include <direct.h>
 #include <Windows.h>
 #include <ShlObj.h>
 #else
-#include <unistd.h>
 #include <glob.h>
-#include "game.h"
 #endif
-#include <sys/stat.h>
-#include <stdlib.h>
-#include <math.h>
-#include <errno.h>
 
 #include <QProgressDialog>
 #include <QMessageBox>
 #include <QDir>
 
-const char *ResTypeName[4] = {"logic", "picture", "view", "sound"};
+#include "menu.h"
+#include "resources.h"
+#include "agicommands.h"
+#include "game.h"
+#include "logedit.h"
+
+const char *ResTypeName[4] =  {"logic", "picture", "view", "sound"};
 const char *ResTypeAbbrv[4] = {"log", "pic", "view", "snd"};
 static const char *files[5] = {"vol.0", "viewdir", "logdir", "snddir", "picdir"};
 Game *game;

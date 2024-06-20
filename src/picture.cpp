@@ -32,6 +32,8 @@
 
 #include "picture.h"
 #include "menu.h"
+#include "game.h"
+#include "wutil.h"
 
 
 static bool picDrawEnabled0, priDrawEnabled0;
@@ -62,7 +64,7 @@ const QString Picture::showPos(byte *code, byte *val) const
     return codestring;
 }
 
-const size_t Picture::getPos() const {
+const uint32_t Picture::getPos() const {
     return std::distance(picCodes.begin(), (actionList::const_iterator)picPos);
 }
 

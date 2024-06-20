@@ -18,35 +18,20 @@
  *
  */
 
-#include "game.h"
-#include "menu.h"
-#include "wutil.h"
-#include "picture.h"
-#include "preview.h"
 
-#include <cstdlib>
-
-#include <QSpinBox>
-#include <QApplication>
+#include <QFileDialog>
 #include <QPainter>
-#include <QToolTip>
 #include <QKeyEvent>
-#include <QLabel>
 #include <QPixmap>
-#include <QHideEvent>
-#include <QResizeEvent>
+#include <QRadioButton>
+#include <QAbstractButton>
 #include <QMouseEvent>
 #include <QShowEvent>
-#include <QPaintEvent>
-#include <QCloseEvent>
-#include <QGroupBox>
 
-#include "left1_x.xpm"
-#include "left2_x.xpm"
-#include "right1_x.xpm"
-#include "right2_x.xpm"
-#include "zoom_minus_x.xpm"
-#include "zoom_plus_x.xpm"
+#include "game.h"
+#include "menu.h"
+#include "preview.h"
+#include "picedit.h"
 
 static const char *comment[] = {
     "pic colour",   //0xf0
@@ -89,231 +74,59 @@ static const char *colname[] = {
 
 //***************************************
 PicEdit::PicEdit(QWidget *parent, const char *name, int win_num, ResourcesWin *res)
-    : QWidget(parent), PicNum(-1)
+    : QMainWindow(parent), PicNum(-1), winnum(win_num), resources_win(res),
+      closing(false), changed(false), viewdata(nullptr), pri_mode(0)
 {
+    setupUi(this);
+
     setAttribute(Qt::WA_DeleteOnClose);
-    setWindowTitle("Picture Editor");
 
-    winnum = win_num;
-    resources_win = res;
     picture = new Picture();
+    palette = new Palette1(this, nullptr, this);
+    toolColumnLayout->replaceWidget(PaletteWidget, palette);
 
-    QMenu *file = new QMenu(this);
-    Q_CHECK_PTR(file);
-    file->setTitle("&File");
-    file->addAction("&New", this, SLOT(open()));
-    file->addAction("&Load from file", this, SLOT(open_file()));
-    file->addAction("&Save to game", this, SLOT(save_to_game()));
-    file->addAction("Save to game &as...", this, SLOT(save_to_game_as()));
-    file->addAction("Save to file", this, SLOT(save_file()));
-    file->addSeparator();
-    file->addAction("&Delete", this, SLOT(delete_picture()));
-    file->addSeparator();
-    file->addAction("&Close", this, SLOT(close()));
+    // Set RadioButton IDs, as they can't be set in the designer
+    toolButtonGroup->setId(lineButton, T_LINE);
+    toolButtonGroup->setId(penButton, T_PEN);
+    toolButtonGroup->setId(stepButton, T_STEP);
+    toolButtonGroup->setId(fillButton, T_FILL);
+    toolButtonGroup->setId(brushButton, T_BRUSH);
 
-    QMenu *util = new QMenu(this);
-    Q_CHECK_PTR(util);
-    util->setTitle("&Utilities");
-    util->addAction("&View data", this, SLOT(view_data()));
-    util->addAction("&Background", this, SLOT(background()));
+    toolShapeButtonGroup->setId(circleButton, 0);
+    toolShapeButtonGroup->setId(squareButton, 1);
 
-    QMenu *help = new QMenu(this);
-    Q_CHECK_PTR(help);
-    help->setTitle("&Help");
-    help->addAction("Help on picture &editor", this, SLOT(editor_help()));
+    toolTypeButtonGroup->setId(sprayButton, 0);
+    toolTypeButtonGroup->setId(solidButton, 1);
 
-    QMenuBar *menu = new QMenuBar(this);
-    Q_CHECK_PTR(menu);
-    menu->addMenu(file);
-    menu->addMenu(util);
-    menu->addMenu(help);
+    drawmodeButtonGroup->setId(visualLayerToggle, 0);
+    drawmodeButtonGroup->setId(priorityLayerToggle, 1);
 
-    QBoxLayout *all =  new QHBoxLayout(this);
-    all->setMenuBar(menu);
-
-    QBoxLayout *leftb = new QVBoxLayout(this);
-    all->addLayout(leftb);
-
-    QHBoxLayout *toollay = new QHBoxLayout();
-    toollay->setAlignment(Qt::AlignLeft);
-    QGroupBox *toolbox = new QGroupBox(this);
-    tool = new QButtonGroup(this);
-    line = new QRadioButton(tr("Line"), toolbox);
-    pen = new QRadioButton(tr("Pen"), toolbox);
-    step = new QRadioButton(tr("Step"), toolbox);
-    fill = new QRadioButton(tr("Fill"), toolbox);
-    brush = new QRadioButton(tr("Brush"), toolbox);
-    toollay->addWidget(line);
-    toollay->addWidget(pen);
-    toollay->addWidget(step);
-    toollay->addWidget(fill);
-    toollay->addWidget(brush);
-    tool->addButton(line, T_LINE);
-    tool->addButton(pen, T_PEN);
-    tool->addButton(step, T_STEP);
-    tool->addButton(fill, T_FILL);
-    tool->addButton(brush, T_BRUSH);
-    leftb->addWidget(toolbox);
-    toolbox->setLayout(toollay);
-    connect(tool, SIGNAL(idClicked(int)), SLOT(change_tool(int)));
-
-    QBoxLayout *b1 = new QHBoxLayout(this);
-    leftb->addLayout(b1);
-
-    palette = new Palette1(this, 0, this);
-    palette->setMinimumSize(250, 40);
-    palette->setMaximumSize(350, 80);
-    b1->addWidget(palette);
-
-    QBoxLayout *b2 = new QHBoxLayout(this);
-    leftb->addLayout(b2);
-
-    QVBoxLayout *shapebox = new QVBoxLayout();
-    QGroupBox *shape = new QGroupBox("Shape", this);
-    QButtonGroup *shapeGrp = new QButtonGroup(this);
-    QRadioButton *circle = new QRadioButton("Circle", shape);
-    QRadioButton *square = new QRadioButton("Square", shape);
-    circle->setChecked(true);
-    shapebox->addWidget(circle);
-    shapebox->addWidget(square);
-    b2->addWidget(shape);
-    shape->setLayout(shapebox);
-    shapeGrp->addButton(circle, 0);
-    shapeGrp->addButton(square, 1);
-    connect(shapeGrp, SIGNAL(idClicked(int)), SLOT(change_shape(int)));
-
-    QVBoxLayout *typebox = new QVBoxLayout();
-    QGroupBox *type = new QGroupBox("Type", this);
-    QButtonGroup *typeGrp = new QButtonGroup(this);
-    QRadioButton *spray = new QRadioButton("Spray", type);
-    QRadioButton *solid = new QRadioButton("Solid", type);
-    spray->setChecked(true);
-    typebox->addWidget(spray);
-    typebox->addWidget(solid);
-    b2->addWidget(type);
-    type->setLayout(typebox);
-    typeGrp->addButton(spray, 0);
-    typeGrp->addButton(solid, 1);
-    connect(typeGrp, SIGNAL(idClicked(int)), SLOT(change_type(int)));
-
-    QVBoxLayout *sizebox = new QVBoxLayout();
-    QGroupBox *lsize = new QGroupBox(tr("Size"), this); //vert
-    b2->addWidget(lsize);
-
-    QSpinBox *size = new QSpinBox(lsize);
-    size->setMinimum(1);
-    size->setMaximum(7);
-    size->setValue(1);
-    sizebox->addWidget(size);
-    lsize->setLayout(sizebox);
-    connect(size, SIGNAL(valueChanged(int)), SLOT(change_size(int)));
-
-    QHBoxLayout *b3 = new QHBoxLayout(this);
-    leftb->addLayout(b3);
-
-    QPushButton *home = new QPushButton(this);
-    home->setIcon(QPixmap(left2_x));
-    connect(home, SIGNAL(clicked()), SLOT(home_cb()));
-    b3->addWidget(home);
-    QPushButton *left = new QPushButton(this);
-    left->setIcon(QPixmap(left1_x));
-    connect(left, SIGNAL(clicked()), SLOT(left_cb()));
-    b3->addWidget(left);
-    pos = new QLineEdit(this);
-    pos->setMinimumWidth(64);
-    connect(pos, SIGNAL(returnPressed()), SLOT(set_pos()));
-    b3->addWidget(pos);
-    QPushButton *right = new QPushButton(this);
-    connect(right, SIGNAL(clicked()), SLOT(right_cb()));
-    right->setIcon(QPixmap(right1_x));
-    b3->addWidget(right);
-    QPushButton *end = new QPushButton(this);
-    connect(end, SIGNAL(clicked()), SLOT(end_cb()));
-    end->setIcon(QPixmap(right2_x));
-    b3->addWidget(end);
-    QPushButton *del = new QPushButton("Del", this);
-    connect(del, SIGNAL(clicked()), SLOT(del_cb()));
-    b3->addWidget(del);
-    QPushButton *wipe = new QPushButton("Wipe", this);
-    connect(wipe, SIGNAL(clicked()), SLOT(wipe_cb()));
-    b3->addWidget(wipe);
-
-    QBoxLayout *b31 = new QHBoxLayout(this);
-    leftb->addLayout(b31);
-
-    codeline = new QLineEdit(this);
-    codeline->setFocusPolicy(Qt::NoFocus);
-    b31->addWidget(codeline);
-
-    comments = new QLineEdit(this);
-    comments->setFocusPolicy(Qt::NoFocus);
-    b31->addWidget(comments);
-
-    QBoxLayout *b4 = new QHBoxLayout(this);
-    leftb->addLayout(b4);
-
-    QPushButton *zoom_minus = new QPushButton(this);
-    zoom_minus->setIcon(QPixmap(zoom_minus_x));
-    zoom_minus->setFixedSize(32, 32);
-    connect(zoom_minus, SIGNAL(clicked()), SLOT(zoom_minus()));
-    b4->addWidget(zoom_minus);
-
-    QPushButton *zoom_plus = new QPushButton(this);
-    zoom_plus->setIcon(QPixmap(zoom_plus_x));
-    zoom_plus->setFixedSize(32, 32);
-    connect(zoom_plus, SIGNAL(clicked()), SLOT(zoom_plus()));
-    b4->addWidget(zoom_plus);
-
-    QVBoxLayout *drawbox = new QVBoxLayout();
-    QGroupBox *drawmode = new QGroupBox("Show", this);
-    QButtonGroup *dmgrp = new QButtonGroup(this);
-    pic = new QRadioButton("Visual", drawmode);
-    pri = new QRadioButton("Priority", drawmode);
-    bg = new QCheckBox("Background", drawmode);
-    prilines = new QCheckBox("PriorityLines", drawmode);
-    drawbox->addWidget(pic);
-    drawbox->addWidget(pri);
-    drawbox->addWidget(bg);
-    drawbox->addWidget(prilines);
-    pic->setChecked(true);
-    pri_mode = false;
-    picture->set_mode(0);
-    b4->addWidget(drawmode);
-    drawmode->setLayout(drawbox);
-    dmgrp->addButton(pic, 0);
-    dmgrp->addButton(pri, 1);
-    connect(dmgrp, SIGNAL(idClicked(int)), SLOT(change_drawmode(int)));
-    connect(bg, SIGNAL(clicked(bool)), SLOT(toggle_bgmode(bool)));
-    connect(prilines, SIGNAL(clicked(bool)), SLOT(toggle_prilinemode(bool)));
-
-    status = new QStatusBar(this);
-    QLabel *msg = new QLabel(status);
-    status->addWidget(msg, 4);
-    pricolor = new QFrame(status);
+    // Create our custom statusbar display
+    QLabel* msg = new QLabel(statusbar);
+    statusbar->addPermanentWidget(msg);
+    pricolor = new QFrame(statusbar);
     pricolor->setMinimumSize(8, 8);
     pricolor->setMaximumSize(8, 8);
-    pricolor->setToolTip(tr("Priority 'color' required to mask an EGO on this priority level"));
-    status->addWidget(pricolor);
-    status->setSizeGripEnabled(false);
-    leftb->addWidget(status);
+    pricolor->setToolTip(tr("Priority 'color' required to mask Ego on this priority level"));
+    pricolor->setAutoFillBackground(true);
+    statusbar->addPermanentWidget(pricolor);
 
+    // Set up our custom canvas
     if (game->picstyle == P_TWO) {
-        canvas = new PCanvas(0, 0, this);
-        canvas->setMinimumSize(canvas->pixsize * MAX_W + canvas->x0 + 10, canvas->pixsize * MAX_HH + canvas->x0 + 10);
+        canvas = new PCanvas(nullptr, 0, this);
+        canvas->setMinimumSize(canvas->pixsize * MAX_W + canvas->x0 + 10, canvas->pixsize * MAX_HH + canvas->y0 + 10);
         canvas->resize(canvas->pixsize * MAX_W + canvas->x0, canvas->pixsize * MAX_HH + canvas->x0);
 
     } else {
         canvas = new PCanvas(this, 0, this);
-        canvas->setMinimumSize(canvas->pixsize * MAX_W + canvas->x0 + 10, canvas->pixsize * MAX_HH + canvas->x0 + 10);
-        canvas->resize(canvas->pixsize*MAX_W+canvas->x0,canvas->pixsize*MAX_HH+canvas->x0);
-        all->addWidget(canvas);
-        setFocusProxy(canvas);
+        canvas->setMinimumSize(canvas->pixsize * MAX_W + canvas->x0 + 10, canvas->pixsize * MAX_HH + canvas->y0 + 10);
+        canvas->resize(canvas->pixsize * MAX_W + canvas->x0, canvas->pixsize * MAX_HH + canvas->x0);
+        canvas->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+        canvasLayout->setAlignment(Qt::AlignLeft | Qt::AlignTop);
+        canvasLayout->addWidget(canvas);
     }
 
-    changed = false;
-    adjustSize();
-    viewdata = NULL;
-    closing = false;
+    change_drawmode(drawmodeButtonGroup->checkedId());
 }
 
 //*********************************************
@@ -337,10 +150,8 @@ void PicEdit::open(int ResNum)
     if (picture->open(ResNum))
         return;
     PicNum = ResNum;
-    sprintf(tmp, "Picture editor: picture.%03d", PicNum);
-    setWindowTitle(tmp);
-    if (canvas->isTopLevel())
-        canvas->setWindowTitle(tmp);
+    auto document_title = windowTitle() + QString(": picture.%1").arg(QString::number(PicNum), 3, '0');
+    setWindowTitle(document_title);
     canvas->update();
     show_pos();
     changed = false;
@@ -356,9 +167,6 @@ void PicEdit::open(char *filename)
     if (picture->open(filename))
         return;
     PicNum = -1;
-    setWindowTitle(tr("Picture Editor"));
-    if (canvas->isTopLevel())
-        canvas->setWindowTitle(tr("Picture Editor"));
     canvas->update();
     show_pos();
     changed = false;
@@ -383,7 +191,7 @@ void PicEdit::deinit()
         viewdata->close();
         viewdata = NULL;
     }
-    if (canvas->isTopLevel()) {
+    if (canvas->isWindow()) {
         closing = true;
         canvas->close();
     }
@@ -397,7 +205,7 @@ void PicEdit::deinit()
 void PicEdit::showEvent(QShowEvent *)
 {
     showing = true;
-    if (canvas->isTopLevel() && !canvas->isVisible())
+    if (canvas->isWindow() && !canvas->isVisible())
         canvas->showNormal();
     showing = false;
     if (window_list && window_list->isVisible())
@@ -408,7 +216,7 @@ void PicEdit::showEvent(QShowEvent *)
 void PicEdit::hideEvent(QHideEvent *)
 {
     hiding = true;
-    if (isMinimized() && canvas->isTopLevel() && canvas->isVisible())
+    if (isMinimized() && canvas->isWindow() && canvas->isVisible())
         canvas->showMinimized();
     hiding = false;
     if (viewdata) {
@@ -508,7 +316,6 @@ void PicEdit::save_to_game_as()
 //*********************************************
 void PicEdit::delete_picture()
 {
-    int k;
     if (PicNum == -1)
         return;
     switch (QMessageBox::warning(this, tr("Picture Editor"),
@@ -518,7 +325,7 @@ void PicEdit::delete_picture()
         case QMessageBox::Yes:
             game->DeleteResource(PICTURE, PicNum);
             if (resources_win) {
-                k = resources_win->list->currentRow();
+                int k = resources_win->list->currentRow();
                 resources_win->select_resource_type(PICTURE);
                 resources_win->list->setCurrentRow(k);
             }
@@ -533,8 +340,6 @@ void PicEdit::open()
 {
     picture->newpic();
     show_pos();
-    if (canvas->isTopLevel())
-        canvas->setWindowTitle("picture");
     canvas->update();
     show();
     canvas->show();
@@ -546,12 +351,11 @@ void PicEdit::open()
 void PicEdit::view_data()
 {
     if (viewdata == NULL)
-        viewdata = new ViewData(0, 0, picture);
+        viewdata = new ViewData(nullptr, nullptr, picture);
     if (PicNum != -1) {
-        sprintf(tmp, "View data: picture %03d", PicNum);
-        viewdata->setWindowTitle(tmp);
+        viewdata->setWindowTitle(QString(tr("View data: picture.%1")).arg(QString::number(PicNum), 3, '0'));
     } else
-        viewdata->setWindowTitle("View data: picture");
+        viewdata->setWindowTitle(tr("View data: picture"));
     viewdata->read();
 }
 
@@ -559,12 +363,14 @@ void PicEdit::view_data()
 void PicEdit::background()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open Background Image"), game->srcdir.c_str(), tr("All Files (*)"));
-    if (!fileName.isNull())
-        canvas->load_bg(fileName.toLatin1().data());
+    if (!fileName.isNull()) {
+        canvas->load_bg(fileName);
+        showBackground->setEnabled(true);
+    }
 }
 
 //*********************************************
-void PicEdit::zoom_minus()
+void PicEdit::on_zoomOutButton_clicked()
 {
     if (canvas->pixsize > 1) {
         canvas->setPixsize(canvas->pixsize - 1);
@@ -576,7 +382,7 @@ void PicEdit::zoom_minus()
 }
 
 //*********************************************
-void PicEdit::zoom_plus()
+void PicEdit::on_zoomInButton_clicked()
 {
     if (canvas->pixsize < 4) {
         canvas->setPixsize(canvas->pixsize + 1);
@@ -594,14 +400,14 @@ void PicEdit::change_drawmode(int mode)
         case 0:  //draw visual
             pri_mode = false;
             picture->set_mode(0);
-            pri->setChecked(false);
-            pic->setChecked(true);
+            priorityLayerToggle->setChecked(false);
+            visualLayerToggle->setChecked(true);
             break;
         case 1:  //draw priority
             pri_mode = true;
             picture->set_mode(1);
-            pic->setChecked(false);
-            pri->setChecked(true);
+            visualLayerToggle->setChecked(false);
+            priorityLayerToggle->setChecked(true);
             break;
     }
     canvas->linedraw = false;
@@ -635,6 +441,7 @@ void PicEdit::change_tool(int k)
     if (canvas->linedraw)
         canvas->line(false);
     picture->tool_proc(k);
+    update_tools();
 }
 
 //*********************************************
@@ -656,24 +463,48 @@ void PicEdit::change_type(int k)
 }
 
 //*********************************************
+void PicEdit::deselect_tool()
+{
+    QAbstractButton* checked = toolButtonGroup->checkedButton();
+    if (checked)
+    {
+        toolButtonGroup->setExclusive(false);
+        checked->setChecked(false);
+        toolButtonGroup->setExclusive(true);
+    }
+}
+
+//*********************************************
+void PicEdit::enable_background(bool mode)
+{
+    showBackground->setChecked(mode);
+}
+
+//*********************************************
+bool PicEdit::background_enabled() const
+{
+    return showBackground->isChecked();
+}
+
+//*********************************************
 void PicEdit::show_pos()
 //show current picture buffer position
 {
     unsigned char code = 0, val = -1;
-    pos->setText(QString("%1").arg(QString::number(picture->getPos())));
-    codeline->setText(picture->showPos(&code, &val));
+    actionFrameDisplay->setValue(picture->getPos());
+    actionCodeDisplay->setText(picture->showPos(&code, &val));
 
-    if (code >= 0xf0 && code <= 0xff) {         // Action: can add comments
-        if (code == 0xf0 || code == 0xf2) {     // Add color name
-            comments->setText(QString("%1 %2").arg(comment[code - 0xf0]).arg(colname[val]));
+    if (code >= action_codes_start && code <= action_codes_end) {       // Action: can add comments
+        if (code == SetPicColor || code == SetPriColor) {               // Add color name
+            actionCodeDesc->setText(QString("%1 %2").arg(comment[code - action_codes_start]).arg(colname[val]));
         } else
-            comments->setText(comment[code - 0xf0]);
+            actionCodeDesc->setText(comment[code - action_codes_start]);
     } else
-        comments->clear();
+        actionCodeDesc->clear();
 }
 
 //*********************************************
-void PicEdit::home_cb()
+void PicEdit::on_startButton_clicked()
 //set picture buffer position to start
 {
     picture->home_proc();
@@ -684,7 +515,7 @@ void PicEdit::home_cb()
 }
 
 //*********************************************
-void PicEdit::end_cb()
+void PicEdit::on_endButton_clicked()
 //set picture buffer position to end
 {
     picture->end_proc();
@@ -695,7 +526,7 @@ void PicEdit::end_cb()
 }
 
 //*********************************************
-void PicEdit::left_cb()
+void PicEdit::on_prevButton_clicked()
 //set picture buffer position to the previous action
 {
     picture->left_proc();
@@ -706,7 +537,7 @@ void PicEdit::left_cb()
 }
 
 //*********************************************
-void PicEdit::right_cb()
+void PicEdit::on_nextButton_clicked()
 //set picture buffer position to the next action
 {
     picture->right_proc();
@@ -717,7 +548,7 @@ void PicEdit::right_cb()
 }
 
 //*********************************************
-void PicEdit::del_cb()
+void PicEdit::on_delButton_clicked()
 //delete action from the picture buffer position
 {
     picture->del_proc();
@@ -728,7 +559,7 @@ void PicEdit::del_cb()
 }
 
 //*********************************************
-void PicEdit::wipe_cb()
+void PicEdit::on_wipeButton_clicked()
 //delete all action from the picture buffer position to the end
 {
     picture->wipe_proc();
@@ -742,17 +573,16 @@ void PicEdit::wipe_cb()
 void PicEdit::set_pos()
 //set picture buffer position
 {
-    QString str = pos->text();
-    char *s = str.toLatin1().data();
-    int num = atoi(s);
-    if (num != 0 || s[0] == '0') {
+    int num = actionFrameDisplay->value();
+
+    if (num != 0) {
         if (!picture->setBufPos(num))
             canvas->update();
     }
     show_pos();
     update_palette();
     update_tools();
-    pos->clearFocus();
+    actionFrameDisplay->clearFocus();
     setFocus();
     return;
 }
@@ -760,29 +590,36 @@ void PicEdit::set_pos()
 //*********************************************
 void PicEdit::update_tools()
 {
+    shapeGroup->setEnabled(false);
+    typeGroup->setEnabled(false);
+    sizeGroup->setEnabled(false);
+
     switch (picture->tool) {
         case T_LINE:
-            if (!line->isChecked())
-                line->setChecked(true);
+            if (!lineButton->isChecked())
+                lineButton->setChecked(true);
             break;
         case T_STEP:
-            if (!step->isChecked())
-                step->setChecked(true);
+            if (!stepButton->isChecked())
+                stepButton->setChecked(true);
             break;
         case T_PEN:
-            if (!pen->isChecked())
-                pen->setChecked(true);
+            if (!penButton->isChecked())
+                penButton->setChecked(true);
             break;
         case T_FILL:
-            if (!fill->isChecked())
-                fill->setChecked(true);
+            if (!fillButton->isChecked())
+                fillButton->setChecked(true);
             break;
         case T_BRUSH:
-            if (!brush->isChecked())
-                brush->setChecked(true);
+            if (!brushButton->isChecked())
+                brushButton->setChecked(true);
+            shapeGroup->setEnabled(true);
+            typeGroup->setEnabled(true);
+            sizeGroup->setEnabled(true);
             break;
         default:
-            QRadioButton *b = (QRadioButton *)tool->checkedButton();
+            QRadioButton *b = (QRadioButton *)toolButtonGroup->checkedButton();
             if (b)
                 b->setChecked(false);
             break;
@@ -829,27 +666,25 @@ void PicEdit::editor_help()
 
 
 //************************************************
+//
 PCanvas::PCanvas(QWidget *parent, const char *name, PicEdit *w)
-    : QScrollArea(parent)
-      //the area to draw picture
+    : QScrollArea(parent),
+      picedit(w), pixsize(2), x0(0), y0(0), x1(0), y1(0),
+      bg_loaded(false), bg_on(false), imagecontainer(),
+      cur_w(MAX_W * pixsize), cur_h(MAX_HH * pixsize), pri_lines(false),
+      bgpix(), pixmap(cur_w, cur_h), CurColor(), linedraw()
+      // The area to draw picture
 {
-    picedit = w;
     picture = picedit->picture;
-    pixsize = 2;
-    x0 = 0;
-    y0 = 0;
-    cur_w = MAX_W * pixsize;
-    cur_h = MAX_HH * pixsize;
-    pixmap = QPixmap(cur_w, cur_h);
-    bg_loaded = false;
-    bg_on = false;
-    pri_lines = false;
-    bgpix = QImage();
 
-    imagecontainer = new QLabel;
-    this->setWidget(imagecontainer);
+    imagecontainer = new QLabel(this);
     imagecontainer->resize(cur_w, cur_h);
     imagecontainer->setPixmap(pixmap);
+    imagecontainer->setMouseTracking(true);
+
+    this->setFrameStyle(QFrame::NoFrame);
+    this->setWidget(imagecontainer);
+    this->setMouseTracking(true);
 }
 
 //*********************************************
@@ -901,9 +736,7 @@ void PCanvas::mousePressEvent(QMouseEvent *event)
         if (picture->button_action(x, y))
             picedit->show_pos();
     } else if (event->button() & Qt::RightButton) {
-        QRadioButton *b = (QRadioButton *)picedit->tool->checkedButton();
-        if (b != 0)
-            b->setChecked(false);
+        picedit->deselect_tool();
         picture->clear_tools();
         picture->tool = -1;
         picture->init_tool();
@@ -943,8 +776,8 @@ void PCanvas::mouseMoveEvent(QMouseEvent *event)
 
     if (x >= 0 && y >= 0) {
         int pri = y / 12 + 1;
-        sprintf(tmp, "X=%d  Y=%d  Pri=%d", x / 2, y, pri);
-        picedit->status->showMessage(tmp);
+        auto msg = picedit->statusbar->findChild<QLabel*>();
+        msg->setText(QString("X=%1  Y=%2  Pri=%3").arg(x / 2).arg(y).arg(pri));
         auto pal = picedit->pricolor->palette();
         pal.setColor(QPalette::Window, egacolor[pri + 1]);
         picedit->pricolor->setPalette(pal);
@@ -1110,53 +943,47 @@ void PCanvas::keyPressEvent(QKeyEvent *k)
     switch (k->key()) {
         case Qt::Key_L:
         case Qt::Key_F1:
-            picedit->line->setChecked(true);
             picedit->change_tool(T_LINE);
             break;
         case Qt::Key_P:
         case Qt::Key_F2:
-            picedit->pen->setChecked(true);
             picedit->change_tool(T_PEN);
             break;
         case Qt::Key_S:
         case Qt::Key_F3:
-            picedit->step->setChecked(true);
             picedit->change_tool(T_STEP);
             break;
         case Qt::Key_F:
         case Qt::Key_F4:
-            picedit->fill->setChecked(true);
             picedit->change_tool(T_FILL);
             break;
         case Qt::Key_B:
         case Qt::Key_F5:
-            picedit->brush->setChecked(true);
             picedit->change_tool(T_BRUSH);
             break;
         case Qt::Key_Tab:
-            picedit->pri_mode = !picedit->pri_mode;
-            picedit->change_drawmode(picedit->pri_mode ? 1 : 0);
+            picedit->change_drawmode(picedit->pri_mode ? 0 : 1);
             break;
         case Qt::Key_Home:
-            picedit->home_cb();
+            picedit->on_startButton_clicked();
             break;
         case Qt::Key_End:
-            picedit->end_cb();
+            picedit->on_endButton_clicked();
             break;
         case Qt::Key_Right:
-            picedit->right_cb();
+            picedit->on_nextButton_clicked();
             break;
         case Qt::Key_Left:
-            picedit->left_cb();
+            picedit->on_prevButton_clicked();
             break;
         case Qt::Key_Delete:
-            picedit->del_cb();
+            picedit->on_delButton_clicked();
             break;
         case Qt::Key_F10:
-            if (picedit->bg->isChecked())
-                picedit->bg->setChecked(false);
+            if (picedit->background_enabled())
+                picedit->enable_background(false);
             else
-                picedit->bg->setChecked(true);
+                picedit->enable_background(true);
             picedit->change_drawmode(2);
             break;
 
@@ -1174,16 +1001,16 @@ bool PCanvas::focusNextPrevChild(bool)
 }
 
 //*****************************************
-void PCanvas::load_bg(char *filename)
+void PCanvas::load_bg(QString &filename)
 {
     if (!bgpix.load(filename)) {
-        menu->errmes("Can't open file %s !", filename);
+        menu->errmes(QString("Can't open file %s!").arg(filename).toStdString().c_str());
         return;
     }
     bg_loaded = true;
 
     picture->bgpix = &bgpix;
-    picedit->bg->setChecked(true);
+    picedit->enable_background(true);
     bg_on = true;
     picture->bg_on = true;
     update();
@@ -1192,7 +1019,7 @@ void PCanvas::load_bg(char *filename)
 //*********************************************
 void PCanvas::showEvent(QShowEvent *)
 {
-    if (isTopLevel() && !picedit->isVisible() && !picedit->showing)
+    if (isWindow() && !picedit->isVisible() && !picedit->showing)
         picedit->showNormal();
     if (window_list && window_list->isVisible())
         window_list->draw();
@@ -1201,7 +1028,7 @@ void PCanvas::showEvent(QShowEvent *)
 //*********************************************
 void PCanvas::hideEvent(QHideEvent *)
 {
-    if (isTopLevel() && picedit->isVisible() && !picedit->hiding)
+    if (isWindow() && picedit->isVisible() && !picedit->hiding)
         picedit->showMinimized();
 }
 
@@ -1213,18 +1040,19 @@ void PCanvas::closeEvent(QCloseEvent *e)
         return;
     }
     picedit->closing = true;
-    if (isTopLevel()) {
+    if (isWindow()) {
         picedit->close();
         e->ignore();
     }
 }
 
 /*******************************************************/
+//
 Palette1::Palette1(QWidget *parent, const char *name, PicEdit *p)
-    : QWidget(parent)
+    : QWidget(parent), left(-1), right(-1), picedit(p) 
 {
-    left = right = -1;
-    picedit = p;
+    this->setMinimumSize(250, 40);
+    this->setMaximumSize(350, 80);
 }
 
 //*****************************************
@@ -1300,11 +1128,11 @@ void Palette1::mousePressEvent(QMouseEvent *event)
 }
 
 //************************************************
+//
 ViewData::ViewData(QWidget *parent, const char *name, Picture *p)
-    : QWidget(parent)
+    : QWidget(parent), picture(p), maxcol(0)
       //view picture codes
 {
-    picture = p;
     QBoxLayout *all = new QVBoxLayout(this);
     codes = new QTextEdit(this);
     codes->setMinimumSize(300, 200);
@@ -1386,7 +1214,7 @@ void ViewData::read()
             strcat(tmp, ptr0);
             if (comm) { //add comments (action and color when applicable)
                 sscanf(str, "%x %x", &c, &cc);
-                strcat(tmp, " //");
+                strcat(tmp, " //\n");
                 strcat(tmp, comment[c - 0xf0]);
                 if (c == 0xf0 || c == 0xf2) {
                     strcat(tmp, " ");
@@ -1397,11 +1225,12 @@ void ViewData::read()
         } else {
             if (comm) { //add comments (action and color when applicable)
                 sscanf(str, "%x %x", &c, &cc);
-                sprintf(tmp, "%s //%s", str, comment[c - 0xf0]);
+                sprintf(tmp, "%s\t// %s", str, comment[c - 0xf0]);
                 if (c == 0xf0 || c == 0xf2) {
                     strcat(tmp, " ");
                     strcat(tmp, colname[cc]);
                 }
+                strcat(tmp, "\n");
                 codes->insertPlainText(tmp);
             } else
                 codes->insertPlainText(str);

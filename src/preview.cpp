@@ -24,8 +24,9 @@
 #include "picture.h"
 #include "wutil.h"
 #include "menu.h"
-
 #include "logedit.h"
+#include "picedit.h"
+#include "viewedit.h"
 
 #include <stdio.h>
 

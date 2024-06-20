@@ -44,6 +44,7 @@
 #include <QFrame>
 #include <QLabel>
 #include <QVBoxLayout>
+#include <QGroupBox>
 
 static const char *dirs[4] = {"left", "right", "bottom", "horizon"};
 

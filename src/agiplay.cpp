@@ -26,7 +26,6 @@
  *
  */
 
-#include "menu.h"
 
 #include <QtMultimedia/QAudioOutput>
 #include <QProgressDialog>
@@ -37,6 +36,9 @@
 #include <QMediaDevices>
 
 #include <sys/stat.h>
+
+#include "menu.h"
+#include "game.h"
 
 
 #define NUM_CHANNELS    4

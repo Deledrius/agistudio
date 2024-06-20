@@ -21,8 +21,6 @@
 #ifndef MENU_H
 #define MENU_H
 
-#include <stdarg.h>
-#include <string>
 #include <QWidget>
 #include <QMenuBar>
 #include <QLabel>
@@ -35,14 +33,8 @@
 #include <QMainWindow>
 #include <QStatusBar>
 #include <QCloseEvent>
+#include <QListWidget>
 
-#include "wordsedit.h"
-#include "objedit.h"
-#include "viewedit.h"
-#include "logedit.h"
-#include "picedit.h"
-#include "resources.h"
-#include "helpwindow.h"
 
 class WindowList : public QWidget
 {
@@ -65,7 +57,7 @@ public:
     About(QWidget *parent = 0, const char *name = 0);
 };
 
-
+class ResourcesWin;
 class Menu : public QMainWindow
 {
     Q_OBJECT
@@ -135,6 +127,15 @@ protected:
 };
 
 extern Menu *menu;
+
+class LogEdit;
+class ViewEdit;
+class WordsEdit;
+class ObjEdit;
+class PicEdit;
+class TextEdit;
+class Preview;
+class HelpWindow;
 
 typedef struct {
     union {
