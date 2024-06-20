@@ -27,6 +27,7 @@
 #include <QAbstractButton>
 #include <QMouseEvent>
 #include <QShowEvent>
+#include <QInputDialog>
 
 #include "game.h"
 #include "menu.h"
@@ -271,18 +272,11 @@ void PicEdit::save_to_game()
 //*********************************************
 void PicEdit::save_to_game_as()
 {
-    AskNumber *picture_number = new AskNumber(0, 0, "Picture number", "Enter picture number: [0-255]");
-
-    if (!picture_number->exec())
+    bool ok;
+    int num = QInputDialog::getInt(this, tr("Picture Number"), tr("Enter picture number [0-255]:"), PicNum, 0, 255, 1, &ok);
+    if (!ok)
         return;
 
-    QString str = picture_number->num->text();
-    int num = str.toInt();
-
-    if (num < 0 || num > 255) {
-        menu->errmes("Picture number must be between 0 and 255 !");
-        return ;
-    }
     if (game->ResourceInfo[PICTURE][num].Exists) {
         switch (QMessageBox::warning(this, tr("Picture Editor"),
                                     tr("Resource picture.%1 already exists. Replace it?").arg(QString::number(num), 3, QChar('0')),

@@ -45,6 +45,7 @@
 #include <QTextStream>
 #include <QFileDialog>
 #include <QGroupBox>
+#include <QInputDialog>
 
 QStringList InputLines;  //temporary buffer for reading the text from editor
 //and sending to compilation
@@ -623,12 +624,11 @@ void LogEdit::compile_and_run()
 //***********************************************
 void LogEdit::change_logic_number()
 {
-    AskNumber *changelogic = new AskNumber(0, 0, "Logic number", "Enter logic number: [0-255]");
-
-    if (!changelogic->exec())
+    bool ok;
+    int num = QInputDialog::getInt(this, tr("Logic Number"), tr("Enter logic number [0-255]:"), LogicNum, 0, 255, 1, &ok);
+    if (!ok)
         return;
-    QString str = changelogic->num->text();
-    int num = str.toInt();
+
     if (num < 0 || num > 255) {
         menu->errmes("Logic number must be between 0 and 255 !");
         return ;
@@ -737,17 +737,19 @@ void LogEdit::new_room()
 
 }
 //***********************************************
-void LogEdit::goto_cb() const
+void LogEdit::goto_cb()
 {
-    AskNumber *ask_number = new AskNumber(0, 0, "Go to line",
-                                          "Go to line: ");
+    auto cursor = editor->textCursor();
 
-    if (!ask_number->exec())
+    bool ok;
+    int linenum = QInputDialog::getInt(this, tr("Go to line"), tr("Go to line:"),
+                    cursor.blockNumber(), 1, editor->document()->blockCount(), ok = &ok);
+    if (!ok)
         return;
 
-    QString str = ask_number->num->text();
-    int linenum = str.toInt();
-    editor->textCursor().setPosition(linenum);
+    cursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor);
+    cursor.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor, linenum);
+    editor->setTextCursor(cursor);
 }
 
 //***********************************************

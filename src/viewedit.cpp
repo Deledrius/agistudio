@@ -55,6 +55,7 @@
 #include <QShowEvent>
 #include <QPaintEvent>
 #include <QCloseEvent>
+#include <QInputDialog>
 
 #include "zoom_minus_x.xpm"
 #include "zoom_plus_x.xpm"
@@ -712,18 +713,11 @@ void ViewEdit::save_to_game()
 //*********************************************
 void ViewEdit::save_to_game_as()
 {
-    AskNumber *view_number = new AskNumber(0, 0, "View number", "Enter view number: [0-255]");
-
-    if (!view_number->exec())
+    bool ok;
+    int num = QInputDialog::getInt(this, tr("View Number"), tr("Enter view number [0-255]:"), 0, 0, 255, 1, &ok);
+    if (!ok)
         return;
 
-    QString str = view_number->num->text();
-    int num = str.toInt();
-
-    if (num < 0 || num > 255) {
-        menu->errmes("View number must be between 0 and 255 !");
-        return ;
-    }
     if (game->ResourceInfo[VIEW][num].Exists) {
         switch (QMessageBox::warning(this, tr("View Editor"), tr("Resource view.%1 already exists. Replace it?").arg(QString::number(num), 3, QChar('0')),
                                     QMessageBox::Yes | QMessageBox::No,

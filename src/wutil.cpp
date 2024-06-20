@@ -32,62 +32,6 @@
 
 QColor egacolor[16];
 
-//**********************************************
-
-AskNumber::AskNumber(QWidget *parent, const char *name, const char *caption, const char *prompt)
-    : QDialog(parent)
-{
-    setWindowTitle(caption);
-
-    QBoxLayout *all =  new QVBoxLayout(this);
-
-    QBoxLayout *top = new QHBoxLayout(this);
-    all->addLayout(top);
-    QLabel *label = new QLabel(prompt, this);
-    top->addWidget(label);
-    num = new QLineEdit(this);
-    num->setMinimumWidth(80);
-    connect(num, SIGNAL(returnPressed()), SLOT(accept()));
-    top->addWidget(num);
-
-    QBoxLayout *bottom = new QHBoxLayout(this);
-    all->addLayout(bottom);
-    QPushButton *ok = new QPushButton(this);
-    ok->setText("OK");
-    connect(ok, SIGNAL(clicked()), SLOT(accept()));
-    bottom->addWidget(ok);
-    QPushButton *cancel = new QPushButton(this);
-    cancel->setText("Cancel");
-    connect(cancel, SIGNAL(clicked()), SLOT(reject()));
-    bottom->addWidget(cancel);
-}
-
-AskText::AskText(QWidget *parent, const char *name, const char *caption, const char *prompt)
-    : QDialog(parent)
-{
-    setWindowTitle(caption);
-
-    QBoxLayout *all =  new QVBoxLayout(this);
-
-    QLabel *label = new QLabel(prompt, this);
-    all->addWidget(label);
-    text = new QLineEdit(this);
-    text->setMinimumWidth(120);
-    connect(text, SIGNAL(returnPressed()), SLOT(accept()));
-    all->addWidget(text);
-
-    QBoxLayout *bottom = new QHBoxLayout(this);
-    all->addLayout(bottom);
-    QPushButton *ok = new QPushButton(this);
-    ok->setText("OK");
-    connect(ok, SIGNAL(clicked()), SLOT(accept()));
-    bottom->addWidget(ok);
-    QPushButton *cancel = new QPushButton(this);
-    cancel->setText("Cancel");
-    connect(cancel, SIGNAL(clicked()), SLOT(reject()));
-    bottom->addWidget(cancel);
-}
-
 
 //**********************************************
 void make_egacolors(void)
