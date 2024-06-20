@@ -18,11 +18,6 @@
  *
  */
 
-#include "game.h"
-#include "words.h"
-#include "menu.h"
-#include "wordsedit.h"
-#include "resources.h"
 
 #include <stdio.h>
 #include <sys/types.h>
@@ -47,6 +42,12 @@
 #include <QHideEvent>
 #include <QVBoxLayout>
 #include <QInputDialog>
+
+#include "game.h"
+#include "words.h"
+#include "menu.h"
+#include "wordsedit.h"
+#include "resources.h"
 
 
 WordsEdit::WordsEdit(QWidget *parent, const char *name, int win_num, ResourcesWin *res)

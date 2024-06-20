@@ -34,6 +34,7 @@
 #include "preview.h"
 #include "picedit.h"
 
+
 static const char *comment[] = {
     "pic colour",   //0xf0
     "pic off",      //0xf1

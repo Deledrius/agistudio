@@ -20,10 +20,6 @@
  *
  */
 
-#include "game.h"
-#include "words.h"
-#include "menu.h"
-#include "wordsedit.h"
 
 #include <stdio.h>
 #include <sys/types.h>
@@ -33,6 +29,11 @@
 #include <sys/stat.h>
 #include <stdlib.h>
 #include <ctype.h>
+
+#include "game.h"
+#include "words.h"
+#include "menu.h"
+#include "wordsedit.h"
 
 
 static TWordGroup NewWordGroup[MaxWordGroups];

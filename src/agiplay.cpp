@@ -27,6 +27,8 @@
  */
 
 
+#include <sys/stat.h>
+
 #include <QtMultimedia/QAudioOutput>
 #include <QProgressDialog>
 #include <QBuffer>
@@ -34,8 +36,6 @@
 #include <QAudioFormat>
 #include <QAudioSink>
 #include <QMediaDevices>
-
-#include <sys/stat.h>
 
 #include "menu.h"
 #include "game.h"

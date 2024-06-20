@@ -18,10 +18,6 @@
  *
  */
 
-#include "game.h"
-#include "object.h"
-#include "objedit.h"
-#include "menu.h"
 
 #include <stdio.h>
 #include <sys/types.h>
@@ -31,11 +27,17 @@
 #include <sys/stat.h>
 #include <stdlib.h>
 #include <ctype.h>
+
 #include <QApplication>
 #include <QCloseEvent>
 #include <QShowEvent>
 #include <QLabel>
 #include <QHideEvent>
+
+#include "game.h"
+#include "object.h"
+#include "objedit.h"
+#include "menu.h"
 
 
 //*****************************************

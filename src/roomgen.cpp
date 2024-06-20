@@ -20,10 +20,6 @@
  *
  */
 
-#include "logedit.h"
-#include "game.h"
-#include "menu.h"
-#include "roomgen.h"
 
 #include <string>
 #include <stdio.h>
@@ -45,6 +41,12 @@
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QGroupBox>
+
+#include "logedit.h"
+#include "game.h"
+#include "menu.h"
+#include "roomgen.h"
+
 
 static const char *dirs[4] = {"left", "right", "bottom", "horizon"};
 

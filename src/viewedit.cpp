@@ -18,11 +18,6 @@
  *
  */
 
-#include "game.h"
-#include "viewedit.h"
-#include "menu.h"
-#include "wutil.h"
-#include "preview.h"
 
 #include <stdio.h>
 #include <sys/types.h>
@@ -56,6 +51,12 @@
 #include <QPaintEvent>
 #include <QCloseEvent>
 #include <QInputDialog>
+
+#include "game.h"
+#include "viewedit.h"
+#include "menu.h"
+#include "wutil.h"
+#include "preview.h"
 
 #include "zoom_minus_x.xpm"
 #include "zoom_plus_x.xpm"

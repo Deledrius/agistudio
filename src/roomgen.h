@@ -23,6 +23,7 @@
 #ifndef ROOMGEN_H
 #define ROOMGEN_H
 
+
 #include <QWidget>
 #include <QLabel>
 #include <QPushButton>

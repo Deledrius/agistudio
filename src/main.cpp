@@ -18,6 +18,7 @@
  *
  */
 
+
 #include <cstdlib>
 #include <stdio.h>
 
@@ -26,6 +27,7 @@
 
 #include "menu.h"
 #include "game.h"
+
 
 QApplication *app;
 char tmp[MAX_TMP]; //global temporary buffer

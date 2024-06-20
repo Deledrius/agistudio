@@ -20,14 +20,16 @@
  *
  */
 
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+
 #include "logic.h"
 #include "game.h"
 #include "logedit.h"
 #include "menu.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <limits.h>
 
 extern QStringList InputLines;  //temporary -
 //input text from the editor window or file

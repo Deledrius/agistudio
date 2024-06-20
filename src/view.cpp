@@ -19,10 +19,6 @@
  *
  */
 
-#include "game.h"
-#include "view.h"
-#include "viewedit.h"
-#include "menu.h"
 
 #include <stdio.h>
 #include <sys/types.h>
@@ -34,6 +30,12 @@
 #include <ctype.h>
 
 #include <QApplication>
+
+#include "game.h"
+#include "view.h"
+#include "viewedit.h"
+#include "menu.h"
+
 
 static int ResPos, DescPos, ResSize;
 //**************************************************

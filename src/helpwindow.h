@@ -11,6 +11,12 @@
 #ifndef HELPWINDOW_H
 #define HELPWINDOW_H
 
+
+#ifdef _WIN32
+#define NOMINMAX
+#include <windows.h>
+#endif
+
 #include <QTextBrowser>
 #include <QMainWindow>
 #include <QStringList>
@@ -20,10 +26,6 @@
 #include <QHideEvent>
 #include <QEvent>
 
-#ifdef _WIN32
-#define NOMINMAX
-#include <windows.h>
-#endif
 
 class QComboBox;
 class QMenu;

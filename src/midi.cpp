@@ -20,7 +20,6 @@
  *
  */
 
-#include "global.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -33,6 +32,9 @@
 #include <QPushButton>
 #include <QFileDialog>
 #include <QVBoxLayout>
+
+#include "global.h"
+
 
 static const char *g_gm_instrument_names[] = {
     "1. Acoustic Grand Piano",

@@ -31,6 +31,7 @@
 #include "menu.h"
 #include "picture.h"
 
+
 BPicture *ppicture;
 
 //********************************************

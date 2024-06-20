@@ -18,8 +18,6 @@
  *
  */
 
-#include "options.h"
-#include "game.h"
 
 #include <stdlib.h>
 
@@ -30,6 +28,10 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QLabel>
+
+#include "options.h"
+#include "game.h"
+
 
 Options *options;
 

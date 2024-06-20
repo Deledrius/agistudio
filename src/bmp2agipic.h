@@ -22,8 +22,10 @@
 #ifndef bmp2agipic_h
 #define bmp2agipic_h
 
+
 #include <QImage>
 #include <QByteArray>
+
 
 // Converts bitmaps (pic and pri) into an AGI "picture" resource.
 // Returns NULL if success, or error message otherwise.

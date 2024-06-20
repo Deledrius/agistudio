@@ -19,16 +19,17 @@
  *
  */
 
-#include "bmp2agipic.h"
-
-#include <QColor>
 
 #include <cmath>
 #include <queue>
 #include <vector>
-
 #include <cstdio>
 #include <cassert>
+
+#include <QColor>
+
+#include "bmp2agipic.h"
+
 
 static const int AGI_WIDTH = 160;
 static const int AGI_HEIGHT = 168;

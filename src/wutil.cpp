@@ -18,6 +18,7 @@
  *
  */
 
+
 #include <stdio.h>
 
 #include <QPainter>
@@ -30,8 +31,8 @@
 
 #include "wutil.h"
 
-QColor egacolor[16];
 
+QColor egacolor[16];
 
 //**********************************************
 void make_egacolors(void)

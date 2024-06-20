@@ -51,6 +51,7 @@
 #include "game.h"
 #include "logedit.h"
 
+
 const char *ResTypeName[4] =  {"logic", "picture", "view", "sound"};
 const char *ResTypeAbbrv[4] = {"log", "pic", "view", "snd"};
 static const char *files[5] = {"vol.0", "viewdir", "logdir", "snddir", "picdir"};

@@ -9,12 +9,13 @@
 ** program may be used, distributed and modified without limitation.
 **
 *****************************************************************************/
+
 //my modifications of the original source:
 //included .xpm in the source, removed 'about' buttons, added setSource,
 //removed tr() (didn't compile with Mandrake 7.0)
 //added hideEvent,showEvent
 
-#include "helpwindow.h"
+#include <ctype.h>
 
 #include <QStatusBar>
 #include <QPixmap>
@@ -35,13 +36,13 @@
 #include <QKeyEvent>
 #include <QToolBar>
 
-#include <ctype.h>
+#include "helpwindow.h"
+#include "menu.h"
 
 #include "home.xpm"
 #include "forward.xpm"
 #include "back.xpm"
 
-#include "menu.h"
 
 HelpWindow *helpwindow, *helpwindow1;
 

@@ -18,15 +18,6 @@
  *
  */
 
-#include "resources.h"
-#include "game.h"
-#include "preview.h"
-#include "picture.h"
-#include "wutil.h"
-#include "menu.h"
-#include "logedit.h"
-#include "picedit.h"
-#include "viewedit.h"
 
 #include <stdio.h>
 
@@ -47,6 +38,16 @@
 #include <QCloseEvent>
 #include <QStackedWidget>
 #include <QGroupBox>
+
+#include "resources.h"
+#include "game.h"
+#include "preview.h"
+#include "picture.h"
+#include "wutil.h"
+#include "menu.h"
+#include "logedit.h"
+#include "picedit.h"
+#include "viewedit.h"
 
 #include "right_x.xpm"
 #include "left_x.xpm"

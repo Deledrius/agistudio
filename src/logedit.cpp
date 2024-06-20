@@ -18,10 +18,6 @@
  *
  */
 
-#include "logedit.h"
-#include "game.h"
-#include "menu.h"
-#include "agicommands.h"
 
 #include <string>
 #include <stdio.h>
@@ -46,6 +42,12 @@
 #include <QFileDialog>
 #include <QGroupBox>
 #include <QInputDialog>
+
+#include "logedit.h"
+#include "game.h"
+#include "menu.h"
+#include "agicommands.h"
+
 
 QStringList InputLines;  //temporary buffer for reading the text from editor
 //and sending to compilation

@@ -18,18 +18,6 @@
  *
  */
 
-#include "menu.h"
-#include "game.h"
-#include "wordsedit.h"
-#include "objedit.h"
-#include "viewedit.h"
-#include "logedit.h"
-#include "resources.h"
-#include "wutil.h"
-#include "preview.h"
-#include "picedit.h"
-#include "options.h"
-#include "helpwindow.h"
 
 #include <stdio.h>
 #ifdef _WIN32
@@ -52,6 +40,19 @@
 #include <QCloseEvent>
 #include <QToolBar>
 
+#include "menu.h"
+#include "game.h"
+#include "wordsedit.h"
+#include "objedit.h"
+#include "viewedit.h"
+#include "logedit.h"
+#include "resources.h"
+#include "wutil.h"
+#include "preview.h"
+#include "picedit.h"
+#include "options.h"
+#include "helpwindow.h"
+
 #include "toolbar_open.xpm"
 #include "toolbar_close.xpm"
 #include "toolbar_run.xpm"
@@ -63,6 +64,7 @@
 #include "toolbar_textedit.xpm"
 #include "logo.xpm"
 #include "app_icon.xpm"
+
 
 extern char tmp[];
 Menu *menu;
