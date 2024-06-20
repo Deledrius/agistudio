@@ -21,7 +21,9 @@
 #ifndef RESOURCES_H
 #define RESOURCES_H
 
+
 #include <string>
+
 #include <QWidget>
 #include <QLabel>
 #include <QComboBox>

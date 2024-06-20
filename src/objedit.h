@@ -21,6 +21,7 @@
 #ifndef OBJEDIT_H
 #define OBJEDIT_H
 
+
 #include <QWidget>
 #include <QLabel>
 #include <QPushButton>
@@ -34,6 +35,7 @@
 #include <QListWidget>
 
 #include "object.h"
+
 
 //inventory objects editor
 class ObjEdit : public QWidget

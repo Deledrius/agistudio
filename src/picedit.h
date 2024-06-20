@@ -21,6 +21,7 @@
 #ifndef PICEDIT_H
 #define PICEDIT_H
 
+
 #include <QWidget>
 #include <QLabel>
 #include <QPushButton>
@@ -49,6 +50,7 @@
 #include "resources.h"
 
 #include "ui/ui_picedit.h"
+
 
 class PicEdit;
 

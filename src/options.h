@@ -21,6 +21,7 @@
 #ifndef OPTIONS_H
 #define OPTIONS_H
 
+
 #include <QWidget>
 #include <QLabel>
 #include <QPushButton>
@@ -38,8 +39,6 @@
 
 #include "wutil.h"
 #include "view.h"
-
-
 
 
 class Options : public QDialog

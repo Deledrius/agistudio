@@ -21,6 +21,7 @@
 #ifndef LOGEDIT_H
 #define LOGEDIT_H
 
+
 #include <QWidget>
 #include <QLabel>
 #include <QPushButton>
@@ -41,6 +42,7 @@
 #include "logic.h"
 #include "roomgen.h"
 #include "resources.h"
+
 
 //find string in the editor window
 class FindEdit : public QWidget

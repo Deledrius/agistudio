@@ -21,9 +21,6 @@
 #ifndef PREVIEW_H
 #define PREVIEW_H
 
-#include "picture.h"
-#include "view.h"
-#include "resources.h"
 
 #include <string>
 #include <QWidget>
@@ -39,6 +36,11 @@
 #include <QHideEvent>
 #include <QCloseEvent>
 #include <QPaintEvent>
+
+#include "picture.h"
+#include "view.h"
+#include "resources.h"
+
 
 class Animate;
 class Preview;

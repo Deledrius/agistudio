@@ -21,12 +21,14 @@
 #ifndef LOGIC_H
 #define LOGIC_H
 
+
 #include <string>
 
 #include "words.h"
 #include "object.h"
 #include "agicommands.h"
 #include "game.h"
+
 
 #define MaxBlockDepth  12
 #define MaxLabels  255

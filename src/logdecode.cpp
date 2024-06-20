@@ -20,6 +20,10 @@
  *
  */
 
+
+#include <cstdlib>
+#include <stdio.h>
+
 #include "game.h"
 #include "logedit.h"
 #include "words.h"
@@ -27,8 +31,6 @@
 #include "menu.h"
 #include "agicommands.h"
 
-#include <cstdlib>
-#include <stdio.h>
 
 static int EncryptionStart;
 static int MessageSectionStart, MessageSectionEnd;

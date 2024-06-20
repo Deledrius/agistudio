@@ -21,9 +21,11 @@
 #ifndef WORDS_H
 #define WORDS_H
 
+
 #include <string>
 
 #include <QStringList>
+
 
 typedef struct {
     QStringList Words;

@@ -22,6 +22,7 @@
 #ifndef WORDSEDIT_H
 #define WORDSEDIT_H
 
+
 #include <QWidget>
 #include <QLabel>
 #include <QPushButton>
@@ -39,6 +40,7 @@
 #include "wutil.h"
 #include "words.h"
 #include "resources.h"
+
 
 class WordsFind;
 

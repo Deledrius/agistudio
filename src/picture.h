@@ -21,10 +21,12 @@
 #ifndef PICTURE_H
 #define PICTURE_H
 
+
+#include <list>
+
 #include <QImage>
 #include <QColor>
 
-#include <list>
 
 #define MAX_W 320
 #define MAX_H 200

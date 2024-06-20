@@ -20,10 +20,6 @@
  *
  */
 
-#include "game.h"
-#include "words.h"
-#include "object.h"
-#include "menu.h"
 
 #include <stdio.h>
 #include <sys/types.h>
@@ -32,6 +28,12 @@
 #endif
 #include <sys/stat.h>
 #include <stdlib.h>
+
+#include "game.h"
+#include "words.h"
+#include "object.h"
+#include "menu.h"
+
 
 //****************************************************
 //list of inventory objects

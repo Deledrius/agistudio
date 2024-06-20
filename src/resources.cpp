@@ -18,24 +18,6 @@
  *
  */
 
-#include "resources.h"
-#include "game.h"
-#include "logedit.h"
-#include "viewedit.h"
-#include "preview.h"
-#include "menu.h"
-#include "midi.h"
-#include "bmp2agipic.h"
-#include "picedit.h"
-
-#include <QHBoxLayout>
-#include <QLabel>
-#include <QHideEvent>
-#include <QVBoxLayout>
-#include <QBoxLayout>
-#include <QShowEvent>
-#include <QCloseEvent>
-#include <QGroupBox>
 
 #include <stdio.h>
 #ifdef _WIN32
@@ -47,7 +29,26 @@
 #include <stdlib.h>
 #include <algorithm>
 
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QHideEvent>
+#include <QVBoxLayout>
+#include <QBoxLayout>
+#include <QShowEvent>
+#include <QCloseEvent>
+#include <QGroupBox>
 #include <QInputDialog>
+
+#include "resources.h"
+#include "game.h"
+#include "logedit.h"
+#include "viewedit.h"
+#include "preview.h"
+#include "menu.h"
+#include "midi.h"
+#include "bmp2agipic.h"
+#include "picedit.h"
+
 
 //**********************************************************
 ResourcesWin::ResourcesWin(QWidget *parent, const char  *name, int win_num):

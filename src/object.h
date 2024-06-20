@@ -21,9 +21,11 @@
 #ifndef OBJECT_H
 #define OBJECT_H
 
-#include "global.h"
 
 #include <QStringList>
+
+#include "global.h"
+
 
 #define MaxItems   256
 

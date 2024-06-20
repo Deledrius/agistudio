@@ -21,6 +21,7 @@
 #ifndef VIEWEDIT_H
 #define VIEWEDIT_H
 
+
 #include <QWidget>
 #include <QLabel>
 #include <QPushButton>
@@ -48,6 +49,7 @@
 #include "view.h"
 #include "preview.h"
 #include "resources.h"
+
 
 #define V_DRAW 0
 #define V_FILL 1

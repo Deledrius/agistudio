@@ -21,8 +21,11 @@
 #ifndef GAME_H
 #define GAME_H
 
+
 #include <string>
+
 #include "global.h"
+
 
 typedef struct {
     char Filename[12];    //[*]vol.*
