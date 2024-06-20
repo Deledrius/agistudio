@@ -86,8 +86,8 @@ protected:
     std::string filename;
     int FindLastGroup, FindLastWord;
     int SelectedGroup;
-    int find_down(char *word);
-    int find_up(char *word);
+    int find_down(QString* word);
+    int find_up(QString* word);
     void print_group(int curgroup);
     void add_group_ok_cb();
     void change_group_ok_cb();
@@ -118,8 +118,8 @@ protected:
     QRadioButton *start, *current;
     QRadioButton *exact, *substring;
     int FindLastGroup, FindLastWord;
-    int find_down(char *word);
-    int find_up(char *word);
+    int find_down(QString* word);
+    int find_up(QString* word);
 };
 
 //******************************************************
