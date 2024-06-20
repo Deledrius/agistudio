@@ -46,6 +46,7 @@
 #include <QLabel>
 #include <QHideEvent>
 #include <QVBoxLayout>
+#include <QInputDialog>
 
 
 WordsEdit::WordsEdit(QWidget *parent, const char *name, int win_num, ResourcesWin *res)
@@ -260,25 +261,16 @@ void WordsEdit::open()
 //********************************************************
 void WordsEdit::add_group_cb(void)
 {
-    AskNumber *addgroup = new AskNumber(0, 0, "Add group", "Enter group number:");
-    if (!addgroup->exec())
+    bool ok;
+    int num = QInputDialog::getInt(this, tr("Add Group"), tr("Enter group number [0-65535]:"), 0, 0, 65535, 1, &ok);
+    if (!ok)
         return;
 
     int i;
-    QString str = addgroup->num->text();
-    int num = str.toInt();
-
-    if (num < 0 || num > 65535) {
-        menu->errmes("Wordsedit", "You must enter an integer from 0 to 65535.");
-        return;
-    }
-
-
     if ((i = wordlist->add_group(num)) == -1)
         return;
 
-    str = QString("%1. ").arg(QString::number(num));
-    listgroup->insertItem(i, str);
+    listgroup->insertItem(i, QString("%1. ").arg(QString::number(num)));
     listgroup->setCurrentRow(i);
     changed = true;
 }
@@ -339,20 +331,15 @@ void WordsEdit::delete_word_cb(void)
 //********************************************************
 void WordsEdit::change_group_number_cb(void)
 {
-    AskNumber *newnumber = new AskNumber(0, 0, "Change group number", "Enter group number:");
-    if (!newnumber->exec())
+    bool ok;
+    int num = QInputDialog::getInt(this, tr("Change Group Number"), tr("Enter group number [0-65535]:"), 0, 0, 65535, 1, &ok);
+    if (!ok)
         return;
-    int i;
-    QString str = newnumber->num->text();
-    int num = str.toInt();
 
-    if (num < 0 || num > 65535) {
-        menu->errmes("Wordsedit", "You must enter an integer from 0 to 65535.");
-        return;
-    }
+    int i;
     int currentgroup = listgroup->currentRow();
     if ((i = wordlist->change_number(currentgroup, num)) == -1)
-        return ;
+        return;
 
     auto item = listgroup->takeItem(currentgroup);
     delete item;

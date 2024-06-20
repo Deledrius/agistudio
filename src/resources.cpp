@@ -47,6 +47,7 @@
 #include <stdlib.h>
 #include <algorithm>
 
+#include <QInputDialog>
 
 //**********************************************************
 ResourcesWin::ResourcesWin(QWidget *parent, const char  *name, int win_num):
@@ -325,14 +326,11 @@ void ResourcesWin::renumber_resource()
     if (k == -1)
         return;
 
-    AskNumber *ask_number = new AskNumber(0, 0, "Resource number",
-                                          "Enter new resource number [0-255]: ");
-
-    if (!ask_number->exec())
+    bool ok;
+    int newnum = QInputDialog::getInt(this, tr("Resource Number"), tr("Enter new resource number [0-255]:"), k, 0, 255, 1, &ok);
+    if (!ok)
         return;
 
-    QString str = ask_number->num->text();
-    int newnum = str.toInt();
     int restype = selected;
     int resnum = ResourceIndex[k];
     if (!game->ResourceInfo[restype][newnum].Exists)
@@ -378,19 +376,16 @@ void ResourcesWin::import_resource()
         return;
     pri = openBitmap("Open PRIORITY bitmap (or press cancel)");
 
-    AskNumber *ask_number = new AskNumber(0, 0, "Resource number",
-                                          "Enter new resource number [0-255]: ");
-    if (!ask_number->exec())
+    bool ok;
+    int newnum = QInputDialog::getInt(this, tr("Resource Number"), tr("Enter new resource number [0-255]:"), 0, 0, 255, 1, &ok);
+    if (!ok)
         return;
 
-    QString str = ask_number->num->text();
-    int newnum = str.toInt();
     int restype = selected;
-
     int replace = 0;
     if (game->ResourceInfo[restype][newnum].Exists) {
         replace = QMessageBox::warning(this, tr("Overwrite resource"),
-                                      tr("Resource %s.%03d already exists. Replace it?").arg(ResTypeName[restype]).arg(QString::number(newnum), 3, QChar('0')),
+                                      tr("Resource %1.%2 already exists. Replace it?").arg(ResTypeName[restype]).arg(QString::number(newnum), 3, QChar('0')),
                                       QMessageBox::Yes | QMessageBox::No,
                                       QMessageBox::No);
     }
