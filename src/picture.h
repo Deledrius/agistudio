@@ -158,7 +158,7 @@ public:
     int button_action(int newX, int newY);
     int move_action(int newX, int newY);
     const QString showPos(byte *code, byte *val) const;
-    const size_t getPos() const;
+    const uint32_t getPos() const;
     int setBufPos(int);
     void viewData(QStringList *data);
     void status(int mode);

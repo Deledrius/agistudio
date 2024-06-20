@@ -33,7 +33,6 @@
 #include <QCloseEvent>
 #include <QListWidget>
 
-#include "preview.h"
 
 class ResourcesWin;
 class Preview;

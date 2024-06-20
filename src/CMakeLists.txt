@@ -104,12 +104,22 @@ set(AGIStudio_SOURCES
     bmp2agipic.cpp
 )
 
+set(AGIStudio_UI
+    ui/picedit.ui
+)
+
+set(AGIStudio_UIRESOURCES
+    ui/agistudio.qrc
+)
+qt_add_resources(RCC_SOURCES ${AGIStudio_UIRESOURCES})
+
 source_group("Header Files" FILES ${AGIStudio_HEADERS})
-source_group("Resource Files" FILES ${AGIStudio_RESOURCES})
+source_group("Resource Files" FILES ${AGIStudio_RESOURCES} ${AGIStudio_UIRESOURCES})
 source_group("Source Files" FILES ${AGIStudio_SOURCES})
+source_group("UI Files" FILES ${AGIStudio_UI})
 
 add_executable(AGIStudio WIN32 MACOSX_BUNDLE
-               ${AGIStudio_HEADERS} ${AGIStudio_SOURCES} ${AGIStudio_RESOURCES})
+               ${AGIStudio_HEADERS} ${AGIStudio_SOURCES} ${AGIStudio_RESOURCES} ${AGIStudio_UI} ${RCC_SOURCES})
 
 target_link_libraries(AGIStudio PRIVATE Qt6::Core Qt6::Widgets Qt6::Multimedia)
 

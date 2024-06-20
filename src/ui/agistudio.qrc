@@ -1,0 +1,42 @@
+<RCC>
+  <qresource prefix="icons">
+    <file>../icon1.ico</file>
+    <file>../icon16.png</file>
+    <file>../icon32.png</file>
+    <file>../icon32b.png</file>
+    <file>../app_icon.xpm</file>
+    <file>../back.xpm</file>
+    <file>../downarrow_x.xpm</file>
+    <file>../forward.xpm</file>
+    <file>../home.xpm</file>
+    <file>../left.xpm</file>
+    <file>../left_x.xpm</file>
+    <file>../left1.xpm</file>
+    <file>../left1_x.xpm</file>
+    <file>../left2.xpm</file>
+    <file>../left2_x.xpm</file>
+    <file>../leftarrow_x.xpm</file>
+    <file>../logo.xpm</file>
+    <file>../right.xpm</file>
+    <file>../right_x.xpm</file>
+    <file>../right1.xpm</file>
+    <file>../right1_x.xpm</file>
+    <file>../right2.xpm</file>
+    <file>../right2_x.xpm</file>
+    <file>../rightarrow_x.xpm</file>
+    <file>../toolbar_close.xpm</file>
+    <file>../toolbar_logedit.xpm</file>
+    <file>../toolbar_objedit.xpm</file>
+    <file>../toolbar_open.xpm</file>
+    <file>../toolbar_picedit.xpm</file>
+    <file>../toolbar_run.xpm</file>
+    <file>../toolbar_textedit.xpm</file>
+    <file>../toolbar_viewedit.xpm</file>
+    <file>../toolbar_wordsedit.xpm</file>
+    <file>../uparrow_x.xpm</file>
+    <file>../zoom_minus.xpm</file>
+    <file>../zoom_minus_x.xpm</file>
+    <file>../zoom_plus.xpm</file>
+    <file>../zoom_plus_x.xpm</file>
+  </qresource>
+</RCC>

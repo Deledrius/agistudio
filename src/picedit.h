@@ -48,6 +48,8 @@
 #include "picture.h"
 #include "resources.h"
 
+#include "ui/ui_picedit.h"
+
 class PicEdit;
 
 class Palette1 : public QWidget
@@ -76,7 +78,7 @@ public:
     bool pri_lines;
     int x0, y0, x1, y1;
     void line(bool mode);
-    void load_bg(char *filename);
+    void load_bg(QString &filename);
     void draw(int ResNum);
     void update();
     void setSize(int w, int h);
@@ -119,23 +121,14 @@ protected:
 };
 
 //************************************************
-class PicEdit : public QWidget
+class PicEdit : public QMainWindow, private Ui::PicEdit
 {
     Q_OBJECT
 public:
-    PicEdit(QWidget *parent = 0, const char *name = 0, int winnum = 0, ResourcesWin *res = 0);
+    explicit PicEdit(QWidget* parent = nullptr, const char* name = 0, int winnum = 0, ResourcesWin* res = 0);
+
     void open(int ResNum);
-    Picture *picture;
-    QButtonGroup *tool;
-    QRadioButton *line, *step, *pen, *fill, *brush;
-    QRadioButton *pic, *pri;
-    QStatusBar *status;
-    QWidget *pricolor;
-    QCheckBox *bg, *prilines;
-    ResourcesWin *resources_win;
-    bool changed;
-    bool closing, hiding, showing;
-    int pri_mode;
+    ResourcesWin* resources_win;
 public slots:
     void open();
     void open_file();
@@ -146,10 +139,6 @@ public slots:
 
     void view_data();
     void background();
-
-    void zoom_minus();
-    void zoom_plus();
-
     void change_drawmode(int);
     void toggle_bgmode(bool);
     void toggle_prilinemode(bool);
@@ -157,26 +146,64 @@ public slots:
     void change_size(int);
     void change_shape(int);
     void change_type(int);
+    void deselect_tool();
+    void enable_background(bool mode);
+    bool background_enabled() const;
 
-    void home_cb();
-    void end_cb();
-    void left_cb();
-    void right_cb();
-    void del_cb();
-    void wipe_cb();
+    void on_startButton_clicked();
+    void on_endButton_clicked();
+    void on_prevButton_clicked();
+    void on_nextButton_clicked();
+    void on_delButton_clicked();
+    void on_wipeButton_clicked();
 
     void set_pos();
     void show_pos();
 
     void editor_help();
 
+private slots:
+    // Menu signal handlers
+    void on_actionNew_triggered() { open(); }
+    void on_actionLoad_from_File_triggered() { open_file(); }
+    void on_actionSave_to_Game_triggered() { save_to_game(); }
+    void on_actionSave_to_Game_As_triggered() { save_to_game_as(); }
+    void on_actionSave_to_File_triggered() { save_file(); }
+    void on_actionDelete_triggered() { delete_picture(); }
+    void on_actionClose_triggered() { this->close(); }
+
+    void on_actionView_Data_triggered() { view_data(); }
+    void on_actionLoad_Background_triggered() { background(); }
+
+    void on_actionPictureEditorHelp_triggered() { editor_help(); }
+
+    // Tool signal handlers
+    void on_toolButtonGroup_idClicked(int tool) { change_tool(tool); };
+    void on_toolShapeButtonGroup_idClicked(int shape) { change_shape(shape); }
+    void on_toolTypeButtonGroup_idClicked(int ttype) { change_type(ttype); }
+    void on_sizeSpinBox_valueChanged(int size) { change_size(size); }
+
+    void on_actionFrameDisplay_valueChanged() { set_pos(); }
+
+    void on_zoomOutButton_clicked();
+    void on_zoomInButton_clicked();
+
+    void on_drawmodeButtonGroup_idClicked(int mode) { change_drawmode(mode); }
+    void on_showBackground_clicked(bool checked) { toggle_bgmode(checked); }
+    void on_showPriorityLines_clicked(bool checked) { toggle_prilinemode(checked); }
+
+
 protected:
     int PicNum;
     int winnum;
     PCanvas *canvas;
     Palette1 *palette;
-    QLineEdit *pos, *codeline, *comments;
     ViewData *viewdata;
+    Picture* picture;
+    QFrame* pricolor;
+    bool changed;
+    bool closing, hiding, showing;
+    int pri_mode;
     void open(char *filename);
     void save(char *filename);
     void deinit();
@@ -186,6 +213,9 @@ protected:
     void update_palette();
     void update_tools();
     bool focusNextPrevChild(bool next) ;
+
+    friend PCanvas;
+    friend Palette1;
 };
 
 

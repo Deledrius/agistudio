@@ -21,6 +21,8 @@
 #ifndef WUTIL_H
 #define WUTIL_H
 
+#include <vector>
+
 #include <QWidget>
 #include <QLabel>
 #include <QPushButton>
@@ -30,9 +32,6 @@
 #include <QPaintEvent>
 #include <QMouseEvent>
 
-#include <vector>
-
-#include "global.h"
 
 //*****************************************************
 class AskNumber : public QDialog

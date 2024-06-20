@@ -24,6 +24,7 @@
 #include <QWidget>
 #include <QLabel>
 #include <QPushButton>
+#include <QRadioButton>
 #include <QLayout>
 #include <qnamespace.h>
 #include <QMessageBox>
