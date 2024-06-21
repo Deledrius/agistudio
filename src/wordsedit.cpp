@@ -28,19 +28,6 @@
 #include <stdlib.h>
 #include <ctype.h>
 
-#include <QApplication>
-#include <QSplitter>
-#include <QFrame>
-#include <QMessageBox>
-#include <QFileDialog>
-#include <QStringList>
-#include <QHBoxLayout>
-#include <QCloseEvent>
-#include <QBoxLayout>
-#include <QShowEvent>
-#include <QLabel>
-#include <QHideEvent>
-#include <QVBoxLayout>
 #include <QInputDialog>
 
 #include "game.h"
@@ -51,120 +38,13 @@
 
 
 WordsEdit::WordsEdit(QWidget *parent, const char *name, int win_num, ResourcesWin *res)
-    : QWidget(parent)
+    : QMainWindow(parent), winnum(win_num), resources_win(res),
+      wordsfind(nullptr), wordlist(new WordList), changed(false), resource_filename(),
+      SelectedGroup(0), FindLastGroup(-1), FindLastWord(-1)
 {
+    setupUi(this);
+
     setAttribute(Qt::WA_DeleteOnClose);
-    setWindowTitle("WORDS.TOK Editor");
-    wordlist = new WordList();
-
-    winnum = win_num;
-    resources_win = res;
-    wordsfind = NULL;
-
-    QMenu *file = new QMenu(this);
-    Q_CHECK_PTR(file);
-    file->setTitle("&File");
-    file->addAction("&New", this, SLOT(new_file()));
-    file->addAction("&Open", this, SLOT(open_file()));
-    file->addAction("&Merge", this, SLOT(merge_file()));
-    file->addAction("&Save", this, SLOT(save_file()));
-    file->addAction("Save &As", this, SLOT(save_as_file()));
-    file->addSeparator();
-    file->addAction("&Close", this, SLOT(close()));
-
-    QMenu *words = new QMenu(this);
-    Q_CHECK_PTR(words);
-    words->setTitle("&Words");
-    words->addAction("Add word group", this, SLOT(add_group_cb()));
-    words->addAction("Delete word group", this, SLOT(delete_group_cb()));
-    words->addAction("Change group number", this, SLOT(change_group_number_cb()));
-    words->addSeparator();
-    words->addAction("Add word", this, SLOT(add_word_cb()));
-    words->addAction("Delete word", this, SLOT(delete_word_cb()));
-    words->addSeparator();
-    words->addAction("Count word groups", this, SLOT(count_groups_cb()));
-    words->addAction("Count words", this, SLOT(count_words_cb()));
-    words->addAction("&Find...", Qt::CTRL | Qt::Key_F, this, SLOT(find_cb()));
-
-
-    QMenuBar *menu = new QMenuBar(this);
-    Q_CHECK_PTR(menu);
-    menu->addMenu(file);
-    menu->addMenu(words);
-    menu->addSeparator();
-
-    QBoxLayout *all =  new QVBoxLayout(this);
-    all->setMenuBar(menu);
-
-    QSplitter *split = new QSplitter(Qt::Horizontal, this);
-
-    QWidget *left = new QWidget(split);
-    QBoxLayout *lgroup = new QVBoxLayout(left);
-    QLabel *labelgroup = new QLabel("Word Groups", left);
-    labelgroup->setAlignment(Qt::AlignCenter);
-    lgroup->addWidget(labelgroup);
-
-    listgroup = new QListWidget(left);
-    listgroup->setMinimumSize(200, 300);
-    connect(listgroup, SIGNAL(itemSelectionChanged()), this, SLOT(select_group()));
-    lgroup->addWidget(listgroup);
-
-
-    QWidget *right = new QWidget(split);
-    QBoxLayout *lwords =  new QVBoxLayout(right);
-    labelword = new QLabel("Words", right);
-    labelword->setAlignment(Qt::AlignCenter);
-    lwords->addWidget(labelword);
-
-    listwords = new QListWidget(right);
-    listwords->setMinimumSize(200, 300);
-    connect(listwords, SIGNAL(itemSelectionChanged()), this, SLOT(select_word()));
-    lwords->addWidget(listwords);
-
-    lineword = new QLineEdit(right);
-    lineword->setEnabled(false);
-    connect(lineword, SIGNAL(returnPressed()), SLOT(do_add_word()));
-    lwords->addWidget(lineword);
-
-    all->addWidget(split);
-
-    QBoxLayout *buttons =  new QHBoxLayout(this);
-    all->addLayout(buttons);
-
-    add_group = new QPushButton("Add group", this);
-    connect(add_group, SIGNAL(clicked()), SLOT(add_group_cb()));
-    buttons->addWidget(add_group);
-
-    delete_group = new QPushButton("Delete group", this);
-    connect(delete_group, SIGNAL(clicked()), SLOT(delete_group_cb()));
-    buttons->addWidget(delete_group);
-
-    add_word = new QPushButton("Add word", this);
-    connect(add_word, SIGNAL(clicked()), SLOT(add_word_cb()));
-    buttons->addWidget(add_word);
-
-    delete_word = new QPushButton("Delete word", this);
-    connect(delete_word, SIGNAL(clicked()), SLOT(delete_word_cb()));
-    buttons->addWidget(delete_word);
-
-    QBoxLayout *buttons1 =  new QHBoxLayout(this);
-    all->addLayout(buttons1);
-
-    change_group_number = new QPushButton("&Change group number", this);
-    connect(change_group_number, SIGNAL(clicked()), SLOT(change_group_number_cb()));
-    buttons1->addWidget(change_group_number);
-
-    find = new QPushButton("Find", this);
-    connect(find, SIGNAL(clicked()), SLOT(find_cb()));
-    buttons1->addWidget(find);
-
-
-    adjustSize();
-
-    changed = false;
-    filename = "";
-    SelectedGroup = 0;
-    FindLastGroup = FindLastWord = -1;
 }
 
 //********************************************************
@@ -181,7 +61,7 @@ void WordsEdit::hideEvent(QHideEvent *)
 {
     if (wordsfind) {
         wordsfind->close();
-        wordsfind = NULL;
+        wordsfind = nullptr;
     }
     if (window_list && window_list->isVisible())
         window_list->draw();
@@ -198,11 +78,11 @@ void WordsEdit::showEvent(QShowEvent *)
 void WordsEdit::closeEvent(QCloseEvent *e)
 {
     if (changed) {
-        switch (QMessageBox::warning(this, tr("WORDS.TOK Editor"), tr("Save changes to WORDS.TOK?"),
+        switch (QMessageBox::warning(this, tr("Word Tokens Editor"), tr("Save changes to WORDS.TOK?"),
                                     QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel,
                                     QMessageBox::Cancel)) {
             case QMessageBox::Save:
-                save_file() ;
+                on_actionSave_triggered();
                 deinit();
                 e->accept();
                 break;
@@ -223,44 +103,48 @@ void WordsEdit::closeEvent(QCloseEvent *e)
 //********************************************************
 void WordsEdit::update_all()
 {
-    listgroup->clear();
-    listwords->clear();
+    listGroup->clear();
+    listWords->clear();
+    QString entry;
+
     if (wordlist->NumGroups > 0) {
         for (int i = 0; i < wordlist->NumGroups; i++) {
-            sprintf(tmp, "%d. ", wordlist->WordGroup[i].GroupNum);
+            entry = QString("%1. ").arg(wordlist->WordGroup[i].GroupNum);
             for (int k = 0; k < wordlist->WordGroup[i].Words.count(); k++) {
                 if (k > 0)
-                    strcat(tmp, " | ");
-                strcat(tmp, wordlist->WordGroup[i].Words.at(k).toStdString().c_str());
+                    entry += " | ";
+                entry += wordlist->WordGroup[i].Words.at(k);
             }
-            QString str = tmp;
-            listgroup->insertItem(i, str);
+            listGroup->insertItem(i, entry);
         }
     }
     show();
     changed = false;
+
+    if (listGroup->count() > 0)
+        listGroup->setCurrentRow(0);
+
+    if (listWords->count() > 0)
+        listWords->setCurrentRow(0);
 }
 
 //********************************************************
-void WordsEdit::open(char *filenam)
+void WordsEdit::open(const QString& fname)
 {
-    int ret = wordlist->read(filenam);
-    if (ret)
+    if (wordlist->read(fname.toStdString()))
         return ;
-    filename = filenam;
+    resource_filename = fname;
     update_all();
-    return;
 }
 
 //********************************************************
 void WordsEdit::open()
 {
-    sprintf(tmp, "%s/words.tok", game->dir.c_str());
-    open(tmp);
+    open(QString("%1/WORDS.TOK").arg(game->dir.c_str()));
 }
 
 //********************************************************
-void WordsEdit::add_group_cb(void)
+void WordsEdit::on_pushButtonAddGroup_pressed(void)
 {
     bool ok;
     int num = QInputDialog::getInt(this, tr("Add Group"), tr("Enter group number [0-65535]:"), 0, 0, 65535, 1, &ok);
@@ -271,66 +155,68 @@ void WordsEdit::add_group_cb(void)
     if ((i = wordlist->add_group(num)) == -1)
         return;
 
-    listgroup->insertItem(i, QString("%1. ").arg(QString::number(num)));
-    listgroup->setCurrentRow(i);
+    listGroup->insertItem(i, QString("%1. ").arg(QString::number(num)));
+    listGroup->setCurrentRow(i);
     changed = true;
 }
 
 //********************************************************
-void WordsEdit::delete_group_cb(void)
+void WordsEdit::on_pushButtonRemoveGroup_pressed(void)
 {
-    int rm = listgroup->currentRow();
+    int rm = listGroup->currentRow();
     if (rm != -1) {
         wordlist->delete_group(rm);
-        auto item = listgroup->takeItem(rm);
+        auto item = listGroup->takeItem(rm);
         delete item;
         if (wordlist->NumGroups > 0) {
-            listgroup->setCurrentRow(rm);
+            listGroup->setCurrentRow(rm);
             select_group(rm);
         } else
-            listwords->clear();
+            listWords->clear();
         changed = true;
     }
 }
 
 //********************************************************
-void WordsEdit::print_group(int curgroup)
+const QString WordsEdit::format_group(int curgroup) const
 {
-    sprintf(tmp, "%d. ", wordlist->WordGroup[curgroup].GroupNum);
-    for (int i = 0; i < wordlist->WordGroup[curgroup].Words.count(); i++) {
+    QString group_words = QString("%1. ").arg(wordlist->WordGroup[curgroup].GroupNum);
+
+    for (qsizetype i = 0; i < wordlist->WordGroup[curgroup].Words.count(); i++) {
         if (i > 0)
-            strcat(tmp, " | ");
-        strcat(tmp, wordlist->WordGroup[curgroup].Words.at(i).toStdString().c_str());
+            group_words += " | ";
+        group_words += wordlist->WordGroup[curgroup].Words.at(i);
     }
+
+    return group_words;
 }
 
 //********************************************************
 void WordsEdit::update_group(int curgroup)
 {
-    print_group(curgroup);
-    auto item = listgroup->item(curgroup);
-    item->setText(tmp);
-    listgroup->editItem(item);
+    auto item = listGroup->item(curgroup);
+    item->setText(format_group(curgroup));
+    listGroup->editItem(item);
 }
 
 //********************************************************
-void WordsEdit::delete_word_cb(void)
+void WordsEdit::on_pushButtonRemoveWord_pressed(void)
 {
-    QString str = lineword->text();
-    char *word = str.toLatin1().data();
-    int k = wordlist->delete_word(word, SelectedGroup);
+    QString str = lineWord->text();
+    int k = wordlist->delete_word(str.toStdString(), SelectedGroup);
     if (k != -1) {
-        lineword->setText("");
-        auto item = listwords->takeItem(k);
+        lineWord->clear();
+        auto item = listWords->takeItem(k);
         delete item;
         update_group(SelectedGroup);
+        on_listWords_itemSelectionChanged();
         changed = true;
         return;
     }
 }
 
 //********************************************************
-void WordsEdit::change_group_number_cb(void)
+void WordsEdit::on_pushButtonChangeGroupNum_pressed(void)
 {
     bool ok;
     int num = QInputDialog::getInt(this, tr("Change Group Number"), tr("Enter group number [0-65535]:"), 0, 0, 65535, 1, &ok);
@@ -338,32 +224,32 @@ void WordsEdit::change_group_number_cb(void)
         return;
 
     int i;
-    int currentgroup = listgroup->currentRow();
+    int currentgroup = listGroup->currentRow();
     if ((i = wordlist->change_number(currentgroup, num)) == -1)
         return;
 
-    auto item = listgroup->takeItem(currentgroup);
+    auto item = listGroup->takeItem(currentgroup);
     delete item;
-    listgroup->insertItem(i, "");
+    listGroup->insertItem(i, "");
     update_group(i);
     changed = true;
 }
 
 //********************************************************
-void WordsEdit::find_cb(void)
+void WordsEdit::on_pushButtonFind_pressed(void)
 {
-    if (wordsfind == NULL)
-        wordsfind = new WordsFind(0, 0, this);
+    if (wordsfind == nullptr)
+        wordsfind = new WordsFind(nullptr, nullptr, this);
     wordsfind->show();
     wordsfind->lineFind->setFocus();
 }
 
 //********************************************************
-int WordsEdit::find_down(QString* word)
+int WordsEdit::find_down(const QString& word)
 {
     for (int i = FindLastGroup; i < wordlist->NumGroups; i++) {
         for (int k = FindLastWord; k < wordlist->WordGroup[i].Words.count(); k++) {
-            if (!QString::compare(wordlist->WordGroup[i].Words.at(k), *word)) {
+            if (!QString::compare(wordlist->WordGroup[i].Words.at(k), word)) {
                 FindLastWord = k;
                 FindLastGroup = i;
                 return 1;
@@ -377,11 +263,11 @@ int WordsEdit::find_down(QString* word)
 }
 
 //********************************************************
-int WordsEdit::find_up(QString* word)
+int WordsEdit::find_up(const QString& word)
 {
     for (int i = FindLastGroup; i >= 0; i--) {
         for (int k = FindLastWord; k >= 0; k--) {
-            if (!QString::compare(wordlist->WordGroup[i].Words.at(k), *word)) {
+            if (!QString::compare(wordlist->WordGroup[i].Words.at(k), word)) {
                 FindLastWord = k;
                 FindLastGroup = i;
                 return 1;
@@ -396,63 +282,59 @@ int WordsEdit::find_up(QString* word)
 }
 
 //********************************************************
-void WordsEdit::select_group()
+void WordsEdit::on_listGroup_itemSelectionChanged()
 {
-    listgroup->currentRow();
-    if (listgroup->selectedItems().isEmpty())
-        listwords->clear();
+    listGroup->currentRow();
+    if (listGroup->selectedItems().isEmpty())
+        listWords->clear();
     else
-        select_group(listgroup->currentRow());
+        select_group(listGroup->currentRow());
 }
 
 //********************************************************
 void WordsEdit::select_group(int num)
 {
-    QString str;
-    str = QString("Word group %1").arg(QString::number(wordlist->WordGroup[num].GroupNum));
-    labelword->setText(str);
+    labelWord->setText(QString("Word Group #%1").arg(QString::number(wordlist->WordGroup[num].GroupNum)));
 
     SelectedGroup = num;
 
-    listwords->clear();
-    for (int k = 0; k < wordlist->WordGroup[num].Words.count(); k++) {
-        std::string str2 = wordlist->WordGroup[num].Words.at(k).toStdString();
-        const char *str1 = str2.c_str();
-        listwords->insertItem(k, str1);
+    listWords->clear();
+    for (qsizetype k = 0; k < wordlist->WordGroup[num].Words.count(); k++) {
+        listWords->insertItem(k, wordlist->WordGroup[num].Words.at(k));
     }
-    delete_word->setEnabled(false);
-    lineword->setText("");
-    lineword->setEnabled(false);
-    listwords->show();
+    pushButtonRemoveWord->setEnabled(false);
+    lineWord->clear();
+    lineWord->setEnabled(false);
+    listWords->show();
 }
 
 //********************************************************
-void WordsEdit::select_word()
+void WordsEdit::on_listWords_itemSelectionChanged()
 {
-    if (!listwords->selectedItems().isEmpty()) {
-        lineword->setText(wordlist->WordGroup[SelectedGroup].Words.at(listwords->currentRow()));
-        delete_word->setEnabled(true);
+    if (!listWords->selectedItems().isEmpty()) {
+        lineWord->setText(wordlist->WordGroup[SelectedGroup].Words.at(listWords->currentRow()));
+        pushButtonRemoveWord->setEnabled(true);
     }
 }
 
 //********************************************************
-void WordsEdit::add_word_cb(void)
+void WordsEdit::on_pushButtonAddWord_pressed(void)
 {
-    lineword->setEnabled(true);
-    lineword->setText("new word");
-    lineword->selectAll();
-    lineword->setFocus();
+    lineWord ->setEnabled(true);
+    lineWord->setText("new word");
+    lineWord->selectAll();
+    lineWord->setFocus();
 }
 
 //********************************************************
-void WordsEdit::do_add_word(void)
+void WordsEdit::on_lineWord_returnPressed(void)
 {
-    QString word = lineword->text();
+    QString word = lineWord->text();
 
     FindLastWord = 0;
     FindLastGroup = 0;
-    int curgroup = listgroup->currentRow();
-    if (find_down(&word)) {
+    int curgroup = listGroup->currentRow();
+    if (find_down(word)) {
         auto prompt = tr("This word already exists (in group %1).\nDo you wish to remove this occurance and add it to this group?").arg(wordlist->WordGroup[FindLastGroup].GroupNum);
 
         switch (QMessageBox::warning(this, tr("Remove duplicate word?"),
@@ -477,13 +359,13 @@ void WordsEdit::do_add_word(void)
 }
 
 //********************************************************
-void WordsEdit::count_groups_cb(void)
+void WordsEdit::on_actionCountWordGroups_triggered(void)
 {
     QMessageBox::information(this, tr("AGI studio"), tr("There are %1 word groups.").arg(QString::number(wordlist->NumGroups)));
 }
 
 //********************************************************
-void WordsEdit::count_words_cb(void)
+void WordsEdit::on_actionCountWords_triggered(void)
 {
     int n = 0;
     for (int i = 0; i < wordlist->NumGroups; i++)
@@ -492,64 +374,64 @@ void WordsEdit::count_words_cb(void)
 }
 
 //********************************************************
-void WordsEdit::open_file()
+void WordsEdit::on_actionOpen_triggered()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open Tokens File"), game->dir.c_str(), tr("Tokens List Files (*.tok);;All Files (*)"));
     if (!fileName.isNull())
-        open(fileName.toLatin1().data());
+        open(fileName);
 }
 
 //********************************************************
-void WordsEdit::save_as_file()
+void WordsEdit::on_actionSaveAs_triggered()
 {
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save Tokens File"), game->dir.c_str(), tr("Tokens List Files(*.tok);;All Files (*)"));
     if (!fileName.isNull())
-        save(fileName.toLatin1().data());
+        save(fileName);
 }
 
 //********************************************************
-void WordsEdit::new_file()
+void WordsEdit::on_actionNew_triggered()
 {
-    setWindowTitle("WORDS.TOK Editor");
     wordlist->clear();
-    listgroup->clear();
-    listwords->clear();
+    listGroup->clear();
+    listWords->clear();
     for (int i = 0; i < 3; i++) {
-        print_group(i);
-        listgroup->insertItem(listgroup->count(), tmp);
+        listGroup->insertItem(listGroup->count(), format_group(i));
     }
-    filename = "";
+    resource_filename = "";
+    update_all();
 }
 
 //********************************************************
-void WordsEdit::save(char *filename)
+void WordsEdit::save(const QString& fname)
 {
     if (wordlist->NumGroups == 0) {
         menu->errmes("Wordsedit", "Error: Could not save the file as there are no word groups.");
         return;
     }
-    if (!wordlist->save(filename))
+    if (!wordlist->save(fname.toStdString()))
         changed = false;
 }
 
 //********************************************************
-void WordsEdit::save_file()
+void WordsEdit::on_actionSave_triggered()
 {
-    if (filename != "")
-        save((char *)filename.c_str());
+    if (!resource_filename.isEmpty())
+        save(resource_filename);
     else
-        save_as_file();
+        on_actionSaveAs_triggered();
 }
 
 //********************************************************
-void WordsEdit::merge_file()
+void WordsEdit::on_actionMerge_triggered()
 {
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Tokens File"), game->dir.c_str(), tr("Tokens List Files (*.tok);;All Files (*)"));
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Word Tokens File"), game->dir.c_str(), tr("Tokens List Files (*.tok);;All Files (*)"));
+
     if (!fileName.isNull()) {
-        WordList w = WordList();
-        if (w.read(fileName.toLatin1().data()))
+        WordList* w = new WordList();
+        if (w->read(fileName.toStdString()))
             return;
-        wordlist->merge(w);
+        wordlist->merge(*w);
         update_all();
     }
 }
@@ -618,12 +500,12 @@ void WordsFind::find_first()
             FindLastGroup = 0;
             FindLastWord = 0;
         } else {
-            if (wordsedit->listgroup->currentRow() != -1)
-                FindLastGroup = wordsedit->listgroup->currentRow();
+            if (wordsedit->listGroup->currentRow() != -1)
+                FindLastGroup = wordsedit->listGroup->currentRow();
             else
                 FindLastGroup = 0;
-            if (wordsedit->listwords->currentRow() != -1)
-                FindLastWord = wordsedit->listwords->currentRow();
+            if (wordsedit->listWords->currentRow() != -1)
+                FindLastWord = wordsedit->listWords->currentRow();
             else
                 FindLastWord = 0;
         }
@@ -633,12 +515,12 @@ void WordsFind::find_first()
             FindLastGroup = wordlist->NumGroups - 1;
             FindLastWord = wordlist->WordGroup[FindLastGroup].Words.count() - 1;
         } else {
-            if (wordsedit->listgroup->currentRow() != -1)
-                FindLastGroup = wordsedit->listgroup->currentRow();
+            if (wordsedit->listGroup->currentRow() != -1)
+                FindLastGroup = wordsedit->listGroup->currentRow();
             else
                 FindLastGroup = wordlist->NumGroups - 1;
-            if (wordsedit->listwords->currentRow() != -1)
-                FindLastWord = wordsedit->listwords->currentRow();
+            if (wordsedit->listWords->currentRow() != -1)
+                FindLastWord = wordsedit->listWords->currentRow();
             else
                 FindLastWord = wordlist->WordGroup[FindLastGroup].Words.count() - 1;
         }
@@ -646,8 +528,8 @@ void WordsFind::find_first()
     }
 
     if (ret) {
-        wordsedit->listgroup->setCurrentRow(FindLastGroup);
-        wordsedit->listwords->setCurrentRow(FindLastWord);
+        wordsedit->listGroup->setCurrentRow(FindLastGroup);
+        wordsedit->listWords->setCurrentRow(FindLastWord);
     } else
         statusBar()->showMessage(tr("Search term '%1' not found!").arg(word));
 }
@@ -692,8 +574,8 @@ void WordsFind::on_buttonFindNext_pressed()
     }
 
     if (ret) {
-        wordsedit->listgroup->setCurrentRow(FindLastGroup);
-        wordsedit->listwords->setCurrentRow(FindLastWord);
+        wordsedit->listGroup->setCurrentRow(FindLastGroup);
+        wordsedit->listWords->setCurrentRow(FindLastWord);
     } else
         statusBar()->showMessage(tr("Search term '%1' not found!").arg(word));
 }

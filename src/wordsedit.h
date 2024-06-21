@@ -22,83 +22,87 @@
 #ifndef WORDSEDIT_H
 #define WORDSEDIT_H
 
-
+#include <QDialog>
+#include <QString>
 #include <QWidget>
-#include <QLabel>
-#include <QPushButton>
-#include <QLayout>
-#include <QListWidget>
-#include <QMessageBox>
-#include <QLineEdit>
-#include <QRadioButton>
-#include <QButtonGroup>
-#include <QEvent>
-#include <QShowEvent>
-#include <QHideEvent>
-#include <QCloseEvent>
 
 #include "wutil.h"
 #include "words.h"
 #include "resources.h"
 
 #include "ui/ui_wordsfind.h"
+#include "ui/ui_wordsedit.h"
 
 
 class WordsFind;
 
 //******************************************************
-class WordsEdit : public QWidget
+class WordsEdit : public QMainWindow, private Ui::WordsEdit
 {
     Q_OBJECT
 public:
     WordsEdit(QWidget *parent = 0, const char *name = 0, int winnum = 0, ResourcesWin *res = 0);
-    QListWidget *listgroup, *listwords;
     ResourcesWin *resources_win;
     WordList *wordlist;
     void open();
-public slots:
-    void add_group_cb(void);
-    void delete_group_cb(void);
-    void add_word_cb(void);
-    void do_add_word(void);
-    void delete_word_cb(void);
-    void change_group_number_cb(void);
-    void find_cb(void);
-    void select_group();
-    void select_group(int);
-    void select_word();
-    void update_group(int);
-    void count_groups_cb(void);
-    void count_words_cb(void);
+private slots:
+    // Menu signal handlers
+    void on_actionNew_triggered();
+    void on_actionOpen_triggered();
+    void on_actionMerge_triggered();
+    void on_actionSave_triggered();
+    void on_actionSaveAs_triggered();
+    void on_actionClose_triggered() { close(); }
 
-    void new_file();
-    void open_file();
-    void merge_file();
-    void save_file();
-    void save_as_file();
+    void on_actionAddWordGroup_triggered() { on_pushButtonAddGroup_pressed(); }
+    void on_actionRemoveWordGroup_triggered() { on_pushButtonRemoveGroup_pressed(); }
+    void on_actionChangeGroupNumber_triggered() { on_pushButtonChangeGroupNum_pressed(); }
+
+    void on_actionAddWord_triggered() { on_pushButtonAddWord_pressed(); }
+    void on_actionRemoveWord_triggered() { on_pushButtonRemoveWord_pressed(); }
+
+    void on_actionFind_triggered() { on_pushButtonFind_pressed(); }
+
+    void on_actionCountWordGroups_triggered(void);
+    void on_actionCountWords_triggered(void);
+
+    // Event signal handlers
+    void on_listGroup_itemSelectionChanged();
+    void on_listWords_itemSelectionChanged();
+
+    // Button signal handlers
+    void on_pushButtonAddGroup_pressed(void);
+    void on_pushButtonRemoveGroup_pressed(void);
+    void on_pushButtonChangeGroupNum_pressed(void);
+
+    void on_lineWord_returnPressed(void);
+    void on_pushButtonAddWord_pressed(void);
+    void on_pushButtonRemoveWord_pressed(void);
+
+    void on_pushButtonFind_pressed(void);
 protected:
-    void open(char *);
-    void save(char *);
+    void open(const QString&);
+    void save(const QString&);
     void deinit();
+
+    void select_group(int);
+    void update_group(int);
+
     int winnum;
-    QLabel *labelword;
-    QLineEdit *lineword;
-    QPushButton *add_group, *delete_group, *add_word, *delete_word,
-                *change_group_number, *find;
     WordsFind *wordsfind;
     bool changed;
-    std::string filename;
+    QString resource_filename;
     int FindLastGroup, FindLastWord;
     int SelectedGroup;
-    int find_down(QString* word);
-    int find_up(QString* word);
-    void print_group(int curgroup);
-    void add_group_ok_cb();
-    void change_group_ok_cb();
+    int find_down(const QString& word);
+    int find_up(const QString& word);
+    const QString format_group(int curgroup) const;
     void closeEvent(QCloseEvent *e);
     void showEvent(QShowEvent *);
     void hideEvent(QHideEvent *);
     void update_all();
+
+    friend WordsFind;
 };
 
 //******************************************************

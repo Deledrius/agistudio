@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>WordsEdit</class>
+ <widget class="QMainWindow" name="WordsEdit">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>682</width>
+    <height>488</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>Word Tokens Editor</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="agistudio.qrc">
+    <normaloff>:/icons/toolbar_wordsedit.xpm</normaloff>:/icons/toolbar_wordsedit.xpm</iconset>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="autoFillBackground">
+    <bool>false</bool>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="QSplitter" name="splitter">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <widget class="QWidget" name="">
+       <layout class="QVBoxLayout" name="verticalLayoutGroups">
+        <item>
+         <widget class="QLabel" name="labelGroup">
+          <property name="text">
+           <string>Word Groups</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QListWidget" name="listGroup"/>
+        </item>
+        <item>
+         <layout class="QGridLayout" name="gridLayoutGroupButtons">
+          <item row="0" column="0">
+           <widget class="QPushButton" name="pushButtonAddGroup">
+            <property name="text">
+             <string>Add Group...</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QPushButton" name="pushButtonRemoveGroup">
+            <property name="text">
+             <string>Remove Group</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0" colspan="2">
+           <widget class="QPushButton" name="pushButtonChangeGroupNum">
+            <property name="text">
+             <string>Change Group Number...</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="">
+       <layout class="QVBoxLayout" name="verticalLayoutWords">
+        <item>
+         <widget class="QLabel" name="labelWord">
+          <property name="text">
+           <string>Words</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QListWidget" name="listWords"/>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="lineWord"/>
+        </item>
+        <item>
+         <layout class="QGridLayout" name="gridLayoutWordButtons">
+          <item row="0" column="0">
+           <widget class="QPushButton" name="pushButtonAddWord">
+            <property name="text">
+             <string>Add Word</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QPushButton" name="pushButtonRemoveWord">
+            <property name="text">
+             <string>Remove Word</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0" colspan="2">
+           <widget class="QPushButton" name="pushButtonFind">
+            <property name="text">
+             <string>Find...</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>682</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu_File">
+    <property name="title">
+     <string>&amp;File</string>
+    </property>
+    <addaction name="actionNew"/>
+    <addaction name="actionOpen"/>
+    <addaction name="actionMerge"/>
+    <addaction name="actionSave"/>
+    <addaction name="actionSaveAs"/>
+    <addaction name="separator"/>
+    <addaction name="actionClose"/>
+   </widget>
+   <widget class="QMenu" name="menu_Help">
+    <property name="title">
+     <string>&amp;Help</string>
+    </property>
+    <addaction name="actionEditorHelp"/>
+   </widget>
+   <widget class="QMenu" name="menu_Words">
+    <property name="title">
+     <string>&amp;Words</string>
+    </property>
+    <addaction name="actionAddWordGroup"/>
+    <addaction name="actionRemoveWordGroup"/>
+    <addaction name="actionChangeGroupNumber"/>
+    <addaction name="separator"/>
+    <addaction name="actionAddWord"/>
+    <addaction name="actionRemoveWord"/>
+    <addaction name="separator"/>
+    <addaction name="actionCountWordGroups"/>
+    <addaction name="actionCountWords"/>
+    <addaction name="separator"/>
+    <addaction name="actionFind"/>
+   </widget>
+   <addaction name="menu_File"/>
+   <addaction name="menu_Words"/>
+   <addaction name="menu_Help"/>
+  </widget>
+  <action name="actionEditorHelp">
+   <property name="text">
+    <string>View &amp;Editor Help...</string>
+   </property>
+  </action>
+  <action name="actionNew">
+   <property name="text">
+    <string>&amp;New</string>
+   </property>
+  </action>
+  <action name="actionClose">
+   <property name="text">
+    <string>&amp;Close</string>
+   </property>
+  </action>
+  <action name="actionAddWordGroup">
+   <property name="text">
+    <string>Add Word Group</string>
+   </property>
+  </action>
+  <action name="actionRemoveWordGroup">
+   <property name="text">
+    <string>Remove Word Group</string>
+   </property>
+  </action>
+  <action name="actionChangeGroupNumber">
+   <property name="text">
+    <string>Change Group Number...</string>
+   </property>
+  </action>
+  <action name="actionAddWord">
+   <property name="text">
+    <string>Add Word</string>
+   </property>
+  </action>
+  <action name="actionRemoveWord">
+   <property name="text">
+    <string>Remove Word</string>
+   </property>
+  </action>
+  <action name="actionCountWordGroups">
+   <property name="text">
+    <string>Count Word Groups</string>
+   </property>
+  </action>
+  <action name="actionCountWords">
+   <property name="text">
+    <string>Count Words</string>
+   </property>
+  </action>
+  <action name="actionFind">
+   <property name="text">
+    <string>&amp;Find...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+F</string>
+   </property>
+  </action>
+  <action name="actionOpen">
+   <property name="text">
+    <string>&amp;Open...</string>
+   </property>
+  </action>
+  <action name="actionMerge">
+   <property name="text">
+    <string>&amp;Merge...</string>
+   </property>
+  </action>
+  <action name="actionSave">
+   <property name="text">
+    <string>&amp;Save</string>
+   </property>
+  </action>
+  <action name="actionSaveAs">
+   <property name="text">
+    <string>Save &amp;As...</string>
+   </property>
+  </action>
+ </widget>
+ <resources>
+  <include location="agistudio.qrc"/>
+ </resources>
+ <connections/>
+</ui>
