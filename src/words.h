@@ -59,11 +59,8 @@ public:
 };
 
 
-#define mrYes      1
-#define mrYesToAll 2
-#define mrNo       3
-#define mrNoToAll  4
 #define AskUser       0
 #define AlwaysReplace 1
 #define NeverReplace  2
+
 #endif

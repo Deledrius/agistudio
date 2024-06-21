@@ -506,14 +506,18 @@ bool WordList::OKToReplaceWord(const std::string& TheWord, int OldGroupNum, int 
         return false;
     if (OldGroupNum == NewGroupNum)
         return true;
-    ReplaceWord *ask = new ReplaceWord(TheWord, OldGroupNum, NewGroupNum);
-    int AskResult = ask->exec();
 
-    if (AskResult == mrYesToAll)
+    QMessageBox ask;
+    ask.setText(QString("The word '%1' already exists in group %2 of the currently open file.").arg(TheWord.c_str()).arg(QString::number(OldGroupNum)));
+    ask.setInformativeText(QString("Do you wish to replace it with the occurrence in the merge file (group %1)?").arg(QString::number(NewGroupNum)));
+    ask.setStandardButtons(QMessageBox::Yes | QMessageBox::YesToAll | QMessageBox::No | QMessageBox::NoToAll);
+    int AskResult = ask.exec();
+
+    if (AskResult == QMessageBox::YesToAll)
         WhatToDoWithExistingWords = AlwaysReplace;
-    if (AskResult == mrNoToAll)
+    if (AskResult == QMessageBox::NoToAll)
         WhatToDoWithExistingWords = NeverReplace;
-    if (AskResult == mrYes || AskResult == mrYesToAll)
+    if (AskResult == QMessageBox::Yes || AskResult == QMessageBox::YesToAll)
         return true;
     else
         return false;
