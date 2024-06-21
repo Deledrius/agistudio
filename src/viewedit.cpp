@@ -646,8 +646,8 @@ void ViewEdit::closeEvent(QCloseEvent *e)
 {
     if (changed) {
         switch (QMessageBox::warning(this, tr("View Editor"), tr("Save changes to view?"),
-                                    QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel,
-                                    QMessageBox::Cancel)) {
+                                     QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel,
+                                     QMessageBox::Cancel)) {
             case QMessageBox::Save:
                 save_to_game();
                 deinit();
@@ -721,8 +721,8 @@ void ViewEdit::save_to_game_as()
 
     if (game->ResourceInfo[VIEW][num].Exists) {
         switch (QMessageBox::warning(this, tr("View Editor"), tr("Resource view.%1 already exists. Replace it?").arg(QString::number(num), 3, QChar('0')),
-                                    QMessageBox::Yes | QMessageBox::No,
-                                    QMessageBox::No)) {
+                                     QMessageBox::Yes | QMessageBox::No,
+                                     QMessageBox::No)) {
             case QMessageBox::Yes:
                 view->save(num);
                 changed = false;
@@ -756,8 +756,8 @@ void ViewEdit::delete_view()
     if (ViewNum == -1)
         return;
     switch (QMessageBox::warning(this, tr("View Editor"), tr("Really delete view.%1?").arg(QString::number(ViewNum), 3, QChar('0')),
-                                QMessageBox::Yes | QMessageBox::No,
-                                QMessageBox::No)) {
+                                 QMessageBox::Yes | QMessageBox::No,
+                                 QMessageBox::No)) {
         case QMessageBox::Yes:
             game->DeleteResource(VIEW, ViewNum);
             if (resources_win) {

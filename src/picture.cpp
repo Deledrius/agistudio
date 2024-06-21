@@ -59,13 +59,13 @@ const QString Picture::showPos(byte *code, byte *val) const
         if (std::next(picPos) != picCodes.end())
             *val = *std::next(picPos);
     }
-    for (tempIter = picPos, count = 0; ((count < 6) && (tempIter != picCodes.end())); count++, tempIter++) {
+    for (tempIter = picPos, count = 0; ((count < 6) && (tempIter != picCodes.end())); count++, tempIter++)
         codestring += QString("%1").arg(QString::number(*tempIter, 16), 2, QChar('0'));
-    }
     return codestring;
 }
 
-const uint32_t Picture::getPos() const {
+const uint32_t Picture::getPos() const
+{
     return std::distance(picCodes.begin(), (actionList::const_iterator)picPos);
 }
 
@@ -76,17 +76,16 @@ int Picture::setBufPos(int inputValue)
     if ((inputValue < 0) || (inputValue > picCodes.size()))
         return 1;
 
-    if (inputValue == picCodes.size()) {
+    if (inputValue == picCodes.size())
         picPos = picCodes.end();
-    } else {
+    else {
         /* Advance to requested location */
         picPos = picCodes.begin();
         std::advance(picPos, inputValue);
 
         /* Walk backward to the beginning of the current action position */
-        while (*picPos < 0xF0) {
+        while (*picPos < 0xF0)
             picPos--;
-        }
     }
     draw();
     init_tool();
@@ -592,9 +591,8 @@ void Picture::load(byte *picdata, int picsize)
     do {
         nodeData = *picdata++;
         picsize--;
-        if (nodeData != DrawEnd) {
+        if (nodeData != DrawEnd)
             picCodes.emplace_back(nodeData);
-        }
         else
             break;
 
@@ -1010,9 +1008,9 @@ void Picture::moveBackAction()
 
     // Back up until we find the previous Action code.
     do {
-        if (picPos != picCodes.begin()) {
+        if (picPos != picCodes.begin())
             picPos--;
-        } else
+        else
             break;
     } while (*picPos < action_codes_start);
 }
@@ -1025,9 +1023,8 @@ void Picture::moveForwardAction()
     // Look ahead until we find the next Action code.
     auto searchPos = std::next(picPos);
     while (searchPos != picCodes.end()) {
-        if (*searchPos >= action_codes_start) {
+        if (*searchPos >= action_codes_start)
             break;
-        }
         searchPos++;
     }
     picPos = searchPos;
@@ -1562,13 +1559,12 @@ void Picture::viewData(QStringList *data)
         return;
     }
 
-    for (auto const& node : picCodes) {
+    for (auto const &node : picCodes) {
         if (node >= action_codes_start && !line.isEmpty()) {
             data->append(line);
             line.clear();
             line = QString("%1 ").arg(QString::number(node, 16), 2, QChar('0'));
-        }
-        else {
+        } else {
             temp = QString("%1 ").arg(QString::number(node, 16), 2, QChar('0'));
             line += temp;
         }

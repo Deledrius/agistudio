@@ -24,7 +24,8 @@
 
 const char *ArgTypePrefix[9] = {"", "v", "f", "m", "o", "i", "s", "w", "c"};
 const char *ArgTypeName[9] = {"number", "var", "flag", "message", "object",
-                              "inventory item", "string", "word", "controller"};
+                              "inventory item", "string", "word", "controller"
+                             };
 
 
 CommandStruct TestCommand[19] = {

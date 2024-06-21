@@ -620,9 +620,8 @@ int Logic::decode(int ResNum)
     if (ret)
         return 1;
 
-    for (auto iter = objlist->ItemNames.begin(); iter < objlist->ItemNames.end(); iter++) {
+    for (auto iter = objlist->ItemNames.begin(); iter < objlist->ItemNames.end(); iter++)
         *iter = iter->toLower();
-    }
     // words already in lower case in file so we don't need to convert them
     for (i = 0; i < objlist->ItemNames.count(); i++) {
         if (!objlist->ItemNames.at(i).contains("\""))

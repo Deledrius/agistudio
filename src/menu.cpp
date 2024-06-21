@@ -556,7 +556,7 @@ void Menu::rebuild_vol()
 {
     switch (QMessageBox::warning(this, tr("Rebuild VOL files"), tr("Are you sure?"),
                                  QMessageBox::Yes | QMessageBox::No,
-                                 QMessageBox::No )) {
+                                 QMessageBox::No)) {
         case QMessageBox::Yes:
             game->RebuildVOLfiles();
             break;
@@ -1103,10 +1103,10 @@ void OpenGameDir(QWidget *parent, bool newgame)
             switch (QMessageBox::warning(parent, "AGI Studio", prompt,
                                          QMessageBox::Yes | QMessageBox::No,
                                          QMessageBox::No)) {
-            case QMessageBox::Yes:
-                break;
-            default:
-                return;
+                case QMessageBox::Yes:
+                    break;
+                default:
+                    return;
             }
         }
     }

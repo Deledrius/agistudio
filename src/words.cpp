@@ -115,7 +115,7 @@ static int GetGroupNum(std::string s)
 }
 
 //************************************************
-int WordList::read(const std::string& filename)
+int WordList::read(const std::string &filename)
 {
     std::string CurWord, PrevWord;
     byte CurByte, CharsFromPrevWord;
@@ -231,7 +231,7 @@ void WordList::clear()
 }
 
 //**************************************************
-int WordList::save(const std::string& filename)
+int WordList::save(const std::string &filename)
 {
     FILE *fptr;
     int CurGroupIndex, NumEmptyWordGroups;
@@ -360,7 +360,7 @@ int WordList::delete_group(int num)
 }
 
 //**************************************************
-int WordList::delete_word(const std::string& word, int SelectedGroup)
+int WordList::delete_word(const std::string &word, int SelectedGroup)
 {
     if (SelectedGroup < 0)
         return -1;
@@ -454,7 +454,7 @@ bool WordList::InsertWordGroup(int GroupNum)
 }
 
 //************************************************************
-int WordList::GroupIndexOfWord(const std::string& word) const
+int WordList::GroupIndexOfWord(const std::string &word) const
 //returns the group index of the group containing the specified word}
 {
     for (int i = 0; i < NumGroups; i++) {
@@ -498,7 +498,7 @@ void WordList::merge(const WordList &NewWordList)
 }
 
 //************************************************************
-bool WordList::OKToReplaceWord(const std::string& TheWord, int OldGroupNum, int NewGroupNum)
+bool WordList::OKToReplaceWord(const std::string &TheWord, int OldGroupNum, int NewGroupNum)
 {
     if (WhatToDoWithExistingWords == AlwaysReplace)
         return true;

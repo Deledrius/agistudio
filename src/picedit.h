@@ -127,10 +127,10 @@ class PicEdit : public QMainWindow, private Ui::PicEdit
 {
     Q_OBJECT
 public:
-    explicit PicEdit(QWidget* parent = nullptr, const char* name = 0, int winnum = 0, ResourcesWin* res = 0);
+    explicit PicEdit(QWidget *parent = nullptr, const char *name = 0, int winnum = 0, ResourcesWin *res = 0);
 
     void open(int ResNum);
-    ResourcesWin* resources_win;
+    ResourcesWin *resources_win;
 public slots:
     void open();
     void open_file();
@@ -201,8 +201,8 @@ protected:
     PCanvas *canvas;
     Palette1 *palette;
     ViewData *viewdata;
-    Picture* picture;
-    QFrame* pricolor;
+    Picture *picture;
+    QFrame *pricolor;
     bool changed;
     bool closing, hiding, showing;
     int pri_mode;

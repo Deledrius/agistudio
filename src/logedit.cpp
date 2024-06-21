@@ -333,9 +333,9 @@ void LogEdit::closeEvent(QCloseEvent *e)
             return;
         }
 
-        switch (QMessageBox::warning(this, tr("Logic Editor"), tr("Save changes to Logic script?"), 
-                                    QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel,
-                                    QMessageBox::Cancel)) {
+        switch (QMessageBox::warning(this, tr("Logic Editor"), tr("Save changes to Logic script?"),
+                                     QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel,
+                                     QMessageBox::Cancel)) {
             case QMessageBox::Save:
                 save_logic();
                 deinit();
@@ -637,9 +637,9 @@ void LogEdit::change_logic_number()
     }
     if (game->ResourceInfo[LOGIC][num].Exists) {
         switch (QMessageBox::warning(this, tr("Logic Editor"),
-                                    tr("Resource logic.%1 already exists. Replace it?").arg(QString::number(num), 3, QChar('0')),
-                                    QMessageBox::Yes | QMessageBox::No,
-                                    QMessageBox::No)) {
+                                     tr("Resource logic.%1 already exists. Replace it?").arg(QString::number(num), 3, QChar('0')),
+                                     QMessageBox::Yes | QMessageBox::No,
+                                     QMessageBox::No)) {
             case QMessageBox::Yes:
                 break;
             case QMessageBox::No:
@@ -667,8 +667,8 @@ void LogEdit::delete_logic()
         return;
 
     switch (QMessageBox::warning(this, tr("Logic Editor"), tr("Really delete logic %1?").arg(QString::number(LogicNum), 3, QChar('0')),
-                                QMessageBox::Yes | QMessageBox::No,
-                                QMessageBox::No)) {
+                                 QMessageBox::Yes | QMessageBox::No,
+                                 QMessageBox::No)) {
         case QMessageBox::Yes:
             game->DeleteResource(LOGIC, LogicNum);
             delete_file(LogicNum);
@@ -705,8 +705,8 @@ void LogEdit::delete_file(int ResNum)
 void LogEdit::clear_all()
 {
     switch (QMessageBox::warning(this, tr("Logic Editor"), tr("Really clear all?"),
-                                QMessageBox::Yes | QMessageBox::No,
-                                QMessageBox::No)) {
+                                 QMessageBox::Yes | QMessageBox::No,
+                                 QMessageBox::No)) {
         case QMessageBox::Yes:
             editor->clear();
             logic->OutputText = "";
@@ -722,8 +722,8 @@ void LogEdit::new_room()
     //  FILE *fptr;
 
     switch (QMessageBox::warning(this, tr("Logic Editor"), tr("Replace the editor contents\nwith the new room template?"),
-                                QMessageBox::Yes | QMessageBox::No,
-                                QMessageBox::No)) {
+                                 QMessageBox::Yes | QMessageBox::No,
+                                 QMessageBox::No)) {
         case QMessageBox::Yes:
             if (roomgen == NULL)
                 roomgen = new RoomGen();
@@ -745,7 +745,7 @@ void LogEdit::goto_cb()
 
     bool ok;
     int linenum = QInputDialog::getInt(this, tr("Go to line"), tr("Go to line:"),
-                    cursor.blockNumber(), 1, editor->document()->blockCount(), ok = &ok);
+                                       cursor.blockNumber(), 1, editor->document()->blockCount(), ok = &ok);
     if (!ok)
         return;
 
@@ -921,8 +921,8 @@ void TextEdit::closeEvent(QCloseEvent *e)
         }
 
         switch (QMessageBox::warning(this, tr("Text Editor"), tr("Do you want to save changes?"),
-                                    QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel,
-                                    QMessageBox::Cancel)) {
+                                     QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel,
+                                     QMessageBox::Cancel)) {
             case QMessageBox::Save:
                 save();
                 deinit();
@@ -947,8 +947,8 @@ void TextEdit::new_text()
 {
     if (filename.length() > 0) {
         switch (QMessageBox::warning(this, tr("Text Editor"), tr("Do you want to save changes to\n%1?").arg(filename.c_str()),
-                                    QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel,
-                                    QMessageBox::Cancel)) {
+                                     QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel,
+                                     QMessageBox::Cancel)) {
             case QMessageBox::Save:
                 save();
                 break;
