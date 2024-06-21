@@ -304,9 +304,9 @@ void ResourcesWin::delete_resource()
     int resnum = ResourceIndex[k];
 
     switch (QMessageBox::warning(this, tr("Delete resource"),
-                                tr("Really delete %s.%03d?").arg(ResTypeName[restype]).arg(QString::number(resnum), 3, QChar('0')),
-                                QMessageBox::Yes | QMessageBox::No,
-                                QMessageBox::No)) {
+                                 tr("Really delete %s.%03d?").arg(ResTypeName[restype]).arg(QString::number(resnum), 3, QChar('0')),
+                                 QMessageBox::Yes | QMessageBox::No,
+                                 QMessageBox::No)) {
         case QMessageBox::Yes:
             game->DeleteResource(restype, resnum);
             select_resource_type(restype);
@@ -336,10 +336,10 @@ void ResourcesWin::renumber_resource()
     int resnum = ResourceIndex[k];
     if (!game->ResourceInfo[restype][newnum].Exists)
         return;
-    switch (QMessageBox::warning(this, tr("Renumber resource"), 
-                                tr("Resource %1.%2 already exists. Replace it?").arg(ResTypeName[restype]).arg(QString::number(newnum), 3, QChar('0')),
-                                QMessageBox::Yes | QMessageBox::No,
-                                QMessageBox::No)) {
+    switch (QMessageBox::warning(this, tr("Renumber resource"),
+                                 tr("Resource %1.%2 already exists. Replace it?").arg(ResTypeName[restype]).arg(QString::number(newnum), 3, QChar('0')),
+                                 QMessageBox::Yes | QMessageBox::No,
+                                 QMessageBox::No)) {
         case QMessageBox::Yes:
             game->ReadResource(restype, resnum);
             game->DeleteResource(restype, resnum);
@@ -386,9 +386,9 @@ void ResourcesWin::import_resource()
     int replace = 0;
     if (game->ResourceInfo[restype][newnum].Exists) {
         replace = QMessageBox::warning(this, tr("Overwrite resource"),
-                                      tr("Resource %1.%2 already exists. Replace it?").arg(ResTypeName[restype]).arg(QString::number(newnum), 3, QChar('0')),
-                                      QMessageBox::Yes | QMessageBox::No,
-                                      QMessageBox::No);
+                                       tr("Resource %1.%2 already exists. Replace it?").arg(ResTypeName[restype]).arg(QString::number(newnum), 3, QChar('0')),
+                                       QMessageBox::Yes | QMessageBox::No,
+                                       QMessageBox::No);
     }
     switch (replace) {
         case QMessageBox::Yes: {
@@ -411,7 +411,7 @@ void ResourcesWin::import_resource()
                 if (ResourceIndex[k] == newnum)
                     list->setCurrentRow(k);
         }
-            break;
+        break;
         default:
             break;
     }
@@ -460,9 +460,9 @@ void ResourcesWin::extract_all_resource()
 
     int restype = selected;
     switch (QMessageBox::warning(this, tr("Extract all"),
-                                tr("Do you really want to extract all %1 resources?").arg(ResTypeName[restype]),
-                                QMessageBox::Yes | QMessageBox::No,
-                                QMessageBox::No)) {
+                                 tr("Do you really want to extract all %1 resources?").arg(ResTypeName[restype]),
+                                 QMessageBox::Yes | QMessageBox::No,
+                                 QMessageBox::No)) {
         case QMessageBox::Yes:
             break;
         default:
@@ -677,9 +677,9 @@ void AddResource::ok_cb()
 
     if (game->ResourceInfo[restype][num].Exists) {
         switch (QMessageBox::warning(this, "Add resource",
-                                    tr("Resource %1.%2 already exists. Replace it?").arg(ResTypeName[restype]).arg(QString::number(num), 3, QChar('0')),
-                                    QMessageBox::Yes | QMessageBox::No,
-                                    QMessageBox::No)) {
+                                     tr("Resource %1.%2 already exists. Replace it?").arg(ResTypeName[restype]).arg(QString::number(num), 3, QChar('0')),
+                                     QMessageBox::Yes | QMessageBox::No,
+                                     QMessageBox::No)) {
             case QMessageBox::Yes:
                 if (!load_resource(file.c_str(), restype))
                     game->AddResource(restype, num);

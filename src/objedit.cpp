@@ -153,8 +153,8 @@ void ObjEdit::closeEvent(QCloseEvent *e)
 {
     if (changed) {
         switch (QMessageBox::warning(this, tr("Object Editor"), tr("Save changes to OBJECT file?"),
-                                    QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel,
-                                    QMessageBox::Cancel)) {
+                                     QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel,
+                                     QMessageBox::Cancel)) {
             case QMessageBox::Save:
                 save_file();
                 deinit();

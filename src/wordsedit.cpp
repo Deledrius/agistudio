@@ -79,8 +79,8 @@ void WordsEdit::closeEvent(QCloseEvent *e)
 {
     if (changed) {
         switch (QMessageBox::warning(this, tr("Word Tokens Editor"), tr("Save changes to WORDS.TOK?"),
-                                    QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel,
-                                    QMessageBox::Cancel)) {
+                                     QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel,
+                                     QMessageBox::Cancel)) {
             case QMessageBox::Save:
                 on_actionSave_triggered();
                 deinit();
@@ -129,7 +129,7 @@ void WordsEdit::update_all()
 }
 
 //********************************************************
-void WordsEdit::open(const QString& fname)
+void WordsEdit::open(const QString &fname)
 {
     if (wordlist->read(fname.toStdString()))
         return ;
@@ -245,7 +245,7 @@ void WordsEdit::on_pushButtonFind_pressed(void)
 }
 
 //********************************************************
-int WordsEdit::find_down(const QString& word)
+int WordsEdit::find_down(const QString &word)
 {
     for (int i = FindLastGroup; i < wordlist->NumGroups; i++) {
         for (int k = FindLastWord; k < wordlist->WordGroup[i].Words.count(); k++) {
@@ -263,7 +263,7 @@ int WordsEdit::find_down(const QString& word)
 }
 
 //********************************************************
-int WordsEdit::find_up(const QString& word)
+int WordsEdit::find_up(const QString &word)
 {
     for (int i = FindLastGroup; i >= 0; i--) {
         for (int k = FindLastWord; k >= 0; k--) {
@@ -299,9 +299,8 @@ void WordsEdit::select_group(int num)
     SelectedGroup = num;
 
     listWords->clear();
-    for (qsizetype k = 0; k < wordlist->WordGroup[num].Words.count(); k++) {
+    for (qsizetype k = 0; k < wordlist->WordGroup[num].Words.count(); k++)
         listWords->insertItem(k, wordlist->WordGroup[num].Words.at(k));
-    }
     pushButtonRemoveWord->setEnabled(false);
     lineWord->clear();
     lineWord->setEnabled(false);
@@ -338,9 +337,9 @@ void WordsEdit::on_lineWord_returnPressed(void)
         auto prompt = tr("This word already exists (in group %1).\nDo you wish to remove this occurance and add it to this group?").arg(wordlist->WordGroup[FindLastGroup].GroupNum);
 
         switch (QMessageBox::warning(this, tr("Remove duplicate word?"),
-                                    prompt,
-                                    QMessageBox::Yes | QMessageBox::No,
-                                    QMessageBox::No)) {
+                                     prompt,
+                                     QMessageBox::Yes | QMessageBox::No,
+                                     QMessageBox::No)) {
             case QMessageBox::Yes:
                 wordlist->WordGroup[FindLastGroup].Words.removeAt(FindLastWord);
                 update_group(FindLastGroup);
@@ -395,15 +394,14 @@ void WordsEdit::on_actionNew_triggered()
     wordlist->clear();
     listGroup->clear();
     listWords->clear();
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 3; i++)
         listGroup->insertItem(listGroup->count(), format_group(i));
-    }
     resource_filename = "";
     update_all();
 }
 
 //********************************************************
-void WordsEdit::save(const QString& fname)
+void WordsEdit::save(const QString &fname)
 {
     if (wordlist->NumGroups == 0) {
         menu->errmes("Wordsedit", "Error: Could not save the file as there are no word groups.");
@@ -428,7 +426,7 @@ void WordsEdit::on_actionMerge_triggered()
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open Word Tokens File"), game->dir.c_str(), tr("Tokens List Files (*.tok);;All Files (*)"));
 
     if (!fileName.isNull()) {
-        WordList* w = new WordList();
+        WordList *w = new WordList();
         if (w->read(fileName.toStdString()))
             return;
         wordlist->merge(*w);
@@ -439,7 +437,7 @@ void WordsEdit::on_actionMerge_triggered()
 
 //********************************************************
 //
-WordsFind::WordsFind(QWidget* parent, const char* name, WordsEdit* w)
+WordsFind::WordsFind(QWidget *parent, const char *name, WordsEdit *w)
     : QMainWindow(parent), wordsedit(w), wordlist(w->wordlist),
       FindLastWord(-1), FindLastGroup(-1), first(false)
 {
@@ -447,7 +445,7 @@ WordsFind::WordsFind(QWidget* parent, const char* name, WordsEdit* w)
 }
 
 //********************************************************
-int WordsFind::find_down(QString* word)
+int WordsFind::find_down(QString *word)
 {
     bool sub = radioButtonMatchSubstr->isChecked();
 
@@ -468,7 +466,7 @@ int WordsFind::find_down(QString* word)
 }
 
 //********************************************************
-int WordsFind::find_up(QString* word)
+int WordsFind::find_up(QString *word)
 {
     bool sub = radioButtonMatchSubstr->isChecked();
 

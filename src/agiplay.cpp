@@ -101,7 +101,7 @@ int init_sound()
     qbuffer = new QBuffer();
     qbuffer->open(QIODevice::ReadWrite);
 
-    buffer = (short*)calloc(2, 2048);
+    buffer = (short *)calloc(2, 2048);
 
     return 0;
 }
@@ -157,7 +157,7 @@ void mix_channels(uint16_t num_samples)
 
 void dump_buffer(uint32_t i)
 {
-    qbuffer->write((const char *)buffer, i*2);
+    qbuffer->write((const char *)buffer, i * 2);
 }
 
 

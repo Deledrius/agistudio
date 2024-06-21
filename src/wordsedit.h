@@ -81,8 +81,8 @@ private slots:
 
     void on_pushButtonFind_pressed(void);
 protected:
-    void open(const QString&);
-    void save(const QString&);
+    void open(const QString &);
+    void save(const QString &);
     void deinit();
 
     void select_group(int);
@@ -94,8 +94,8 @@ protected:
     QString resource_filename;
     int FindLastGroup, FindLastWord;
     int SelectedGroup;
-    int find_down(const QString& word);
-    int find_up(const QString& word);
+    int find_down(const QString &word);
+    int find_up(const QString &word);
     const QString format_group(int curgroup) const;
     void closeEvent(QCloseEvent *e);
     void showEvent(QShowEvent *);
@@ -115,11 +115,11 @@ public:
 public slots:
     void on_buttonFindNext_pressed();
 protected:
-    WordsEdit* wordsedit;
-    WordList* wordlist;
+    WordsEdit *wordsedit;
+    WordList *wordlist;
     int FindLastGroup, FindLastWord;
-    int find_down(QString* word);
-    int find_up(QString* word);
+    int find_down(QString *word);
+    int find_up(QString *word);
     void find_first();
 
     friend WordsEdit;

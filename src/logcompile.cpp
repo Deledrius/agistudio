@@ -196,9 +196,8 @@ int Logic::AddIncludes()
         RealLineNum[CurLine] = CurInputLine;
         LineFile[CurLine] = 0;
 
-        if (InputLines.at(CurInputLine).startsWith("#include", Qt::CaseInsensitive)) {
+        if (InputLines.at(CurInputLine).startsWith("#include", Qt::CaseInsensitive))
             continue;
-        }
         std::string str = InputLines.at(CurInputLine).right(8).toStdString();
         if (str.length() < 4) {
             ShowError(CurLine, "Missing include filename !");
@@ -269,9 +268,8 @@ int Logic::ReadDefines()
 
     NumDefines = 0;
     for (CurLine = 0; CurLine < EditLines.count(); CurLine++) {
-        if (EditLines.at(CurLine).startsWith("#define", Qt::CaseInsensitive)) {
+        if (EditLines.at(CurLine).startsWith("#define", Qt::CaseInsensitive))
             continue;
-        }
         std::string str = EditLines.at(CurLine).right(7).toStdString();
         std::transform(str.begin(), str.end(), str.begin(), ::tolower);
         if (str.length() < 4) {
@@ -394,9 +392,8 @@ int Logic::ReadPredefinedMessages()
         MessageExists[i] = false;
     }
     for (CurLine = 0; CurLine < EditLines.count(); CurLine++) {
-        if (EditLines.at(CurLine).startsWith("#message", Qt::CaseInsensitive)) {
+        if (EditLines.at(CurLine).startsWith("#message", Qt::CaseInsensitive))
             continue;
-        }
         std::string str = EditLines.at(CurLine).right(8).toStdString();
         if (str[0] != ' ') {
             ShowError(CurLine, "' ' expected after #message.");
@@ -1512,9 +1509,8 @@ int Logic::compile()
     if (ret)
         return 1;
 
-    for (auto iter = objlist->ItemNames.begin(); iter < objlist->ItemNames.end(); iter++) {
+    for (auto iter = objlist->ItemNames.begin(); iter < objlist->ItemNames.end(); iter++)
         *iter = iter->toLower();
-    }
 
     // words already in lower case in file so we don't need to convert them
     for (i = 0; i < objlist->ItemNames.count(); i++) {

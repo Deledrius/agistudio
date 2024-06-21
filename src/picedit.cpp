@@ -104,7 +104,7 @@ PicEdit::PicEdit(QWidget *parent, const char *name, int win_num, ResourcesWin *r
     drawmodeButtonGroup->setId(priorityLayerToggle, 1);
 
     // Create our custom statusbar display
-    QLabel* msg = new QLabel(statusbar);
+    QLabel *msg = new QLabel(statusbar);
     statusbar->addPermanentWidget(msg);
     pricolor = new QFrame(statusbar);
     pricolor->setMinimumSize(8, 8);
@@ -234,8 +234,8 @@ void PicEdit::closeEvent(QCloseEvent *e)
 {
     if (changed) {
         switch (QMessageBox::warning(this, tr("Picture Editor"), tr("Save changes to picture?"),
-                                    QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel,
-                                    QMessageBox::Cancel)) {
+                                     QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel,
+                                     QMessageBox::Cancel)) {
             case QMessageBox::Save:
                 save_to_game();
                 deinit();
@@ -280,9 +280,9 @@ void PicEdit::save_to_game_as()
 
     if (game->ResourceInfo[PICTURE][num].Exists) {
         switch (QMessageBox::warning(this, tr("Picture Editor"),
-                                    tr("Resource picture.%1 already exists. Replace it?").arg(QString::number(num), 3, QChar('0')),
-                                    QMessageBox::Yes | QMessageBox::No,
-                                    QMessageBox::No)) {
+                                     tr("Resource picture.%1 already exists. Replace it?").arg(QString::number(num), 3, QChar('0')),
+                                     QMessageBox::Yes | QMessageBox::No,
+                                     QMessageBox::No)) {
             case QMessageBox::Yes:
                 picture->save(num);
                 PicNum = num;
@@ -314,9 +314,9 @@ void PicEdit::delete_picture()
     if (PicNum == -1)
         return;
     switch (QMessageBox::warning(this, tr("Picture Editor"),
-                                tr("Really delete picture %1?").arg(QString::number(PicNum), 3, QChar('0')),
-                                QMessageBox::Yes | QMessageBox::No,
-                                QMessageBox::No)) {
+                                 tr("Really delete picture %1?").arg(QString::number(PicNum), 3, QChar('0')),
+                                 QMessageBox::Yes | QMessageBox::No,
+                                 QMessageBox::No)) {
         case QMessageBox::Yes:
             game->DeleteResource(PICTURE, PicNum);
             if (resources_win) {
@@ -347,9 +347,9 @@ void PicEdit::view_data()
 {
     if (viewdata == NULL)
         viewdata = new ViewData(nullptr, nullptr, picture);
-    if (PicNum != -1) {
+    if (PicNum != -1)
         viewdata->setWindowTitle(QString(tr("View data: picture.%1")).arg(QString::number(PicNum), 3, '0'));
-    } else
+    else
         viewdata->setWindowTitle(tr("View data: picture"));
     viewdata->read();
 }
@@ -460,9 +460,8 @@ void PicEdit::change_type(int k)
 //*********************************************
 void PicEdit::deselect_tool()
 {
-    QAbstractButton* checked = toolButtonGroup->checkedButton();
-    if (checked)
-    {
+    QAbstractButton *checked = toolButtonGroup->checkedButton();
+    if (checked) {
         toolButtonGroup->setExclusive(false);
         checked->setChecked(false);
         toolButtonGroup->setExclusive(true);
@@ -490,9 +489,9 @@ void PicEdit::show_pos()
     actionCodeDisplay->setText(picture->showPos(&code, &val));
 
     if (code >= action_codes_start && code <= action_codes_end) {       // Action: can add comments
-        if (code == SetPicColor || code == SetPriColor) {               // Add color name
+        if (code == SetPicColor || code == SetPriColor)                 // Add color name
             actionCodeDesc->setText(QString("%1 %2").arg(comment[code - action_codes_start]).arg(colname[val]));
-        } else
+        else
             actionCodeDesc->setText(comment[code - action_codes_start]);
     } else
         actionCodeDesc->clear();
@@ -771,7 +770,7 @@ void PCanvas::mouseMoveEvent(QMouseEvent *event)
 
     if (x >= 0 && y >= 0) {
         int pri = y / 12 + 1;
-        auto msg = picedit->statusbar->findChild<QLabel*>();
+        auto msg = picedit->statusbar->findChild<QLabel *>();
         msg->setText(QString("X=%1  Y=%2  Pri=%3").arg(x / 2).arg(y).arg(pri));
         auto pal = picedit->pricolor->palette();
         pal.setColor(QPalette::Window, egacolor[pri + 1]);
@@ -1044,7 +1043,7 @@ void PCanvas::closeEvent(QCloseEvent *e)
 /*******************************************************/
 //
 Palette1::Palette1(QWidget *parent, const char *name, PicEdit *p)
-    : QWidget(parent), left(-1), right(-1), picedit(p) 
+    : QWidget(parent), left(-1), right(-1), picedit(p)
 {
     this->setMinimumSize(250, 40);
     this->setMaximumSize(350, 80);
