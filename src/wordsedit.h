@@ -41,6 +41,8 @@
 #include "words.h"
 #include "resources.h"
 
+#include "ui/ui_wordsfind.h"
+
 
 class WordsFind;
 
@@ -100,28 +102,23 @@ protected:
 };
 
 //******************************************************
-class WordsFind : public QWidget
+class WordsFind : public QMainWindow, private Ui::WordsFind
 {
     Q_OBJECT
 public:
     WordsFind(QWidget *parent = 0, const char *name = 0, WordsEdit *w = 0);
-    void open();
-    QLineEdit *find_field;
     bool first;
 public slots:
-    void find_next_cb();
-    void find_first_cb();
-    void cancel_cb();
+    void on_buttonFindNext_pressed();
 protected:
-    WordList *wordlist;
-    WordsEdit *wordsedit;
-    QPushButton *find_first, *find_next, *cancel;
-    QRadioButton *up, *down;
-    QRadioButton *start, *current;
-    QRadioButton *exact, *substring;
+    WordsEdit* wordsedit;
+    WordList* wordlist;
     int FindLastGroup, FindLastWord;
     int find_down(QString* word);
     int find_up(QString* word);
+    void find_first();
+
+    friend WordsEdit;
 };
 
 //******************************************************
