@@ -106,6 +106,7 @@ set(AGIStudio_SOURCES
 
 set(AGIStudio_UI
     ui/picedit.ui
+    ui/wordsfind.ui
 )
 
 set(AGIStudio_UIRESOURCES

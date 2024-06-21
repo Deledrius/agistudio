@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>WordsFind</class>
+ <widget class="QMainWindow" name="WordsFind">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>505</width>
+    <height>144</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>Find</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="agistudio.qrc">
+    <normaloff>:/icons/toolbar_wordsedit.xpm</normaloff>:/icons/toolbar_wordsedit.xpm</iconset>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="autoFillBackground">
+    <bool>false</bool>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="lineFind"/>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="labelFind">
+        <property name="text">
+         <string>Find:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QPushButton" name="buttonFindNext">
+        <property name="text">
+         <string>Find Next</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <layout class="QHBoxLayout" name="horizontalLayoutOptions">
+        <item>
+         <widget class="QGroupBox" name="groupBoxDirection">
+          <property name="title">
+           <string>Direction:</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout">
+           <item>
+            <widget class="QRadioButton" name="radioButtonDirUp">
+             <property name="text">
+              <string>Up</string>
+             </property>
+             <attribute name="buttonGroup">
+              <string notr="true">buttonGroupDirection</string>
+             </attribute>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="radioButtonDirDown">
+             <property name="text">
+              <string>Down</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+             <attribute name="buttonGroup">
+              <string notr="true">buttonGroupDirection</string>
+             </attribute>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="groupBoxFrom">
+          <property name="title">
+           <string>Search From:</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_2">
+           <item>
+            <widget class="QRadioButton" name="radioButtonFromStart">
+             <property name="text">
+              <string>Start</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+             <attribute name="buttonGroup">
+              <string notr="true">buttonGroupFrom</string>
+             </attribute>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="radioButtonFromCurrent">
+             <property name="text">
+              <string>Current</string>
+             </property>
+             <attribute name="buttonGroup">
+              <string notr="true">buttonGroupFrom</string>
+             </attribute>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="groupBoxMatch">
+          <property name="title">
+           <string>Match:</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_3">
+           <item>
+            <widget class="QRadioButton" name="radioButtonMatchExact">
+             <property name="text">
+              <string>Exact</string>
+             </property>
+             <attribute name="buttonGroup">
+              <string notr="true">buttonGroupMatch</string>
+             </attribute>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="radioButtonMatchSubstr">
+             <property name="text">
+              <string>Substring</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+             <attribute name="buttonGroup">
+              <string notr="true">buttonGroupMatch</string>
+             </attribute>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QStatusBar" name="statusBarFind">
+   <property name="sizeGripEnabled">
+    <bool>false</bool>
+   </property>
+  </widget>
+ </widget>
+ <resources>
+  <include location="agistudio.qrc"/>
+ </resources>
+ <connections/>
+ <buttongroups>
+  <buttongroup name="buttonGroupDirection"/>
+  <buttongroup name="buttonGroupFrom"/>
+  <buttongroup name="buttonGroupMatch"/>
+ </buttongroups>
+</ui>

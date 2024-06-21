@@ -355,7 +355,7 @@ void WordsEdit::find_cb(void)
     if (wordsfind == NULL)
         wordsfind = new WordsFind(0, 0, this);
     wordsfind->show();
-    wordsfind->find_field->setFocus();
+    wordsfind->lineFind->setFocus();
 }
 
 //********************************************************
@@ -554,81 +554,20 @@ void WordsEdit::merge_file()
     }
 }
 
+
 //********************************************************
-WordsFind::WordsFind(QWidget *parent, const char *name, WordsEdit *w)
-    : QWidget(parent)
+//
+WordsFind::WordsFind(QWidget* parent, const char* name, WordsEdit* w)
+    : QMainWindow(parent), wordsedit(w), wordlist(w->wordlist),
+      FindLastWord(-1), FindLastGroup(-1), first(false)
 {
-    wordsedit = w;
-    wordlist = w->wordlist;
-    setWindowTitle("Find");
-    QBoxLayout *all =  new QVBoxLayout(this);
-
-    QBoxLayout *txt = new QHBoxLayout(this);
-    all->addLayout(txt);
-
-    QLabel *label = new QLabel("Find what:", this);
-    txt->addWidget(label);
-
-    find_field = new QLineEdit(this);
-    find_field->setMinimumWidth(200);
-    connect(find_field, SIGNAL(returnPressed()), SLOT(find_first_cb()));
-    txt->addWidget(find_field);
-
-    QBoxLayout *left1 =  new QHBoxLayout(this);
-    all->addLayout(left1);
-
-    QButtonGroup *direction = new QButtonGroup(this);
-    up = new QRadioButton(tr("Up"));
-    up->setChecked(false);
-    down = new QRadioButton(tr("Down"));
-    down->setChecked(true);
-    direction->addButton(up);
-    direction->addButton(down);
-    all->addWidget(up);
-    all->addWidget(down);
-
-    QButtonGroup *from = new QButtonGroup(this);
-    start = new QRadioButton(tr("Start"));
-    start->setChecked(true);
-    current = new QRadioButton(tr("Current"));
-    current->setChecked(false);
-    from->addButton(start);
-    from->addButton(current);
-    all->addWidget(start);
-    all->addWidget(current);
-
-    QButtonGroup *type = new QButtonGroup(this);
-    exact = new QRadioButton(tr("Exact"));
-    exact->setChecked(false);
-    substring = new QRadioButton(tr("Substr"));
-    substring->setChecked(true);
-    type->addButton(exact);
-    type->addButton(substring);
-    all->addWidget(exact);
-    all->addWidget(substring);
-
-    QBoxLayout *right =  new QVBoxLayout(this);
-    left1->addLayout(right);
-    find_first = new QPushButton("Find", this);
-    right->addWidget(find_first);
-    connect(find_first, SIGNAL(clicked()), SLOT(find_first_cb()));
-    find_next = new QPushButton("Find next", this);
-    connect(find_next, SIGNAL(clicked()), SLOT(find_next_cb()));
-    right->addWidget(find_next);
-    cancel = new QPushButton("Cancel", this);
-    connect(cancel, SIGNAL(clicked()), SLOT(cancel_cb()));
-    right->addWidget(cancel);
-
-    adjustSize();
-
-    FindLastWord = -1;
-    FindLastGroup = -1;
+    setupUi(this);
 }
 
 //********************************************************
 int WordsFind::find_down(QString* word)
 {
-    bool sub = substring->isChecked();
+    bool sub = radioButtonMatchSubstr->isChecked();
 
     for (int i = FindLastGroup; i < wordlist->NumGroups; i++) {
         for (int k = FindLastWord; k < wordlist->WordGroup[i].Words.count(); k++) {
@@ -649,7 +588,7 @@ int WordsFind::find_down(QString* word)
 //********************************************************
 int WordsFind::find_up(QString* word)
 {
-    bool sub = substring->isChecked();
+    bool sub = radioButtonMatchSubstr->isChecked();
 
     for (int i = FindLastGroup; i >= 0; i--) {
         for (int k = FindLastWord; k >= 0; k--) {
@@ -669,13 +608,13 @@ int WordsFind::find_up(QString* word)
 }
 
 //********************************************************
-void WordsFind::find_first_cb()
+void WordsFind::find_first()
 {
     int ret;
-    QString word = find_field->text();
+    QString word = lineFind->text();
 
-    if (down->isChecked()) {
-        if (start->isChecked()) {
+    if (radioButtonDirDown->isChecked()) {
+        if (radioButtonFromStart->isChecked()) {
             FindLastGroup = 0;
             FindLastWord = 0;
         } else {
@@ -690,7 +629,7 @@ void WordsFind::find_first_cb()
         }
         ret = find_down(&word);
     } else {
-        if (start->isChecked()) {
+        if (radioButtonFromStart->isChecked()) {
             FindLastGroup = wordlist->NumGroups - 1;
             FindLastWord = wordlist->WordGroup[FindLastGroup].Words.count() - 1;
         } else {
@@ -710,24 +649,26 @@ void WordsFind::find_first_cb()
         wordsedit->listgroup->setCurrentRow(FindLastGroup);
         wordsedit->listwords->setCurrentRow(FindLastWord);
     } else
-        menu->errmes("Find", "'%s' not found !", word);
+        statusBar()->showMessage(tr("Search term '%1' not found!").arg(word));
 }
 
 //********************************************************
-void WordsFind::find_next_cb()
+void WordsFind::on_buttonFindNext_pressed()
 {
     int ret;
-    QString word = find_field->text();
+    QString word = lineFind->text();
+
+    statusBar()->clearMessage();
 
     if (FindLastGroup == -1 || FindLastWord == -1) {
-        find_first_cb();
+        find_first();
         return;
     }
 
-    if (down->isChecked()) {
+    if (radioButtonDirDown->isChecked()) {
         if (FindLastWord + 1 >= wordlist->WordGroup[FindLastGroup].Words.count()) {
             if (FindLastGroup + 1 >= wordlist->NumGroups) {
-                menu->errmes("Find", "'%s' not found !", word);
+                statusBar()->showMessage(tr("Search term '%1' not found!").arg(word));
                 return ;
             } else {
                 FindLastWord = 0;
@@ -739,7 +680,7 @@ void WordsFind::find_next_cb()
     } else {
         if (FindLastWord - 1 < 0) {
             if (FindLastGroup - 1 < 0) {
-                menu->errmes("Find", "'%s' not found !", word);
+                statusBar()->showMessage(tr("Search term '%1' not found!").arg(word));
                 return;
             } else {
                 FindLastGroup--;
@@ -754,13 +695,7 @@ void WordsFind::find_next_cb()
         wordsedit->listgroup->setCurrentRow(FindLastGroup);
         wordsedit->listwords->setCurrentRow(FindLastWord);
     } else
-        menu->errmes("Find", "'%s' not found !", word);
-}
-
-//************************************************
-void WordsFind::cancel_cb()
-{
-    hide();
+        statusBar()->showMessage(tr("Search term '%1' not found!").arg(word));
 }
 
 //************************************************
