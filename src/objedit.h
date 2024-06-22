@@ -23,19 +23,18 @@
 
 
 #include <QWidget>
-#include <QLabel>
-#include <QPushButton>
-#include <QLayout>
-#include <QMessageBox>
-#include <QLineEdit>
-#include <QEvent>
-#include <QShowEvent>
-#include <QHideEvent>
-#include <QCloseEvent>
-#include <QListWidget>
 
 #include "object.h"
 
+
+class QAction;
+class QCloseEvent;
+class QHideEvent;
+class QListWidget;
+class QLineEdit;
+class QMenu;
+class QPushButton;
+class QShowEvent;
 
 //inventory objects editor
 class ObjEdit : public QWidget

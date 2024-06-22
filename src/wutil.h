@@ -25,14 +25,11 @@
 #include <vector>
 
 #include <QWidget>
-#include <QLabel>
-#include <QPushButton>
-#include <QLayout>
-#include <QMessageBox>
-#include <QLineEdit>
-#include <QPaintEvent>
-#include <QMouseEvent>
 
+
+class QColor;
+class QPaintEvent;
+class QMouseEvent;
 
 //*****************************************************
 class Palette : public QWidget

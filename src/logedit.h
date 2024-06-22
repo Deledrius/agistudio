@@ -23,26 +23,21 @@
 
 
 #include <QWidget>
-#include <QLabel>
-#include <QPushButton>
-#include <QRadioButton>
-#include <QLayout>
-#include <qnamespace.h>
-#include <QMessageBox>
-#include <QTextEdit>
-#include <QEvent>
-#include <QStatusBar>
-#include <QCheckBox>
-#include <QResizeEvent>
-#include <QShowEvent>
-#include <QHideEvent>
-#include <QCloseEvent>
 
-#include "wutil.h"
 #include "logic.h"
-#include "roomgen.h"
 #include "resources.h"
 
+
+class QCheckBox;
+class QCloseEvent;
+class QHideEvent;
+class QLineEdit;
+class QPushButton;
+class QRadioButton;
+class QResizeEvent;
+class QShowEvent;
+class QStatusBar;
+class QTextEdit;
 
 //find string in the editor window
 class FindEdit : public QWidget
@@ -64,6 +59,7 @@ public slots:
 };
 
 class LogicSyntaxHL;
+class RoomGen;
 
 //Logic editor
 class LogEdit : public QWidget

@@ -19,44 +19,34 @@
  */
 
 
-#include <stdio.h>
-#include <sys/types.h>
-#ifndef _WIN32
-#include <unistd.h>
-#endif
 #include <sys/stat.h>
-#include <stdlib.h>
-#include <ctype.h>
 #include <algorithm>
 
-#include <QApplication>
-#include <QSplitter>
-#include <QFrame>
-#include <QMessageBox>
-#include <QFileDialog>
-#include <QStringList>
-#include <QLayout>
-#include <QPixmap>
-#include <QPainter>
-#include <QHBoxLayout>
-#include <QKeyEvent>
-#include <QLabel>
-#include <QGridLayout>
-#include <QHideEvent>
-#include <QResizeEvent>
-#include <QMouseEvent>
-#include <QVBoxLayout>
 #include <QBoxLayout>
-#include <QShowEvent>
-#include <QPaintEvent>
+#include <QButtonGroup>
+#include <QCheckBox>
 #include <QCloseEvent>
+#include <QComboBox>
+#include <QFileDialog>
+#include <QGridLayout>
 #include <QInputDialog>
+#include <QLabel>
+#include <QLineEdit>
+#include <QListWidget>
+#include <QMenuBar>
+#include <QMessageBox>
+#include <QPainter>
+#include <QPushButton>
+#include <QRadioButton>
+#include <QTextEdit>
+#include <QTimer>
 
 #include "game.h"
 #include "viewedit.h"
 #include "menu.h"
 #include "wutil.h"
 #include "preview.h"
+#include "resources.h"
 
 #include "zoom_minus_x.xpm"
 #include "zoom_plus_x.xpm"

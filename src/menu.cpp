@@ -19,7 +19,6 @@
  */
 
 
-#include <stdio.h>
 #ifdef _WIN32
 #define NOMINMAX
 #include <direct.h>
@@ -29,29 +28,32 @@
 #include <unistd.h>
 #endif
 #include <sys/stat.h>
-#include <stdlib.h>
-#include <string.h>
 
-#include <QApplication>
-#include <QPixmap>
-#include <QToolButton>
-#include <QToolTip>
-#include <QLabel>
+#include <QBoxLayout>
 #include <QCloseEvent>
+#include <QFile>
+#include <QFileDialog>
+#include <QLabel>
+#include <QMenu>
+#include <QMenuBar>
+#include <QMessageBox>
+#include <QPushButton>
+#include <QStringList>
+#include <QStatusBar>
+#include <QTextEdit>
 #include <QToolBar>
 
-#include "menu.h"
-#include "game.h"
-#include "wordsedit.h"
-#include "objedit.h"
-#include "viewedit.h"
-#include "logedit.h"
-#include "resources.h"
-#include "wutil.h"
-#include "preview.h"
-#include "picedit.h"
-#include "options.h"
 #include "helpwindow.h"
+#include "logedit.h"
+#include "menu.h"
+#include "objedit.h"
+#include "options.h"
+#include "picedit.h"
+#include "preview.h"
+#include "resources.h"
+#include "viewedit.h"
+#include "wordsedit.h"
+#include "wutil.h"
 
 #include "toolbar_open.xpm"
 #include "toolbar_close.xpm"

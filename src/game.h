@@ -24,8 +24,8 @@
 
 #include <string>
 
-#include "global.h"
 
+typedef unsigned char byte;
 
 typedef struct {
     char Filename[12];    //[*]vol.*

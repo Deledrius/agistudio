@@ -21,14 +21,10 @@
  */
 
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <limits.h>
+#include <QStringList>
 
 #include "logic.h"
-#include "game.h"
 #include "logedit.h"
-#include "menu.h"
 
 
 extern QStringList InputLines;  //temporary -

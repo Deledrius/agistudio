@@ -19,22 +19,15 @@
  */
 
 
-#include <stdio.h>
-#include <sys/types.h>
-#ifndef _WIN32
-#include <unistd.h>
-#endif
-#include <sys/stat.h>
-#include <stdlib.h>
-#include <ctype.h>
-
+#include <QCloseEvent>
+#include <QFileDialog>
 #include <QInputDialog>
+#include <QMessageBox>
 
 #include "game.h"
 #include "words.h"
 #include "menu.h"
 #include "wordsedit.h"
-#include "resources.h"
 
 
 WordsEdit::WordsEdit(QWidget *parent, const char *name, int win_num, ResourcesWin *res)

@@ -15,25 +15,15 @@
 //removed tr() (didn't compile with Mandrake 7.0)
 //added hideEvent,showEvent
 
-#include <ctype.h>
 
-#include <QStatusBar>
-#include <QPixmap>
-#include <QMenuBar>
-#include <QToolButton>
-#include <QIcon>
-#include <QFile>
-#include <QMessageBox>
-#include <QApplication>
 #include <QComboBox>
-#include <QEvent>
-#include <QLineEdit>
-#include <QObject>
-#include <QFileInfo>
-#include <QDataStream>
-#include <QShowEvent>
-#include <QHideEvent>
+#include <QFileDialog>
 #include <QKeyEvent>
+#include <QLineEdit>
+#include <QMenu>
+#include <QMenuBar>
+#include <QStatusBar>
+#include <QTextBrowser>
 #include <QToolBar>
 
 #include "helpwindow.h"

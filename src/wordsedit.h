@@ -22,18 +22,17 @@
 #ifndef WORDSEDIT_H
 #define WORDSEDIT_H
 
+
 #include <QDialog>
 #include <QString>
 #include <QWidget>
-
-#include "wutil.h"
-#include "words.h"
-#include "resources.h"
 
 #include "ui/ui_wordsfind.h"
 #include "ui/ui_wordsedit.h"
 
 
+class ResourcesWin;
+class WordList;
 class WordsFind;
 
 //******************************************************

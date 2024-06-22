@@ -24,9 +24,11 @@
 
 #include <list>
 
-#include <QImage>
 #include <QColor>
 
+
+class QImage;
+class QString;
 
 #define MAX_W 320
 #define MAX_H 200

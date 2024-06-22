@@ -20,19 +20,21 @@
 
 
 #include <QFileDialog>
-#include <QPainter>
-#include <QKeyEvent>
-#include <QPixmap>
-#include <QRadioButton>
-#include <QAbstractButton>
-#include <QMouseEvent>
-#include <QShowEvent>
 #include <QInputDialog>
+#include <QLabel>
+#include <QListWidget>
+#include <QMessageBox>
+#include <QMouseEvent>
+#include <QPainter>
+#include <QTextEdit>
 
 #include "game.h"
 #include "menu.h"
-#include "preview.h"
 #include "picedit.h"
+#include "picture.h"
+#include "preview.h"
+#include "resources.h"
+#include "wutil.h"
 
 
 static const char *comment[] = {

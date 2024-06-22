@@ -22,39 +22,30 @@
 #define VIEWEDIT_H
 
 
-#include <QWidget>
-#include <QLabel>
-#include <QPushButton>
-#include <QLayout>
-#include <QMessageBox>
-#include <QLineEdit>
-#include <QRadioButton>
-#include <QButtonGroup>
-#include <QCheckBox>
-#include <QTextEdit>
 #include <QPixmap>
-#include <QComboBox>
-#include <QEvent>
-#include <QTimer>
-#include <QCloseEvent>
-#include <QShowEvent>
-#include <QPaintEvent>
-#include <QResizeEvent>
-#include <QMouseEvent>
-#include <QHideEvent>
-#include <QKeyEvent>
 #include <QScrollArea>
+#include <QWidget>
 
-#include "wutil.h"
 #include "view.h"
-#include "preview.h"
-#include "resources.h"
 
 
 #define V_DRAW 0
 #define V_FILL 1
 
+class QCheckBox;
+class QComboBox;
+class QLabel;
+class QLineEdit;
+class QPaintEvent;
+class QPushButton;
+class QRadioButton;
+class QTextEdit;
+
+class Palette;
+class Preview;
+class ResourcesWin;
 class ViewEdit;
+
 //********************************************************
 class ViewIcon : public QWidget
 //small non-editable picture in the description window

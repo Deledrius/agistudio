@@ -19,35 +19,26 @@
  */
 
 
-#include <stdio.h>
-
-#include <QButtonGroup>
-#include <QPixmap>
-#include <QImage>
-#include <QImageWriter>
-#include <QFileDialog>
-#include <QPainter>
-#include <QHBoxLayout>
-#include <QLabel>
-#include <QGridLayout>
-#include <QHideEvent>
-#include <QVBoxLayout>
 #include <QBoxLayout>
-#include <QShowEvent>
-#include <QPaintEvent>
 #include <QCloseEvent>
-#include <QStackedWidget>
+#include <QComboBox>
+#include <QFileDialog>
 #include <QGroupBox>
+#include <QImageWriter>
+#include <QLabel>
+#include <QListWidget>
+#include <QPainter>
+#include <QPushButton>
+#include <QRadioButton>
+#include <QTextEdit>
 
-#include "resources.h"
 #include "game.h"
-#include "preview.h"
-#include "picture.h"
-#include "wutil.h"
-#include "menu.h"
 #include "logedit.h"
-#include "picedit.h"
+#include "menu.h"
+#include "picture.h"
+#include "preview.h"
 #include "viewedit.h"
+#include "wutil.h"
 
 #include "right_x.xpm"
 #include "left_x.xpm"

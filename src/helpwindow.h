@@ -12,23 +12,17 @@
 #define HELPWINDOW_H
 
 
-#ifdef _WIN32
-#define NOMINMAX
-#include <windows.h>
-#endif
-
-#include <QTextBrowser>
-#include <QMainWindow>
-#include <QStringList>
-#include <QMap>
 #include <QDir>
-#include <QShowEvent>
-#include <QHideEvent>
-#include <QEvent>
+#include <QMainWindow>
+#include <QMap>
+#include <QString>
+#include <QStringList>
 
 
+class QAction;
 class QComboBox;
 class QMenu;
+class QTextBrowser;
 
 class HelpWindow : public QMainWindow
 {

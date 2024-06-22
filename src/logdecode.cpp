@@ -21,15 +21,7 @@
  */
 
 
-#include <cstdlib>
-#include <stdio.h>
-
-#include "game.h"
 #include "logedit.h"
-#include "words.h"
-#include "object.h"
-#include "menu.h"
-#include "agicommands.h"
 
 
 static int EncryptionStart;

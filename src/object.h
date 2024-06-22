@@ -24,8 +24,8 @@
 
 #include <QStringList>
 
-#include "global.h"
 
+typedef unsigned char byte;
 
 #define MaxItems   256
 

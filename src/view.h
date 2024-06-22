@@ -22,8 +22,7 @@
 #define VIEW_H
 
 
-#include "global.h"
-
+typedef unsigned char byte;
 
 #define MaxLoops 16
 #define MaxCels  32

@@ -19,9 +19,6 @@
  */
 
 
-#include <cstdlib>
-#include <stdio.h>
-
 #include <QApplication>
 #include <QMainWindow>
 

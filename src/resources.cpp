@@ -19,35 +19,30 @@
  */
 
 
-#include <stdio.h>
-#ifdef _WIN32
-#define strncasecmp(a, b, l) _stricmp(a, b)
-#else
-#include <unistd.h>
-#endif
 #include <sys/stat.h>
-#include <stdlib.h>
 #include <algorithm>
 
-#include <QHBoxLayout>
-#include <QLabel>
-#include <QHideEvent>
-#include <QVBoxLayout>
 #include <QBoxLayout>
-#include <QShowEvent>
 #include <QCloseEvent>
+#include <QComboBox>
+#include <QFileDialog>
 #include <QGroupBox>
 #include <QInputDialog>
+#include <QLabel>
+#include <QListWidget>
+#include <QMenu>
+#include <QMenuBar>
+#include <QMessageBox>
 
-#include "resources.h"
+#include "bmp2agipic.h"
 #include "game.h"
 #include "logedit.h"
-#include "viewedit.h"
-#include "preview.h"
+#include "resources.h"
 #include "menu.h"
 #include "midi.h"
-#include "bmp2agipic.h"
+#include "preview.h"
 #include "picedit.h"
+#include "viewedit.h"
 
 
 //**********************************************************

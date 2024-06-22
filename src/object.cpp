@@ -21,16 +21,13 @@
  */
 
 
-#include <stdio.h>
-#include <sys/types.h>
 #ifndef _WIN32
 #include <unistd.h>
 #endif
+#include <string>
 #include <sys/stat.h>
-#include <stdlib.h>
 
 #include "game.h"
-#include "words.h"
 #include "object.h"
 #include "menu.h"
 
