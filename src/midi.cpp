@@ -21,20 +21,14 @@
  */
 
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-
-#include <QDataStream>
 #include <QIODevice>
 #include <QLabel>
 #include <QComboBox>
-#include <QPushButton>
 #include <QFileDialog>
-#include <QVBoxLayout>
+#include <QBoxLayout>
 
-#include "global.h"
 
+typedef unsigned char byte;
 
 static const char *g_gm_instrument_names[] = {
     "1. Acoustic Grand Piano",

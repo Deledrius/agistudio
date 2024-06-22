@@ -19,34 +19,35 @@
  */
 
 
-#include <string>
-#include <stdio.h>
-#include <sys/types.h>
 #ifndef _WIN32
 #include <dirent.h>
 #include <unistd.h>
 #endif
 #include <sys/stat.h>
-#include <stdlib.h>
-#include <ctype.h>
 
-#include <QApplication>
-#include <QRegularExpression>
-#include <QLabel>
-#include <QHideEvent>
-#include <QResizeEvent>
-#include <QShowEvent>
-#include <QCloseEvent>
-#include <QSyntaxHighlighter>
-#include <QTextStream>
+#include <QCheckBox>
 #include <QFileDialog>
 #include <QGroupBox>
 #include <QInputDialog>
+#include <QLabel>
+#include <QListWidget>
+#include <QMenuBar>
+#include <QMenu>
+#include <QMessageBox>
+#include <QPushButton>
+#include <QRadioButton>
+#include <QRegularExpression>
+#include <QStatusBar>
+#include <QSyntaxHighlighter>
+#include <QTextEdit>
+#include <QVBoxLayout>
 
-#include "logedit.h"
-#include "game.h"
-#include "menu.h"
 #include "agicommands.h"
+#include "game.h"
+#include "logedit.h"
+#include "menu.h"
+#include "resources.h"
+#include "roomgen.h"
 
 
 QStringList InputLines;  //temporary buffer for reading the text from editor

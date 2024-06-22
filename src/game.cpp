@@ -22,14 +22,6 @@
  *
  */
 
-
-#include <string>
-#include <filesystem>
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <errno.h>
-#include <sys/types.h>
 #include <sys/stat.h>
 
 #ifdef _WIN32
@@ -41,12 +33,12 @@
 #include <glob.h>
 #endif
 
-#include <QProgressDialog>
-#include <QMessageBox>
 #include <QDir>
+#include <QMessageBox>
+#include <QProgressDialog>
+#include <QStatusBar>
 
 #include "menu.h"
-#include "resources.h"
 #include "agicommands.h"
 #include "game.h"
 #include "logedit.h"

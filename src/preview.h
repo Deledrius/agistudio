@@ -22,28 +22,21 @@
 #define PREVIEW_H
 
 
-#include <string>
 #include <QWidget>
-#include <QLabel>
-#include <QLayout>
-#include <QRadioButton>
-#include <QPushButton>
-#include <QPixmap>
-#include <QTextEdit>
-#include <QComboBox>
 #include <QStackedWidget>
-#include <QShowEvent>
-#include <QHideEvent>
-#include <QCloseEvent>
-#include <QPaintEvent>
 
-#include "picture.h"
-#include "view.h"
-#include "resources.h"
 
+class QComboBox;
+class QLabel;
+class QRadioButton;
+class QTextEdit;
+class QPushButton;
 
 class Animate;
+class BPicture;
 class Preview;
+class ResourcesWin;
+class View;
 
 //****************************************************
 class PreviewView : public QWidget

@@ -14,7 +14,6 @@ endif(APPLE)
 set(AGIStudio_HEADERS
     agicommands.h
     game.h
-    global.h
     helpwindow.h
     logedit.h
     logic.h

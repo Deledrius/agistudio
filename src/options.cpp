@@ -19,15 +19,17 @@
  */
 
 
-#include <stdlib.h>
-
-#include <QApplication>
+#include <QBoxLayout>
+#include <QCheckBox>
+#include <QComboBox>
+#include <QDialogButtonBox>
 #include <QFileDialog>
 #include <QGroupBox>
-#include <QBoxLayout>
-#include <QHBoxLayout>
-#include <QVBoxLayout>
 #include <QLabel>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QRadioButton>
+#include <QTabWidget>
 
 #include "options.h"
 #include "game.h"

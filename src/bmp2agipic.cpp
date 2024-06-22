@@ -20,13 +20,11 @@
  */
 
 
-#include <cmath>
 #include <queue>
-#include <vector>
-#include <cstdio>
-#include <cassert>
 
 #include <QColor>
+#include <QImage>
+#include <QByteArray>
 
 #include "bmp2agipic.h"
 

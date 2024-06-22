@@ -24,20 +24,16 @@
 #define ROOMGEN_H
 
 
-#include <QWidget>
-#include <QLabel>
-#include <QPushButton>
-#include <QLayout>
-#include <qnamespace.h>
-#include <QMessageBox>
-#include <QTextEdit>
-#include <QEvent>
-#include <QStatusBar>
-#include <QCheckBox>
+#include <string>
 
-#include "wutil.h"
-#include "logic.h"
+#include <QDialog>
 
+
+class QCheckBox;
+class QLabel;
+class QLineEdit;
+class QPushButton;
+class QWidget;
 
 class RoomGenEntry: public QDialog
 {

@@ -22,24 +22,15 @@
 #define OPTIONS_H
 
 
-#include <QWidget>
-#include <QLabel>
-#include <QPushButton>
-#include <QLayout>
-#include <QMessageBox>
-#include <QLineEdit>
-#include <QRadioButton>
-#include <QButtonGroup>
-#include <QCheckBox>
-#include <QTextEdit>
-#include <QPixmap>
-#include <QComboBox>
-#include <QEvent>
-#include <QDialogButtonBox>
+#include <QDialog>
 
-#include "wutil.h"
-#include "view.h"
 
+class QCheckBox;
+class QComboBox;
+class QDialogButtonBox;
+class QLineEdit;
+class QRadioButton;
+class QTabWidget;
 
 class Options : public QDialog
 {

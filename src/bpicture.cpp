@@ -20,15 +20,7 @@
  *
  */
 
-#include <stdio.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <stdlib.h>
-#include <ctype.h>
-#include <math.h>
 
-#include "game.h"
-#include "menu.h"
 #include "picture.h"
 
 

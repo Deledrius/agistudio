@@ -19,15 +19,8 @@
  */
 
 
-#include <stdio.h>
-
 #include <QPainter>
-#include <QBoxLayout>
-#include <QHBoxLayout>
-#include <QVBoxLayout>
-#include <QLabel>
 #include <QMouseEvent>
-#include <QPaintEvent>
 
 #include "wutil.h"
 

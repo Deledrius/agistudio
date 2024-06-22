@@ -22,27 +22,15 @@
 
 
 #include <string>
-#include <stdio.h>
-#include <sys/types.h>
-#ifndef _WIN32
-#include <dirent.h>
-#include <unistd.h>
-#endif
 #include <sys/stat.h>
-#include <stdlib.h>
-#include <ctype.h>
 
-#include <QApplication>
-#include <QFileDialog>
-#include <QHBoxLayout>
 #include <QBoxLayout>
-#include <QGridLayout>
-#include <QFrame>
-#include <QLabel>
-#include <QVBoxLayout>
+#include <QCheckBox>
 #include <QGroupBox>
+#include <QLabel>
+#include <QLineEdit>
+#include <QPushButton>
 
-#include "logedit.h"
 #include "game.h"
 #include "menu.h"
 #include "roomgen.h"

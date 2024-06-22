@@ -19,20 +19,21 @@
  */
 
 
-#include <stdio.h>
-#include <sys/types.h>
 #ifndef _WIN32
 #include <unistd.h>
 #endif
 #include <sys/stat.h>
-#include <stdlib.h>
-#include <ctype.h>
 
-#include <QApplication>
 #include <QCloseEvent>
-#include <QShowEvent>
+#include <QFileDialog>
 #include <QLabel>
-#include <QHideEvent>
+#include <QLineEdit>
+#include <QListWidget>
+#include <QMessageBox>
+#include <QMenu>
+#include <QMenuBar>
+#include <QPushButton>
+#include <QBoxLayout>
 
 #include "game.h"
 #include "object.h"

@@ -25,16 +25,18 @@
 #include <string>
 
 #include <QWidget>
-#include <QLabel>
-#include <QComboBox>
-#include <QLayout>
-#include <QLineEdit>
-#include <QButtonGroup>
-#include <QShowEvent>
-#include <QHideEvent>
-#include <QCloseEvent>
-#include <QListWidget>
+#include <QString>
 
+
+class QLabel;
+class QLineEdit;
+class QButtonGroup;
+class QLabel;
+class QListWidget;
+class QListWidgetItem;
+class QMenu;
+class QAction;
+class QComboBox;
 
 class ResourcesWin;
 class Preview;

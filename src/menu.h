@@ -22,20 +22,15 @@
 #define MENU_H
 
 
-#include <QWidget>
-#include <QMenuBar>
-#include <QLabel>
-#include <QPushButton>
-#include <QLayout>
-#include <QMessageBox>
-#include <QFileDialog>
-#include <QLineEdit>
-#include <QRadioButton>
 #include <QMainWindow>
-#include <QStatusBar>
-#include <QCloseEvent>
-#include <QListWidget>
+#include <QWidget>
 
+
+class QFileDialog;
+class QListWidget;
+class QMessageBox;
+class QPushButton;
+class QStatusBar;
 
 class WindowList : public QWidget
 {

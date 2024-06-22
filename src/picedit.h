@@ -22,37 +22,29 @@
 #define PICEDIT_H
 
 
-#include <QWidget>
-#include <QLabel>
-#include <QPushButton>
-#include <QLayout>
-#include <qnamespace.h>
-#include <QMessageBox>
-#include <QTextEdit>
-#include <QEvent>
-#include <QPixmap>
+#include <QMainWindow>
 #include <QImage>
-#include <QStatusBar>
-#include <QCheckBox>
-#include <QPaintDevice>
-#include <QCloseEvent>
-#include <QShowEvent>
-#include <QPaintEvent>
-#include <QResizeEvent>
-#include <QMouseEvent>
-#include <QHideEvent>
-#include <QKeyEvent>
+#include <QPixmap>
 #include <QScrollArea>
-#include <QGroupBox>
-
-#include "wutil.h"
-#include "picture.h"
-#include "resources.h"
+#include <QString>
+#include <QStringList>
+#include <QWidget>
 
 #include "ui/ui_picedit.h"
 
 
+class QPaintEvent;
+class QMouseEvent;
+class QKeyEvent;
+class QResizeEvent;
+class QLabel;
+class QTextEdit;
+class QCheckBox;
+
 class PicEdit;
+class Picture;
+class PCanvas;
+class ResourcesWin;
 
 class Palette1 : public QWidget
 {

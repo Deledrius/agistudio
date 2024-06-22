@@ -20,21 +20,14 @@
  */
 
 
-#include <stdio.h>
-#include <sys/types.h>
 #ifndef _WIN32
 #include <unistd.h>
 #endif
 #include <sys/stat.h>
-#include <stdlib.h>
-#include <ctype.h>
-
-#include <QApplication>
 
 #include "game.h"
-#include "view.h"
-#include "viewedit.h"
 #include "menu.h"
+#include "view.h"
 
 
 static int ResPos, DescPos, ResSize;
