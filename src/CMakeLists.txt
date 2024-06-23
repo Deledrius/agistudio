@@ -104,6 +104,7 @@ set(AGIStudio_SOURCES
 )
 
 set(AGIStudio_UI
+    ui/mainmenu.ui
     ui/picedit.ui
     ui/wordsedit.ui
     ui/wordsfind.ui

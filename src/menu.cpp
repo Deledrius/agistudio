@@ -19,29 +19,16 @@
  */
 
 
-#ifdef _WIN32
-#define NOMINMAX
-#include <direct.h>
-#include <process.h>
-#include <windows.h>
-#else
-#include <unistd.h>
-#endif
 #include <sys/stat.h>
 
-#include <QBoxLayout>
+#include <QActionGroup>
 #include <QCloseEvent>
 #include <QFile>
 #include <QFileDialog>
-#include <QLabel>
-#include <QMenu>
-#include <QMenuBar>
+#include <QListWidget>
 #include <QMessageBox>
-#include <QPushButton>
-#include <QStringList>
-#include <QStatusBar>
+#include <QProcess>
 #include <QTextEdit>
-#include <QToolBar>
 
 #include "helpwindow.h"
 #include "logedit.h"
@@ -55,20 +42,9 @@
 #include "wordsedit.h"
 #include "wutil.h"
 
-#include "toolbar_open.xpm"
-#include "toolbar_close.xpm"
-#include "toolbar_run.xpm"
-#include "toolbar_viewedit.xpm"
-#include "toolbar_logedit.xpm"
-#include "toolbar_picedit.xpm"
-#include "toolbar_wordsedit.xpm"
-#include "toolbar_objedit.xpm"
-#include "toolbar_textedit.xpm"
 #include "logo.xpm"
-#include "app_icon.xpm"
 
 
-extern char tmp[];
 Menu *menu;
 WindowList *window_list;
 static About *about;
@@ -76,141 +52,53 @@ WinList winlist[MAXWIN];  //list of all open resource editor windows
 
 //*************************************************
 Menu::Menu(QWidget *parent, const char *name)
-    : QMainWindow(parent)
+    : QMainWindow(parent), resources_win(nullptr), num_res(0)
 {
-    int n = 0;
+    setupUi(this);
+    
+    // Sadly, Action Groups are not exposed in QtDesigner...
+    activeGameGroup = new QActionGroup(this);
+    activeGameGroup->addAction(actionGameClose);
+    activeGameGroup->addAction(actionGameRun);
+    activeGameGroup->addAction(actionResNewWindow);
+    activeGameGroup->addAction(actionResAdd);
+    activeGameGroup->addAction(actionResExtract);
+    activeGameGroup->addAction(actionResDelete);
+    activeGameGroup->addAction(actionResRenumber);
+    activeGameGroup->addAction(actionResRebuildVOLFiles);
+    activeGameGroup->addAction(actionResRecompileAll);
+    activeGameGroup->addAction(actionToolsViewEditor);
+    activeGameGroup->addAction(actionToolsLogicEditor);
+    activeGameGroup->addAction(actionToolsTextEditor);
+    activeGameGroup->addAction(actionToolsObjectEditor);
+    activeGameGroup->addAction(actionToolsWordTokensEditor);
+    activeGameGroup->addAction(actionToolsPictureEditor);
+    activeGameGroup->addAction(actionToolsSoundPlayer);
 
-    setWindowTitle("AGI Studio");
-    setWindowIcon(QPixmap(app_icon));
+    activeGameGroup->addAction(actionCloseGameButton);
+    activeGameGroup->addAction(actionRunGameButton);
+    activeGameGroup->addAction(actionViewEditorButton);
+    activeGameGroup->addAction(actionLogicEditorButton);
+    activeGameGroup->addAction(actionObjectEditorButton);
+    activeGameGroup->addAction(actionWordTokensEditorButton);
+    activeGameGroup->addAction(actionPictureEditorButton);
 
-    QMenu *new_game = new QMenu(this);
-    Q_CHECK_PTR(new_game);
-    new_game->setTitle("&New");
-    new_game->addAction("From &Template", this, SLOT(from_template()));
-    new_game->addAction("&Blank", this, SLOT(blank()));
-
-    QMenu *game = new QMenu(this);
-    Q_CHECK_PTR(game);
-    game->setTitle("&Game");
-    game->addMenu(new_game);
-    game->addAction("&Open", this, SLOT(open_game()));
-    id[n++] = game->addAction("&Close", this, SLOT(close_game()));
-    id[n++] = game->addAction("&Run", Qt::CTRL | Qt::Key_R, this, SLOT(run_game()));
-    game->addSeparator();
-    game->addAction("&Settings...", this, SLOT(settings()));
-    game->addSeparator();
-    game->addAction("E&xit", Qt::ALT | Qt::Key_F4, this, SLOT(quit_cb()));
-
-    QMenu *resource = new QMenu(this);
-    Q_CHECK_PTR(resource);
-    resource->setTitle("&Resource");
-    id[n++] = resource->addAction("New window", this, SLOT(new_resource_window()));
-    resource->addSeparator();
-    n_res = n;
-    id[n++] = resource->addAction("&Add", this, SLOT(add_resource()));
-    id[n++] = resource->addAction("&Extract", this, SLOT(extract_resource()));
-    id[n++] = resource->addAction("&Delete", this, SLOT(delete_resource()));
-    id[n++] = resource->addAction("&Renumber", this, SLOT(renumber_resource()));
-    resource->addSeparator();
-    id[n++] = resource->addAction("Re&build VOL files", this, SLOT(rebuild_vol()));
-    id[n++] = resource->addAction("Recompile all", this, SLOT(recompile_all()));
-
-    QMenu *tools = new QMenu(this);
-    Q_CHECK_PTR(tools);
-    tools->setTitle("&Tools");
-    id[n++] = tools->addAction("&View Editor", this, SLOT(view_editor()));
-    id[n++] = tools->addAction("&Logic Editor", this, SLOT(logic_editor()));
-    id[n++] = tools->addAction("&Text Editor", this, SLOT(text_editor()));
-    id[n++] = tools->addAction("&Object Editor", this, SLOT(object_editor()));
-    id[n++] = tools->addAction("&Words.tok Editor", this, SLOT(words_editor()));
-    id[n++] = tools->addAction("&Picture Editor", this, SLOT(picture_editor()));
-    id[n++] = tools->addAction("&Sound Player", this, SLOT(sound_player()));
-
-    QMenu *help = new QMenu(this);
-    Q_CHECK_PTR(help);
-    help->setTitle("&Help");
-    help->addAction("&Contents", this, SLOT(help_contents()));
-    help->addAction("&Index", Qt::Key_F1, this, SLOT(help_index()));
-    help->addSeparator();
-    help->addAction("About", this, SLOT(about_it()));
-    help->addAction("About QT", this, SLOT(about_qt()));
-
-    QMenu *window = menuBar()->addMenu("&Window");
-    Q_CHECK_PTR(window);
-    window->addAction("Save all", this, SLOT(save_all()));
-    window->addAction("Save all and run", this, SLOT(save_and_run()));
-    window->addAction("Window list", this, SLOT(window_list_cb()));
-
-    menubar = menuBar();
-    Q_CHECK_PTR(menubar);
-    menubar->addMenu(game);
-    menubar->addMenu(resource);
-    menubar->addMenu(tools);
-    menubar->addMenu(window);
-    menubar->addSeparator();
-    menubar->addMenu(help);
-
-    QToolBar *toolbar = addToolBar(tr("Main"));
-
-    open = new QAction((QPixmap)toolbar_open, "Open game", toolbar);
-    connect(open, &QAction::triggered, this, &Menu::open_game);
-    toolbar->addAction(open);
-
-    close_ = new QAction((QPixmap)toolbar_close, "Close game", toolbar);
-    connect(close_, &QAction::triggered, this, &Menu::close_game);
-    toolbar->addAction(close_);
-
-    run = new QAction((QPixmap)toolbar_run, "Run game", toolbar);
-    connect(run, &QAction::triggered, this, &Menu::run_game);
-    toolbar->addAction(run);
-
-    view = new QAction((QPixmap)toolbar_viewedit, "View Editor", toolbar);
-    connect(view, &QAction::triggered, this, &Menu::view_editor);
-    toolbar->addAction(view);
-
-    logic = new QAction((QPixmap)toolbar_logedit, "Logic Editor", toolbar);
-    connect(logic, &QAction::triggered, this, &Menu::logic_editor);
-    toolbar->addAction(logic);
-
-    text = new QAction((QPixmap)toolbar_textedit, "Text Editor", toolbar);
-    connect(text, &QAction::triggered, this, &Menu::text_editor);
-    toolbar->addAction(text);
-
-    obj = new QAction((QPixmap)toolbar_objedit, "Object Editor", toolbar);
-    connect(obj, &QAction::triggered, this, &Menu::object_editor);
-    toolbar->addAction(obj);
-
-    words = new QAction((QPixmap)toolbar_wordsedit, "WORDS.TOK editor", toolbar);
-    connect(words, &QAction::triggered, this, &Menu::words_editor);
-    toolbar->addAction(words);
-
-    pic = new QAction((QPixmap)toolbar_picedit, "Picture Editor", toolbar);
-    connect(pic, &QAction::triggered, this, &Menu::picture_editor);
-    toolbar->addAction(pic);
-
-    toolbar->setMovable(false);
-    toolbar->show();
-
-    status = statusBar();
-    QLabel *msg = new QLabel("", status);
-    status->addWidget(msg, 4);
-    status->setSizeGripEnabled(false);
+    resActionGroup = new QActionGroup(this);
+    resActionGroup->addAction(actionResAdd);
+    resActionGroup->addAction(actionResExtract);
+    resActionGroup->addAction(actionResDelete);
+    resActionGroup->addAction(actionResRenumber);
 
     err = new QMessageBox(QMessageBox::Critical, tr("AGI Studio"), tr(""));
     warn = new QMessageBox(QMessageBox::Warning, tr("AGI Studio"), tr(""));
 
-    max_disabled = n;
-    disable();
-    adjustSize();
-    setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
+    disable_game_actions();
 
     for (int i = 0; i < MAXWIN; i++)
         winlist[i].type = -1;
     make_egacolors();
 
-    window_list = NULL;
-    resources_win = NULL;
-    num_res = 0;
+    window_list = nullptr;
 }
 
 //**********************************************
@@ -230,54 +118,38 @@ int get_win()
 }
 
 //**********************************************
-void Menu::disable()
+void Menu::disable_game_actions()
 {
-    for (int i = 0; i < max_disabled; i++)
-        id[i]->setEnabled(false);
-    close_->setEnabled(false);
-    run->setEnabled(false);
-    view->setEnabled(false);
-    logic->setEnabled(false);
-    obj->setEnabled(false);
-    words->setEnabled(false);
-    pic->setEnabled(false);
+    activeGameGroup->setDisabled(true);
 }
 
 //**********************************************
-void Menu::enable()
+void Menu::enable_game_actions()
 {
-    for (int i = 0; i < max_disabled; i++)
-        id[i]->setEnabled(true);
-    close_->setEnabled(true);
-    run->setEnabled(true);
-    view->setEnabled(true);
-    logic->setEnabled(true);
-    obj->setEnabled(true);
-    words->setEnabled(true);
-    pic->setEnabled(true);
+    activeGameGroup->setEnabled(true);
 }
 
 //**********************************************
 void Menu::open_game()
 {
-    OpenGameDir(0, false);
+    OpenGameDir(nullptr, false);
 }
 
 //**********************************************
 void Menu::show_resources()
 {
-    if (resources_win == NULL) {
+    if (resources_win == nullptr) {
         int n;
         if ((n = get_win()) == -1)
             return;
-        resources_win = new ResourcesWin(NULL, "Resources", n);
+        resources_win = new ResourcesWin(nullptr, "Resources", n);
         winlist[n].type = RESOURCES;
         winlist[n].w.r = resources_win;
         inc_res(resources_win);
     }
     resources_win->select_resource_type(game->res_default);
     resources_win->show();
-    enable();
+    enable_game_actions();
 }
 
 //**********************************************
@@ -312,17 +184,21 @@ void Menu::dec_res()
 }
 
 //**********************************************
+void Menu::showStatusMessage(const QString &msg)
+{
+    statusBarMainMenu->showMessage(msg);
+}
+
+//**********************************************
 void Menu::enable_resources()
 {
-    for (int i = n_res; i < n_res + 4; i++)
-        id[i]->setEnabled(true);
+    resActionGroup->setEnabled(true);
 }
 
 //**********************************************
 void Menu::disable_resources()
 {
-    for (int i = n_res; i < n_res + 4; i++)
-        id[i]->setEnabled(false);
+    resActionGroup->setDisabled(true);
 }
 
 //**********************************************
@@ -391,53 +267,13 @@ void Menu::close_game()
 
     if (window_list)
         window_list->hide();
-    disable();
+    disable_game_actions();
     game->isOpen = false;
 }
 
 //**********************************************
 void Menu::run_game()
 {
-#ifdef _WIN32
-    int i;
-    _chdir(game->dir.c_str());
-#else
-    int i = fork();
-    if (i == 0) {
-        chdir(game->dir.c_str());
-#endif
-#define MAX_ARG 32
-    char *argv[MAX_ARG];
-    strcpy(tmp, game->command.c_str());
-    argv[0] = strtok(tmp, " ");
-    for (i = 1; i < MAX_ARG; i++) {
-        argv[i] = strtok(NULL, " ");
-        if (argv[i] == NULL)
-            break;
-    }
-    if (argv[MAX_ARG - 1] != NULL)
-        argv[MAX_ARG - 1] = NULL;
-#ifdef _WIN32
-    STARTUPINFOA si;
-    PROCESS_INFORMATION pi;
-
-    ZeroMemory(&si, sizeof(si));
-    si.cb = sizeof(si);
-    ZeroMemory(&pi, sizeof(pi));
-
-    if (!CreateProcessA(NULL, tmp, NULL, NULL, false, 0, NULL, NULL, &si, &pi)) {
-#else
-    if (execvp(argv[0], argv)) {
-#endif
-        printf("Couldn't execute command %s !\n", game->command.c_str());
-    }
-#ifdef _WIN32
-    CloseHandle(pi.hProcess);
-    CloseHandle(pi.hThread);
-#else
-    exit(0);
-}
-#endif
 }
 
 //**********************************************
@@ -472,7 +308,7 @@ void Menu::save_and_run()
 //**********************************************
 void Menu::window_list_cb()
 {
-    if (window_list == NULL)
+    if (window_list == nullptr)
         window_list = new WindowList();
     window_list->draw();
 }
@@ -480,7 +316,7 @@ void Menu::window_list_cb()
 //**********************************************
 void Menu::settings()
 {
-    if (options == NULL)
+    if (options == nullptr)
         options = new Options();
     options->show();
 }
@@ -489,14 +325,14 @@ void Menu::settings()
 void Menu::from_template()
 {
     menu->templ = true;
-    OpenGameDir(0, true);
+    OpenGameDir(nullptr, true);
 }
 
 //**********************************************
 void Menu::blank()
 {
     menu->templ = false;
-    OpenGameDir(0, true);
+    OpenGameDir(nullptr, true);
 }
 
 //**********************************************
@@ -587,7 +423,7 @@ void Menu::view_editor()
     int n;
     if ((n = get_win()) == -1)
         return;
-    winlist[n].w.v = new ViewEdit(NULL, NULL, n, resources_win);
+    winlist[n].w.v = new ViewEdit(nullptr, nullptr, n, resources_win);
     winlist[n].type = VIEW;
     winlist[n].w.v->open();
 }
@@ -598,7 +434,7 @@ void Menu::logic_editor()
     int n;
     if ((n = get_win()) == -1)
         return;
-    winlist[n].w.l = new LogEdit(NULL, NULL, n, resources_win);
+    winlist[n].w.l = new LogEdit(nullptr, nullptr, n, resources_win);
     winlist[n].type = LOGIC;
     winlist[n].w.l->open();
 }
@@ -609,7 +445,7 @@ void Menu::text_editor()
     int n;
     if ((n = get_win()) == -1)
         return;
-    winlist[n].w.t = new TextEdit(NULL, NULL, n);
+    winlist[n].w.t = new TextEdit(nullptr, nullptr, n);
     winlist[n].type = TEXTRES;
     winlist[n].w.t->new_text();
 }
@@ -620,7 +456,7 @@ void Menu::object_editor()
     int n;
     if ((n = get_win()) == -1)
         return;
-    winlist[n].w.o = new ObjEdit(NULL, NULL, n);
+    winlist[n].w.o = new ObjEdit(nullptr, nullptr, n);
     winlist[n].type = OBJECT;
     winlist[n].w.o->open();
 }
@@ -631,7 +467,7 @@ void Menu::words_editor()
     int n;
     if ((n = get_win()) == -1)
         return;
-    winlist[n].w.w = new WordsEdit(NULL, NULL, n, resources_win);
+    winlist[n].w.w = new WordsEdit(nullptr, nullptr, n, resources_win);
     winlist[n].type = WORDS;
     winlist[n].w.w->open();
 }
@@ -642,7 +478,7 @@ void Menu::picture_editor()
     int n;
     if ((n = get_win()) == -1)
         return;
-    winlist[n].w.p = new PicEdit(NULL, NULL, n, resources_win);
+    winlist[n].w.p = new PicEdit(nullptr, nullptr, n, resources_win);
     winlist[n].type = PICTURE;
     winlist[n].w.p->open();
 }
@@ -650,73 +486,74 @@ void Menu::picture_editor()
 //**********************************************
 void Menu::sound_player()
 {
-    extern void play_sound(char *);
+    extern void play_sound(const std::string &);
 
     QString fileName = QFileDialog::getOpenFileName(this, tr("Play Sound File"), game->srcdir.c_str(), tr("Sound Files (sound*.*);;All Files (*)"));
     if (!fileName.isNull())
-        play_sound(fileName.toLatin1().data());
+        play_sound(fileName.toStdString());
 }
 
 //**********************************************
 void Menu::help_contents()
-//from QT examples (qbrowser)
 {
-    sprintf(tmp, "%s/index.html", game->helpdir.c_str());
-    if (helpwindow == NULL) {
+    QString fullpath = QString("%1/index.html").arg(game->helpdir.c_str());
+
+    if (helpwindow == nullptr) {
         int n;
         if ((n = get_win()) == -1)
             return;
-        helpwindow = new HelpWindow(tmp, ".");
+        helpwindow = new HelpWindow(fullpath, ".");
         winlist[n].type = HELPWIN;
         winlist[n].w.h = helpwindow;
     } else
-        helpwindow->setSource(tmp);
+        helpwindow->setSource(fullpath);
     helpwindow->show();
 }
 
 //**********************************************
 bool Menu::help_topic(const QString &topic)
 {
-    sprintf(tmp, "%s/%s.html", game->helpdir.c_str(),
-            QString(topic).replace(".", "_").toLatin1().constData());
+    QString fullpath = QString("%1/%1.html").arg(game->helpdir.c_str()).arg(
+            QString(topic).replace(".", "_"));
 
-    if (QFile(tmp).exists()) {
-        if (helpwindow1 == NULL) {
-            int n;
-            if ((n = get_win()) == -1)
-                return true;
-            helpwindow1 = new HelpWindow(tmp, ".");
-            winlist[n].type = HELPWIN;
-            winlist[n].w.h = helpwindow1;
-        } else
-            helpwindow1->setSource(tmp);
-        helpwindow1->show();
-        helpwindow1->raise();
-        return true;
-    } else
+    if (!QFile(fullpath).exists())
         return false;
+
+    if (helpwindow1 == nullptr) {
+        int n;
+        if ((n = get_win()) == -1)
+            return true;
+        helpwindow1 = new HelpWindow(fullpath, ".");
+        winlist[n].type = HELPWIN;
+        winlist[n].w.h = helpwindow1;
+    } else
+        helpwindow1->setSource(fullpath);
+    helpwindow1->show();
+    helpwindow1->raise();
+    return true;
 }
 
 //**********************************************
 void Menu::help_index()
 {
-    sprintf(tmp, "%s/indexabc.html", game->helpdir.c_str());
-    if (helpwindow1 == NULL) {
+    QString fullpath = QString("%1/indexabc.html").arg(game->helpdir.c_str());
+
+    if (helpwindow1 == nullptr) {
         int n;
         if ((n = get_win()) == -1)
             return;
-        helpwindow1 = new HelpWindow(tmp, ".");
+        helpwindow1 = new HelpWindow(fullpath, ".");
         winlist[n].type = HELPWIN;
         winlist[n].w.h = helpwindow1;
     } else
-        helpwindow1->setSource(tmp);
+        helpwindow1->setSource(fullpath);
     helpwindow1->show();
 }
 
 //**********************************************
 void Menu::about_it()
 {
-    if (about == NULL)
+    if (about == nullptr)
         about = new About();
     about->show();
 }
@@ -724,20 +561,17 @@ void Menu::about_it()
 //**********************************************
 void Menu::about_qt()
 {
-    QMessageBox::aboutQt(this, "AGI studio");
+    QMessageBox::aboutQt(this, tr("AGI studio"));
 }
 
 //**********************************************
 void Menu::errmes(const char *caption, const char *fmt, ...)
 {
-    char tmp[512];
     va_list argp;
 
     va_start(argp, fmt);
-    vsprintf(tmp, fmt, argp);
+    err->setText(QString::asprintf(fmt, argp));
     va_end(argp);
-
-    err->setText(QString(tmp));
     err->setWindowTitle(caption);
     err->adjustSize();
     err->show();
@@ -746,14 +580,11 @@ void Menu::errmes(const char *caption, const char *fmt, ...)
 //*************************************************
 void Menu::errmes(const char *fmt, ...)
 {
-    char tmp[512];
     va_list argp;
 
     va_start(argp, fmt);
-    vsprintf(tmp, fmt, argp);
+    err->setText(QString::asprintf(fmt, argp));
     va_end(argp);
-
-    err->setText(QString(tmp));
     err->setWindowTitle("AGI studio");
     err->adjustSize();
     err->show();
@@ -762,14 +593,12 @@ void Menu::errmes(const char *fmt, ...)
 //**********************************************
 void Menu::warnmes(const char *fmt, ...)
 {
-    char tmp[512];
     va_list argp;
 
     va_start(argp, fmt);
-    vsprintf(tmp, fmt, argp);
+    warn->setText(QString::asprintf(fmt, argp));
     va_end(argp);
 
-    warn->setText(QString(tmp));
     warn->setWindowTitle("AGI studio");
     warn->adjustSize();
     warn->show();
@@ -793,7 +622,7 @@ About::About(QWidget *parent, const char *name)
     QTextEdit *about = new QTextEdit(this);
     about->setReadOnly(true);
     about->setText(
-        "<center><b>QT AGI studio v. 1.3.0</b><br>"
+        "<center><b>Qt AGI studio v. 1.3.0</b><br>"
         "http://agistudio.sourceforge.net/<br>"
         "<br>"
         "<b>Authors:</b><br>"
@@ -866,7 +695,6 @@ void WindowList::draw()
     for (int i = 0; i < MAXWIN; i++) {
         if (winlist[i].type == -1)
             continue;
-        //    printf("i=%d type=%d\n",i,winlist[i].type);
         switch (winlist[i].type) {
             case LOGIC:
                 caption = QString("Logic editor: ").append(winlist[i].w.l->windowTitle());

@@ -212,7 +212,7 @@ int Game::open(std::string name)
         CorrectCommands(AGIVersionNumber);
         isOpen = true;
         make_source_dir();
-        menu->status->showMessage(dir.c_str());
+        menu->showStatusMessage(dir.c_str());
         return 0;
     } else
         return 1;
@@ -386,7 +386,7 @@ int Game::newgame(std::string name)
         for (j = 0; j <= 255; j++)
             ResourceInfo[_i][j].Exists = false;
     }
-    menu->status->showMessage(dir.c_str());
+    menu->showStatusMessage(dir.c_str());
     return 0;
 }
 
