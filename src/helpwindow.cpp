@@ -218,9 +218,9 @@ void HelpWindow::openFile()
         browser->setSource(filename);
 }
 
-void HelpWindow::setSource(char *filename)
+void HelpWindow::setSource(const QString &filename)
 {
-    browser->setSource("file:///" + QString(filename));
+    browser->setSource("file:///" + filename);
 }
 
 void HelpWindow::newWindow()

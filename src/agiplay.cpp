@@ -254,14 +254,14 @@ void play_sound(int ResNum)
     close_sound();
 }
 
-void play_sound(char *filename)
+void play_sound(const std::string &filename)
 {
     if (init_sound() != 0) {
         menu->errmes("Can't initialize sound !");
         return;
     }
 
-    FILE *fptr = fopen(filename, "rb");
+    FILE *fptr = fopen(filename.c_str(), "rb");
     if (fptr == NULL) {
         menu->errmes("Can't open file %s !", filename);
         return;

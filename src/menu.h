@@ -25,12 +25,13 @@
 #include <QMainWindow>
 #include <QWidget>
 
+#include "ui/ui_mainmenu.h"
 
+
+class QActionGroup;
 class QFileDialog;
 class QListWidget;
 class QMessageBox;
-class QPushButton;
-class QStatusBar;
 
 class WindowList : public QWidget
 {
@@ -46,7 +47,7 @@ public slots:
 };
 
 
-class About: public QWidget
+class About : public QWidget
 {
     Q_OBJECT
 public:
@@ -54,19 +55,19 @@ public:
 };
 
 class ResourcesWin;
-class Menu : public QMainWindow
+class Menu : public QMainWindow, private Ui::Menu
 {
     Q_OBJECT
 public:
     Menu(QWidget *parent = 0, const char *name = 0);
-    QStatusBar *status;
     ResourcesWin *resources_win;
+    void showStatusMessage(const QString &msg);
     void errmes(const char *, const char *, ...);
     void errmes(const char *, ...);
     void warnmes(const char *, ...);
 
-    void enable(void);
-    void disable(void);
+    void enable_game_actions(void);
+    void disable_game_actions(void);
     void show_resources();
     void enable_resources();
     void disable_resources();
@@ -111,15 +112,52 @@ public slots:
     void save_and_run(void);
     void window_list_cb(void);
 protected:
-    QMenuBar *menubar;
     QMessageBox *err, *warn;
-    QPushButton *create;
-    QFileDialog *f;
-    QAction *open, *close_, *run, *view, *logic, *text, *obj, *words, *pic;
+    QActionGroup *activeGameGroup, *resActionGroup;
     int num_res;
-    int n_res;
-    QAction *id[24];
-    int max_disabled;
+
+private slots:
+    // Menu signal handlers
+    void on_actionGameOpen_triggered(void) { open_game(); }
+    void on_actionGameClose_triggered(void) { close_game(); }
+    void on_actionGameRun_triggered(void) { run_game(); }
+    void on_actionAppSettings_triggered(void) { settings(); }
+
+    void on_actionResNewWindow_triggered(void) { new_resource_window(); }
+    void on_actionResAdd_triggered(void) { add_resource(); }
+    void on_actionResExtract_triggered(void) { extract_resource(); }
+    void on_actionResDelete_triggered(void) { delete_resource(); }
+    void on_actionResRenumber_triggered(void) { renumber_resource(); }
+    void on_actionResRebuildVOLFiles_triggered(void) { rebuild_vol(); }
+    void on_actionResRecompileAll_triggered(void) { recompile_all(); }
+
+    void on_actionToolsViewEditor_triggered(void) { view_editor(); }
+    void on_actionToolsLogicEditor_triggered(void) { logic_editor(); }
+    void on_actionToolsTextEditor_triggered(void) { text_editor(); }
+    void on_actionToolsObjectEditor_triggered(void) { object_editor(); }
+    void on_actionToolsWordTokensEditor_triggered(void) { words_editor(); }
+    void on_actionToolsPictureEditor_triggered(void) { picture_editor(); }
+    void on_actionToolsSoundPlayer_triggered(void) { sound_player(); }
+
+    void on_actionWindowSaveAll_triggered(void) { save_all(); }
+    void on_actionWindowSaveAllandRun_triggered(void) { save_and_run(); }
+    void on_actionWindowList_triggered(void) { window_list_cb(); }
+
+    void on_actionHelpContents_triggered(void) { help_contents(); }
+    void on_actionHelpIndex_triggered(void) { help_index(); }
+    void on_actionHelpAboutQt_triggered(void) { about_qt(); }
+    void on_actionHelpAboutAGIStudio_triggered(void) { about_it(); }
+
+    // Toolbar signal handlers
+    void on_actionOpenGameButton_triggered(void) { open_game(); }
+    void on_actionCloseGameButton_triggered(void) { close_game(); }
+    void on_actionRunGameButton_triggered(void) { run_game(); }
+    void on_actionViewEditorButton_triggered(void) { view_editor(); }
+    void on_actionLogicEditorButton_triggered(void) { logic_editor(); }
+    void on_actionTextEditorButton_triggered(void) { text_editor(); }
+    void on_actionObjectEditorButton_triggered(void) { object_editor(); }
+    void on_actionWordTokensEditorButton_triggered(void) { words_editor(); }
+    void on_actionPictureEditorButton_triggered(void) { picture_editor(); }
 };
 
 extern Menu *menu;

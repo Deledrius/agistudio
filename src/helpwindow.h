@@ -30,7 +30,7 @@ class HelpWindow : public QMainWindow
 public:
     HelpWindow(const QString &home_,  const QString &path, QWidget *parent = 0, const char *name = 0);
     ~HelpWindow();
-    void setSource(char *filename);
+    void setSource(const QString &filename);
 private slots:
     void setBackwardAvailable(bool);
     void setForwardAvailable(bool);
