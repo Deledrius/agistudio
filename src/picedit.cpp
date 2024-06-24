@@ -26,6 +26,7 @@
 #include <QMessageBox>
 #include <QMouseEvent>
 #include <QPainter>
+#include <QSettings>
 #include <QTextEdit>
 
 #include "game.h"
@@ -116,7 +117,7 @@ PicEdit::PicEdit(QWidget *parent, const char *name, int win_num, ResourcesWin *r
     statusbar->addPermanentWidget(pricolor);
 
     // Set up our custom canvas
-    if (game->picstyle == P_TWO) {
+    if (game->settings->value("PictureEditorStyle").toInt() == P_TWO) {
         canvas = new PCanvas(nullptr, 0, this);
         canvas->setMinimumSize(canvas->pixsize * MAX_W + canvas->x0 + 10, canvas->pixsize * MAX_HH + canvas->y0 + 10);
         canvas->resize(canvas->pixsize * MAX_W + canvas->x0, canvas->pixsize * MAX_HH + canvas->x0);

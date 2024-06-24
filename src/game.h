@@ -41,6 +41,8 @@ typedef struct {
 } TResource;
 
 
+class QSettings;
+
 class Game
 {
 public:
@@ -48,10 +50,8 @@ public:
     int open(std::string name);
     int newgame(std::string name);
     int from_template(std::string name);
-    int close();
-    void save_settings();
-    void read_settings();
-    void defaults();
+    void reset_settings();
+    int close() { return 0; }
     void make_source_dir();
     int GetResourceSize(char ResType, int ResNum);
     int ReadResource(char ResourceType, int ResourceID);
@@ -66,24 +66,14 @@ public:
     std::string dirname;  //name of the 'directory' file
     //(e.g. picdir, snddir for V2, [ID]dir for V3)
 
-    std::string srcdir;   //dir for saving logic sources
+    std::string srcdir;   // Directory for saving logic sources
     bool isOpen, isV3;
 
-    //defaults; some GUI defauts are part of GAME object because it is the
-    //only object which is guaranteed to exist at the beginning of the program
-    int res_default;  //default resource type in resources window
-    int picstyle;     //Picedit style
-    bool save_logic_as_text;  //default for 'extract' function
-    bool show_all_messages;   //logic decompile - show all messages at end
-    //or just unused ones
-    bool show_elses_as_gotos;
-    bool show_special_syntax; //v30=4 vs assignn(v30,4)
-    bool reldir;  //if the source dir is relative to the game dir or absolute
-    std::string command;  //interpreter command line
-    std::string srcdirname;  //source dir as entered in options
-    //(i.e. either relative or absolute; srcdir is always absolute)
-    std::string templatedir;  //template game directory
-    std::string helpdir;      //help directory
+    // Keep our application settings here, accessible to other windows.
+    //  Some GUI defaults are part of Game object because it is the
+    //  only object which is guaranteed to exist at the start of the program.
+    QSettings *settings;
+
 private:
     long AGIVersionNumber;
     std::string FindAGIV3GameID(const char *name);

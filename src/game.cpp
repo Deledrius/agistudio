@@ -36,6 +36,7 @@
 #include <QDir>
 #include <QMessageBox>
 #include <QProgressDialog>
+#include <QSettings>
 #include <QStatusBar>
 
 #include "menu.h"
@@ -78,8 +79,10 @@ TResource ResourceData;
 Game::Game()
 {
     ResourceData.Data = (byte *)malloc(MaxResourceSize);
-    defaults();
-    read_settings();
+
+    settings = new QSettings(QSettings::IniFormat, QSettings::UserScope, "AGI Studio", "AGI Studio");
+    if (settings->allKeys().empty())
+        reset_settings();
 }
 
 //*******************************************
@@ -232,20 +235,20 @@ int Game::from_template(std::string name)
 
     // Check if template directory contains *dir files and vol.0
     for (i = 0; i < 5; i++) {
-        sprintf(tmp, "%s/%s", templatedir.c_str(), files[i]);
+        sprintf(tmp, "%s/%s", game->settings->value("TemplateDir").toString().toStdString().c_str(), files[i]);
         if (stat(tmp, &buf)) {
-            menu->errmes("AGI Studio error", "Can't read %s in template directory %s!", files[i], templatedir.c_str());
+            menu->errmes("AGI Studio error", "Can't read %s in template directory %s!", files[i], game->settings->value("TemplateDir").toString());
             return 1;
         }
     }
 
-    sprintf(tmp, "%s/*", templatedir.c_str());
+    sprintf(tmp, "%s/*", game->settings->value("TemplateDir").toString().toStdString().c_str());
 #ifdef _WIN32
     struct _finddata_t c_file;
     long hFile;
     if ((hFile = _findfirst(tmp, &c_file)) != -1L)
         do {
-            auto tmp2 = QDir::cleanPath(QString(templatedir.c_str()) + "/" + c_file.name);
+            auto tmp2 = QDir::cleanPath(game->settings->value("TemplateDir").toString() + "/" + c_file.name);
             cfilename = (char *)malloc(tmp2.length());
             strcpy(cfilename, tmp2.toStdString().c_str());
 #else
@@ -283,12 +286,12 @@ int Game::from_template(std::string name)
     globfree(&globbuf);
 #endif
 
-    sprintf(tmp, "%s/src/*", templatedir.c_str());
+    sprintf(tmp, "%s/src/*", game->settings->value("TemplateDir").toString().toStdString().c_str());
 #ifdef _WIN32
     if ((hFile = _findfirst(tmp, &c_file)) != -1L)
         do
         {
-            auto tmp2 = QDir::cleanPath(QString(templatedir.c_str()) + "/src/" + c_file.name);
+            auto tmp2 = QDir::cleanPath(game->settings->value("TemplateDir").toString() + "/src/" + c_file.name);
             cfilename = (char *)malloc(tmp2.length());
             strcpy(cfilename, tmp2.toStdString().c_str());
 #else
@@ -327,17 +330,17 @@ int Game::from_template(std::string name)
 
 //*******************************************
 void Game::make_source_dir()
-//create directory for sources (extracting logic, etc)
+// Create directory for sources (extracting logic, etc.)
 {
-    if (reldir)
-        srcdir = dir + "/" + srcdirname; //srcdir is inside the game directory
+    if (game->settings->value("UseRelativeSrcDir").toBool())
+        srcdir = dir + "/" + game->settings->value("RelativeSrcDir").toString().toStdString();  // srcdir is inside the game directory
     else
-        srcdir = srcdirname;             //srcdir can be anywhere
+        srcdir = game->settings->value("AbsoluteSrcDir").toString().toStdString();              // srcdir can be anywhere
 
-    QDir dir;
-    bool ret = dir.mkpath(srcdir.c_str());
+    QDir newdir;
+    bool ret = newdir.mkpath(srcdir.c_str());
     if (ret == false)
-        menu->errmes("Can't create the source directory %s!\nLogic text files will not be saved.", srcdirname.c_str());
+        menu->errmes("Can't create the source directory %s!\nLogic text files will not be saved.", srcdir.c_str());
 }
 
 //*******************************************
@@ -1298,137 +1301,33 @@ int Game::ReadV3Resource(char ResourceType1_c, int ResourceID1)
 }
 
 //*********************************************************
-void Game::defaults()
-{
-    res_default = VIEW;
-    save_logic_as_text = true;
-    show_elses_as_gotos = false;
-    show_all_messages = true;
-    show_special_syntax = true;
-    reldir = true;
-    srcdirname = "src";
+void Game::reset_settings(void)
+{       
 #ifdef _WIN32
-    command = "sarien -e -H 0 ./";
-    templatedir = QDir::cleanPath(QDir::currentPath() + QString("\\template\\")).toStdString();
-    helpdir = QDir::cleanPath(QDir::currentPath() + QString("\\help\\")).toStdString();
+    QString template_dir = QDir::cleanPath(QDir::currentPath() + QString("\\template\\"));
+    QString help_dir = QDir::cleanPath(QDir::currentPath() + QString("\\help\\"));
 #else
-    command = "nagi ./ || sarien -e -H 0 ./";
-    templatedir = "/usr/share/agistudio/template";
-    helpdir = "/usr/share/agistudio/help";
+    QString template_dir = "/usr/share/agistudio/template";
+    QString help_dir = "/usr/share/agistudio/help";
 #endif
-    picstyle = P_ONE;
-}
+    settings->setValue("DefaultResourceType", VIEW);                // Default resource type in resources window at startup.
+    settings->setValue("PictureEditorStyle", P_ONE);                // PicEdit Window style.
+    settings->setValue("ExtractLogicAsText", true);                 // Default for 'extract' function.
 
-//*********************************************************
-void Game::read_settings()
-//read ~/.agistudio file
-{
-    char *home;
-    FILE *fptr;
-    int n;
-    char *ptr;
+    settings->setValue("LogicEditor/ShowAllMessages", true);        // Logic decompiler - show all messages at end, or just unused ones.
+    settings->setValue("LogicEditor/ShowElsesAsGotos", false);      //  
+    settings->setValue("LogicEditor/ShowSpecialSyntax", true);      // v30=4 vs. assignn(v30,4).
 
-#ifdef _WIN32
-    wchar_t *localAppData = nullptr;
-    SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, NULL, &localAppData);
+    settings->setValue("UseRelativeSrcDir", true);                  // Will determine whether RelativeSrcDir or AbsoluteSrcDir is used:
+    settings->setValue("RelativeSrcDir", "src");                    // - Path relative to the game dir used to store logic source.
+    settings->setValue("AbsoluteSrcDir", "");                       // - Absolute path used to store logic source.
 
-    home = (char *)malloc(MAX_PATH);
-    wcstombs(home, localAppData, MAX_PATH);
+    settings->setValue("TemplateDir", template_dir);                // Template game directory
+    settings->setValue("HelpDir", help_dir);                        // Help directory
 
-    CoTaskMemFree(static_cast<void *>(localAppData));
-#else
-    home = getenv("HOME");
-#endif
-    if (!home)
-        home = getenv("home");
-    if (!home)
-        return;
-
-    sprintf(tmp, "%s/.agistudio", home);
-    fptr = fopen(tmp, "rb");
-    if (!fptr)
-        return;
-
-    while (fgets(tmp, MAX_TMP, fptr) != NULL) {
-        if ((ptr = strchr(tmp, 0x0a)))
-            * ptr = 0;
-        if ((ptr = strchr(tmp, 0x0d)))
-            * ptr = 0;
-        if (!strncmp(tmp, "res_default=", 12))
-            res_default = atoi(tmp + 12);
-        else if (!strncmp(tmp, "save_logic_as_text=", 20)) {
-            n = atoi(tmp + 20);
-            save_logic_as_text = (n == 1);
-        } else if (!strncmp(tmp, "show_all_messages=", 18)) {
-            n = atoi(tmp + 18);
-            show_all_messages = (n == 1);
-        } else if (!strncmp(tmp, "show_elses_as_gotos=", 20)) {
-            n = atoi(tmp + 20);
-            show_elses_as_gotos = (n == 1);
-        } else if (!strncmp(tmp, "show_special_syntax=", 20)) {
-            n = atoi(tmp + 20);
-            show_special_syntax = (n == 1);
-        } else if (!strncmp(tmp, "reldir=", 8)) {
-            n = atoi(tmp + 8);
-            reldir = (n == 1);
-        } else if (!strncmp(tmp, "command=", 8))
-            command = std::string(tmp + 8);
-        else if (!strncmp(tmp, "srcdirname=", 11))
-            srcdirname = std::string(tmp + 11);
-        else if (!strncmp(tmp, "template=", 9))
-            templatedir = std::string(tmp + 9);
-        else if (!strncmp(tmp, "help=", 5))
-            helpdir = std::string(tmp + 5);
-        else if (!strncmp(tmp, "picstyle=", 9))
-            picstyle = atoi(tmp + 9);
-    }
-
-    fclose(fptr);
-}
-
-//*********************************************************
-void Game::save_settings()
-// Save ~/.agistudio file
-{
-    char *home;
-    FILE *fptr;
-
-#ifdef _WIN32
-    wchar_t *localAppData = nullptr;
-    SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, NULL, &localAppData);
-
-    home = (char *)malloc(MAX_PATH);
-    wcstombs(home, localAppData, MAX_PATH);
-
-    CoTaskMemFree(static_cast<void *>(localAppData));
-#else
-    home = getenv("HOME");
-#endif
-    if (!home)
-        home = getenv("home");
-    if (!home) {
-        menu->errmes("Can't determine HOME environment variable!\nSettings were not saved.");
-        return;
-    }
-
-    sprintf(tmp, "%s/.agistudio", home);
-    fptr = fopen(tmp, "wb");
-    if (!fptr) {
-        menu->errmes("Can't open file %s for writing!\nSettings were not saved.", tmp);
-        return;
-    }
-    fprintf(fptr, "res_default=%d\n", res_default);
-    fprintf(fptr, "save_logic_as_text=%d\n", save_logic_as_text);
-    fprintf(fptr, "show_elses_as_gotos=%d\n", show_elses_as_gotos);
-    fprintf(fptr, "show_all_messages=%d\n", show_all_messages);
-    fprintf(fptr, "show_special_syntax=%d\n", show_special_syntax);
-    fprintf(fptr, "reldir=%d\n", reldir);
-    fprintf(fptr, "command=%s\n", command.c_str());
-    fprintf(fptr, "srcdirname=%s\n", srcdirname.c_str());
-    fprintf(fptr, "template=%s\n", templatedir.c_str());
-    fprintf(fptr, "help=%s\n", helpdir.c_str());
-    fprintf(fptr, "picstyle=%d\n", picstyle);
-    fclose(fptr);
+    settings->setValue("Interpreter", 0);                           // Interpreter name.
+    settings->setValue("InterpreterPath", "");                      // Interpreter executable.
+    settings->setValue("InterpreterArgs", "");                      // Interpreter command-line arguments.
 }
 
 //************************************************
