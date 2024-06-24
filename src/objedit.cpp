@@ -42,87 +42,34 @@
 
 
 //*****************************************
-//Inventory object editor
+// Inventory object editor
 ObjEdit::ObjEdit(QWidget *parent, const char *name, int win_num)
-    : QWidget(parent)
+    : QMainWindow(parent), winnum(win_num), filename(), changed(false),
+      CurObject(), objlist(new ObjList())
 {
+    setupUi(this);
+
     setAttribute(Qt::WA_DeleteOnClose);
-    setWindowTitle("Object Editor");
-    setMinimumSize(400, 400);
 
-    winnum = win_num;
-    objlist = new ObjList();
+    connect(actionNew, &QAction::triggered, this, &ObjEdit::new_file);
+    connect(actionOpen, &QAction::triggered, this, &ObjEdit::open_file);
+    connect(actionSave, &QAction::triggered, this, &ObjEdit::save_file);
+    connect(actionSaveAs, &QAction::triggered, this, &ObjEdit::save_as_file);
+    connect(actionClose, &QAction::triggered, this, &ObjEdit::close);
 
-    QMenu *file = new QMenu(this);
-    Q_CHECK_PTR(file);
-    file->setTitle("&File");
-    file->addAction("&New", this, SLOT(new_file()));
-    file->addAction("&Open", this, SLOT(open_file()));
-    file->addAction("&Save", this, SLOT(save_file()));
-    file->addAction("Save &As", this, SLOT(save_as_file()));
-    file->addSeparator();
-    file->addAction("&Close", this, SLOT(close()));
-
-    options = new QMenu(this);
-    Q_CHECK_PTR(options);
-    options->setTitle("&Options");
-    encrypted = options->addAction("&Encrypted");
-    encrypted->setCheckable(true);
-    encrypted->setChecked(true);
-
-    QMenuBar *menu = new QMenuBar(this);
-    Q_CHECK_PTR(menu);
-    menu->addMenu(file);
-    menu->addMenu(options);
-
-    QBoxLayout *all =  new QVBoxLayout(this);
-    all->setMenuBar(menu);
-
-    list = new QListWidget(this);
-    list->setMinimumSize(400, 400);
-
-    connect(list, SIGNAL(itemSelectionChanged()), this, SLOT(select_object()));
-    all->addWidget(list);
-
-    objname = new QLineEdit(this);
-    connect(objname, SIGNAL(returnPressed()), SLOT(name_cb()));
-    all->addWidget(objname);
-
-    QBoxLayout *down =  new QHBoxLayout(this);
-    all->addLayout(down);
-
-    add = new QPushButton("&Add", this);
-    connect(add, SIGNAL(clicked()), SLOT(add_cb()));
-    down->addWidget(add);
-    del = new QPushButton("&Delete", this);
-    connect(del, SIGNAL(clicked()), SLOT(del_cb()));
-    down->addWidget(del);
-
-    QLabel *label = new QLabel("Room no:", this);
-    down->addWidget(label);
-
-    num = new QLineEdit(this);
-    connect(num, SIGNAL(returnPressed()), SLOT(num_cb()));
-    down->addWidget(num);
-
-    left = new QPushButton("<", this);
-    connect(left, SIGNAL(clicked()), SLOT(left_cb()));
-    down->addWidget(left);
-    right = new QPushButton(">", this);
-    connect(right, SIGNAL(clicked()), SLOT(right_cb()));
-    down->addWidget(right);
-
-    adjustSize();
-
-    filename = "";
-    changed = false;
+    connect(listWidgetObjects, &QListWidget::itemSelectionChanged, this, &ObjEdit::select_object);
+    connect(lineEditObjectName, &QLineEdit::returnPressed, this, &ObjEdit::name_cb);
+    connect(pushButtonAdd, &QPushButton::clicked, this, &ObjEdit::add_cb);
+    connect(pushButtonDelete, &QPushButton::clicked, this, &ObjEdit::del_cb);
+    connect(lineEditRoomNumber, &QLineEdit::returnPressed, this, &ObjEdit::num_cb);
+    connect(pushButtonLeft, &QPushButton::clicked, this, &ObjEdit::left_cb);
+    connect(pushButtonRight, &QPushButton::clicked, this, &ObjEdit::right_cb);
 }
 
 //*****************************************
 void ObjEdit::open()
 {
-    sprintf(tmp, "%s/object", game->dir.c_str());
-    open(tmp);
+    open(QString("%1/OBJECT").arg(game->dir.c_str()).toStdString());
     show();
 }
 
@@ -176,7 +123,7 @@ void ObjEdit::closeEvent(QCloseEvent *e)
 }
 
 //*****************************************
-void ObjEdit::open(char *name)
+void ObjEdit::open(const std::string &name)
 {
     int ret = objlist->read(name, false);
     if (ret)
@@ -184,13 +131,12 @@ void ObjEdit::open(char *name)
 
     filename = name;
 
-    list->clear();
+    listWidgetObjects->clear();
     for (int i = 0; i < objlist->ItemNames.count(); i++) {
-        sprintf(tmp, "%d. %s", i, objlist->ItemNames.at(i).toStdString().c_str());
-        list->addItem(tmp);
+        listWidgetObjects->addItem(QString("%1. %2").arg(i).arg(objlist->ItemNames.at(i)));
     }
-    list->show();
-    list->setCurrentItem(0);
+    listWidgetObjects->show();
+    listWidgetObjects->setCurrentItem(0);
     changed = false;
 }
 
@@ -199,7 +145,7 @@ void ObjEdit::open_file()
 {
     QString filename = QFileDialog::getOpenFileName(this, tr("Open Object"), game->dir.c_str(), tr("Object Files (object);;All Files (*)"));
     if (!filename.isNull())
-        open(filename.toLatin1().data());
+        open(filename.toStdString());
 }
 
 //*****************************************
@@ -208,7 +154,7 @@ void ObjEdit::save_file()
     if (filename == "")
         save_as_file();
     else {
-        objlist->save((char *)filename.c_str(), encrypted->isChecked());
+        objlist->save(filename, actionEncrypted->isChecked());
         changed = false;
     }
 }
@@ -218,7 +164,7 @@ void ObjEdit::save_as_file()
 {
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save Object"), filename.c_str(), tr("Object Files (object);;All Files (*)"));
     if (!fileName.isNull()) {
-        objlist->save(fileName.toLatin1().data(), encrypted->isChecked());
+        objlist->save(fileName.toStdString(), actionEncrypted->isChecked());
         changed = false;
     }
 }
@@ -228,19 +174,18 @@ void ObjEdit::new_file()
 {
     objlist->clear();
     CurObject = 0;
-    list->clear();
-    list->addItem("0. ?");
-    list->setCurrentRow(CurObject);
+    listWidgetObjects->clear();
+    listWidgetObjects->addItem("0. ?");
+    listWidgetObjects->setCurrentRow(CurObject);
     changed = false;
 }
 
 //*****************************************
 void ObjEdit::select_object()
 {
-    int n = list->currentRow();
-    objname->setText(objlist->ItemNames.at(n));
-    sprintf(tmp, "%d", objlist->RoomNum[n]);
-    num->setText(tmp);
+    int n = listWidgetObjects->currentRow();
+    lineEditObjectName->setText(objlist->ItemNames.at(n));
+    lineEditRoomNumber->setText(QString::number(objlist->RoomNum[n]));
     CurObject = n;
 }
 
@@ -250,9 +195,8 @@ void ObjEdit::add_cb()
     objlist->ItemNames.append("?");
     CurObject = objlist->ItemNames.count() - 1;
     objlist->RoomNum[CurObject] = 0;
-    sprintf(tmp, "%d. ?", CurObject);
-    list->addItem(tmp);
-    list->setCurrentRow(CurObject);
+    listWidgetObjects->addItem(QString("%1. ?").arg(QString::number(CurObject)));
+    listWidgetObjects->setCurrentRow(CurObject);
     changed = true;
 }
 
@@ -260,9 +204,8 @@ void ObjEdit::add_cb()
 void ObjEdit::del_cb()
 {
     objlist->ItemNames.replace(CurObject, "?");
-    sprintf(tmp, "%d. ?", CurObject);
-    auto item = list->item(CurObject);
-    item->setText(tmp);
+    auto item = listWidgetObjects->item(CurObject);
+    item->setText(QString("%1. ?").arg(QString::number(CurObject)));
     changed = true;
 }
 
@@ -271,8 +214,7 @@ void ObjEdit::left_cb()
 {
     if (objlist->RoomNum[CurObject] > 0) {
         objlist->RoomNum[CurObject]--;
-        sprintf(tmp, "%d", objlist->RoomNum[CurObject]);
-        num->setText(tmp);
+        lineEditRoomNumber->setText(QString::number(objlist->RoomNum[CurObject]));
         changed = true;
     }
 }
@@ -282,8 +224,7 @@ void ObjEdit::right_cb()
 {
     if (objlist->RoomNum[CurObject] < 255) {
         objlist->RoomNum[CurObject]++;
-        sprintf(tmp, "%d", objlist->RoomNum[CurObject]);
-        num->setText(tmp);
+        lineEditRoomNumber->setText(QString::number(objlist->RoomNum[CurObject]));
         changed = true;
     }
 }
@@ -291,24 +232,22 @@ void ObjEdit::right_cb()
 //*****************************************
 void ObjEdit::num_cb()
 {
-    char *str = num->text().toLatin1().data();
-    int k = num->text().toInt();
-    if (!strcmp(str, "0") || (k > 0 && k < 256)) {
+    bool ok;
+    int k = lineEditRoomNumber->text().toInt(&ok);
+    if (ok && (k > 0 && k < 256)) {
         objlist->RoomNum[CurObject] = k;
         changed = true;
     } else {
-        sprintf(tmp, "%d", objlist->RoomNum[CurObject]);
-        num->setText(tmp);
+        lineEditRoomNumber->setText(QString::number(objlist->RoomNum[CurObject]));
     }
 }
 
 //*****************************************
 void ObjEdit::name_cb()
 {
-    std::string str = objname->text().toStdString();
+    std::string str = lineEditObjectName->text().toStdString();
     objlist->ItemNames.replace(CurObject, str.c_str());
-    sprintf(tmp, "%d. %s", CurObject, str.c_str());
-    auto item = list->item(CurObject);
-    item->setText(tmp);
+    auto item = listWidgetObjects->item(CurObject);
+    item->setText(QString("%1. %2").arg(QString::number(CurObject)).arg(str.c_str()));
     changed = true;
 }

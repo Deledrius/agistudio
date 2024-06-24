@@ -198,8 +198,8 @@ protected:
     bool changed;
     bool closing, hiding, showing;
     int pri_mode;
-    void open(char *filename);
-    void save(char *filename);
+    void open(const std::string &filename);
+    void save(const std::string &filename);
     void deinit();
     void closeEvent(QCloseEvent *e);
     void showEvent(QShowEvent *);

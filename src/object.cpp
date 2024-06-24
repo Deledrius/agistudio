@@ -79,9 +79,9 @@ void ObjList::XORData()
 }
 
 //****************************************************
-int ObjList::read(char *filename, bool FileIsEncrypted)
+int ObjList::read(const std::string &filename, bool FileIsEncrypted)
 {
-    FILE *fptr = fopen(filename, "rb");
+    FILE *fptr = fopen(filename.c_str(), "rb");
     if (fptr == NULL) {
         menu->errmes("Error opening file %s", filename);
         return 1;
@@ -118,7 +118,7 @@ int ObjList::read(char *filename, bool FileIsEncrypted)
 }
 
 //********************************************
-int ObjList::save(char *filename, bool FileIsEncrypted)
+int ObjList::save(const std::string &filename, bool FileIsEncrypted)
 {
     byte lsbyte, msbyte;
     int ItemNamesStart, ObjectFilePos;
@@ -164,7 +164,7 @@ int ObjList::save(char *filename, bool FileIsEncrypted)
             ObjectFilePos++;
         }
     }//end create data
-    fptr = fopen(filename, "wb");
+    fptr = fopen(filename.c_str(), "wb");
     if (fptr == NULL) {
         menu->errmes("Error opening file %s !", filename);
         return 1;

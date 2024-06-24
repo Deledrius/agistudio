@@ -38,8 +38,8 @@ public:
     byte RoomNum[MaxItems];
     byte MaxScreenObjects; //what this is for ?
     void XORData();
-    int read(char *filename, bool FileIsEncrypted);
-    int save(char *filename, bool FileIsEncrypted);
+    int read(const std::string &filename, bool FileIsEncrypted);
+    int save(const std::string &filename, bool FileIsEncrypted);
     bool GetItems();
     void clear();
 };

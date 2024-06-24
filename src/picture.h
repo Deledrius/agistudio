@@ -139,10 +139,10 @@ public:
     Points points, points0, points1;
     Points *curp, *newp;
     void load(byte *, int);
-    int open(char *filename);
+    int open(const std::string &filename);
     int open(int ResNum);
     void save();
-    int save(char *filename);
+    int save(const std::string &filename);
     int save(int ResNum);
     void newpic();
     void draw();

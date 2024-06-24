@@ -26,6 +26,8 @@
 
 #include "object.h"
 
+#include "ui/ui_objedit.h"
+
 
 class QAction;
 class QCloseEvent;
@@ -37,7 +39,7 @@ class QPushButton;
 class QShowEvent;
 
 //inventory objects editor
-class ObjEdit : public QWidget
+class ObjEdit : public QMainWindow, private Ui::ObjEdit
 {
     Q_OBJECT
 public:
@@ -57,18 +59,12 @@ public slots:
     void name_cb();
 protected:
     int winnum;
-    QListWidget *list;
-    QLineEdit *objname, *num;
-    QPushButton *add, *del, *left, *right;
-    QMenu *options;
-    QAction *encrypted;
     int CurObject;
     bool changed;
     std::string filename;
     ObjList *objlist;
 
-    void open(char *);
-    void save(char *);
+    void open(const std::string &);
     void deinit();
     void closeEvent(QCloseEvent *e);
     void showEvent(QShowEvent *);
