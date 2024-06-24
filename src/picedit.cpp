@@ -135,7 +135,7 @@ PicEdit::PicEdit(QWidget *parent, const char *name, int win_num, ResourcesWin *r
 }
 
 //*********************************************
-void PicEdit::save(char *filename)
+void PicEdit::save(const std::string &filename)
 {
     picture->save(filename);
     changed = false;
@@ -146,7 +146,7 @@ void PicEdit::open_file()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open Picture File"), game->srcdir.c_str(), tr("Picture Files (picture*.*);;All Files (*)"));
     if (!fileName.isNull())
-        open(fileName.toLatin1().data());
+        open(fileName.toStdString());
 }
 
 //*********************************************
@@ -167,7 +167,7 @@ void PicEdit::open(int ResNum)
 }
 
 //*********************************************
-void PicEdit::open(char *filename)
+void PicEdit::open(const std::string &filename)
 {
     if (picture->open(filename))
         return;
@@ -186,7 +186,7 @@ void PicEdit::save_file()
 {
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save Picture File"), game->srcdir.c_str(), tr("Picture Files (picture*.*);;All Files (*)"));
     if (!fileName.isNull())
-        save(fileName.toLatin1().data());
+        save(fileName.toStdString());
 }
 
 //*********************************************

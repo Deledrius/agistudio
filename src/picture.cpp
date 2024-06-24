@@ -599,9 +599,9 @@ void Picture::load(byte *picdata, int picsize)
 }
 
 //*************************************************
-int Picture::open(char *filename)
+int Picture::open(const std::string &filename)
 {
-    FILE *fptr = fopen(filename, "rb");
+    FILE *fptr = fopen(filename.c_str(), "rb");
 
     if (fptr == NULL) {
         menu->errmes("Can't open file %s ! ", filename);
@@ -642,9 +642,9 @@ int Picture::save(int ResNum)
 }
 
 //*************************************************
-int Picture::save(char *filename)
+int Picture::save(const std::string &filename)
 {
-    FILE *fptr = fopen(filename, "wb");
+    FILE *fptr = fopen(filename.c_str(), "wb");
 
     if (fptr == NULL) {
         menu->errmes("Can't open file %s ! ", filename);
