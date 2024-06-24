@@ -24,49 +24,32 @@
 
 #include <QDialog>
 
+#include "ui/ui_options.h"
 
-class QCheckBox;
-class QComboBox;
-class QDialogButtonBox;
-class QLineEdit;
-class QRadioButton;
-class QTabWidget;
 
-class Options : public QDialog
+class QAbstractButton;
+
+class Options : public QDialog, private Ui::Settings
 {
     Q_OBJECT
 public:
-    Options(QWidget *parent = 0, const char *name = 0);
-    QTabWidget *tabs;
-    QComboBox *type, *picstyle;
-    QCheckBox *messages, *elses, *special;
-    QRadioButton *text, *binary;
-    QLineEdit *relname, *absname;
-    QRadioButton *reldir, *absdir;
-    QLineEdit *command, *templatedir, *helpdir;
-    QDialogButtonBox *bb;
+    Options(QWidget *parent = nullptr);
 
-public slots:
-    void set_general();
-    void set_logedit();
-    void set_directories();
-    void set_interpreter();
-    void set_settings();
-
-    void apply();
-    void defaults();
+private:
+    void populate_settings();
+    void apply_settings();
+    void reset_to_defaults();
 
     void browse_abs();
     void browse_template();
     void browse_help();
     void browse_interpreter();
 
-    void set_reldir();
-    void set_absdir();
+    void on_update_directories();
+    void on_accept();
+    void on_reject();
+    void on_buttonBox_clicked(QAbstractButton *);
 };
 
-
-extern Options *options;
-extern char tmp[];
 
 #endif

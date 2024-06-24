@@ -54,6 +54,7 @@ public:
     About(QWidget *parent = 0, const char *name = 0);
 };
 
+
 class ResourcesWin;
 class Menu : public QMainWindow, private Ui::Menu
 {
@@ -80,7 +81,7 @@ public slots:
     void close_game(void);
     void quit_cb(void);
     void run_game(void);
-    void settings(void);
+    void options(void);
 
     void from_template(void);
     void blank(void);
@@ -121,7 +122,7 @@ private slots:
     void on_actionGameOpen_triggered(void) { open_game(); }
     void on_actionGameClose_triggered(void) { close_game(); }
     void on_actionGameRun_triggered(void) { run_game(); }
-    void on_actionAppSettings_triggered(void) { settings(); }
+    void on_actionAppSettings_triggered(void) { options(); }
 
     void on_actionResNewWindow_triggered(void) { new_resource_window(); }
     void on_actionResAdd_triggered(void) { add_resource(); }

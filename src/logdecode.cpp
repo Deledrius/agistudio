@@ -21,6 +21,8 @@
  */
 
 
+#include <QSettings>
+
 #include "logedit.h"
 
 
@@ -134,7 +136,7 @@ void Logic::DisplayMessages(void)
 {
     int i;
 
-    if (game->show_all_messages) {
+    if (game->settings->value("ShowAllMessages").toBool()) {
         OutputText.append("// Messages\n");
         for (i = 1; i <= 255; i++) {
             if (MessageExists[i])
@@ -228,7 +230,7 @@ int Logic::FindLabels(void)
         else if (CurByte == 0xFE) {
             DoGoto = false;
             TempBlockLength = ReadLSMSWord();
-            if ((BlockEnd[BlockDepth] == ResPos) && (BlockIsIf[BlockDepth]) && (BlockDepth > 0) && (!game->show_elses_as_gotos)) {
+            if ((BlockEnd[BlockDepth] == ResPos) && (BlockIsIf[BlockDepth]) && (BlockDepth > 0) && (!game->settings->value("ShowElsesAsGotos").toBool())) {
                 BlockIsIf[BlockDepth] = false;
                 if (TempBlockLength + ResPos > BlockEnd[BlockDepth - 1] || (TempBlockLength & 0x8000) || BlockLength[BlockDepth] <= 3)
                     DoGoto = true;
@@ -525,7 +527,7 @@ void Logic::ReadIfs(void)
                 ThisLine = QString("  ").repeated(BlockDepth).toStdString() + "    ";
             }
             ThisCommand = CurByte;
-            if (game->show_special_syntax && ThisCommand >= 1 && ThisCommand <= 6)
+            if (game->settings->value("ShowSpecialSyntax").toBool() && ThisCommand >= 1 && ThisCommand <= 6)
                 AddSpecialIFSyntaxCommand();
             else {
                 if (NOTOn)
@@ -664,7 +666,7 @@ int Logic::decode(int ResNum)
         else if (CurByte <= NumAGICommands) {
             ThisCommand = CurByte;
             ThisLine = QString("  ").repeated(BlockDepth).toStdString();
-            if (game->show_special_syntax && (ThisCommand >= 0x01 && ThisCommand <= 0x0B) || (ThisCommand >= 0xA5 && ThisCommand <= 0xA8))
+            if (game->settings->value("ShowSpecialSyntax").toBool() && (ThisCommand >= 0x01 && ThisCommand <= 0x0B) || (ThisCommand >= 0xA5 && ThisCommand <= 0xA8))
                 AddSpecialSyntaxCommand();
             else {
                 ThisLine += (std::string(AGICommand[ThisCommand].Name) + "(");
@@ -683,7 +685,7 @@ int Logic::decode(int ResNum)
         } else if (CurByte == 0xfe) {
             DoGoto = false;
             TempBlockLength = ReadLSMSWord();
-            if (BlockEnd[BlockDepth] == ResPos && (BlockIsIf[BlockDepth]) && BlockDepth > 0 && (!game->show_elses_as_gotos)) {
+            if (BlockEnd[BlockDepth] == ResPos && (BlockIsIf[BlockDepth]) && BlockDepth > 0 && (!game->settings->value("ShowElsesAsGotos").toBool())) {
                 //else
                 BlockIsIf[BlockDepth] = false;
                 if (TempBlockLength + ResPos > BlockEnd[BlockDepth - 1] || TempBlockLength & 0x8000 || BlockLength[BlockDepth] <= 3)

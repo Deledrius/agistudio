@@ -33,6 +33,7 @@
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
+#include <QSettings>
 
 #include "bmp2agipic.h"
 #include "game.h"
@@ -100,7 +101,7 @@ ResourcesWin::ResourcesWin(QWidget *parent, const char  *name, int win_num):
     connect(list, SIGNAL(itemActivated(QListWidgetItem *)), this, SLOT(select_resource(QListWidgetItem *)));
     list->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::MinimumExpanding));
 
-    selected = game->res_default;
+    selected = game->settings->value("DefaultResourceType").toInt();
     resbox->addWidget(list);
 
     msg = new QLabel(this);
@@ -423,7 +424,7 @@ static void extract(char *filename, int restype, int resnum)
         menu->errmes("Can't open file %s ! ", filename);
         return ;
     }
-    if (restype == LOGIC && game->save_logic_as_text) {
+    if (restype == LOGIC && game->settings->value("ExtractLogicAsText").toBool()) {
         Logic *logic = new Logic();
         int err = logic->decode(resnum);
         if (!err)

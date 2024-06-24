@@ -28,6 +28,7 @@
 #include <QListWidget>
 #include <QMessageBox>
 #include <QProcess>
+#include <QSettings>
 #include <QTextEdit>
 
 #include "helpwindow.h"
@@ -147,7 +148,7 @@ void Menu::show_resources()
         winlist[n].w.r = resources_win;
         inc_res(resources_win);
     }
-    resources_win->select_resource_type(game->res_default);
+    resources_win->select_resource_type(game->settings->value("DefaultResourceType").toInt());
     resources_win->show();
     enable_game_actions();
 }
@@ -274,6 +275,20 @@ void Menu::close_game()
 //**********************************************
 void Menu::run_game()
 {
+    QString program = game->settings->value("InterpreterPath").toString();
+    if (program.isEmpty()) {
+        this->errmes("Cannot Run Game", "No Interpreter has been configured.");
+        return;
+    }
+
+    QStringList arguments = game->settings->value("InterpreterArgs").toString().split(' ');
+    for (auto &arg : arguments) {
+        if (arg.contains("%1"))
+            arg = arg.arg(game->dir.c_str());
+    }
+
+    QProcess *myProcess = new QProcess(this);
+    myProcess->start(program, arguments);
 }
 
 //**********************************************
@@ -314,10 +329,9 @@ void Menu::window_list_cb()
 }
 
 //**********************************************
-void Menu::settings()
+void Menu::options()
 {
-    if (options == nullptr)
-        options = new Options();
+    auto options = new Options();
     options->show();
 }
 
@@ -351,7 +365,7 @@ void Menu::new_resource_window()
     ResourcesWin *resources_win = new ResourcesWin(NULL, "Resources", n);
     winlist[n].type = RESOURCES;
     winlist[n].w.r = resources_win;
-    int res = game->res_default;
+    int res = game->settings->value("DefaultResourceType").toInt();
     for (i = 0; i < 4; i++) {
         if (sel[i] == 0) {
             res = i;
@@ -496,7 +510,7 @@ void Menu::sound_player()
 //**********************************************
 void Menu::help_contents()
 {
-    QString fullpath = QString("%1/index.html").arg(game->helpdir.c_str());
+    QString fullpath = QString("%1/index.html").arg(game->settings->value("HelpDir").toString());
 
     if (helpwindow == nullptr) {
         int n;
@@ -513,7 +527,7 @@ void Menu::help_contents()
 //**********************************************
 bool Menu::help_topic(const QString &topic)
 {
-    QString fullpath = QString("%1/%1.html").arg(game->helpdir.c_str()).arg(
+    QString fullpath = QString("%1/%1.html").arg(game->settings->value("HelpDir").toString()).arg(
             QString(topic).replace(".", "_"));
 
     if (!QFile(fullpath).exists())
@@ -536,7 +550,7 @@ bool Menu::help_topic(const QString &topic)
 //**********************************************
 void Menu::help_index()
 {
-    QString fullpath = QString("%1/indexabc.html").arg(game->helpdir.c_str());
+    QString fullpath = QString("%1/indexabc.html").arg(game->settings->value("HelpDir").toString());
 
     if (helpwindow1 == nullptr) {
         int n;
