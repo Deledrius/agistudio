@@ -394,82 +394,28 @@ int Game::newgame(std::string name)
 }
 
 //*******************************************
-std::string Game::FindAGIV3GameID(const char *name)
-//compare the prefix for vol.0 and dir - if they are same and non-NULL
-//it is a V3 game
+std::string Game::FindAGIV3GameID(const char *gamepath) const
+// Compare the filename prefix (if any) for vol.0 and dir; If they exist and are the same,
+// it is a V3 game.
 {
-    std::string ID1;
-    char *ptr;
-    char *cfilename;
+    std::string ID1 = "V2";
+    std::string dirString = "";
+    std::string volString = "";
 
-    ID1 = "V2";  //default for V2 games
-
-#ifdef _WIN32
-    struct _finddata_t c_file;
-    long hFile;
-#else
-    glob_t globbuf;
-#endif
-    char dirString[10] = "", volString[10] = "";
-
-    sprintf(tmp, "%s/*dir", name);
-#ifdef _WIN32
-    if ((hFile = _findfirst(tmp, &c_file)) == -1L) {
-#else
-    if (glob(tmp, GLOB_ERR | GLOB_NOSORT, NULL, &globbuf)) {
-        globfree(&globbuf);
-#endif
-        return ID1;
+    for (const auto& entry : std::filesystem::directory_iterator(gamepath)) {
+        if (entry.is_regular_file()) {
+            if (dirString.empty() && entry.path().filename().string().ends_with("DIR")) {
+                dirString = entry.path().filename().string().substr(0, 3);
+            }
+            else if (volString.empty() && entry.path().filename().string().ends_with("VOL.0")) {
+                volString = entry.path().filename().string().substr(0, 3);
+            }
+        }
     }
 
-#ifdef _WIN32
-    cfilename = c_file.name;
-#else
-    cfilename = globbuf.gl_pathv[0];
-#endif
-    if ((ptr = strrchr(cfilename, '/')))
-        ptr++;
-    else
-        ptr = cfilename;
-    strncpy(dirString, ptr, strlen(ptr) - 3);
-
-#ifdef _WIN32
-    _findclose(hFile);
-#else
-    globfree(&globbuf);
-#endif
-
-    sprintf(tmp, "%s/*vol.0", name);
-
-#ifdef _WIN32
-    if ((hFile = _findfirst(tmp, &c_file)) == -1L) {
-#else
-    if (glob(tmp, GLOB_ERR | GLOB_NOSORT, NULL, &globbuf)) {
-        globfree(&globbuf);
-#endif
-        return ID1;
-    }
-
-#ifdef _WIN32
-    cfilename = c_file.name;
-#else
-    cfilename = globbuf.gl_pathv[0];
-#endif
-    if ((ptr = strrchr(cfilename, '/')))
-        ptr++;
-    else
-        ptr = cfilename;
-    strncpy(volString, ptr, strlen(ptr) - 5);
-
-#ifdef _WIN32
-    _findclose(hFile);
-#else
-    globfree(&globbuf);
-#endif
-
-    if ((strcmp(volString, dirString) == 0) && (volString != NULL))
+    if (!volString.empty() && (volString == dirString))
         ID1 = volString;
-
+        
     return ID1;
 }
 
