@@ -76,7 +76,7 @@ public:
 
 private:
     long AGIVersionNumber;
-    std::string FindAGIV3GameID(const char *name);
+    std::string FindAGIV3GameID(const char *gamepath) const;
     long GetAGIVersionNumber(void) const;
     int ReadV3Resource(char ResourceType, int ResourceID);
     FILE *OpenPatchVol(int PatchVol, int *filesize) const;
