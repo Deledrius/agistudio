@@ -527,7 +527,7 @@ void Menu::help_contents()
 //**********************************************
 bool Menu::help_topic(const QString &topic)
 {
-    QString fullpath = QString("%1/%1.html").arg(game->settings->value("HelpDir").toString()).arg(
+    QString fullpath = QString("%1/%2.html").arg(game->settings->value("HelpDir").toString()).arg(
             QString(topic).replace(".", "_"));
 
     if (!QFile(fullpath).exists())
