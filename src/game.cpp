@@ -1289,12 +1289,12 @@ int Game::RecompileAll()
         if (winlist[i].type == TEXTRES) {
             if (winlist[i].w.t->filename != "") {
                 winlist[i].w.t->save();
-                winlist[i].w.t->status->showMessage("");
+                winlist[i].w.t->statusBar()->showMessage("");
             }
         } else if (winlist[i].type == LOGIC) {
             if (winlist[i].w.l->filename != "") {
                 winlist[i].w.l->save_logic();
-                winlist[i].w.l->status->showMessage("");
+                winlist[i].w.l->statusBar()->showMessage("");
             }
         }
 

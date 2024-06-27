@@ -106,10 +106,11 @@ set(AGIStudio_SOURCES
 set(AGIStudio_UI
     ui/mainmenu.ui
     ui/objedit.ui
+    ui/options.ui
     ui/picedit.ui
+    ui/textedit.ui
     ui/wordsedit.ui
     ui/wordsfind.ui
-    ui/options.ui
 )
 
 set(AGIStudio_UIRESOURCES
