@@ -27,6 +27,8 @@
 #include "logic.h"
 #include "resources.h"
 
+#include "ui/ui_textedit.h"
+
 
 class QCheckBox;
 class QCloseEvent;
@@ -61,16 +63,14 @@ public slots:
 class LogicSyntaxHL;
 class RoomGen;
 
-//Logic editor
-class LogEdit : public QWidget
+// Logic editor
+class LogEdit : public QMainWindow, private Ui::TextEditor
 {
     Q_OBJECT
 public:
     LogEdit(QWidget *parent = 0, const char *name = 0, int winnum = 0, ResourcesWin *res = 0, bool readonly = false);
-    QTextEdit *editor;
     FindEdit *findedit;
     ResourcesWin *resources_win;
-    QStatusBar *status;
     RoomGen *roomgen;
     Logic *logic;
     LogicSyntaxHL *syntax_hl;
@@ -99,8 +99,8 @@ protected:
     int LogicNum;
     int winnum;
     bool changed;
-    int open(char *filename);
-    void save(char *filename);
+    int open(const std::string &filename);
+    void save(const std::string &filename);
     void deinit();
     void delete_file(int num);
     void getmaxcol();
@@ -108,20 +108,20 @@ protected:
     void closeEvent(QCloseEvent *e);
     void showEvent(QShowEvent *);
     void hideEvent(QHideEvent *);
+    void setNewTitle(const QString &);
 };
 
-//a simple text editor
-class TextEdit : public QWidget
+// A simple text editor
+class TextEdit : public QMainWindow, private Ui::TextEditor
 {
     Q_OBJECT
 public:
     TextEdit(QWidget *parent = 0, const char *name = 0, int winnum = 0);
-    QTextEdit *editor;
     FindEdit *findedit;
-    QStatusBar *status;
     std::string filename;
-    int open(char *filename);
-    void save(const char *filename);
+    int open(const std::string &filename);
+    void save(const std::string &filename);
+    void setPosition(int newpos);
 public slots:
     void new_text();
     void clear_all();
@@ -138,6 +138,7 @@ protected:
     void showEvent(QShowEvent *);
     void hideEvent(QHideEvent *);
     void deinit();
+    void setNewTitle(const QString &);
 };
 
 

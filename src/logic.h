@@ -62,7 +62,7 @@ private:
     void ReadIfs();
 
     std::string ReadString(std::string::size_type *pos, std::string &str);
-    int RemoveComments(QStringList Lines);
+    int RemoveComments(QStringList &Lines);
     int AddIncludes();
     int ReadDefines();
     int ReadPredefinedMessages();
