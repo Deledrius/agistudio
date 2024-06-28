@@ -19,15 +19,10 @@
  */
 
 
-#include <QCheckBox>
 #include <QFileDialog>
-#include <QGroupBox>
 #include <QInputDialog>
-#include <QLabel>
 #include <QListWidget>
 #include <QMessageBox>
-#include <QPushButton>
-#include <QRadioButton>
 #include <QRegularExpression>
 #include <QSyntaxHighlighter>
 
@@ -662,9 +657,9 @@ void LogEdit::goto_cb()
 void LogEdit::find_cb()
 {
     if (findedit == nullptr)
-        findedit = new FindEdit(nullptr, nullptr, textEditor, statusBar());
+        findedit = new FindEdit(this, nullptr, textEditor);
     findedit->show();
-    findedit->find_field->setFocus();
+    findedit->focusEditLine();
 }
 
 //***********************************************
@@ -931,9 +926,9 @@ void TextEdit::clear_all()
 void TextEdit::find_cb()
 {
     if (findedit == nullptr)
-        findedit = new FindEdit(nullptr, nullptr, textEditor, statusBar());
+        findedit = new FindEdit(this, nullptr, textEditor);
     findedit->show();
-    findedit->find_field->setFocus();
+    findedit->focusEditLine();
 }
 
 //***********************************************
@@ -953,84 +948,24 @@ void TextEdit::setNewTitle(const QString &newtitle)
 
 
 //***********************************************
-FindEdit::FindEdit(QWidget *parent, const char *name, QTextEdit *edit, QStatusBar *s)
-    : QWidget(parent)
+FindEdit::FindEdit(QWidget *parent, const char *name, QTextEdit *edit)
+    : QMainWindow(parent), editor(edit), curline(0)
 {
-    setAttribute(Qt::WA_DeleteOnClose);
+    setupUi(this);
+
     setWindowTitle("Find");
-    setMinimumSize(340, 140);
 
-    status = s;
-    editor = edit;
-
-    QBoxLayout *all =  new QVBoxLayout(this);
-
-    QBoxLayout *txt = new QHBoxLayout(this);
-    all->addLayout(txt);
-
-    QLabel *label = new QLabel("Find what:", this);
-    txt->addWidget(label);
-
-    find_field = new QLineEdit(this);
-    find_field->setMinimumWidth(200);
-    connect(find_field, SIGNAL(returnPressed()), SLOT(find_first_cb()));
-    txt->addWidget(find_field);
-
-    QBoxLayout *left1 =  new QHBoxLayout(this);
-    all->addLayout(left1);
-
-    QVBoxLayout *dirbox = new QVBoxLayout();
-    QGroupBox *direction = new QGroupBox("Direction", this);
-    up = new QRadioButton("Up", direction);
-    down = new QRadioButton("Down", direction);
-    down->setChecked(true);
-    dirbox->addWidget(up);
-    dirbox->addWidget(down);
-    left1->addWidget(direction);
-    direction->setLayout(dirbox);
-
-    QVBoxLayout *frombox = new QVBoxLayout();
-    QGroupBox *from = new QGroupBox("From", this);
-    start = new QRadioButton("Start", from);
-    current = new QRadioButton("Current", from);
-    start->setChecked(true);
-    frombox->addWidget(start);
-    frombox->addWidget(current);
-    left1->addWidget(from);
-    from->setLayout(frombox);
-
-    QVBoxLayout *typebox = new QVBoxLayout();
-    QGroupBox *type = new QGroupBox("Match", this);
-    match_whole = new QCheckBox("Match exact", type);
-    match_case = new QCheckBox("Match case", type);
-    typebox->addWidget(match_whole);
-    typebox->addWidget(match_case);
-    left1->addWidget(type);
-    type->setLayout(typebox);
-
-
-    QBoxLayout *right =  new QVBoxLayout(this);
-    left1->addLayout(right);
-    find_first = new QPushButton("Find", this);
-    right->addWidget(find_first);
-    connect(find_first, SIGNAL(clicked()), SLOT(find_first_cb()));
-    find_next = new QPushButton("Find next", this);
-    connect(find_next, SIGNAL(clicked()), SLOT(find_next_cb()));
-    right->addWidget(find_next);
-    cancel = new QPushButton("Cancel", this);
-    connect(cancel, SIGNAL(clicked()), SLOT(cancel_cb()));
-    right->addWidget(cancel);
-
-    adjustSize();
-    curline = 0;
+    radioButtonMatchSubstr->setVisible(false);
+    connect(lineFind, &QLineEdit::returnPressed, this, &FindEdit::find_first_cb);
+    connect(buttonFindNext, &QPushButton::clicked, this, &FindEdit::find_next_cb);
 }
 
 //***********************************************
 void FindEdit::find_first_cb()
 {
-    if (current->isChecked())
+    if (radioButtonFromCurrent->isChecked())
         curline = editor->textCursor().position();
-    else if (down->isChecked())
+    else if (radioButtonDirDown->isChecked())
         curline = 0;
     else
         curline = editor->toPlainText().length();
@@ -1042,22 +977,23 @@ void FindEdit::find_first_cb()
 void FindEdit::find_next_cb()
 {
     QTextDocument::FindFlags flags;
-    if (match_whole->isChecked())
+    if (radioButtonMatchExact->isChecked())
         flags |= QTextDocument::FindWholeWords;
-    if (match_case->isChecked())
+    if (radioButtonMatchCase->isChecked())
         flags |= QTextDocument::FindCaseSensitively;
-    if (!down->isChecked())
+    if (!radioButtonDirDown->isChecked())
         flags |= QTextDocument::FindBackward;
 
-    if (!editor->find(find_field->text(), flags))
-        menu->errmes("Find", "'%s' not found!", find_field->text().toStdString().c_str());
-    status->showMessage("");
+    if (!editor->find(lineFind->text(), flags))
+        statusBar()->showMessage(QString("'%1' not found!").arg(lineFind->text()));
+    else
+        statusBar()->clearMessage();
 }
 
 //***********************************************
 void FindEdit::cancel_cb()
 {
     hide();
-    status->clearMessage();
+    statusBar()->clearMessage();
 }
 //***********************************************
