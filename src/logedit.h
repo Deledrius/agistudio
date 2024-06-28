@@ -28,6 +28,7 @@
 #include "resources.h"
 
 #include "ui/ui_textedit.h"
+#include "ui/ui_wordsfind.h"
 
 
 class QCheckBox;
@@ -41,19 +42,15 @@ class QShowEvent;
 class QStatusBar;
 class QTextEdit;
 
-//find string in the editor window
-class FindEdit : public QWidget
+// Find strings in the editor window
+class FindEdit : public QMainWindow, private Ui::WordsFind
 {
     Q_OBJECT
 public:
-    FindEdit(QWidget *parent = 0, const char *name = 0, QTextEdit *edit = 0, QStatusBar *s = 0);
-    QStatusBar *status;
-    QPushButton *find_first, *find_next, *cancel;
-    QRadioButton *up, *down, *start, *current;
-    QCheckBox *match_whole, *match_case;
-    QLineEdit *find_field;
+    FindEdit(QWidget *parent = 0, const char *name = 0, QTextEdit *edit = 0);
     QTextEdit *editor;
     int curline;
+    void focusEditLine() { lineFind->setFocus(); }
 public slots:
     void find_first_cb();
     void find_next_cb();
