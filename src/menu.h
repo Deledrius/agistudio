@@ -74,9 +74,8 @@ public:
     void disable_resources();
     void inc_res(ResourcesWin *res);
     void dec_res();
-    bool templ;
+    bool use_template;
 
-public slots:
     void open_game(void);
     void close_game(void);
     void quit_cb(void);
@@ -116,49 +115,6 @@ protected:
     QMessageBox *err, *warn;
     QActionGroup *activeGameGroup, *resActionGroup;
     int num_res;
-
-private slots:
-    // Menu signal handlers
-    void on_actionGameOpen_triggered(void) { open_game(); }
-    void on_actionGameClose_triggered(void) { close_game(); }
-    void on_actionGameRun_triggered(void) { run_game(); }
-    void on_actionAppSettings_triggered(void) { options(); }
-
-    void on_actionResNewWindow_triggered(void) { new_resource_window(); }
-    void on_actionResAdd_triggered(void) { add_resource(); }
-    void on_actionResExtract_triggered(void) { extract_resource(); }
-    void on_actionResDelete_triggered(void) { delete_resource(); }
-    void on_actionResRenumber_triggered(void) { renumber_resource(); }
-    void on_actionResRebuildVOLFiles_triggered(void) { rebuild_vol(); }
-    void on_actionResRecompileAll_triggered(void) { recompile_all(); }
-
-    void on_actionToolsViewEditor_triggered(void) { view_editor(); }
-    void on_actionToolsLogicEditor_triggered(void) { logic_editor(); }
-    void on_actionToolsTextEditor_triggered(void) { text_editor(); }
-    void on_actionToolsObjectEditor_triggered(void) { object_editor(); }
-    void on_actionToolsWordTokensEditor_triggered(void) { words_editor(); }
-    void on_actionToolsPictureEditor_triggered(void) { picture_editor(); }
-    void on_actionToolsSoundPlayer_triggered(void) { sound_player(); }
-
-    void on_actionWindowSaveAll_triggered(void) { save_all(); }
-    void on_actionWindowSaveAllandRun_triggered(void) { save_and_run(); }
-    void on_actionWindowList_triggered(void) { window_list_cb(); }
-
-    void on_actionHelpContents_triggered(void) { help_contents(); }
-    void on_actionHelpIndex_triggered(void) { help_index(); }
-    void on_actionHelpAboutQt_triggered(void) { about_qt(); }
-    void on_actionHelpAboutAGIStudio_triggered(void) { about_it(); }
-
-    // Toolbar signal handlers
-    void on_actionOpenGameButton_triggered(void) { open_game(); }
-    void on_actionCloseGameButton_triggered(void) { close_game(); }
-    void on_actionRunGameButton_triggered(void) { run_game(); }
-    void on_actionViewEditorButton_triggered(void) { view_editor(); }
-    void on_actionLogicEditorButton_triggered(void) { logic_editor(); }
-    void on_actionTextEditorButton_triggered(void) { text_editor(); }
-    void on_actionObjectEditorButton_triggered(void) { object_editor(); }
-    void on_actionWordTokensEditorButton_triggered(void) { words_editor(); }
-    void on_actionPictureEditorButton_triggered(void) { picture_editor(); }
 };
 
 extern Menu *menu;

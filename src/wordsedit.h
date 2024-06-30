@@ -44,48 +44,31 @@ public:
     ResourcesWin *resources_win;
     WordList *wordlist;
     void open();
-private slots:
-    // Menu signal handlers
-    void on_actionNew_triggered();
-    void on_actionOpen_triggered();
-    void on_actionMerge_triggered();
-    void on_actionSave_triggered();
-    void on_actionSaveAs_triggered();
-    void on_actionClose_triggered() { close(); }
-
-    void on_actionAddWordGroup_triggered() { on_pushButtonAddGroup_pressed(); }
-    void on_actionRemoveWordGroup_triggered() { on_pushButtonRemoveGroup_pressed(); }
-    void on_actionChangeGroupNumber_triggered() { on_pushButtonChangeGroupNum_pressed(); }
-
-    void on_actionAddWord_triggered() { on_pushButtonAddWord_pressed(); }
-    void on_actionRemoveWord_triggered() { on_pushButtonRemoveWord_pressed(); }
-
-    void on_actionFind_triggered() { on_pushButtonFind_pressed(); }
-
-    void on_actionCountWordGroups_triggered(void);
-    void on_actionCountWords_triggered(void);
-
-    // Event signal handlers
-    void on_listGroup_itemSelectionChanged();
-    void on_listWords_itemSelectionChanged();
-
-    // Button signal handlers
-    void on_pushButtonAddGroup_pressed(void);
-    void on_pushButtonRemoveGroup_pressed(void);
-    void on_pushButtonChangeGroupNum_pressed(void);
-
-    void on_lineWord_returnPressed(void);
-    void on_pushButtonAddWord_pressed(void);
-    void on_pushButtonRemoveWord_pressed(void);
-
-    void on_pushButtonFind_pressed(void);
 protected:
+    void new_file();
+    void open_file();
+    void merge_file();
+    void save_file();
+    void save_as_file();
+
+    void add_group_cb();
+    void delete_group_cb();
+    void change_group_number_cb();
+    void add_word_cb(void);
+    void do_add_word(void);
+    void delete_word_cb();
+    void find_cb();
+    void count_groups_cb(void);
+    void count_words_cb(void);
+
     void open(const QString &);
     void save(const QString &);
     void deinit();
 
     void select_group(int);
     void update_group(int);
+    void select_group();
+    void select_word();
 
     int winnum;
     WordsFind *wordsfind;
@@ -111,9 +94,8 @@ class WordsFind : public QMainWindow, private Ui::WordsFind
 public:
     WordsFind(QWidget *parent = 0, const char *name = 0, WordsEdit *w = 0);
     bool first;
-public slots:
-    void on_buttonFindNext_pressed();
 protected:
+    void find_next_cb();
     WordsEdit *wordsedit;
     WordList *wordlist;
     int FindLastGroup, FindLastWord;
