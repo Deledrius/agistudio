@@ -93,6 +93,49 @@ Menu::Menu(QWidget *parent, const char *name)
     err = new QMessageBox(QMessageBox::Critical, tr("AGI Studio"), tr(""));
     warn = new QMessageBox(QMessageBox::Warning, tr("AGI Studio"), tr(""));
 
+    // Menu signal handlers
+    connect(actionGameOpen, &QAction::triggered, this, &Menu::open_game);
+    connect(actionGameClose, &QAction::triggered, this, &Menu::close_game);
+    connect(actionGameRun, &QAction::triggered, this, &Menu::run_game);
+    connect(actionAppSettings, &QAction::triggered, this, &Menu::options);
+    connect(actionAppQuit, &QAction::triggered, this, &Menu::close);
+
+    connect(actionResNewWindow, &QAction::triggered, this, &Menu::new_resource_window);
+    connect(actionResAdd, &QAction::triggered, this, &Menu::add_resource);
+    connect(actionResExtract, &QAction::triggered, this, &Menu::extract_resource);
+    connect(actionResDelete, &QAction::triggered, this, &Menu::delete_resource);
+    connect(actionResRenumber, &QAction::triggered, this, &Menu::renumber_resource);
+    connect(actionResRebuildVOLFiles, &QAction::triggered, this, &Menu::rebuild_vol);
+    connect(actionResRecompileAll, &QAction::triggered, this, &Menu::recompile_all);
+
+    connect(actionToolsViewEditor, &QAction::triggered, this, &Menu::view_editor);
+    connect(actionToolsLogicEditor, &QAction::triggered, this, &Menu::logic_editor);
+    connect(actionToolsTextEditor, &QAction::triggered, this, &Menu::text_editor);
+    connect(actionToolsObjectEditor, &QAction::triggered, this, &Menu::object_editor);
+    connect(actionToolsWordTokensEditor, &QAction::triggered, this, &Menu::words_editor);
+    connect(actionToolsPictureEditor, &QAction::triggered, this, &Menu::picture_editor);
+    connect(actionToolsSoundPlayer, &QAction::triggered, this, &Menu::sound_player);
+
+    connect(actionWindowSaveAll, &QAction::triggered, this, &Menu::save_all);
+    connect(actionWindowSaveAllandRun, &QAction::triggered, this, &Menu::save_and_run);
+    connect(actionWindowList, &QAction::triggered, this, &Menu::window_list_cb);
+
+    connect(actionHelpContents, &QAction::triggered, this, &Menu::help_contents);
+    connect(actionHelpIndex, &QAction::triggered, this, &Menu::help_index);
+    connect(actionHelpAboutQt, &QAction::triggered, this, &Menu::about_qt);
+    connect(actionHelpAboutAGIStudio, &QAction::triggered, this, &Menu::about_it);
+
+    // Toolbar signal handlers
+    connect(actionOpenGameButton, &QAction::triggered, this, &Menu::open_game);
+    connect(actionCloseGameButton, &QAction::triggered, this, &Menu::close_game);
+    connect(actionRunGameButton, &QAction::triggered, this, &Menu::run_game);
+    connect(actionViewEditorButton, &QAction::triggered, this, &Menu::view_editor);
+    connect(actionLogicEditorButton, &QAction::triggered, this, &Menu::logic_editor);
+    connect(actionTextEditorButton, &QAction::triggered, this, &Menu::text_editor);
+    connect(actionObjectEditorButton, &QAction::triggered, this, &Menu::object_editor);
+    connect(actionWordTokensEditorButton, &QAction::triggered, this, &Menu::words_editor);
+    connect(actionPictureEditorButton, &QAction::triggered, this, &Menu::picture_editor);
+
     disable_game_actions();
 
     for (int i = 0; i < MAXWIN; i++)
@@ -338,14 +381,14 @@ void Menu::options()
 //**********************************************
 void Menu::from_template()
 {
-    menu->templ = true;
+    menu->use_template = true;
     OpenGameDir(nullptr, true);
 }
 
 //**********************************************
 void Menu::blank()
 {
-    menu->templ = false;
+    menu->use_template = false;
     OpenGameDir(nullptr, true);
 }
 
@@ -957,7 +1000,7 @@ void OpenGameDir(QWidget *parent, bool newgame)
 
     int err = 0;
     if (newgame) {
-        if (menu->templ)
+        if (menu->use_template)
             err = game->from_template(dir.toStdString());
         else
             err = game->newgame(dir.toStdString());

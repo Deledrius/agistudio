@@ -38,6 +38,38 @@ WordsEdit::WordsEdit(QWidget *parent, const char *name, int win_num, ResourcesWi
     setupUi(this);
 
     setAttribute(Qt::WA_DeleteOnClose);
+
+    // Menu signal handlers
+    connect(actionNew, &QAction::triggered, this, &WordsEdit::new_file);
+    connect(actionOpen, &QAction::triggered, this, &WordsEdit::open_file);
+    connect(actionMerge, &QAction::triggered, this, &WordsEdit::merge_file);
+    connect(actionSave, &QAction::triggered, this, &WordsEdit::save_file);
+    connect(actionSaveAs, &QAction::triggered, this, &WordsEdit::save_as_file);
+    connect(actionClose, &QAction::triggered, this, &WordsEdit::close);
+
+    connect(actionAddWordGroup, &QAction::triggered, this, &WordsEdit::add_group_cb);
+    connect(actionRemoveWordGroup, &QAction::triggered, this, &WordsEdit::delete_group_cb);
+    connect(actionChangeGroupNumber, &QAction::triggered, this, &WordsEdit::change_group_number_cb);
+    connect(actionAddWord, &QAction::triggered, this, &WordsEdit::add_word_cb);
+    connect(actionRemoveWord, &QAction::triggered, this, &WordsEdit::delete_word_cb);
+    connect(actionFind, &QAction::triggered, this, &WordsEdit::find_cb);
+    connect(actionCountWordGroups, &QAction::triggered, this, &WordsEdit::count_groups_cb);
+    connect(actionCountWords, &QAction::triggered, this, &WordsEdit::count_words_cb);
+
+    // Event signal handlers
+    connect(listGroup, &QListWidget::itemSelectionChanged, this, qOverload<>(&WordsEdit::select_group));
+    connect(listWords, &QListWidget::itemSelectionChanged, this, &WordsEdit::select_word);
+
+    // Button signal handlers
+    connect(pushButtonAddGroup, &QPushButton::pressed, this, &WordsEdit::add_group_cb);
+    connect(pushButtonRemoveGroup, &QPushButton::pressed, this, &WordsEdit::delete_group_cb);
+    connect(pushButtonChangeGroupNum, &QPushButton::pressed, this, &WordsEdit::change_group_number_cb);
+
+    connect(lineWord, &QLineEdit::returnPressed, this, &WordsEdit::do_add_word);
+    connect(pushButtonAddWord, &QPushButton::pressed, this, &WordsEdit::add_word_cb);
+    connect(pushButtonRemoveWord, &QPushButton::pressed, this, &WordsEdit::delete_word_cb);
+
+    connect(pushButtonFind, &QPushButton::pressed, this, &WordsEdit::find_cb);
 }
 
 //********************************************************
@@ -75,7 +107,7 @@ void WordsEdit::closeEvent(QCloseEvent *e)
                                      QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel,
                                      QMessageBox::Cancel)) {
             case QMessageBox::Save:
-                on_actionSave_triggered();
+                save_file();
                 deinit();
                 e->accept();
                 break;
@@ -137,7 +169,7 @@ void WordsEdit::open()
 }
 
 //********************************************************
-void WordsEdit::on_pushButtonAddGroup_pressed(void)
+void WordsEdit::add_group_cb(void)
 {
     bool ok;
     int num = QInputDialog::getInt(this, tr("Add Group"), tr("Enter group number [0-65535]:"), 0, 0, 65535, 1, &ok);
@@ -154,7 +186,7 @@ void WordsEdit::on_pushButtonAddGroup_pressed(void)
 }
 
 //********************************************************
-void WordsEdit::on_pushButtonRemoveGroup_pressed(void)
+void WordsEdit::delete_group_cb(void)
 {
     int rm = listGroup->currentRow();
     if (rm != -1) {
@@ -193,7 +225,7 @@ void WordsEdit::update_group(int curgroup)
 }
 
 //********************************************************
-void WordsEdit::on_pushButtonRemoveWord_pressed(void)
+void WordsEdit::delete_word_cb(void)
 {
     QString str = lineWord->text();
     int k = wordlist->delete_word(str.toStdString(), SelectedGroup);
@@ -202,14 +234,14 @@ void WordsEdit::on_pushButtonRemoveWord_pressed(void)
         auto item = listWords->takeItem(k);
         delete item;
         update_group(SelectedGroup);
-        on_listWords_itemSelectionChanged();
+        select_word();
         changed = true;
         return;
     }
 }
 
 //********************************************************
-void WordsEdit::on_pushButtonChangeGroupNum_pressed(void)
+void WordsEdit::change_group_number_cb(void)
 {
     bool ok;
     int num = QInputDialog::getInt(this, tr("Change Group Number"), tr("Enter group number [0-65535]:"), 0, 0, 65535, 1, &ok);
@@ -229,7 +261,7 @@ void WordsEdit::on_pushButtonChangeGroupNum_pressed(void)
 }
 
 //********************************************************
-void WordsEdit::on_pushButtonFind_pressed(void)
+void WordsEdit::find_cb(void)
 {
     if (wordsfind == nullptr)
         wordsfind = new WordsFind(nullptr, nullptr, this);
@@ -275,7 +307,7 @@ int WordsEdit::find_up(const QString &word)
 }
 
 //********************************************************
-void WordsEdit::on_listGroup_itemSelectionChanged()
+void WordsEdit::select_group()
 {
     listGroup->currentRow();
     if (listGroup->selectedItems().isEmpty())
@@ -301,7 +333,7 @@ void WordsEdit::select_group(int num)
 }
 
 //********************************************************
-void WordsEdit::on_listWords_itemSelectionChanged()
+void WordsEdit::select_word()
 {
     if (!listWords->selectedItems().isEmpty()) {
         lineWord->setText(wordlist->WordGroup[SelectedGroup].Words.at(listWords->currentRow()));
@@ -310,7 +342,7 @@ void WordsEdit::on_listWords_itemSelectionChanged()
 }
 
 //********************************************************
-void WordsEdit::on_pushButtonAddWord_pressed(void)
+void WordsEdit::add_word_cb(void)
 {
     lineWord ->setEnabled(true);
     lineWord->setText("new word");
@@ -319,7 +351,7 @@ void WordsEdit::on_pushButtonAddWord_pressed(void)
 }
 
 //********************************************************
-void WordsEdit::on_lineWord_returnPressed(void)
+void WordsEdit::do_add_word(void)
 {
     QString word = lineWord->text();
 
@@ -351,13 +383,13 @@ void WordsEdit::on_lineWord_returnPressed(void)
 }
 
 //********************************************************
-void WordsEdit::on_actionCountWordGroups_triggered(void)
+void WordsEdit::count_groups_cb(void)
 {
     QMessageBox::information(this, tr("AGI studio"), tr("There are %1 word groups.").arg(QString::number(wordlist->NumGroups)));
 }
 
 //********************************************************
-void WordsEdit::on_actionCountWords_triggered(void)
+void WordsEdit::count_words_cb(void)
 {
     int n = 0;
     for (int i = 0; i < wordlist->NumGroups; i++)
@@ -366,7 +398,7 @@ void WordsEdit::on_actionCountWords_triggered(void)
 }
 
 //********************************************************
-void WordsEdit::on_actionOpen_triggered()
+void WordsEdit::open_file()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open Tokens File"), game->dir.c_str(), tr("Tokens List Files (*.tok);;All Files (*)"));
     if (!fileName.isNull())
@@ -374,7 +406,7 @@ void WordsEdit::on_actionOpen_triggered()
 }
 
 //********************************************************
-void WordsEdit::on_actionSaveAs_triggered()
+void WordsEdit::save_as_file()
 {
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save Tokens File"), game->dir.c_str(), tr("Tokens List Files(*.tok);;All Files (*)"));
     if (!fileName.isNull())
@@ -382,7 +414,7 @@ void WordsEdit::on_actionSaveAs_triggered()
 }
 
 //********************************************************
-void WordsEdit::on_actionNew_triggered()
+void WordsEdit::new_file()
 {
     wordlist->clear();
     listGroup->clear();
@@ -405,16 +437,16 @@ void WordsEdit::save(const QString &fname)
 }
 
 //********************************************************
-void WordsEdit::on_actionSave_triggered()
+void WordsEdit::save_file()
 {
     if (!resource_filename.isEmpty())
         save(resource_filename);
     else
-        on_actionSaveAs_triggered();
+        save_as_file();
 }
 
 //********************************************************
-void WordsEdit::on_actionMerge_triggered()
+void WordsEdit::merge_file()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open Word Tokens File"), game->dir.c_str(), tr("Tokens List Files (*.tok);;All Files (*)"));
 
@@ -435,6 +467,8 @@ WordsFind::WordsFind(QWidget *parent, const char *name, WordsEdit *w)
       FindLastWord(-1), FindLastGroup(-1), first(false)
 {
     setupUi(this);
+    
+    connect(buttonFindNext, &QPushButton::pressed, this, &WordsFind::find_next_cb);
 
     radioButtonMatchCase->setVisible(false);
 }
@@ -528,7 +562,7 @@ void WordsFind::find_first()
 }
 
 //********************************************************
-void WordsFind::on_buttonFindNext_pressed()
+void WordsFind::find_next_cb()
 {
     int ret;
     QString word = lineFind->text();

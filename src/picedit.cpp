@@ -106,6 +106,34 @@ PicEdit::PicEdit(QWidget *parent, const char *name, int win_num, ResourcesWin *r
     drawmodeButtonGroup->setId(visualLayerToggle, 0);
     drawmodeButtonGroup->setId(priorityLayerToggle, 1);
 
+    // Menu signal handlers
+    connect(actionNew, &QAction::triggered, this, qOverload<>(&PicEdit::open));
+    connect(actionLoad_from_File, &QAction::triggered, this, &PicEdit::open_file);
+    connect(actionSave_to_Game, &QAction::triggered, this, &PicEdit::save_to_game);
+    connect(actionSave_to_Game_As, &QAction::triggered, this, &PicEdit::save_to_game_as);
+    connect(actionSave_to_File, &QAction::triggered, this, &PicEdit::save_file);
+    connect(actionDelete, &QAction::triggered, this, &PicEdit::delete_picture);
+    connect(actionClose, &QAction::triggered, this, &PicEdit::close);
+
+    connect(actionView_Data, &QAction::triggered, this, &PicEdit::view_data);
+    connect(actionLoad_Background, &QAction::triggered, this, &PicEdit::background);
+    connect(actionPictureEditorHelp, &QAction::triggered, this, &PicEdit::editor_help);
+
+    // Tool signal handlers
+    connect(toolButtonGroup, &QButtonGroup::idClicked, this, &PicEdit::change_tool);
+    connect(toolShapeButtonGroup, &QButtonGroup::idClicked, this, &PicEdit::change_shape);
+    connect(toolTypeButtonGroup, &QButtonGroup::idClicked, this, &PicEdit::change_type);
+    connect(sizeSpinBox, &QSpinBox::valueChanged, this, &PicEdit::change_size);
+
+    connect(actionFrameDisplay, &QSpinBox::valueChanged, this, &PicEdit::set_pos);
+
+    connect(zoomOutButton, &QPushButton::clicked, this, &PicEdit::zoom_minus);
+    connect(zoomInButton, &QPushButton::clicked, this, &PicEdit::zoom_plus);
+
+    connect(drawmodeButtonGroup, &QButtonGroup::idClicked, this, &PicEdit::change_drawmode);
+    connect(showBackground, &QCheckBox::clicked, this, &PicEdit::toggle_bgmode);
+    connect(showPriorityLines, &QCheckBox::clicked, this, &PicEdit::toggle_prilinemode);
+
     // Create our custom statusbar display
     QLabel *msg = new QLabel(statusbar);
     statusbar->addPermanentWidget(msg);
@@ -368,7 +396,7 @@ void PicEdit::background()
 }
 
 //*********************************************
-void PicEdit::on_zoomOutButton_clicked()
+void PicEdit::zoom_minus()
 {
     if (canvas->pixsize > 1) {
         canvas->setPixsize(canvas->pixsize - 1);
@@ -380,7 +408,7 @@ void PicEdit::on_zoomOutButton_clicked()
 }
 
 //*********************************************
-void PicEdit::on_zoomInButton_clicked()
+void PicEdit::zoom_plus()
 {
     if (canvas->pixsize < 4) {
         canvas->setPixsize(canvas->pixsize + 1);

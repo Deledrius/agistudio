@@ -133,6 +133,8 @@ public slots:
 
     void view_data();
     void background();
+    void zoom_minus();
+    void zoom_plus();
     void change_drawmode(int);
     void toggle_bgmode(bool);
     void toggle_prilinemode(bool);
@@ -155,37 +157,6 @@ public slots:
     void show_pos();
 
     void editor_help();
-
-private slots:
-    // Menu signal handlers
-    void on_actionNew_triggered() { open(); }
-    void on_actionLoad_from_File_triggered() { open_file(); }
-    void on_actionSave_to_Game_triggered() { save_to_game(); }
-    void on_actionSave_to_Game_As_triggered() { save_to_game_as(); }
-    void on_actionSave_to_File_triggered() { save_file(); }
-    void on_actionDelete_triggered() { delete_picture(); }
-    void on_actionClose_triggered() { this->close(); }
-
-    void on_actionView_Data_triggered() { view_data(); }
-    void on_actionLoad_Background_triggered() { background(); }
-
-    void on_actionPictureEditorHelp_triggered() { editor_help(); }
-
-    // Tool signal handlers
-    void on_toolButtonGroup_idClicked(int tool) { change_tool(tool); };
-    void on_toolShapeButtonGroup_idClicked(int shape) { change_shape(shape); }
-    void on_toolTypeButtonGroup_idClicked(int ttype) { change_type(ttype); }
-    void on_sizeSpinBox_valueChanged(int size) { change_size(size); }
-
-    void on_actionFrameDisplay_valueChanged() { set_pos(); }
-
-    void on_zoomOutButton_clicked();
-    void on_zoomInButton_clicked();
-
-    void on_drawmodeButtonGroup_idClicked(int mode) { change_drawmode(mode); }
-    void on_showBackground_clicked(bool checked) { toggle_bgmode(checked); }
-    void on_showPriorityLines_clicked(bool checked) { toggle_prilinemode(checked); }
-
 
 protected:
     int PicNum;
