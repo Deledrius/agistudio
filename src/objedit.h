@@ -43,7 +43,7 @@ class ObjEdit : public QMainWindow, private Ui::ObjEdit
 {
     Q_OBJECT
 public:
-    ObjEdit(QWidget *parent = 0, const char *name = 0, int winnum = 0);
+    explicit ObjEdit(QWidget *parent = 0, const char *name = 0, int winnum = 0);
     void open();
 public slots:
     void open_file();

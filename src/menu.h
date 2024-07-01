@@ -60,7 +60,7 @@ class Menu : public QMainWindow, private Ui::Menu
 {
     Q_OBJECT
 public:
-    Menu(QWidget *parent = 0, const char *name = 0);
+    explicit Menu(QWidget *parent = 0, const char *name = 0);
     ResourcesWin *resources_win;
     void showStatusMessage(const QString &msg);
     void errmes(const char *, const char *, ...);

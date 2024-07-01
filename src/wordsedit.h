@@ -40,7 +40,7 @@ class WordsEdit : public QMainWindow, private Ui::WordsEdit
 {
     Q_OBJECT
 public:
-    WordsEdit(QWidget *parent = 0, const char *name = 0, int winnum = 0, ResourcesWin *res = 0);
+    explicit WordsEdit(QWidget *parent = 0, const char *name = 0, int winnum = 0, ResourcesWin *res = 0);
     ResourcesWin *resources_win;
     WordList *wordlist;
     void open();
@@ -92,7 +92,7 @@ class WordsFind : public QMainWindow, private Ui::WordsFind
 {
     Q_OBJECT
 public:
-    WordsFind(QWidget *parent = 0, const char *name = 0, WordsEdit *w = 0);
+    explicit WordsFind(QWidget *parent = 0, const char *name = 0, WordsEdit *w = 0);
     bool first;
 protected:
     void find_next_cb();

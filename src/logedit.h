@@ -47,7 +47,7 @@ class FindEdit : public QMainWindow, private Ui::WordsFind
 {
     Q_OBJECT
 public:
-    FindEdit(QWidget *parent = 0, const char *name = 0, QTextEdit *edit = 0);
+    explicit FindEdit(QWidget *parent = 0, const char *name = 0, QTextEdit *edit = 0);
     QTextEdit *editor;
     int curline;
     void focusEditLine() { lineFind->setFocus(); }
@@ -65,7 +65,7 @@ class LogEdit : public QMainWindow, private Ui::TextEditor
 {
     Q_OBJECT
 public:
-    LogEdit(QWidget *parent = 0, const char *name = 0, int winnum = 0, ResourcesWin *res = 0, bool readonly = false);
+    explicit LogEdit(QWidget *parent = 0, const char *name = 0, int winnum = 0, ResourcesWin *res = 0, bool readonly = false);
     FindEdit *findedit;
     ResourcesWin *resources_win;
     RoomGen *roomgen;
@@ -113,7 +113,7 @@ class TextEdit : public QMainWindow, private Ui::TextEditor
 {
     Q_OBJECT
 public:
-    TextEdit(QWidget *parent = 0, const char *name = 0, int winnum = 0);
+    explicit TextEdit(QWidget *parent = 0, const char *name = 0, int winnum = 0);
     FindEdit *findedit;
     std::string filename;
     int open(const std::string &filename);

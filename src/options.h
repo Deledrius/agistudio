@@ -33,7 +33,7 @@ class Options : public QDialog, private Ui::Settings
 {
     Q_OBJECT
 public:
-    Options(QWidget *parent = nullptr);
+    explicit Options(QWidget *parent = nullptr);
 
 private:
     void populate_settings();
