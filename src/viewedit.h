@@ -132,7 +132,7 @@ class ViewEdit : public QWidget
 {
     Q_OBJECT
 public:
-    ViewEdit(QWidget *parent = 0, const char *name = 0, int winnum = 0, ResourcesWin *res = 0);
+    explicit ViewEdit(QWidget *parent = 0, const char *name = 0, int winnum = 0, ResourcesWin *res = 0);
     Description *description;
     Palette *palette;
     View *view;
