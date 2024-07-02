@@ -28,6 +28,8 @@
 
 #include "view.h"
 
+#include "ui/ui_viewedit.h"
+
 
 #define V_DRAW 0
 #define V_FILL 1
@@ -60,7 +62,7 @@ protected:
 
 //********************************************************
 class Canvas : public QScrollArea
-//view drawing area
+// View drawing area
 {
     Q_OBJECT
 public:
@@ -79,7 +81,6 @@ protected:
     bool cur_mirror;
     byte *data;
     ViewEdit *viewedit;
-    void keyPressEvent(QKeyEvent *);
     void mousePressEvent(QMouseEvent *e);
     void mouseMoveEvent(QMouseEvent *e);
     void drawContents(QPainter *p, int, int, int, int) const;
@@ -128,7 +129,7 @@ protected:
 };
 
 //********************************************************
-class ViewEdit : public QWidget
+class ViewEdit : public QMainWindow, private Ui::ViewEdit
 {
     Q_OBJECT
 public:
@@ -142,12 +143,17 @@ public:
     void open(int ResNum);
     void fillCel(int x, int y, byte color);
     void change_mode1(int);
-public slots:
+
     void open();
     void open_file();
     void save_file();
     void save_to_game();
     void save_to_game_as();
+
+    void next_cel_cycle();
+    void prev_cel_cycle();
+
+protected:
     void delete_view();
 
     void undo_cel();
@@ -198,30 +204,13 @@ public slots:
     void dec_height();
 
     void animate_cb();
-    void next_cel_cycle();
-    void prev_cel_cycle();
-protected:
 
-    QWidget *transcolor;
-    QPushButton *edit_descriptor;
-    QCheckBox *is_descriptor;
-    Canvas *canvas;
-    QLabel *loopnum, *celnum;
-    QLineEdit *width, *height;
-    QComboBox *mirror_loop;
-    QRadioButton *view_draw, *view_fill;
-    Animate *animate;
-    int ViewNum;
-    int transcol;
-    Cel undoCel;
-    bool undo;
-    int winnum;
     void closeEvent(QCloseEvent *e);
     void showEvent(QShowEvent *);
     void hideEvent(QHideEvent *);
+    void keyPressEvent(QKeyEvent *);
     void open(char *filename);
     void save(char *filename);
-    void do_open();
     void deinit();
     void display();
     void DisplayView();
@@ -232,7 +221,16 @@ protected:
     void showcelpar();
     int curIndex() const;
     void saveundo();
-    bool focusNextPrevChild(bool next) ;
+    bool focusNextPrevChild(bool next);
+    void show_help();
+
+    Canvas *canvas;
+    Animate *animate;
+    int ViewNum;
+    int transcol;
+    Cel undoCel;
+    bool undo;
+    int winnum;
 };
 
 #endif

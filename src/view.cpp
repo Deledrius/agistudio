@@ -32,12 +32,7 @@
 
 static int ResPos, DescPos, ResSize;
 //**************************************************
-View::View()
-{
-    Description = "";
-    loops = NULL;
-    opened = false;
-}
+View::View() : Description(), loops(nullptr), opened(false), NumLoops(), CurLoop(), CurCel() {}
 
 //**************************************************
 void View::init()
