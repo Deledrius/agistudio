@@ -109,6 +109,7 @@ set(AGIStudio_UI
     ui/options.ui
     ui/picedit.ui
     ui/textedit.ui
+    ui/viewedit.ui
     ui/wordsedit.ui
     ui/wordsfind.ui
 )

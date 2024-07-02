@@ -1,0 +1,878 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ViewEdit</class>
+ <widget class="QMainWindow" name="ViewEdit">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>756</width>
+    <height>414</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>View Editor</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="agistudio.qrc">
+    <normaloff>:/icons/toolbar_viewedit.xpm</normaloff>:/icons/toolbar_viewedit.xpm</iconset>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="autoFillBackground">
+    <bool>false</bool>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout_2">
+    <item>
+     <layout class="QHBoxLayout" name="primaryLayout">
+      <item>
+       <layout class="QVBoxLayout" name="toolColumnLayout">
+        <item>
+         <widget class="QGroupBox" name="toolBoxGroup">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>Draw Tools</string>
+          </property>
+          <property name="title">
+           <string/>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_3">
+           <item row="3" column="0">
+            <widget class="QLabel" name="labelHeight">
+             <property name="text">
+              <string>Height:</string>
+             </property>
+             <property name="buddy">
+              <cstring>lineEditHeight</cstring>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="1">
+            <widget class="QComboBox" name="comboBoxMirrorLoop">
+             <property name="currentText">
+              <string/>
+             </property>
+             <property name="placeholderText">
+              <string>No other loop</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QLabel" name="labelLoopNum">
+             <property name="text">
+              <string>0/0</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="labelLoop">
+             <property name="text">
+              <string>Loop:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="0">
+            <widget class="QLabel" name="labelMirror">
+             <property name="text">
+              <string>This loop mirrors:</string>
+             </property>
+             <property name="buddy">
+              <cstring>comboBoxMirrorLoop</cstring>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="0">
+            <widget class="QCheckBox" name="checkBoxDescription">
+             <property name="text">
+              <string>Description</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="2">
+            <widget class="QPushButton" name="pushButtonLoopLeft">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="icon">
+              <iconset resource="agistudio.qrc">
+               <normaloff>:/icons/left_x.xpm</normaloff>:/icons/left_x.xpm</iconset>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="labelWidth">
+             <property name="text">
+              <string>Width:</string>
+             </property>
+             <property name="buddy">
+              <cstring>lineEditWidth</cstring>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="labelCel">
+             <property name="text">
+              <string>Cel:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QLabel" name="labelCelNum">
+             <property name="text">
+              <string>0/0</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QLineEdit" name="lineEditWidth">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1">
+            <widget class="QLineEdit" name="lineEditHeight">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="3">
+            <widget class="QPushButton" name="pushButtonLoopRight">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="icon">
+              <iconset resource="agistudio.qrc">
+               <normaloff>:/icons/right_x.xpm</normaloff>:/icons/right_x.xpm</iconset>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="2">
+            <widget class="QPushButton" name="pushButtonCelLeft">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="icon">
+              <iconset resource="agistudio.qrc">
+               <normaloff>:/icons/left_x.xpm</normaloff>:/icons/left_x.xpm</iconset>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="3">
+            <widget class="QPushButton" name="pushButtonCelRight">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="icon">
+              <iconset resource="agistudio.qrc">
+               <normaloff>:/icons/right_x.xpm</normaloff>:/icons/right_x.xpm</iconset>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="2">
+            <widget class="QPushButton" name="pushButtonWidthleft">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="icon">
+              <iconset resource="agistudio.qrc">
+               <normaloff>:/icons/left_x.xpm</normaloff>:/icons/left_x.xpm</iconset>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="2">
+            <widget class="QPushButton" name="pushButtonHeightLeft">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="icon">
+              <iconset resource="agistudio.qrc">
+               <normaloff>:/icons/left_x.xpm</normaloff>:/icons/left_x.xpm</iconset>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="3">
+            <widget class="QPushButton" name="pushButtonWidthRight">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="icon">
+              <iconset resource="agistudio.qrc">
+               <normaloff>:/icons/right_x.xpm</normaloff>:/icons/right_x.xpm</iconset>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="3">
+            <widget class="QPushButton" name="pushButtonHeightRight">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="icon">
+              <iconset resource="agistudio.qrc">
+               <normaloff>:/icons/right_x.xpm</normaloff>:/icons/right_x.xpm</iconset>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="1">
+            <widget class="QPushButton" name="pushButtonEditDesc">
+             <property name="text">
+              <string>Edit...</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QFrame" name="frame">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>150</height>
+           </size>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::Panel</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <item>
+            <layout class="QGridLayout" name="gridLayout">
+             <item row="2" column="3">
+              <widget class="QPushButton" name="pushButtonDown">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>28</width>
+                 <height>28</height>
+                </size>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="agistudio.qrc">
+                 <normaloff>:/icons/downarrow_x.xpm</normaloff>:/icons/downarrow_x.xpm</iconset>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="4">
+              <widget class="QPushButton" name="pushButtonRight">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>28</width>
+                 <height>28</height>
+                </size>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="agistudio.qrc">
+                 <normaloff>:/icons/rightarrow_x.xpm</normaloff>:/icons/rightarrow_x.xpm</iconset>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="2">
+              <widget class="QPushButton" name="pushButtonLeft">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>28</width>
+                 <height>28</height>
+                </size>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="agistudio.qrc">
+                 <normaloff>:/icons/leftarrow_x.xpm</normaloff>:/icons/leftarrow_x.xpm</iconset>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="3">
+              <widget class="QPushButton" name="pushButtonUp">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>28</width>
+                 <height>28</height>
+                </size>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="agistudio.qrc">
+                 <normaloff>:/icons/uparrow_x.xpm</normaloff>:/icons/uparrow_x.xpm</iconset>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QToolButton" name="zoomInButton">
+               <property name="minimumSize">
+                <size>
+                 <width>28</width>
+                 <height>28</height>
+                </size>
+               </property>
+               <property name="toolTip">
+                <string>Zoom In</string>
+               </property>
+               <property name="text">
+                <string>...</string>
+               </property>
+               <property name="icon">
+                <iconset resource="agistudio.qrc">
+                 <normaloff>:/icons/zoom_plus_x.xpm</normaloff>:/icons/zoom_plus_x.xpm</iconset>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QToolButton" name="zoomOutButton">
+               <property name="minimumSize">
+                <size>
+                 <width>28</width>
+                 <height>28</height>
+                </size>
+               </property>
+               <property name="toolTip">
+                <string>Zoom Out</string>
+               </property>
+               <property name="text">
+                <string>...</string>
+               </property>
+               <property name="icon">
+                <iconset resource="agistudio.qrc">
+                 <normaloff>:/icons/zoom_minus_x.xpm</normaloff>:/icons/zoom_minus_x.xpm</iconset>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0" rowspan="2" colspan="2">
+              <widget class="QGroupBox" name="groupBox">
+               <property name="title">
+                <string>Paint Mode</string>
+               </property>
+               <layout class="QVBoxLayout" name="verticalLayout">
+                <item>
+                 <widget class="QRadioButton" name="radioButtonDraw">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="text">
+                   <string>Draw</string>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
+                  </property>
+                  <attribute name="buttonGroup">
+                   <string notr="true">buttonGroupDrawMode</string>
+                  </attribute>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QRadioButton" name="radioButtonFill">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="text">
+                   <string>Fill</string>
+                  </property>
+                  <attribute name="buttonGroup">
+                   <string notr="true">buttonGroupDrawMode</string>
+                  </attribute>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="viewColumnLayout">
+        <item>
+         <widget class="QFrame" name="PictureFrame">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>400</width>
+            <height>200</height>
+           </size>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Sunken</enum>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_2"/>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayoutTrans">
+          <property name="leftMargin">
+           <number>10</number>
+          </property>
+          <property name="rightMargin">
+           <number>10</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="labelTrans">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>Transparency Color:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QWidget" name="transcolor" native="true">
+            <property name="minimumSize">
+             <size>
+              <width>40</width>
+              <height>16</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>100</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="autoFillBackground">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButtonSetTrans">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>Set</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QWidget" name="PaletteWidget" native="true">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>250</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>350</width>
+            <height>80</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>756</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu_File">
+    <property name="title">
+     <string>&amp;File</string>
+    </property>
+    <addaction name="actionNew"/>
+    <addaction name="actionOpenfromFile"/>
+    <addaction name="actionSavetoGame"/>
+    <addaction name="actionSavetoGameAs"/>
+    <addaction name="actionSavetoFile"/>
+    <addaction name="separator"/>
+    <addaction name="actionDeleteView"/>
+    <addaction name="separator"/>
+    <addaction name="actionClose"/>
+   </widget>
+   <widget class="QMenu" name="menu_Help">
+    <property name="title">
+     <string>&amp;Help</string>
+    </property>
+    <addaction name="actionEditorHelp"/>
+   </widget>
+   <widget class="QMenu" name="menu_Edit">
+    <property name="title">
+     <string>&amp;Edit</string>
+    </property>
+    <addaction name="actionUndo"/>
+    <addaction name="separator"/>
+    <addaction name="actionCopyCel"/>
+    <addaction name="actionPasteCel"/>
+   </widget>
+   <widget class="QMenu" name="menu_Loop">
+    <property name="title">
+     <string>&amp;Loop</string>
+    </property>
+    <addaction name="actionNextLoop"/>
+    <addaction name="actionPreviousLoop"/>
+    <addaction name="actionFirstLoop"/>
+    <addaction name="actionLastLoop"/>
+    <addaction name="separator"/>
+    <addaction name="actionInsertBeforeLoop"/>
+    <addaction name="actionInsertAfterLoop"/>
+    <addaction name="actionAppendLoop"/>
+    <addaction name="actionDeleteLoop"/>
+    <addaction name="actionClear"/>
+   </widget>
+   <widget class="QMenu" name="menu_Cel">
+    <property name="title">
+     <string>&amp;Cel</string>
+    </property>
+    <addaction name="actionNextCel"/>
+    <addaction name="actionPreviousCel"/>
+    <addaction name="actionFirstCel"/>
+    <addaction name="actionLastCel"/>
+    <addaction name="separator"/>
+    <addaction name="actionInsertBeforeCel"/>
+    <addaction name="actionInsertAfterCel"/>
+    <addaction name="actionAppendCel"/>
+    <addaction name="actionDeleteCel"/>
+    <addaction name="actionClearCel"/>
+    <addaction name="separator"/>
+    <addaction name="actionFlipCelHorizontally"/>
+    <addaction name="actionFlipCelVertically"/>
+   </widget>
+   <widget class="QMenu" name="menu_Animate">
+    <property name="title">
+     <string>&amp;Animate</string>
+    </property>
+    <addaction name="actionAnimationOptions"/>
+   </widget>
+   <addaction name="menu_File"/>
+   <addaction name="menu_Edit"/>
+   <addaction name="menu_Loop"/>
+   <addaction name="menu_Cel"/>
+   <addaction name="menu_Animate"/>
+   <addaction name="menu_Help"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionEditorHelp">
+   <property name="text">
+    <string>View &amp;Editor Help...</string>
+   </property>
+  </action>
+  <action name="actionNew">
+   <property name="text">
+    <string>&amp;New</string>
+   </property>
+  </action>
+  <action name="actionDeleteView">
+   <property name="text">
+    <string>&amp;Delete</string>
+   </property>
+  </action>
+  <action name="actionClose">
+   <property name="text">
+    <string>&amp;Close</string>
+   </property>
+  </action>
+  <action name="actionOpenfromFile">
+   <property name="text">
+    <string>&amp;Open...</string>
+   </property>
+  </action>
+  <action name="actionSavetoGame">
+   <property name="text">
+    <string>&amp;Save to Game...</string>
+   </property>
+  </action>
+  <action name="actionSavetoGameAs">
+   <property name="text">
+    <string>Save to Game &amp;As...</string>
+   </property>
+  </action>
+  <action name="actionSavetoFile">
+   <property name="text">
+    <string>Save to file...</string>
+   </property>
+  </action>
+  <action name="actionUndo">
+   <property name="text">
+    <string>&amp;Undo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Z</string>
+   </property>
+  </action>
+  <action name="actionCopyCel">
+   <property name="text">
+    <string>&amp;Copy Cel</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+C</string>
+   </property>
+  </action>
+  <action name="actionPasteCel">
+   <property name="text">
+    <string>&amp;Paste Cel</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+V</string>
+   </property>
+  </action>
+  <action name="actionNextLoop">
+   <property name="text">
+    <string>&amp;Next</string>
+   </property>
+  </action>
+  <action name="actionPreviousLoop">
+   <property name="text">
+    <string>&amp;Previous</string>
+   </property>
+  </action>
+  <action name="actionFirstLoop">
+   <property name="text">
+    <string>&amp;First</string>
+   </property>
+  </action>
+  <action name="actionLastLoop">
+   <property name="text">
+    <string>&amp;Last</string>
+   </property>
+  </action>
+  <action name="actionInsertBeforeLoop">
+   <property name="text">
+    <string>Insert &amp;Before</string>
+   </property>
+  </action>
+  <action name="actionInsertAfterLoop">
+   <property name="text">
+    <string>&amp;Insert After</string>
+   </property>
+  </action>
+  <action name="actionAppendLoop">
+   <property name="text">
+    <string>&amp;Append</string>
+   </property>
+  </action>
+  <action name="actionDeleteLoop">
+   <property name="text">
+    <string>&amp;Delete</string>
+   </property>
+  </action>
+  <action name="actionClear">
+   <property name="text">
+    <string>&amp;Clear</string>
+   </property>
+  </action>
+  <action name="actionNextCel">
+   <property name="text">
+    <string>&amp;Next</string>
+   </property>
+  </action>
+  <action name="actionPreviousCel">
+   <property name="text">
+    <string>&amp;Previous</string>
+   </property>
+  </action>
+  <action name="actionFirstCel">
+   <property name="text">
+    <string>&amp;First</string>
+   </property>
+  </action>
+  <action name="actionLastCel">
+   <property name="text">
+    <string>&amp;Last</string>
+   </property>
+  </action>
+  <action name="actionInsertBeforeCel">
+   <property name="text">
+    <string>Insert &amp;Before</string>
+   </property>
+  </action>
+  <action name="actionInsertAfterCel">
+   <property name="text">
+    <string>&amp;Insert After</string>
+   </property>
+  </action>
+  <action name="actionDeleteCel">
+   <property name="text">
+    <string>&amp;Delete</string>
+   </property>
+  </action>
+  <action name="actionClearCel">
+   <property name="text">
+    <string>&amp;Clear</string>
+   </property>
+  </action>
+  <action name="actionAppendCel">
+   <property name="text">
+    <string>&amp;Append</string>
+   </property>
+  </action>
+  <action name="actionFlipCelHorizontally">
+   <property name="text">
+    <string>Flip &amp;Horizontally</string>
+   </property>
+  </action>
+  <action name="actionFlipCelVertically">
+   <property name="text">
+    <string>Flip &amp;Vertically</string>
+   </property>
+  </action>
+  <action name="actionAnimationOptions">
+   <property name="text">
+    <string>Animation &amp;Options...</string>
+   </property>
+  </action>
+ </widget>
+ <tabstops>
+  <tabstop>pushButtonLoopLeft</tabstop>
+  <tabstop>pushButtonLoopRight</tabstop>
+  <tabstop>pushButtonCelLeft</tabstop>
+  <tabstop>pushButtonCelRight</tabstop>
+  <tabstop>lineEditWidth</tabstop>
+  <tabstop>pushButtonWidthleft</tabstop>
+  <tabstop>pushButtonWidthRight</tabstop>
+  <tabstop>lineEditHeight</tabstop>
+  <tabstop>pushButtonHeightLeft</tabstop>
+  <tabstop>pushButtonHeightRight</tabstop>
+  <tabstop>checkBoxDescription</tabstop>
+  <tabstop>pushButtonEditDesc</tabstop>
+  <tabstop>comboBoxMirrorLoop</tabstop>
+  <tabstop>zoomOutButton</tabstop>
+  <tabstop>zoomInButton</tabstop>
+  <tabstop>radioButtonDraw</tabstop>
+  <tabstop>radioButtonFill</tabstop>
+  <tabstop>pushButtonLeft</tabstop>
+  <tabstop>pushButtonUp</tabstop>
+  <tabstop>pushButtonRight</tabstop>
+  <tabstop>pushButtonDown</tabstop>
+  <tabstop>pushButtonSetTrans</tabstop>
+ </tabstops>
+ <resources>
+  <include location="agistudio.qrc"/>
+ </resources>
+ <connections/>
+ <buttongroups>
+  <buttongroup name="buttonGroupDrawMode"/>
+ </buttongroups>
+</ui>
