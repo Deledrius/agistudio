@@ -19,7 +19,6 @@
  */
 
 
-#include <sys/stat.h>
 #include <algorithm>
 
 #include <QBoxLayout>
@@ -48,80 +47,28 @@
 
 //**********************************************************
 ResourcesWin::ResourcesWin(QWidget *parent, const char  *name, int win_num):
-    QWidget(parent)
+    QMainWindow(parent), ResourceIndex(), ResourceNum(), first(), winnum(win_num),
+    addmenu(nullptr), preview(nullptr), closing(false)
 {
+    setupUi(this);
+
     setAttribute(Qt::WA_DeleteOnClose);
-    setWindowTitle("Resources");
 
-    setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    winnum = win_num;
+    connect(actionNew, &QAction::triggered, this, &ResourcesWin::new_resource_window);
+    connect(actionClose, &QAction::triggered, this, &ResourcesWin::close);
+    connect(actionAdd, &QAction::triggered, this, &ResourcesWin::add_resource);
+    connect(actionExtract, &QAction::triggered, this, &ResourcesWin::extract_resource);
+    connect(actionDelete, &QAction::triggered, this, &ResourcesWin::delete_resource);
+    connect(actionRenumber, &QAction::triggered, this, &ResourcesWin::renumber_resource);
+    connect(actionImportBitmap, &QAction::triggered, this, &ResourcesWin::import_resource);
+    connect(actionExtract_All, &QAction::triggered, this, &ResourcesWin::extract_all_resource);
 
-    QMenu *window = new QMenu(this);
-    Q_CHECK_PTR(window);
-    window->setTitle("&Window");
-    window->addAction("&New", this, SLOT(new_resource_window()));
-    window->addSeparator();
-    window->addAction("&Close", this, SLOT(close()));
+    connect(comboBoxResourceType, &QComboBox::activated, this, &ResourcesWin::select_resource_type);
+    connect(listWidgetResources, &QListWidget::itemSelectionChanged, this, qOverload<>(&ResourcesWin::highlight_resource));
+    connect(listWidgetResources, &QListWidget::itemActivated, this, qOverload<QListWidgetItem *>(&ResourcesWin::select_resource));
 
-    resourceMenu = new QMenu(this);
-    Q_CHECK_PTR(resourceMenu);
-    resourceMenu->setTitle("&Resource");
-    resourceMenu->addAction("&Add", this, SLOT(add_resource()));
-    resourceMenu->addAction("&Extract", this, SLOT(extract_resource()));
-    resourceMenu->addAction("&Delete", this, SLOT(delete_resource()));
-    resourceMenu->addAction("&Renumber", this, SLOT(renumber_resource()));
-    importMenuItemAction = resourceMenu->addAction("Import &bitmap", this, SLOT(import_resource()));
-    importMenuItemAction->setEnabled(false);
-    resourceMenu->addAction("E&xtract all", this, SLOT(extract_all_resource()));
-
-    QMenuBar *resourceMenubar = new QMenuBar(this);
-    Q_CHECK_PTR(resourceMenubar);
-    resourceMenubar->addMenu(window);
-    resourceMenubar->addMenu(resourceMenu);
-    resourceMenubar->addSeparator();
-
-    QBoxLayout *hbox =  new QHBoxLayout(this);
-    hbox->setMenuBar(resourceMenubar);
-
-    QBoxLayout *resbox =  new QVBoxLayout(this);
-    hbox->addLayout(resbox);
-
-    type = new QComboBox(this);
-    type->addItem("LOGIC");
-    type->addItem("PICTURE");
-    type->addItem("VIEW");
-    type->addItem("SOUND");
-    connect(type, SIGNAL(activated(int)), SLOT(select_resource_type(int)));
-    type->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
-    resbox->addWidget(type);
-
-    list = new QListWidget();
-    list->setMinimumSize(200, 300);
-    connect(list, SIGNAL(itemSelectionChanged()), this, SLOT(highlight_resource()));
-    connect(list, SIGNAL(itemActivated(QListWidgetItem *)), this, SLOT(select_resource(QListWidgetItem *)));
-    list->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::MinimumExpanding));
-
+    list = listWidgetResources;
     selected = game->settings->value("DefaultResourceType").toInt();
-    resbox->addWidget(list);
-
-    msg = new QLabel(this);
-    msg->setAlignment(Qt::AlignLeft);
-    resbox->addWidget(msg);
-
-    addmenu = NULL;
-    preview = NULL;
-    closing = false;
-
-    QBoxLayout *prevbox =  new QVBoxLayout();
-    prevbox->addLayout(hbox);
-
-    QGroupBox *group = new QGroupBox("Preview", this);
-    group->setMinimumSize(340 + 10 * 2, 280 + 10 * 2);
-    group->setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
-    previewPane = group;
-    hbox->addWidget(previewPane);
-
-    adjustSize();
 }
 
 //********************************************************
@@ -130,32 +77,32 @@ void ResourcesWin::select_resource_type(int ResType)
     QString str;
     uint i, k;
 
-    type->setCurrentIndex(ResType);
+    comboBoxResourceType->setCurrentIndex(ResType);
     selected = ResType;
 
-    // enable import item if resource type supports it
-    importMenuItemAction->setEnabled(selected == PICTURE);
+    // Enable import item if resource type supports it
+    actionImportBitmap->setEnabled(selected == PICTURE);
 
     // Show a resource list
-    list->hide();
-    list->clear();
+    listWidgetResources->hide();
+    listWidgetResources->clear();
     for (i = 0, k = 0; i < 256; i++) {
         if (game->ResourceInfo[ResType][i].Exists) {
             str = QString("%1.%2").arg(ResTypeName[ResType]).arg(QString::number(i), 3, QChar('0'));
-            list->addItem(str);
+            listWidgetResources->addItem(str);
             ResourceIndex[k++] = i;
         }
     }
     ResourceNum = k;
-    list->show();
+    listWidgetResources->show();
     first = true;
 }
 
 //********************************************************
 void ResourcesWin::highlight_resource()
 {
-    if (!list->selectedItems().isEmpty())
-        highlight_resource(list->currentRow());
+    if (!listWidgetResources->selectedItems().isEmpty())
+        highlight_resource(listWidgetResources->currentRow());
 }
 
 //********************************************************
@@ -164,12 +111,10 @@ void ResourcesWin::highlight_resource(int k)
     int i = ResourceIndex[k];
     int size = game->GetResourceSize(selected, i);
 
-    QString str;
-    str = QString("%1 bytes").arg(QString::number(size));
-    msg->setText(str);
+    statusBar()->showMessage(QString("%1 bytes").arg(QString::number(size)));
 
-    if (preview == NULL)
-        preview = new Preview(previewPane, 0, this);
+    if (preview == nullptr)
+        preview = new Preview(groupBoxPreview, nullptr, this);
 
     preview->open(i, selected);
     preview->show();
@@ -178,7 +123,7 @@ void ResourcesWin::highlight_resource(int k)
 //********************************************************
 void ResourcesWin::select_resource(QListWidgetItem *item)
 {
-    if (!list->selectedItems().isEmpty())
+    if (!listWidgetResources->selectedItems().isEmpty())
         select_resource(list->currentRow());
 }
 
@@ -190,25 +135,23 @@ void ResourcesWin::select_resource(int k)
     int n;
     extern void play_sound(int ResNum);
 
-    QString str;
-    str = QString("%1 bytes").arg(QString::number(size));
-    msg->setText(str);
+    statusBar()->showMessage(QString("%1 bytes").arg(QString::number(size)));
 
     if ((n = get_win()) == -1)
         return;
     switch (selected) {
         case LOGIC:
-            winlist[n].w.l = new LogEdit(NULL, NULL, n);
+            winlist[n].w.l = new LogEdit(nullptr, nullptr, n);
             winlist[n].type = LOGIC;
             winlist[n].w.l->open(i);
             break;
         case PICTURE:
-            winlist[n].w.p = new PicEdit(NULL, NULL, n);
+            winlist[n].w.p = new PicEdit(nullptr, nullptr, n);
             winlist[n].type = PICTURE;
             winlist[n].w.p->open(i);
             break;
         case VIEW:
-            winlist[n].w.v = new ViewEdit(NULL, NULL, n);
+            winlist[n].w.v = new ViewEdit(nullptr, nullptr, n);
             winlist[n].type = VIEW;
             winlist[n].w.v->open(i);
             break;
@@ -223,7 +166,7 @@ void ResourcesWin::set_current(int n)
 {
     for (int i = 0; i < ResourceNum; i++) {
         if (ResourceIndex[i] == n) {
-            list->setCurrentRow(i);
+            listWidgetResources->setCurrentRow(i);
             break;
         }
     }
@@ -234,7 +177,7 @@ void ResourcesWin::deinit()
     closing = true;
     if (preview) {
         preview->close();
-        preview = NULL;
+        preview = nullptr;
     }
     for (int i = 0; i < MAXWIN; i++) {
         if (winlist[i].type == -1)
@@ -242,15 +185,15 @@ void ResourcesWin::deinit()
         switch (winlist[i].type) {
             case LOGIC:
                 if (winlist[i].w.l->resources_win == this)
-                    winlist[i].w.l->resources_win = NULL;
+                    winlist[i].w.l->resources_win = nullptr;
                 break;
             case VIEW:
                 if (winlist[i].w.v->resources_win == this)
-                    winlist[i].w.v->resources_win = NULL;
+                    winlist[i].w.v->resources_win = nullptr;
                 break;
             case PICTURE:
                 if (winlist[i].w.p->resources_win == this)
-                    winlist[i].w.p->resources_win = NULL;
+                    winlist[i].w.p->resources_win = nullptr;
                 break;
         }
     }
@@ -296,20 +239,20 @@ void ResourcesWin::new_resource_window()
 void ResourcesWin::delete_resource()
 {
     int restype = selected;
-    int k = list->currentRow();
+    int k = listWidgetResources->currentRow();
     int resnum = ResourceIndex[k];
 
     switch (QMessageBox::warning(this, tr("Delete resource"),
-                                 tr("Really delete %s.%03d?").arg(ResTypeName[restype]).arg(QString::number(resnum), 3, QChar('0')),
+                                 tr("Really delete %1.%2?").arg(ResTypeName[restype]).arg(QString::number(resnum), 3, QChar('0')),
                                  QMessageBox::Yes | QMessageBox::No,
                                  QMessageBox::No)) {
         case QMessageBox::Yes:
             game->DeleteResource(restype, resnum);
             select_resource_type(restype);
             if (k > 0)
-                list->setCurrentRow(k - 1);
+                listWidgetResources->setCurrentRow(k - 1);
             else
-                list->setCurrentRow(0);
+                listWidgetResources->setCurrentRow(0);
             break;
         default:
             break;
@@ -319,7 +262,7 @@ void ResourcesWin::delete_resource()
 //**********************************************
 void ResourcesWin::renumber_resource()
 {
-    int k = list->currentRow();
+    int k = listWidgetResources->currentRow();
     if (k == -1)
         return;
 
@@ -356,8 +299,10 @@ static QImage openBitmap(const char *title)
         if (pic.isNull())
             menu->errmes("Error loading bitmap.");
         else {
-            if ((pic.width() != 320 && pic.width() != 160) || pic.height() < 168)
+            if ((pic.width() != 320 && pic.width() != 160) || pic.height() < 168) {
                 menu->errmes("Bitmap size must be 320x168 or 160x168.\nHeight can be more but will be cropped to 168.");
+                pic = QImage();
+            }
         }
     }
     return pic;
@@ -405,7 +350,7 @@ void ResourcesWin::import_resource()
 
             for (int k = 0; k < 255; ++k)
                 if (ResourceIndex[k] == newnum)
-                    list->setCurrentRow(k);
+                    listWidgetResources->setCurrentRow(k);
         }
         break;
         default:
@@ -414,46 +359,45 @@ void ResourcesWin::import_resource()
 }
 
 //**********************************************
-static void extract(char *filename, int restype, int resnum)
+static void extract(const std::string &filename, int restype, int resnum)
 {
     if (game->ReadResource(restype, resnum))
-        return ;
+        return;
 
-    FILE *fptr = fopen(filename, "wb");
-    if (fptr == NULL) {
-        menu->errmes("Can't open file %s ! ", filename);
-        return ;
+    QFile outfile(filename.c_str());
+    if (!outfile.open(QIODevice::WriteOnly)) {
+        menu->errmes("Can't open file %s!", filename);
+        return;
     }
+
     if (restype == LOGIC && game->settings->value("ExtractLogicAsText").toBool()) {
         Logic *logic = new Logic();
         int err = logic->decode(resnum);
         if (!err)
-            fprintf(fptr, "%s", logic->OutputText.c_str());
+            outfile.write(logic->OutputText.c_str());
         delete logic;
     } else
-        fwrite(ResourceData.Data, ResourceData.Size, 1, fptr);
-    fclose(fptr);
+        outfile.write(reinterpret_cast<char *>(ResourceData.Data), ResourceData.Size);
+    outfile.close();
 }
 
 //**********************************************
 void ResourcesWin::extract_resource()
 {
     int restype = selected;
-    int resnum = ResourceIndex[list->currentRow()];
+    int resnum = ResourceIndex[listWidgetResources->currentRow()];
 
-    auto defaultfile = QString("%1.%2").arg(ResTypeName[restype]).arg(resnum, 3, 10, QLatin1Char('0'));
+    auto defaultfile = QString("%1.%2").arg(ResTypeName[restype]).arg(QString::number(resnum), 3, '0');
     auto defaultpath = QDir::cleanPath(QString(game->srcdir.c_str()) + QDir::separator() + defaultfile);
 
     QString fileName = QFileDialog::getSaveFileName(this, tr("Extract Resource"), defaultpath, tr("All Files (*)"));
     if (!fileName.isNull())
-        extract(fileName.toLatin1().data(), restype, resnum);
+        extract(fileName.toStdString(), restype, resnum);
 }
 
 //**********************************************
 void ResourcesWin::extract_all_resource()
 {
-    char filename[256];
-
     int restype = selected;
     switch (QMessageBox::warning(this, tr("Extract all"),
                                  tr("Do you really want to extract all %1 resources?").arg(ResTypeName[restype]),
@@ -465,11 +409,11 @@ void ResourcesWin::extract_all_resource()
             return;
     }
 
-
+    QString filename;
     for (int resnum = 0; resnum < 256; resnum++) {
         if (game->ResourceInfo[restype][resnum].Exists) {
-            sprintf(filename, "%s/%s.%03d", game->srcdir.c_str(), ResTypeName[restype], resnum);
-            extract(filename, restype, resnum);
+            filename = QString("%1/%2.%3").arg(game->srcdir.c_str()).arg(ResTypeName[restype]).arg(QString::number(resnum), 3, '0');
+            extract(filename.toStdString(), restype, resnum);
         }
     }
 }
@@ -483,16 +427,16 @@ void ResourcesWin::add_resource()
 
     QString fileName = QFileDialog::getOpenFileName(this, tr("Add Resource"), game->srcdir.c_str(), filters, &preferredfilter);
     if (!fileName.isNull()) {
-        if (addmenu == NULL)
-            addmenu = new AddResource(0, 0, this);
-        addmenu->open(fileName.toLatin1().data());
+        if (addmenu == nullptr)
+            addmenu = new AddResource(nullptr, nullptr, this);
+        addmenu->open(fileName.toStdString());
     }
 }
 
 //**********************************************
 void ResourcesWin::export_resource()
 {
-    int k = list->currentRow();
+    int k = listWidgetResources->currentRow();
     if (k < 0)
         return;
     int i = ResourceIndex[k];
@@ -500,22 +444,21 @@ void ResourcesWin::export_resource()
     switch (selected) {
         case SOUND:
             if (game->ReadResource(SOUND, i))
-                menu->errmes("Couldn't read sound resource ! ");
+                menu->errmes("Couldn't read sound resource! ");
             else
                 showSaveAsMidi(this, ResourceData.Data);
             break;
         default:
-            qWarning("BUG in code. Export not supported for this resource type!");
+            qWarning("Export not supported for this resource type!");
             break;
     }
 }
 
 //**********************************************
 AddResource::AddResource(QWidget *parent, const char *name, ResourcesWin *res)
-    : QWidget(parent)
+    : QWidget(parent), resources_win(res)
 {
-    resources_win = res;
-    setWindowTitle("Add resource");
+    setWindowTitle("Add Resource");
 
     QBoxLayout *box = new QVBoxLayout(this);
 
@@ -575,19 +518,19 @@ AddResource::AddResource(QWidget *parent, const char *name, ResourcesWin *res)
 }
 
 //**********************************************
-void AddResource::open(char *file_name)
+void AddResource::open(const std::string &file_name)
 {
-    file = std::string(file_name);
-    auto f = QFileInfo(file_name).fileName();
+    file = file_name;
+    auto f = QFileInfo(file_name.c_str()).fileName();
 
     filename->setText("Filename: " + f);
-    if (f.startsWith("logic"))
+    if (f.toLower().startsWith("logic"))
         restype = LOGIC;
-    else if (f.startsWith("picture"))
+    else if (f.toLower().startsWith("picture"))
         restype = PICTURE;
-    else if (f.startsWith("view"))
+    else if (f.toLower().startsWith("view"))
         restype = VIEW;
-    else if (f.startsWith("sound"))
+    else if (f.toLower().startsWith("sound"))
         restype = SOUND;
 
     type->buttons()[restype]->setChecked(true);
@@ -598,64 +541,61 @@ void AddResource::open(char *file_name)
 //**********************************************
 void AddResource::edit_cb(const QString &str)
 {
-    int num = str.toInt();
-    sprintf(tmp, "%s.%03d", ResTypeName[restype], num);
-    resname->setText(tmp);
+    resname->setText(QString("%1.%2").arg(ResTypeName[restype]).arg(str, 3, '0'));
 }
 
 //**********************************************
-static int load_resource(const char *filename, int restype)
+static int load_resource(const std::string &filename, int restype)
 {
     extern QStringList InputLines;
-    char *ptr;
-    byte b;
-    FILE *fptr = fopen(filename, "rb");
-    if (fptr == NULL) {
-        menu->errmes("Can't open file %s ! ", filename);
+
+    QFile infile(filename.c_str());
+    if (!infile.open(QIODevice::ReadOnly)) {
+        menu->errmes("Can't open file %s!", filename);
         return 1;
     }
-    struct stat buf;
-    fstat(fileno(fptr), &buf);
-    int size = buf.st_size;
+
+    int size = QFileInfo(infile).size();
     if (size >= MaxResourceSize) {
-        menu->errmes("File %s is too big ! ", filename);
-        fclose(fptr);
+        menu->errmes("File %s is too big!", filename);
+        infile.close();
         return 1;
     }
 
     if (restype == LOGIC) {
-        //check if file is binary or ascii
-        fread(ResourceData.Data, std::min(size, 64), 1, fptr);
-        for (int i = 0; i < std::min(size, 64); i++) {
-            b = ResourceData.Data[i];
-            if (b > 0x80 || (b < 0x20 && b != 0x0a && b != 0x0d && b != 0x09)) { //file is binary
-                fseek(fptr, 0, SEEK_SET);
+        int sample_size = std::min(size, 64);
+
+        // Check if file contains non-text data
+        infile.read(reinterpret_cast<char *>(ResourceData.Data), sample_size);
+        for (int i = 0; i < sample_size; i++) {
+            unsigned char b = ResourceData.Data[i];
+            if (b > 0x80 || (b < 0x20 && b != 0x0a && b != 0x0d && b != 0x09)) {
+                // File is binary
+                infile.seek(0);
                 ResourceData.Size = size;
-                fread(ResourceData.Data, ResourceData.Size, 1, fptr);
-                fclose(fptr);
+                infile.read(reinterpret_cast<char *>(ResourceData.Data), ResourceData.Size);
+                infile.close();
                 return 0;
             }
         }
-        //file is ascii - trying to compile
-        fseek(fptr, 0, SEEK_SET);
+
+        // File appears to be text - trying to compile...
+        infile.seek(0);
         Logic *logic = new Logic();
         InputLines.clear();
-        while (fgets(tmp, 1024, fptr) != NULL) {
-            if ((ptr = strchr(tmp, 0x0a)))
-                * ptr = 0;
-            if ((ptr = strchr(tmp, 0x0d)))
-                * ptr = 0;
-            InputLines.append(tmp);
-        }
-        fclose(fptr);
+        QTextStream instream(&infile);
+        QString line;
+        while (instream.readLineInto(&line))
+            InputLines.append(line);
+        infile.close();
         int err = logic->compile();
         delete logic;
         if (err)
             return 1;
     } else {
         ResourceData.Size = size;
-        fread(ResourceData.Data, ResourceData.Size, 1, fptr);
-        fclose(fptr);
+        infile.read(reinterpret_cast<char *>(ResourceData.Data), ResourceData.Size);
+        infile.close();
     }
     return 0;
 }
@@ -663,8 +603,7 @@ static int load_resource(const char *filename, int restype)
 //**********************************************
 void AddResource::ok_cb()
 {
-    QString str = number->text();
-    int num = str.toInt();
+    int num = number->text().toInt();
 
     if (num < 0 || num > 255) {
         menu->errmes("Resource number must be between 0 and 255 !");
@@ -677,14 +616,14 @@ void AddResource::ok_cb()
                                      QMessageBox::Yes | QMessageBox::No,
                                      QMessageBox::No)) {
             case QMessageBox::Yes:
-                if (!load_resource(file.c_str(), restype))
+                if (!load_resource(file, restype))
                     game->AddResource(restype, num);
                 break;
             default:
                 break;
         }
     } else {
-        if (!load_resource(file.c_str(), restype)) {
+        if (!load_resource(file, restype)) {
             game->AddResource(restype, num);
             if (resources_win->selected == restype)
                 resources_win->select_resource_type(restype);
@@ -703,10 +642,5 @@ void AddResource::cancel_cb()
 void AddResource::select_type(int type)
 {
     restype = type;
-
-    QString str = number->text();
-    int num = str.toInt();
-
-    sprintf(tmp, "%s.%03d", ResTypeName[restype], num);
-    resname->setText(tmp);
+    resname->setText(QString("%1.%2").arg(ResTypeName[restype]).arg(number->text(), 3, '0'));
 }
