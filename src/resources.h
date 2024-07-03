@@ -27,6 +27,8 @@
 #include <QWidget>
 #include <QString>
 
+#include "ui/ui_resources.h"
+
 
 class QLabel;
 class QLineEdit;
@@ -34,9 +36,6 @@ class QButtonGroup;
 class QLabel;
 class QListWidget;
 class QListWidgetItem;
-class QMenu;
-class QAction;
-class QComboBox;
 
 class ResourcesWin;
 class Preview;
@@ -55,7 +54,7 @@ public:
     Preview *preview;
     int restype;
     std::string file;
-    void open(char *filename);
+    void open(const std::string &filename);
 public slots:
     void ok_cb();
     void cancel_cb();
@@ -64,7 +63,7 @@ public slots:
 };
 
 
-class ResourcesWin : public QWidget
+class ResourcesWin : public QMainWindow, private Ui::Resources
 {
     Q_OBJECT
 public:
@@ -92,15 +91,9 @@ public slots:
     void import_resource(void);
 
 protected:
-    bool first;
-    QLabel *msg;
-    QComboBox *type;
-    QWidget *previewPane;
     AddResource *addmenu;
 
-    QMenu *resourceMenu;
-    QAction *importMenuItemAction;
-
+    bool first;
     int winnum;
     void closeEvent(QCloseEvent *e);
     void showEvent(QShowEvent *);
