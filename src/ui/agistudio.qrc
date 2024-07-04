@@ -1,9 +1,6 @@
 <RCC>
   <qresource prefix="icons">
     <file>../icon1.ico</file>
-    <file>../icon16.png</file>
-    <file>../icon32.png</file>
-    <file>../icon32b.png</file>
     <file>../app_icon.xpm</file>
     <file>../back.xpm</file>
     <file>../downarrow_x.xpm</file>
