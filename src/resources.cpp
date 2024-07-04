@@ -95,6 +95,10 @@ void ResourcesWin::select_resource_type(int ResType)
     }
     ResourceNum = k;
     listWidgetResources->show();
+
+    if (listWidgetResources->count() > 0)
+        listWidgetResources->setCurrentRow(0);
+
     first = true;
 }
 
