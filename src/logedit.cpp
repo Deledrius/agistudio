@@ -19,6 +19,9 @@
  */
 
 
+#include <sstream>
+#include <iomanip>
+
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QListWidget>
@@ -476,9 +479,11 @@ int LogEdit::compile_logic()
     } else {
         if (!logic->ErrorList.empty()) {
             std::string logic_name;
-            if (LogicNum != -1)
-                logic_name = std::format("logic.{:03}", LogicNum);
-            else
+            if (LogicNum != -1) {
+                std::stringstream ss;
+                ss << "logic." << std::setw(3) << std::setfill('0') << LogicNum;
+                logic_name = ss.str();
+            } else
                 logic_name = "logic";
 
             if (logic->ErrorList.starts_with("File ")) {
@@ -517,7 +522,7 @@ int LogEdit::compile_logic()
                 textEditor->textCursor().setPosition(match.capturedTexts()[0].toInt());
                 statusBar()->showMessage(match.capturedTexts()[1]);
             }
-            QMessageBox::critical(this, logic_name.c_str(), std::format("Errors:\n\n{}", logic->ErrorList.c_str()).c_str());
+            QMessageBox::critical(this, logic_name.c_str(), (std::string("Errors:\n\n") + logic->ErrorList).c_str());
         }
     }
 
