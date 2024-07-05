@@ -120,7 +120,7 @@ int WordList::read(const std::string &filename)
 
     FILE *fptr = fopen(filename.c_str(), "rb");
     if (fptr == NULL) {
-        menu->errmes("Error opening file %s", filename);
+        menu->errmes("Error opening file %s", filename.c_str());
         return 1;
     }
 
@@ -128,7 +128,7 @@ int WordList::read(const std::string &filename)
     fstat(fileno(fptr), &buf);
     int size = buf.st_size;
     if (size > MaxResourceSize) {
-        menu->errmes("Error:  File %s is too big (>%d bytes)", filename, MaxResourceSize);
+        menu->errmes("Error:  File %s is too big (>%d bytes)", filename.c_str(), MaxResourceSize);
         return 1;
     }
 
@@ -249,7 +249,7 @@ int WordList::save(const std::string &filename)
     }
 
     if ((fptr = fopen(filename.c_str(), "wb")) == NULL) {
-        menu->errmes("Error opening file %s", filename);
+        menu->errmes("Error opening file %s", filename.c_str());
         return 1;
     }
 

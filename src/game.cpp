@@ -86,7 +86,7 @@ Game::Game()
 }
 
 //*******************************************
-int Game::open(std::string name)
+int Game::open(const std::string &gamepath)
 {
     byte DirData[3080];
     int CurResType, CurResNum, NumDirEntries;
@@ -94,9 +94,9 @@ int Game::open(std::string name)
     byte byte1, byte2, byte3;
     FILE *fptr;
 
-    dir = name;
+    dir = gamepath;
 
-    ID = FindAGIV3GameID(dir.c_str());  // 'V2' if not found
+    ID = FindAGIV3GameID(dir);  // 'V2' if not found
     if (ID.length() == 0)
         return 1;
 
@@ -222,7 +222,7 @@ int Game::open(std::string name)
 }
 
 //*******************************************
-int Game::from_template(std::string name)
+int Game::from_template(const std::string &name)
 //create a new game (in 'name' directory) from template
 {
     int i;
@@ -237,7 +237,7 @@ int Game::from_template(std::string name)
     for (i = 0; i < 5; i++) {
         sprintf(tmp, "%s/%s", game->settings->value("TemplateDir").toString().toStdString().c_str(), files[i]);
         if (stat(tmp, &buf)) {
-            menu->errmes("AGI Studio error", "Can't read %s in template directory %s!", files[i], game->settings->value("TemplateDir").toString());
+            menu->errmes("AGI Studio error", "Can't read %s in template directory %s!", files[i], game->settings->value("TemplateDir").toString().toStdString().c_str());
             return 1;
         }
     }
@@ -344,7 +344,7 @@ void Game::make_source_dir()
 }
 
 //*******************************************
-int Game::newgame(std::string name)
+int Game::newgame(const std::string &name)
 //create an empty game in 'name' directory
 {
     static byte BlankObjectFile[8] = {0x42, 0x76, 0x79, 0x70, 0x20, 0x44, 0x4A, 0x72};
@@ -394,7 +394,7 @@ int Game::newgame(std::string name)
 }
 
 //*******************************************
-std::string Game::FindAGIV3GameID(const char *gamepath) const
+std::string Game::FindAGIV3GameID(const std::string &gamepath) const
 // Compare the filename prefix (if any) for vol.0 and dir; If they exist and are the same,
 // it is a V3 game.
 {

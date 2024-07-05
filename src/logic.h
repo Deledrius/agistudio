@@ -89,6 +89,4 @@ private:
     int CompileCommands();
 };
 
-extern char tmp[];
-
 #endif

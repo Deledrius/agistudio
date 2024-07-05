@@ -342,7 +342,7 @@ int LogEdit::open(const std::string &filepath)
 
         return 0;
     } else {
-        menu->errmes("Can't open file '%s'!", filepath);
+        menu->errmes("Can't open file '%s'!", filepath.c_str());
         return 1;
     }
 }
@@ -390,7 +390,7 @@ void LogEdit::save(const std::string &fname)
 {
     QFile file(fname.c_str());
     if (!file.open(QIODevice::WriteOnly)) {
-        menu->errmes("Can't save file '%s'!", fname);
+        menu->errmes("Can't save file '%s'!", fname.c_str());
         return;
     }
     file.write(textEditor->toPlainText().toStdString().c_str());
@@ -551,7 +551,7 @@ void LogEdit::change_logic_number()
                                      QMessageBox::No)) {
             case QMessageBox::Yes:
                 break;
-            case QMessageBox::No:
+            default:
                 return;
         }
     }
@@ -649,7 +649,7 @@ void LogEdit::goto_cb()
 
     bool ok;
     int linenum = QInputDialog::getInt(this, tr("Go to line"), tr("Go to line:"),
-                                       cursor.blockNumber(), 1, textEditor->document()->blockCount(), ok = &ok);
+                                       cursor.blockNumber(), 1, textEditor->document()->blockCount(), 1, &ok);
     if (!ok)
         return;
 
@@ -859,7 +859,7 @@ int TextEdit::open(const std::string &fname)
 {
     QFile file(fname.c_str());
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        menu->errmes("Can't open file '%s'!", fname);
+        menu->errmes("Can't open file '%s'!", fname.c_str());
         return 1;
     }
 
@@ -897,7 +897,7 @@ void TextEdit::save(const std::string &fname)
 {
     QFile file(fname.c_str());
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        menu->errmes("Can't save file '%s'!", fname);
+        menu->errmes("Can't save file '%s'!", fname.c_str());
         return;
     }
     file.write(textEditor->toPlainText().toStdString().c_str());
