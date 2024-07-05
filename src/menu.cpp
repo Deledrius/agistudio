@@ -56,7 +56,7 @@ Menu::Menu(QWidget *parent, const char *name)
     : QMainWindow(parent), resources_win(nullptr), num_res(0)
 {
     setupUi(this);
-    
+
     // Sadly, Action Groups are not exposed in QtDesigner...
     activeGameGroup = new QActionGroup(this);
     activeGameGroup->addAction(actionGameClose);
@@ -571,7 +571,7 @@ void Menu::help_contents()
 bool Menu::help_topic(const QString &topic)
 {
     QString fullpath = QString("%1/%2.html").arg(game->settings->value("HelpDir").toString()).arg(
-            QString(topic).replace(".", "_"));
+                           QString(topic).replace(".", "_"));
 
     if (!QFile(fullpath).exists())
         return false;
