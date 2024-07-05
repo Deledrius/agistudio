@@ -224,7 +224,7 @@ LogEdit::LogEdit(QWidget *parent, const char *name, int win_num, ResourcesWin *r
 
         connect(actionContextHelp, &QAction::triggered, this, &LogEdit::context_help);
         connect(actionAllCommands, &QAction::triggered, this, &LogEdit::command_help);
-        
+
         connect(textEditor, &QTextEdit::cursorPositionChanged, this, &LogEdit::update_line_num);
     }
 
@@ -331,7 +331,7 @@ int LogEdit::open(const std::string &filepath)
         file.close();
 
         logic->OutputText = textEditor->toPlainText().toStdString();
-        
+
         QString fname = QFileInfo(filepath.c_str()).fileName();
         if (LogicNum != -1)
             setNewTitle(QString("logic.%1 (file %2)").arg(QString::number(LogicNum)).arg(fname));
@@ -362,7 +362,7 @@ int LogEdit::open(int ResNum)
     };
 
     std::string source_file = "";
-    for (auto & test_path : test_paths)
+    for (auto &test_path : test_paths)
         if (QFile::exists(test_path))
             source_file = test_path.toStdString();
 
@@ -730,7 +730,7 @@ void LogEdit::setNewTitle(const QString &newtitle)
 //*******************************************************
 TextEdit::TextEdit(QWidget *parent, const char *name, int win_num)
     : QMainWindow(parent), findedit(nullptr), winnum(win_num),
-    changed(false), filename(), OutputText()
+      changed(false), filename(), OutputText()
 {
     setupUi(this);
 

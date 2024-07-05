@@ -132,9 +132,8 @@ void ObjEdit::open(const std::string &name)
     filename = name;
 
     listWidgetObjects->clear();
-    for (int i = 0; i < objlist->ItemNames.count(); i++) {
+    for (int i = 0; i < objlist->ItemNames.count(); i++)
         listWidgetObjects->addItem(QString("%1. %2").arg(i).arg(objlist->ItemNames.at(i)));
-    }
     listWidgetObjects->show();
     listWidgetObjects->setCurrentItem(0);
     changed = false;
@@ -237,9 +236,8 @@ void ObjEdit::num_cb()
     if (ok && (k > 0 && k < 256)) {
         objlist->RoomNum[CurObject] = k;
         changed = true;
-    } else {
+    } else
         lineEditRoomNumber->setText(QString::number(objlist->RoomNum[CurObject]));
-    }
 }
 
 //*****************************************

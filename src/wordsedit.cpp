@@ -467,7 +467,7 @@ WordsFind::WordsFind(QWidget *parent, const char *name, WordsEdit *w)
       FindLastWord(-1), FindLastGroup(-1), first(false)
 {
     setupUi(this);
-    
+
     connect(buttonFindNext, &QPushButton::pressed, this, &WordsFind::find_next_cb);
 
     radioButtonMatchCase->setVisible(false);

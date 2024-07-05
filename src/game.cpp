@@ -152,7 +152,7 @@ int Game::open(const std::string &gamepath)
             fstat(fileno(fptr), &buf);
             int size = buf.st_size;
             if (size > 3080) {
-                menu->errmes("Error: %s is too big (should not be mode than 3080 bytes) !", DIRFilename.c_str());
+                menu->errmes("Error: %s is too big (should not be mode than 3080 bytes)!", DIRFilename.c_str());
                 ErrorOccured = true;
             } else {
                 fread(DirData, size, 1, fptr);
@@ -182,7 +182,7 @@ int Game::open(const std::string &gamepath)
                             ErrorOccured = true;
                             break;
                         } else if (DirOffset + DirSize > size) {
-                            menu->errmes("Error: Directory is beyond end of %s file !", DIRFilename.c_str());
+                            menu->errmes("Error: Directory is beyond end of %s file!", DIRFilename.c_str());
                             ErrorOccured = true;
                             break;
                         } else {
@@ -402,20 +402,18 @@ std::string Game::FindAGIV3GameID(const std::string &gamepath) const
     std::string dirString = "";
     std::string volString = "";
 
-    for (const auto& entry : std::filesystem::directory_iterator(gamepath)) {
+    for (const auto &entry : std::filesystem::directory_iterator(gamepath)) {
         if (entry.is_regular_file()) {
-            if (dirString.empty() && entry.path().filename().string().ends_with("DIR")) {
+            if (dirString.empty() && entry.path().filename().string().ends_with("DIR"))
                 dirString = entry.path().filename().string().substr(0, 3);
-            }
-            else if (volString.empty() && entry.path().filename().string().ends_with("VOL.0")) {
+            else if (volString.empty() && entry.path().filename().string().ends_with("VOL.0"))
                 volString = entry.path().filename().string().substr(0, 3);
-            }
         }
     }
 
     if (!volString.empty() && (volString == dirString))
         ID1 = volString;
-        
+
     return ID1;
 }
 
@@ -1248,7 +1246,7 @@ int Game::ReadV3Resource(char ResourceType1_c, int ResourceID1)
 
 //*********************************************************
 void Game::reset_settings(void)
-{       
+{
 #ifdef _WIN32
     QString template_dir = QDir::cleanPath(QDir::currentPath() + QString("\\template\\"));
     QString help_dir = QDir::cleanPath(QDir::currentPath() + QString("\\help\\"));
@@ -1261,7 +1259,7 @@ void Game::reset_settings(void)
     settings->setValue("ExtractLogicAsText", true);                 // Default for 'extract' function.
 
     settings->setValue("LogicEditor/ShowAllMessages", true);        // Logic decompiler - show all messages at end, or just unused ones.
-    settings->setValue("LogicEditor/ShowElsesAsGotos", false);      //  
+    settings->setValue("LogicEditor/ShowElsesAsGotos", false);      //
     settings->setValue("LogicEditor/ShowSpecialSyntax", true);      // v30=4 vs. assignn(v30,4).
 
     settings->setValue("UseRelativeSrcDir", true);                  // Will determine whether RelativeSrcDir or AbsoluteSrcDir is used:

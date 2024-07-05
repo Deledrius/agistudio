@@ -139,7 +139,7 @@ void Options::browse_interpreter()
 
 //***********************************************
 void Options::on_update_directories()
-{    
+{
     bool toggle = radioButtonGameDir->isChecked();
 
     lineEditGameDirSrc->setEnabled(toggle);

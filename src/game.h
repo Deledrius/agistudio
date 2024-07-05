@@ -98,14 +98,14 @@ extern const char EncryptionKey[];
 #define MAX_TMP 2048
 extern char tmp[];
 
-//resource types
-//(the numbers assigned to these defines are important !)
+// Resource types
+// (The numbers assigned to these defines are important!)
 #define LOGIC   0
 #define PICTURE 1
 #define VIEW    2
 #define SOUND   3
 
-//additional resource types
+// Additional resource types
 #define OBJECT  4
 #define WORDS   5
 #define TEXTRES 6
@@ -114,7 +114,7 @@ extern char tmp[];
 #define PREVIEW   8
 #define HELPWIN   9
 
-//Picedit styles (tools and picture in one window or in separate windows (for small displays))
+// PicEdit styles (tools and picture in one window, or in separate windows for small displays)
 #define P_ONE  0
 #define P_TWO  1
 

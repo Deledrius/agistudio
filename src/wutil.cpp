@@ -59,7 +59,8 @@ void make_egacolors(void)
 
 /*******************************************************/
 Palette::Palette(QWidget *parent, const char *name)
-    : QWidget(parent), left(0), right(0) {}
+    : QWidget(parent), left(0), right(0)
+{ }
 
 
 void Palette::paintEvent(QPaintEvent *)
