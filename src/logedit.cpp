@@ -202,6 +202,7 @@ LogEdit::LogEdit(QWidget *parent, const char *name, int win_num, ResourcesWin *r
         textEditor->setReadOnly(readonly);
         menuBar()->setVisible(false);
         statusBar()->setVisible(false);
+        centralwidget->layout()->setContentsMargins(0, 0, 0, 0);
     } else {
         actionNew->setDisabled(true);
 
@@ -688,9 +689,7 @@ void LogEdit::getmaxcol()
 //***********************************************
 void LogEdit::resizeEvent(QResizeEvent *)
 {
-    QString str = textEditor->toPlainText();
     getmaxcol();
-    textEditor->setText(str);
 }
 
 //***********************************************
