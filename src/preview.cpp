@@ -52,29 +52,27 @@ Preview::Preview(QWidget *parent, const char  *name, ResourcesWin *res):
     make_egacolors();
 
     resources_win = res;
-
     // Logic
-
     w_logic = new QWidget(this);
-    w_logic->setMinimumSize(340, 280);
+    w_logic->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     QBoxLayout *d =  new QVBoxLayout(w_logic);
+    d->setAlignment(Qt::AlignTop);
+    d->layout()->setContentsMargins(0, 0, 0, 0);
 
-    p_logic = new LogEdit(w_logic, 0, 0, res, true);
+    p_logic = new LogEdit(w_logic, nullptr, 0, res, true);
+    p_logic->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     d->addWidget(p_logic);
 
     QPushButton *edit = new QPushButton("Edit", w_logic);
-    edit->setMaximumSize(80, 60);
-    connect(edit, SIGNAL(clicked()), SLOT(double_click()));
+    edit->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+    connect(edit, &QPushButton::clicked, this, &Preview::double_click);
     d->addWidget(edit);
 
     // Sound
-
     w_sound = new QWidget(this);
-    w_sound->setMinimumSize(340, 280);
-
     QVBoxLayout *d1 =  new QVBoxLayout(w_sound);
-    d1->addSpacing(10);
+
     QLabel *l1 = new QLabel("Preview is not available!\nDouble-click to listen, or click the 'Listen' button.", w_sound, Qt::Widget);
     d1->addWidget(l1);
 
@@ -91,16 +89,15 @@ Preview::Preview(QWidget *parent, const char  *name, ResourcesWin *res):
     d1->addStretch();
 
     // Picture
-
     w_picture = new QWidget(this);
-    w_picture->setMinimumSize(340, 280);
-
     QVBoxLayout *pbox =  new QVBoxLayout(w_picture);
+    pbox->layout()->setContentsMargins(0, 0, 0, 0);
 
     pbox->addSpacing(10);
     p_picture = new PreviewPicture(w_picture, 0, this);
     p_picture->setFixedSize(MAX_W, MAX_HH);
     pbox->addWidget(p_picture);
+    pbox->addSpacing(5);
 
     QHBoxLayout *pbox1 = new QHBoxLayout(w_picture);
     pbox1->setAlignment(Qt::AlignLeft);
@@ -137,11 +134,10 @@ Preview::Preview(QWidget *parent, const char  *name, ResourcesWin *res):
     pbox->addStretch();
 
     // View
-
     w_view = new QWidget(this, Qt::Widget);
-    w_view->setMinimumSize(340, 240);
 
     QVBoxLayout *vbox = new QVBoxLayout(w_view);
+    vbox->layout()->setContentsMargins(0, 0, 0, 0);
 
     int maxrow1 = 3, maxcol1 = 5;
     QGridLayout *grid1 = new QGridLayout(w_view);
@@ -157,7 +153,6 @@ Preview::Preview(QWidget *parent, const char  *name, ResourcesWin *res):
         grid1->setRowStretch(i, 1);
         grid1->setVerticalSpacing(2);
     }
-
 
     int row = 0;
     int col = 0;
@@ -246,15 +241,12 @@ Preview::Preview(QWidget *parent, const char  *name, ResourcesWin *res):
     vbox->addStretch();
 
     // Build the widget stack
-
     addWidget(w_picture);
     addWidget(w_view);
     addWidget(w_sound);
     addWidget(w_logic);
 
-    setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
-    adjustSize();
-    animate = NULL;
+    animate = nullptr;
 }
 
 //*****************************************

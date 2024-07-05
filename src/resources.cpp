@@ -77,6 +77,10 @@ void ResourcesWin::select_resource_type(int ResType)
     QString str;
     uint i, k;
 
+    // Hide any existing previews
+    if (preview)
+        preview->hide();
+
     comboBoxResourceType->setCurrentIndex(ResType);
     selected = ResType;
 
@@ -121,6 +125,7 @@ void ResourcesWin::highlight_resource(int k)
         preview = new Preview(groupBoxPreview, nullptr, this);
 
     preview->open(i, selected);
+    groupBoxPreview->layout()->addWidget(preview);
     preview->show();
 }
 
