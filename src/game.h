@@ -28,7 +28,7 @@
 typedef unsigned char byte;
 
 typedef struct {
-    char Filename[12];    //[*]vol.*
+    char Filename[15];    //[*]vol.*
     long Loc;             //location in vol file
     bool Exists;
 } TResourceInfo ;
@@ -47,11 +47,14 @@ class Game
 {
 public:
     Game();
-    int open(std::string name);
-    int newgame(std::string name);
-    int from_template(std::string name);
+    int open(const std::string &name);
+    int newgame(const std::string &name);
+    int from_template(const std::string &name);
     void reset_settings();
-    int close() { return 0; }
+    int close()
+    {
+        return 0;
+    }
     void make_source_dir();
     int GetResourceSize(char ResType, int ResNum);
     int ReadResource(char ResourceType, int ResourceID);
@@ -76,7 +79,7 @@ public:
 
 private:
     long AGIVersionNumber;
-    std::string FindAGIV3GameID(const char *gamepath) const;
+    std::string FindAGIV3GameID(const std::string &gamepath) const;
     long GetAGIVersionNumber(void) const;
     int ReadV3Resource(char ResourceType, int ResourceID);
     FILE *OpenPatchVol(int PatchVol, int *filesize) const;

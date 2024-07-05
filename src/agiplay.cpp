@@ -263,7 +263,7 @@ void play_sound(const std::string &filename)
 
     FILE *fptr = fopen(filename.c_str(), "rb");
     if (fptr == NULL) {
-        menu->errmes("Can't open file %s !", filename);
+        menu->errmes("Can't open file %s !", filename.c_str());
         return;
     }
     struct stat buf;

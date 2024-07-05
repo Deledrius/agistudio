@@ -544,8 +544,9 @@ void Picture::plotPattern(byte x, byte y)
             if (patCode & 0x10)   /* Square */
                 plotPatternPoint();
             else { /* Circle */
-                if ((circles[patCode & 7][circlePos >> 3] >> (7 - (circlePos & 7))) & 1)
+                if ((circles[patCode & 7][circlePos >> 3] >> (7 - (circlePos & 7))) & 1) {
                     plotPatternPoint();
+                }
                 circlePos++;
             }
         }
@@ -604,7 +605,7 @@ int Picture::open(const std::string &filename)
     FILE *fptr = fopen(filename.c_str(), "rb");
 
     if (fptr == NULL) {
-        menu->errmes("Can't open file %s ! ", filename);
+        menu->errmes("Can't open file %s ! ", filename.c_str());
         return 1;
     }
 
@@ -647,7 +648,7 @@ int Picture::save(const std::string &filename)
     FILE *fptr = fopen(filename.c_str(), "wb");
 
     if (fptr == NULL) {
-        menu->errmes("Can't open file %s ! ", filename);
+        menu->errmes("Can't open file %s ! ", filename.c_str());
         return 1;
     }
     save();

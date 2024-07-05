@@ -221,6 +221,4 @@ protected:
     void putpix2(int x, int y);
 };
 
-extern char tmp[];
-
 #endif

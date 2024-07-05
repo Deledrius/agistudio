@@ -29,7 +29,7 @@
 QApplication *app;
 char tmp[MAX_TMP]; //global temporary buffer
 
-static char help[] =
+static const char help[] =
     "QT AGI Studio v1.1.\n\
 A Sierra On-Line(tm) adventure game creator and editor.\n\
 \n\

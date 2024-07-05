@@ -621,7 +621,8 @@ int Logic::decode(int ResNum)
         if (!objlist->ItemNames.at(i).contains("\""))
             continue;
         //replace " with \"
-        char *ptr = (char *)objlist->ItemNames.at(i).toStdString().c_str();
+        auto str = objlist->ItemNames.at(i).toStdString();
+        char *ptr = (char *)str.c_str();
         for (j = 0; *ptr; ptr++) {
             if (*ptr == '"') {
                 tmp[j++] = '\\';

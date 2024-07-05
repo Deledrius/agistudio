@@ -50,7 +50,10 @@ public:
     explicit FindEdit(QWidget *parent = 0, const char *name = 0, QTextEdit *edit = 0);
     QTextEdit *editor;
     int curline;
-    void focusEditLine() { lineFind->setFocus(); }
+    void focusEditLine()
+    {
+        lineFind->setFocus();
+    }
 public slots:
     void find_first_cb();
     void find_next_cb();

@@ -83,7 +83,7 @@ int ObjList::read(const std::string &filename, bool FileIsEncrypted)
 {
     FILE *fptr = fopen(filename.c_str(), "rb");
     if (fptr == NULL) {
-        menu->errmes("Error opening file %s", filename);
+        menu->errmes("Error opening file %s", filename.c_str());
         return 1;
     }
 
@@ -91,7 +91,7 @@ int ObjList::read(const std::string &filename, bool FileIsEncrypted)
     fstat(fileno(fptr), &buf);
     int size = buf.st_size;
     if (size > MaxResourceSize) {
-        menu->errmes("Error:  File %s is too big (>%d bytes)", filename, MaxResourceSize);
+        menu->errmes("Error:  File %s is too big (>%d bytes)", filename.c_str(), MaxResourceSize);
         return 1;
     }
 
@@ -166,7 +166,7 @@ int ObjList::save(const std::string &filename, bool FileIsEncrypted)
     }//end create data
     fptr = fopen(filename.c_str(), "wb");
     if (fptr == NULL) {
-        menu->errmes("Error opening file %s !", filename);
+        menu->errmes("Error opening file %s !", filename.c_str());
         return 1;
     }
     if (FileIsEncrypted)
