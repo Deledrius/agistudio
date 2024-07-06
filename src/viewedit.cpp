@@ -21,11 +21,13 @@
 
 #include <algorithm>
 
+#include <QClipboard>
 #include <QCloseEvent>
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QListWidget>
 #include <QMessageBox>
+#include <QMimeData>
 #include <QPainter>
 #include <QSettings>
 #include <QTextEdit>
@@ -39,9 +41,6 @@
 #include "viewedit.h"
 #include "wutil.h"
 
-
-Cel saveCel = Cel();  // Cel "Clipboard"
-bool cel_copied = false;
 
 //*********************************************
 ViewEdit::ViewEdit(QWidget *parent, const char *name, int win_num, ResourcesWin *res)
@@ -82,8 +81,8 @@ ViewEdit::ViewEdit(QWidget *parent, const char *name, int win_num, ResourcesWin 
     connect(actionClose, &QAction::triggered, this, &ViewEdit::close);
 
     connect(actionUndo, &QAction::triggered, this, &ViewEdit::undo_cel);
-    connect(actionCopyCel, &QAction::triggered, this, &ViewEdit::copy_cel);
-    connect(actionPasteCel, &QAction::triggered, this, &ViewEdit::paste_cel);
+    connect(actionCopyCel, &QAction::triggered, this, &ViewEdit::copy_to_clipboard);
+    connect(actionPasteCel, &QAction::triggered, this, &ViewEdit::paste_from_clipboard);
 
     connect(actionNextLoop, &QAction::triggered, this, &ViewEdit::next_loop);
     connect(actionPreviousLoop, &QAction::triggered, this, &ViewEdit::previous_loop);
@@ -441,20 +440,33 @@ void ViewEdit::fliph_cel()
 }
 
 //*********************************************
-void ViewEdit::copy_cel()
+void ViewEdit::copy_to_clipboard()
 {
-    saveCel.deinit();
-    saveCel.copy(view->loops[curIndex()].cels[view->CurCel]);
-    cel_copied = true;
+    const auto &current_cel = view->loops[curIndex()].cels[view->CurCel];
+    auto image = QImage(reinterpret_cast<unsigned char *>(current_cel.data), current_cel.width * 2, current_cel.height, current_cel.width * 2, QImage::Format_Indexed8);
+    image.setColorTable(egaColorTable);
+    image = image.convertToFormat(QImage::Format_ARGB32);
+    QApplication::clipboard()->setImage(image);
 }
 
 //*********************************************
-void ViewEdit::paste_cel()
+void ViewEdit::paste_from_clipboard()
 {
-    if (!cel_copied)
-        return;
-    saveundo();
-    view->loops[curIndex()].cels[view->CurCel].copy(saveCel);
+    const QMimeData *mimeData = QApplication::clipboard()->mimeData();
+
+    if (mimeData->hasImage()) {
+        saveundo();
+        auto image = qvariant_cast<QImage>(mimeData->imageData()).convertToFormat(QImage::Format_Indexed8, egaColorTable);
+
+        Cel croppedcel(image.width() / 2, image.height(), image.pixelIndex(0,0), false);
+        if (croppedcel.data) {
+            for (int y = 0; y < croppedcel.height; y++) {
+                for (int x = 0; x < croppedcel.width * 2; x++)
+                    croppedcel.data[(croppedcel.width * 2 * y) + x] = image.pixelIndex(x, y);
+            }
+            view->loops[curIndex()].cels[view->CurCel].copy(croppedcel);
+        }
+    }
     showcelpar();
     DisplayView();
     changed = true;

@@ -568,30 +568,24 @@ void View::setMirror(int n, int k)
 }
 
 //*************************************************
-Cel::Cel(int w, int h, int c, bool m)
+Cel::Cel(int w, int h, int c, bool m) :
+    width(w), height(h), transcol(c), mirror(m), data()
 {
-    width = w;
-    height = h;
-    transcol = c;
-    mirror = m;
-    data = (byte *)malloc(width * 2 * height);
+    data = (byte *)malloc(static_cast<size_t>(width) * 2 * height);
     clear();
 }
 
 //*************************************************
-Cel::Cel()
-{
-    data = NULL;
-    width = height = transcol = 0;
-    mirror = false;
-}
+Cel::Cel() :
+    width(0), height(0), transcol(0), mirror(false), data()
+{ }
 
 //*************************************************
 void Cel::deinit()
 {
     if (data)
         free(data);
-    data = NULL;
+    data = nullptr;
     width = height = transcol = 0;
     mirror = false;
 }
@@ -646,7 +640,7 @@ void Cel::setH(int h)
 //*************************************************
 void Cel::clear()
 {
-    memset(data, transcol, width * 2 * height);
+    memset(data, transcol, static_cast<size_t>(width) * 2 * height);
 }
 
 //*************************************************

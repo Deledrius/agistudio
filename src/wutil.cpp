@@ -26,6 +26,7 @@
 
 
 QColor egacolor[16];
+QList<QRgb> egaColorTable;
 
 //**********************************************
 void make_egacolors(void)
@@ -51,6 +52,10 @@ void make_egacolors(void)
     egacolor[13] = QColor(0xff, 0x50, 0xff);    // lightmagenta
     egacolor[14] = QColor(0xff, 0xff, 0x50);    // yellow
     egacolor[15] = QColor(0xff, 0xff, 0xff);    // white
+
+    // Create color table
+    for (int c = 0; c < 16; c++)
+        egaColorTable.append(egacolor[c].rgb());
 
     ok = true;
 }
