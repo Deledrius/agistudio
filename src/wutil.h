@@ -44,6 +44,7 @@ public:
 
 //*****************************************************
 extern QColor egacolor[];
+extern QList<QRgb> egaColorTable;
 extern void make_egacolors(void);
 
 #endif

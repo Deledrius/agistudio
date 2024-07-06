@@ -157,8 +157,8 @@ protected:
     void delete_view();
 
     void undo_cel();
-    void copy_cel();
-    void paste_cel();
+    void copy_to_clipboard();
+    void paste_from_clipboard();
 
     void next_loop();
     void previous_loop();
