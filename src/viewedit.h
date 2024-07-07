@@ -183,6 +183,7 @@ protected:
     void clear_cel();
     void flipv_cel();
     void fliph_cel();
+    void load_cel();
 
     void set_transcolor();
     void change_mode(int);

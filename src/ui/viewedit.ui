@@ -659,6 +659,8 @@
     <addaction name="separator"/>
     <addaction name="actionFlipCelHorizontally"/>
     <addaction name="actionFlipCelVertically"/>
+    <addaction name="separator"/>
+    <addaction name="actionLoadCelFromFile"/>
    </widget>
    <widget class="QMenu" name="menu_Animate">
     <property name="title">
@@ -841,6 +843,11 @@
   <action name="actionAnimationOptions">
    <property name="text">
     <string>Animation &amp;Options...</string>
+   </property>
+  </action>
+  <action name="actionLoadCelFromFile">
+   <property name="text">
+    <string>L&amp;oad from file...</string>
    </property>
   </action>
  </widget>
