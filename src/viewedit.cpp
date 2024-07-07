@@ -24,6 +24,7 @@
 #include <QClipboard>
 #include <QCloseEvent>
 #include <QFileDialog>
+#include <QImageReader>
 #include <QInputDialog>
 #include <QListWidget>
 #include <QMessageBox>
@@ -105,6 +106,7 @@ ViewEdit::ViewEdit(QWidget *parent, const char *name, int win_num, ResourcesWin 
     connect(actionClearCel, &QAction::triggered, this, &ViewEdit::clear_cel);
     connect(actionFlipCelHorizontally, &QAction::triggered, this, &ViewEdit::fliph_cel);
     connect(actionFlipCelVertically, &QAction::triggered, this, &ViewEdit::flipv_cel);
+    connect(actionLoadCelFromFile, &QAction::triggered, this, &ViewEdit::load_cel);
 
     connect(actionAnimationOptions, &QAction::triggered, this, &ViewEdit::animate_cb);
     connect(actionEditorHelp, &QAction::triggered, this, &ViewEdit::show_help);
@@ -437,6 +439,33 @@ void ViewEdit::fliph_cel()
     view->loops[curIndex()].cels[view->CurCel].mirrorh();
     DisplayView();
     changed = true;
+}
+
+//*********************************************
+void ViewEdit::load_cel()
+{
+    auto formats = QImageReader::supportedImageFormats();
+    QStringList filters;
+    for (const auto &format : formats)
+        filters.append("*." + format);
+
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Image File"), game->srcdir.c_str(), tr("Images (%1)").arg(filters.join(" ")));
+    if (!fileName.isNull()) {
+        auto image = QImage(fileName).convertToFormat(QImage::Format_Indexed8, egaColorTable);
+
+        Cel croppedcel(image.width() / 2, image.height(), image.pixelIndex(0, 0), false);
+        if (croppedcel.data) {
+            for (int y = 0; y < croppedcel.height; y++) {
+                for (int x = 0; x < croppedcel.width * 2; x++)
+                    croppedcel.data[(croppedcel.width * 2 * y) + x] = image.pixelIndex(x, y);
+            }
+            view->loops[curIndex()].cels[view->CurCel].copy(croppedcel);
+
+            showcelpar();
+            DisplayView();
+            changed = true;
+        }
+    }
 }
 
 //*********************************************
