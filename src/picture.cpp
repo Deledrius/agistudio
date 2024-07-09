@@ -661,7 +661,6 @@ int Picture::save(const std::string &filename)
 void Picture::save()
 {
     byte *ptr = ResourceData.Data;
-    actionListIter pos;
 
     if (picCodes.empty()) {   /* Black picture */
         *ptr = action_codes_end; /* End of picture marker */
@@ -669,13 +668,8 @@ void Picture::save()
         return;
     }
 
-    pos = picCodes.begin();
-    *ptr++ = *pos;
-
-    do {
-        pos++;
-        *ptr++ = *pos;
-    } while (pos != picCodes.end());
+    for (const auto &picCode : picCodes)
+        *ptr++ = picCode;
 
     *ptr++ = action_codes_end; /* End of picture marker */
     ResourceData.Size = (int)(ptr - ResourceData.Data);
