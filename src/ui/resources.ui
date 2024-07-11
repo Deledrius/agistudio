@@ -154,12 +154,12 @@
   </action>
   <action name="actionAdd">
    <property name="text">
-    <string>&amp;Add</string>
+    <string>&amp;Add...</string>
    </property>
   </action>
   <action name="actionExtract">
    <property name="text">
-    <string>&amp;Extract</string>
+    <string>&amp;Extract...</string>
    </property>
   </action>
   <action name="actionDelete">
@@ -169,7 +169,7 @@
   </action>
   <action name="actionRenumber">
    <property name="text">
-    <string>&amp;Renumber</string>
+    <string>&amp;Renumber...</string>
    </property>
   </action>
   <action name="actionImportBitmap">
