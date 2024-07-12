@@ -25,6 +25,7 @@
 #include <unistd.h>
 #endif
 #include <sys/stat.h>
+#include <algorithm>
 
 #include <QImage>
 #include <QColor>
@@ -1074,16 +1075,14 @@ void Picture::addPatCode()
 
 //**************************************************
 void Picture::adjustDisp(int *dX, int *dY)
-//for pen
 {
-    if (*dX > 6)
-        *dX = 6;
-    if (*dX < -6)
-        *dX = -6;
-    if (*dY > 7)
-        *dY = 7;
-    if (*dY < -7)
-        *dY = -7;
+    // Clamp values for pen displacement
+    //
+    // Due to the encoding format, dX cannot be <=
+    // -7 as it would result in a byte >= 0xF0,
+    // which signals a new action code.
+    *dX = std::clamp(*dX, -6, 7);
+    *dY = std::clamp(*dY, -7, 7);
 }
 
 //**************************************************
