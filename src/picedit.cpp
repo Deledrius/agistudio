@@ -154,7 +154,7 @@ PicEdit::PicEdit(QWidget *parent, const char *name, int win_num, ResourcesWin *r
         canvas = new PCanvas(this, 0, this);
         canvas->setMinimumSize(canvas->pixsize * MAX_W + canvas->x0 + 10, canvas->pixsize * MAX_HH + canvas->y0 + 10);
         canvas->resize(canvas->pixsize * MAX_W + canvas->x0, canvas->pixsize * MAX_HH + canvas->x0);
-        canvas->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+        canvas->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         canvasLayout->setAlignment(Qt::AlignLeft | Qt::AlignTop);
         canvasLayout->addWidget(canvas);
     }
@@ -398,25 +398,15 @@ void PicEdit::background()
 //*********************************************
 void PicEdit::zoom_minus()
 {
-    if (canvas->pixsize > 1) {
+    if (canvas->pixsize > 1)
         canvas->setPixsize(canvas->pixsize - 1);
-        int w, h;
-        w = canvas->cur_w + 4;
-        h = canvas->cur_h + 4;
-        canvas->resize(w, h);
-    }
 }
 
 //*********************************************
 void PicEdit::zoom_plus()
 {
-    if (canvas->pixsize < 4) {
+    if (canvas->pixsize < 4)
         canvas->setPixsize(canvas->pixsize + 1);
-        int w, h;
-        w = canvas->cur_w + 4;
-        h = canvas->cur_h + 4;
-        canvas->resize(w, h);
-    }
 }
 
 //*********************************************
