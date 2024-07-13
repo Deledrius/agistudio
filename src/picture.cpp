@@ -21,14 +21,11 @@
  */
 
 
-#ifndef _WIN32
-#include <unistd.h>
-#endif
-#include <sys/stat.h>
 #include <algorithm>
 
-#include <QImage>
 #include <QColor>
+#include <QFileInfo>
+#include <QImage>
 #include <QStringList>
 
 #include "picture.h"
@@ -428,7 +425,7 @@ void Picture::relativeDraw(actionListIter *pos)
 /**************************************************************************
 ** fill
 **
-** Agi flood fill.  (drawing action 0xF8)
+** AGI flood fill.  (drawing action 0xF8)
 **************************************************************************/
 void Picture::fill(actionListIter *pos)
 {
@@ -606,13 +603,11 @@ int Picture::open(const std::string &filename)
     FILE *fptr = fopen(filename.c_str(), "rb");
 
     if (fptr == NULL) {
-        menu->errmes("Can't open file %s ! ", filename.c_str());
+        menu->errmes("Can't open file %s!", filename.c_str());
         return 1;
     }
 
-    struct stat buf;
-    fstat(fileno(fptr), &buf);
-    ResourceData.Size = buf.st_size;
+    ResourceData.Size = QFileInfo(filename.c_str()).size();
     fread(ResourceData.Data, ResourceData.Size, 1, fptr);
     fclose(fptr);
 
@@ -649,7 +644,7 @@ int Picture::save(const std::string &filename)
     FILE *fptr = fopen(filename.c_str(), "wb");
 
     if (fptr == NULL) {
-        menu->errmes("Can't open file %s ! ", filename.c_str());
+        menu->errmes("Can't open file %s!", filename.c_str());
         return 1;
     }
     save();
