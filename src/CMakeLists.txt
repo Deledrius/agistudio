@@ -120,13 +120,22 @@ set(AGIStudio_UIRESOURCES
 )
 qt_add_resources(RCC_SOURCES ${AGIStudio_UIRESOURCES})
 
+# Create a group for the template project files
+set(AGIStudio_TEMPLATEFILES 
+	../template/logdir ../template/object ../template/picdir ../template/snddir ../template/viewdir ../template/vol.0 ../template/words.tok )
+source_group("Template Files" FILES ${AGIStudio_TEMPLATEFILES})
+set_source_files_properties(${AGIStudio_TEMPLATEFILES} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources/template")
+install(FILES ${AGIStudio_TEMPLATEFILES} DESTINATION ${CMAKE_INSTALL_BINDIR}/template)
+
+# Create a group for the AGIStudio project files
 source_group("Header Files" FILES ${AGIStudio_HEADERS})
 source_group("Resource Files" FILES ${AGIStudio_RESOURCES} ${AGIStudio_UIRESOURCES})
 source_group("Source Files" FILES ${AGIStudio_SOURCES})
 source_group("UI Files" FILES ${AGIStudio_UI})
 
 add_executable(AGIStudio WIN32 MACOSX_BUNDLE
-               ${AGIStudio_HEADERS} ${AGIStudio_SOURCES} ${AGIStudio_RESOURCES} ${AGIStudio_UI} ${RCC_SOURCES})
+               ${AGIStudio_HEADERS} ${AGIStudio_SOURCES} ${AGIStudio_RESOURCES} ${AGIStudio_UI} ${RCC_SOURCES}
+               ${AGIStudio_TEMPLATEFILES} )
 
 target_link_libraries(AGIStudio PRIVATE Qt6::Core Qt6::Widgets Qt6::Multimedia)
 
