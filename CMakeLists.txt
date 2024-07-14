@@ -14,12 +14,6 @@ message(STATUS "Project version: " ${PROJECT_VERSION_FULL})
 set(CMAKE_CXX_STANDARD 20)
 include(GNUInstallDirs)
 
-# Create a group for the help files
-file(GLOB AGIStudio_HELPFILES help/*.html help/*.css help/*.png)
-source_group("Help Files" FILES ${AGIStudio_HELPFILES})
-add_custom_target(AGIStudio-Help SOURCES ${AGIStudio_HELPFILES})
-install(FILES ${AGIStudio_HELPFILES} DESTINATION ${CMAKE_INSTALL_BINDIR}/help)
-
 # Create the main program
 add_subdirectory(src)
 
