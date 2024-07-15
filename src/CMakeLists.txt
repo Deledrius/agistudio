@@ -7,10 +7,6 @@ if(MINGW)
     add_definitions(-D_WIN32_WINNT=_WIN32_WINNT_WIN6)
 endif(MINGW)
 
-if(APPLE)
-    set(CMAKE_CXX_FLAGS "-std=c++11 -stdlib=libc++")
-endif(APPLE)
-
 set(AGIStudio_HEADERS
     agicommands.h
     game.h
