@@ -137,7 +137,7 @@ else ()
     install(FILES ${AGIStudio_HELPFILES} DESTINATION ${CMAKE_INSTALL_BINDIR}/help)
 endif()
 
-# Create a group for the AGIStudio project files
+# Create groups for the AGIStudio project files
 source_group("Header Files" FILES ${AGIStudio_HEADERS})
 source_group("Resource Files" FILES ${AGIStudio_RESOURCES} ${AGIStudio_UIRESOURCES})
 source_group("Source Files" FILES ${AGIStudio_SOURCES})
