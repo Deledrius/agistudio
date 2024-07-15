@@ -12,7 +12,11 @@ project(AGIStudio
 message(STATUS "Project version: " ${PROJECT_VERSION_FULL})
 
 set(CMAKE_CXX_STANDARD 20)
-include(GNUInstallDirs)
+if(WIN32)
+	set(CMAKE_INSTALL_BINDIR .)
+else()
+	include(GNUInstallDirs)
+endif()
 
 # Create the main program
 add_subdirectory(src)
@@ -26,6 +30,8 @@ set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION_FULL})
 set(CPACK_PACKAGE_INSTALL_DIRECTORY "AGIStudio")
 set(CPACK_PACKAGE_EXECUTABLES "AGIStudio;AGI Studio")
 
+set(CPACK_NSIS_EXECUTABLES_DIRECTORY ${CMAKE_INSTALL_BINDIR})
+set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
 set(CPACK_NSIS_IGNORE_LICENSE_PAGE ON)
 
 include(CPack)
