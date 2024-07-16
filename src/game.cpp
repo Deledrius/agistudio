@@ -1248,12 +1248,16 @@ int Game::ReadV3Resource(char ResourceType1_c, int ResourceID1)
 void Game::reset_settings(void)
 {
 #ifdef _WIN32
-    QString template_dir = QDir::cleanPath(QDir::currentPath() + QString("\\template\\"));
-    QString help_dir = QDir::cleanPath(QDir::currentPath() + QString("\\help\\"));
+    QString template_dir = QDir::cleanPath(QApplication::applicationDirPath() + "/template/");
+    QString help_dir = QDir::cleanPath(QApplication::applicationDirPath() + "/help/");
+#elif __APPLE__
+    QString template_dir = QDir::cleanPath(QApplication::applicationDirPath() + "/../Resources/template/");
+    QString help_dir = QDir::cleanPath(QApplication::applicationDirPath() + "/../Resources/help/");
 #else
     QString template_dir = "/usr/share/agistudio/template";
     QString help_dir = "/usr/share/agistudio/help";
 #endif
+
     settings->setValue("DefaultResourceType", VIEW);                // Default resource type in resources window at startup.
     settings->setValue("PictureEditorStyle", P_ONE);                // PicEdit Window style.
     settings->setValue("ExtractLogicAsText", true);                 // Default for 'extract' function.
