@@ -40,9 +40,6 @@
 #include "viewedit.h"
 #include "wutil.h"
 
-#include "right_x.xpm"
-#include "left_x.xpm"
-
 
 //*****************************************
 Preview::Preview(QWidget *parent, const char  *name, ResourcesWin *res):
@@ -156,8 +153,8 @@ Preview::Preview(QWidget *parent, const char  *name, ResourcesWin *res):
 
     int row = 0;
     int col = 0;
-    QPixmap pright = QPixmap(right_x);
-    QPixmap pleft = QPixmap(left_x);
+    QPixmap pright = QPixmap(":/icons/right_x.xpm");
+    QPixmap pleft = QPixmap(":/icons/left_x.xpm");
 
     QLabel *looplabel = new QLabel("Loop:", w_view);
     grid1->addWidget(looplabel, row, col, Qt::AlignRight);

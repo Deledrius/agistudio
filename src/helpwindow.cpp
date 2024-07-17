@@ -29,10 +29,6 @@
 #include "helpwindow.h"
 #include "menu.h"
 
-#include "home.xpm"
-#include "forward.xpm"
-#include "back.xpm"
-
 
 HelpWindow *helpwindow, *helpwindow1;
 
@@ -70,9 +66,9 @@ HelpWindow::HelpWindow(const QString &home_, const QString &_path, QWidget *pare
 
     QMenu *go = new QMenu(this);
     go->setTitle("&Go");
-    backwardAction = go->addAction(QPixmap(back), "&Backward", Qt::ALT | Qt::Key_Left, browser, SLOT(backward()));
-    forwardAction = go->addAction(QPixmap(forward), "&Forward", Qt::ALT | Qt::Key_Right, browser, SLOT(forward()));
-    go->addAction(QPixmap(home), "&Home", browser, SLOT(home()));
+    backwardAction = go->addAction(QPixmap(":/icons/back.xpm"), "&Backward", Qt::ALT | Qt::Key_Left, browser, SLOT(backward()));
+    forwardAction = go->addAction(QPixmap(":/icons/forward.xpm"), "&Forward", Qt::ALT | Qt::Key_Right, browser, SLOT(forward()));
+    go->addAction(QPixmap(":/icons/home.xpm"), "&Home", browser, SLOT(home()));
 
     hist = new QMenu(this);
     hist->setTitle("H&istory");
@@ -108,21 +104,21 @@ HelpWindow::HelpWindow(const QString &home_, const QString &_path, QWidget *pare
     addToolBar(toolbar);
 
     QAction *bButton;
-    bButton = new QAction(QPixmap(back), "Backward", browser);
+    bButton = new QAction(QPixmap(":/icons/back.xpm"), "Backward", browser);
     connect(bButton, &QAction::triggered, browser, &QTextBrowser::backward);
     connect(browser, SIGNAL(backwardAvailable(bool)), bButton, SLOT(setEnabled(bool)));
     bButton->setEnabled(false);
     toolbar->addAction(bButton);
 
     QAction *fButton;
-    fButton = new QAction(QPixmap(forward), "Forward", browser);
+    fButton = new QAction(QPixmap(":/icons/forward.xpm"), "Forward", browser);
     connect(fButton, &QAction::triggered, browser, &QTextBrowser::forward);
     connect(browser, SIGNAL(forwardAvailable(bool)), fButton, SLOT(setEnabled(bool)));
     fButton->setEnabled(false);
     toolbar->addAction(fButton);
 
     QAction *homeButton;
-    homeButton = new QAction(QPixmap(home), "Home", browser);
+    homeButton = new QAction(QPixmap(":/icons/home.xpm"), "Home", browser);
     connect(homeButton, &QAction::triggered, browser, &QTextBrowser::home);
     toolbar->addAction(homeButton);
 
