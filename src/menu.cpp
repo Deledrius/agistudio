@@ -43,8 +43,6 @@
 #include "wordsedit.h"
 #include "wutil.h"
 
-#include "logo.xpm"
-
 
 Menu *menu;
 WindowList *window_list;
@@ -671,7 +669,7 @@ About::About(QWidget *parent, const char *name)
     QBoxLayout *all = new QVBoxLayout(this);
 
     QLabel *alogo = new QLabel(this);
-    alogo->setPixmap(QPixmap(logo));
+    alogo->setPixmap(QPixmap(":/icons/logo.xpm"));
     alogo->setAlignment(Qt::AlignHCenter);
     alogo->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum));
     all->addWidget(alogo);
