@@ -142,7 +142,7 @@ ViewEdit::ViewEdit(QWidget *parent, const char *name, int win_num, ResourcesWin 
 }
 
 //*********************************************
-void ViewEdit::save(char *filename)
+void ViewEdit::save(const std::string &filename)
 {
     view->save(filename);
     changed = false;
@@ -179,7 +179,7 @@ void ViewEdit::open(int ResNum)
 }
 
 //*********************************************
-void ViewEdit::open(char *filename)
+void ViewEdit::open(const std::string &filename)
 {
     if (view->open(filename))
         return;
@@ -326,7 +326,7 @@ void ViewEdit::open_file()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open View File"), game->srcdir.c_str(), tr("View Files (view*.*);;All Files (*)"));
     if (!fileName.isNull())
-        open(fileName.toLatin1().data());
+        open(fileName.toStdString());
 }
 
 //*********************************************
@@ -347,7 +347,7 @@ void ViewEdit::save_file()
 {
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save View File"), game->srcdir.c_str(), tr("View Files (view*.*);;All Files (*)"));
     if (!fileName.isNull())
-        save(fileName.toLatin1().data());
+        save(fileName.toStdString());
 }
 
 //*********************************************

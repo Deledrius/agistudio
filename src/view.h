@@ -81,10 +81,9 @@ public:
     bool opened;
     std::string Description;
     Loop *loops;
-    void open();
     void init();
     int open(int resnum);
-    int open(char *filename);
+    int open(const std::string &filename);
     void newView();
     void ReadViewInfo();
     void LoadCel(int loopno, int celno);
@@ -97,7 +96,7 @@ public:
     void fixmirror();
     void printmirror();
     void save();
-    int save(char *filename);
+    int save(const std::string &filename);
     int save(int resnum);
 };
 

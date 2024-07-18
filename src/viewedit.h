@@ -210,8 +210,8 @@ protected:
     void showEvent(QShowEvent *);
     void hideEvent(QHideEvent *);
     void keyPressEvent(QKeyEvent *);
-    void open(char *filename);
-    void save(char *filename);
+    void open(const std::string &filename);
+    void save(const std::string &filename);
     void deinit();
     void display();
     void DisplayView();
