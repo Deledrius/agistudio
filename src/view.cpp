@@ -20,10 +20,7 @@
  */
 
 
-#ifndef _WIN32
-#include <unistd.h>
-#endif
-#include <sys/stat.h>
+#include <filesystem>
 
 #include "game.h"
 #include "menu.h"
@@ -32,7 +29,10 @@
 
 static int ResPos, DescPos, ResSize;
 //**************************************************
-View::View() : Description(), loops(nullptr), opened(false), NumLoops(), CurLoop(), CurCel() {}
+View::View() :
+    Description(), loops(), opened(false),
+    NumLoops(), CurLoop(), CurCel()
+{ }
 
 //**************************************************
 void View::init()
@@ -44,17 +44,15 @@ void View::init()
 }
 
 //*************************************************
-int View::open(char *filename)
+int View::open(const std::string &filename)
 {
-    FILE *fptr = fopen(filename, "rb");
-    if (fptr == NULL) {
-        menu->errmes("Can't open file %s ! ", filename);
+    FILE *fptr = fopen(filename.c_str(), "rb");
+    if (fptr == nullptr) {
+        menu->errmes("Can't open file %s!", filename.c_str());
         return 1;
     }
 
-    struct stat buf;
-    fstat(fileno(fptr), &buf);
-    ResourceData.Size = buf.st_size;
+    ResourceData.Size = std::filesystem::file_size(filename);
     fread(ResourceData.Data, ResourceData.Size, 1, fptr);
     fclose(fptr);
 
@@ -214,12 +212,12 @@ void View::LoadCel(int loopno, int celno)
 }
 
 //*************************************************
-int View::save(char *filename)
+int View::save(const std::string &filename)
 {
-    FILE *fptr = fopen(filename, "wb");
+    FILE *fptr = fopen(filename.c_str(), "wb");
 
-    if (fptr == NULL) {
-        menu->errmes("Can't open file %s ! ", filename);
+    if (fptr == nullptr) {
+        menu->errmes("Can't open file %s!", filename.c_str());
         return 1;
     }
     save();
@@ -239,7 +237,7 @@ int View::save(int ResNum)
 void WriteByte(byte b)
 {
     if (ResPos >= MaxResourceSize) {
-        menu->errmes("Resource too big !");
+        menu->errmes("Resource too big!");
         return;
     }
     ResourceData.Data[ResPos++] = b;
@@ -513,7 +511,7 @@ void View::appendLoop()
 
     delete  [] loops;
     loops = loops1;
-    NumLoops++;;
+    NumLoops++;
 }
 
 //*************************************************
@@ -754,8 +752,10 @@ void Cel::copy(Cel c)
         free(data);
     data = (byte *)malloc(width * 2 * height);
 
-    for (int i = 0; i < width * 2 * height; i++)
-        data[i] = c.data[i];
+    if (data) {
+        for (int i = 0; i < width * 2 * height; i++)
+            data[i] = c.data[i];
+    }
 }
 
 //*************************************************
@@ -798,12 +798,10 @@ void Cel::fill(int xn, int yn, byte c)
 }
 
 //**************************************************
-Loop::Loop()
-{
-    mirror = mirror1 = -1;
-    cels = NULL;
-    CelLoc = NULL;
-}
+Loop::Loop() :
+    mirror(-1), mirror1(-1), cels(),
+    CelLoc(), LoopLoc(), NumCels(0)
+{ }
 
 //**************************************************
 void Loop::numcels(int n)
