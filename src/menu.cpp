@@ -92,6 +92,8 @@ Menu::Menu(QWidget *parent, const char *name)
     warn = new QMessageBox(QMessageBox::Warning, tr("AGI Studio"), tr(""));
 
     // Menu signal handlers
+    connect(actionNewBlank, &QAction::triggered, this, &Menu::blank);
+    connect(actionNewFromTemplate, &QAction::triggered, this, &Menu::from_template);
     connect(actionGameOpen, &QAction::triggered, this, &Menu::open_game);
     connect(actionGameClose, &QAction::triggered, this, &Menu::close_game);
     connect(actionGameRun, &QAction::triggered, this, &Menu::run_game);
