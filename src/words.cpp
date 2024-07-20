@@ -120,7 +120,7 @@ int WordList::read(const std::string &filename)
 
     FILE *fptr = fopen(filename.c_str(), "rb");
     if (fptr == NULL) {
-        menu->errmes("Error opening file %s", filename.c_str());
+        menu->errmes("Error opening file '%s'.", filename.c_str());
         return 1;
     }
 
@@ -128,7 +128,7 @@ int WordList::read(const std::string &filename)
     fstat(fileno(fptr), &buf);
     int size = buf.st_size;
     if (size > MaxResourceSize) {
-        menu->errmes("Error:  File %s is too big (>%d bytes)", filename.c_str(), MaxResourceSize);
+        menu->errmes("Error:  File '%s' is too big (>%d bytes).", filename.c_str(), MaxResourceSize);
         return 1;
     }
 
@@ -167,7 +167,7 @@ int WordList::read(const std::string &filename)
                 NewWordGroup[GroupIndex].Words.append(CurWord.c_str());
             else {
                 if (NumGroups >= MaxWordGroups) {
-                    menu->errmes("Error ! Too many groups !");
+                    menu->errmes("Error: Too many groups!");
                     return 1;
                 }
                 NumGroups++;
@@ -244,12 +244,11 @@ int WordList::save(const std::string &filename)
             NumEmptyWordGroups++;
     }
     if (NumEmptyWordGroups > 0) {
-        sprintf(tmp, "Warning: There are %d empty word groups.\nThese will not be saved.", NumEmptyWordGroups);
-        menu->warnmes(tmp);
+        menu->warnmes("Warning: There are %d empty word groups.\nThese will not be saved.", NumEmptyWordGroups);
     }
 
     if ((fptr = fopen(filename.c_str(), "wb")) == NULL) {
-        menu->errmes("Error opening file %s", filename.c_str());
+        menu->errmes("Error opening file '%s'.", filename.c_str());
         return 1;
     }
 
@@ -418,7 +417,7 @@ bool WordList::InsertWordGroup(int GroupNum)
     bool InsertPositionFound;
 
     if (NumGroups >= MaxWordGroups) {
-        menu->errmes("Error! Too many groups (max %d).", MaxWordGroups);
+        menu->errmes("Error: Too many groups (max %d).", MaxWordGroups);
         return false;
     }
 

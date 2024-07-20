@@ -264,7 +264,7 @@ bool RoomGen::bad_int(QLineEdit *w, int *res, int nmin, int nmax, bool ignore, c
     if ((*res == -1) && ignore)
         return false;
     if ((*res < nmin) || (*res > nmax)) {
-        menu->errmes("%s must be between %d and %d !", text, nmin, nmax);
+        menu->errmes("%s must be between %d and %d!", text, nmin, nmax);
         return true;
     }
     return false;
@@ -276,7 +276,7 @@ bool RoomGen::bad_int(int res, int nmin, int nmax, bool ignore, const char *text
     if (res == -1 && ignore)
         return false;
     if (res < nmin || res > nmax) {
-        menu->errmes("%s must be between %d and %d !", text, nmin, nmax);
+        menu->errmes("%s must be between %d and %d!", text, nmin, nmax);
         return true;
     }
     return false;
@@ -308,7 +308,7 @@ bool RoomGen::bad_input()
             yn[i] = str.toInt();
         if (rn[i] == -1 || xn[i] == -1 || yn[i] == -1) {
             if (!(rn[i] == -1 && xn[i] == -1 && yn[i] == -1)) {
-                menu->errmes("Ego positioning: incomplete input !");
+                menu->errmes("Ego positioning: incomplete input!");
                 return true;
             }
         } else {

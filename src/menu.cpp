@@ -19,7 +19,8 @@
  */
 
 
-#include <sys/stat.h>
+#include <cstdarg>
+#include <vector>
 
 #include <QActionGroup>
 #include <QCloseEvent>
@@ -155,7 +156,7 @@ int get_win()
             break;
     }
     if (n == MAXWIN) {
-        menu->errmes("Too many open windows !");
+        menu->errmes("Too many open windows!");
         return -1;
     }
     return n;
@@ -320,7 +321,7 @@ void Menu::run_game()
 {
     QString program = game->settings->value("InterpreterPath").toString();
     if (program.isEmpty()) {
-        this->errmes("Cannot Run Game", "No Interpreter has been configured.");
+        this->errmes("Cannot Run Game.\nNo Interpreter has been configured.");
         return;
     }
 
@@ -621,43 +622,33 @@ void Menu::about_qt()
     QMessageBox::aboutQt(this, tr("AGI studio"));
 }
 
-//**********************************************
-void Menu::errmes(const char *caption, const char *fmt, ...)
-{
-    va_list argp;
-
-    va_start(argp, fmt);
-    err->setText(QString::asprintf(fmt, argp));
-    va_end(argp);
-    err->setWindowTitle(caption);
-    err->adjustSize();
-    err->show();
-}
-
 //*************************************************
 void Menu::errmes(const char *fmt, ...)
 {
-    va_list argp;
+    std::va_list argp;
 
     va_start(argp, fmt);
-    err->setText(QString::asprintf(fmt, argp));
+    std::vector<char> buffer(std::vsnprintf(nullptr, 0, fmt, argp) + 1);
+    vsnprintf(buffer.data(), buffer.size(), fmt, argp);
+    err->setText(buffer.data());
     va_end(argp);
+
     err->setWindowTitle("AGI studio");
-    err->adjustSize();
     err->show();
 }
 
 //**********************************************
 void Menu::warnmes(const char *fmt, ...)
 {
-    va_list argp;
+    std::va_list argp;
 
     va_start(argp, fmt);
-    warn->setText(QString::asprintf(fmt, argp));
+    std::vector<char> buffer(std::vsnprintf(nullptr, 0, fmt, argp) + 1);
+    vsnprintf(buffer.data(), buffer.size(), fmt, argp);
+    warn->setText(buffer.data());
     va_end(argp);
 
     warn->setWindowTitle("AGI studio");
-    warn->adjustSize();
     warn->show();
 }
 

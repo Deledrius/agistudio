@@ -375,7 +375,7 @@ static void extract(const std::string &filename, int restype, int resnum)
 
     QFile outfile(filename.c_str());
     if (!outfile.open(QIODevice::WriteOnly)) {
-        menu->errmes("Can't open file %s!", filename.c_str());
+        menu->errmes("Can't open file '%s'!", filename.c_str());
         return;
     }
 
@@ -560,13 +560,13 @@ static int load_resource(const std::string &filename, int restype)
 
     QFile infile(filename.c_str());
     if (!infile.open(QIODevice::ReadOnly)) {
-        menu->errmes("Can't open file %s!", filename.c_str());
+        menu->errmes("Can't open file '%s'!", filename.c_str());
         return 1;
     }
 
     int size = QFileInfo(infile).size();
     if (size >= MaxResourceSize) {
-        menu->errmes("File %s is too big!", filename.c_str());
+        menu->errmes("File '%s' is too big!", filename.c_str());
         infile.close();
         return 1;
     }
@@ -615,7 +615,7 @@ void AddResource::ok_cb()
     int num = number->text().toInt();
 
     if (num < 0 || num > 255) {
-        menu->errmes("Resource number must be between 0 and 255 !");
+        menu->errmes("Resource number must be between 0 and 255!");
         return;
     }
 
