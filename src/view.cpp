@@ -48,7 +48,7 @@ int View::open(const std::string &filename)
 {
     FILE *fptr = fopen(filename.c_str(), "rb");
     if (fptr == nullptr) {
-        menu->errmes("Can't open file %s!", filename.c_str());
+        menu->errmes("Can't open file '%s'!", filename.c_str());
         return 1;
     }
 
@@ -217,7 +217,7 @@ int View::save(const std::string &filename)
     FILE *fptr = fopen(filename.c_str(), "wb");
 
     if (fptr == nullptr) {
-        menu->errmes("Can't open file %s!", filename.c_str());
+        menu->errmes("Can't open file '%s'!", filename.c_str());
         return 1;
     }
     save();

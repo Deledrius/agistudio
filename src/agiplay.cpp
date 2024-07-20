@@ -93,7 +93,7 @@ int init_sound()
 
     QAudioDevice info(QMediaDevices::defaultAudioOutput());
     if (!info.isFormatSupported(format)) {
-        menu->errmes("Cannot play audio", "Raw audio format not supported by backend.");
+        menu->errmes("Cannot play audio:\nRaw audio format not supported by backend.");
         return -1;
     }
 
@@ -241,7 +241,7 @@ void play_song(unsigned char *song, int size)
 void play_sound(int ResNum)
 {
     if (init_sound() != 0) {
-        menu->errmes("Can't initialize sound !");
+        menu->errmes("Can't initialize sound!");
         return;
     }
 
@@ -257,13 +257,13 @@ void play_sound(int ResNum)
 void play_sound(const std::string &filename)
 {
     if (init_sound() != 0) {
-        menu->errmes("Can't initialize sound !");
+        menu->errmes("Can't initialize sound!");
         return;
     }
 
     FILE *fptr = fopen(filename.c_str(), "rb");
     if (fptr == NULL) {
-        menu->errmes("Can't open file %s !", filename.c_str());
+        menu->errmes("Can't open file '%s'!", filename.c_str());
         return;
     }
     struct stat buf;

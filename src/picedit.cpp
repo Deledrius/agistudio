@@ -1019,7 +1019,7 @@ bool PCanvas::focusNextPrevChild(bool)
 void PCanvas::load_bg(QString &filename)
 {
     if (!bgpix.load(filename)) {
-        menu->errmes(QString("Can't open file %s!").arg(filename).toStdString().c_str());
+        menu->errmes("Can't open file '%s'!", filename.toStdString().c_str());
         return;
     }
     bg_loaded = true;

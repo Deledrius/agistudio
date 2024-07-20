@@ -114,7 +114,7 @@ int Game::open(const std::string &gamepath)
             std::string DIRFilename = dir + "/" + ResTypeAbbrv[CurResType] + "dir";
             fptr = fopen(DIRFilename.c_str(), "rb");
             if (fptr == NULL) {
-                menu->errmes("Error: can't open %s !", DIRFilename.c_str());
+                menu->errmes("Error: can't open '%s'!", DIRFilename.c_str());
                 ErrorOccured = true;
                 break;
             } else {
@@ -122,7 +122,7 @@ int Game::open(const std::string &gamepath)
                 fstat(fileno(fptr), &buf);
                 int size = buf.st_size;
                 if (size >  768) {
-                    menu->errmes("Error: %s  is too big (should not be mode than 768 bytes) !", DIRFilename.c_str());
+                    menu->errmes("Error: '%s' is too big (should not be mode than 768 bytes)!", DIRFilename.c_str());
                     ErrorOccured = true;
                     break;
                 } else {   //read resource info
@@ -145,14 +145,14 @@ int Game::open(const std::string &gamepath)
         std::string DIRFilename = dir + "/" + ID + "dir";
         fptr = fopen(DIRFilename.c_str(), "rb");
         if (fptr == NULL) {
-            menu->errmes("Error: can't open %s ! ", DIRFilename.c_str());
+            menu->errmes("Error: can't open '%s'!", DIRFilename.c_str());
             ErrorOccured = true;
         } else {
             struct stat buf;
             fstat(fileno(fptr), &buf);
             int size = buf.st_size;
             if (size > 3080) {
-                menu->errmes("Error: %s is too big (should not be mode than 3080 bytes)!", DIRFilename.c_str());
+                menu->errmes("Error: '%s' is too big (should not be mode than 3080 bytes)!", DIRFilename.c_str());
                 ErrorOccured = true;
             } else {
                 fread(DirData, size, 1, fptr);
@@ -182,7 +182,7 @@ int Game::open(const std::string &gamepath)
                             ErrorOccured = true;
                             break;
                         } else if (DirOffset + DirSize > size) {
-                            menu->errmes("Error: Directory is beyond end of %s file!", DIRFilename.c_str());
+                            menu->errmes("Error: Directory is beyond end of '%s' file!", DIRFilename.c_str());
                             ErrorOccured = true;
                             break;
                         } else {
@@ -533,7 +533,7 @@ int Game::ReadResource(char ResType_c, int ResNum)
     sprintf(tmp, "%s/%s", dir.c_str(), ResourceInfo[ResType][ResNum].Filename);
     FILE *fptr = fopen(tmp, "rb");
     if (fptr == NULL) {
-        menu->errmes("Error reading file %s/%s", dir.c_str(), ResourceInfo[ResType][ResNum].Filename);
+        menu->errmes("Error reading file '%s/%s'!", dir.c_str(), ResourceInfo[ResType][ResNum].Filename);
         return 1;
     }
 
@@ -541,7 +541,7 @@ int Game::ReadResource(char ResType_c, int ResNum)
     fstat(fileno(fptr), &buf);
     int size = buf.st_size;
     if (ResourceInfo[ResType][ResNum].Loc > size) {
-        menu->errmes("Error: %s: Specified resource location is past end of file", ResourceInfo[ResType][ResNum].Filename);
+        menu->errmes("Error reading '%s': Specified resource location is past end of file.", ResourceInfo[ResType][ResNum].Filename);
         return 1;
     }
 
@@ -549,7 +549,7 @@ int Game::ReadResource(char ResType_c, int ResNum)
     fread(&msbyte, 1, 1, fptr);
     fread(&lsbyte, 1, 1, fptr);
     if (!(msbyte == 0x12 && lsbyte == 0x34)) {
-        menu->errmes("Error: %s: Resource signature not found", ResourceInfo[ResType][ResNum].Filename);
+        menu->errmes("Error reading '%s': Resource signature not found.", ResourceInfo[ResType][ResNum].Filename);
         return 1;
     }
 
@@ -559,7 +559,7 @@ int Game::ReadResource(char ResType_c, int ResNum)
     ResourceData.Size = msbyte * 256 + lsbyte;
 
     if (ResourceData.Size == 0) {
-        menu->errmes("Error: %s: Resource size 0 !", ResourceInfo[ResType][ResNum].Filename);
+        menu->errmes("Error reading '%s': Resource size 0!", ResourceInfo[ResType][ResNum].Filename);
         return 1;
     }
 
@@ -607,7 +607,7 @@ static int RewriteDirFile(FILE *dir, int dirsize)
         else
             Size[CurResType] = Offset[CurResType + 1] - Offset[CurResType];
         if (Offset[CurResType] > dirsize || Size[CurResType] > 768 || Offset[CurResType] + Size[CurResType] > dirsize) {
-            menu->errmes("DIR file is invalid");
+            menu->errmes("DIR file is invalid.");
             fclose(dir);
             return 1;
         }
@@ -649,7 +649,7 @@ FILE *Game::OpenDirUpdate(int *dirsize, int ResType)
 
     fptr = fopen(dirname.c_str(), "r+b");
     if (fptr == NULL) {
-        menu->errmes("Error writing file %s ! ", dirname.c_str());
+        menu->errmes("Error writing file '%s'!", dirname.c_str());
         return NULL;
     }
     struct stat buf;
@@ -674,7 +674,7 @@ int Game::AddResource(int ResType, int ResNum)
     PatchVol = 0;
     fptr = OpenPatchVol(PatchVol, &filesize); //open vol.0
     if (fptr == NULL) {
-        menu->errmes("Can't open vol.%d !", PatchVol);
+        menu->errmes("Can't open vol.%d!", PatchVol);
         return 1;
     }
 
@@ -686,9 +686,9 @@ int Game::AddResource(int ResType, int ResNum)
             fptr = OpenPatchVol(PatchVol, &filesize);
             if (fptr == NULL) {
                 if (isV3)
-                    menu->errmes("Can't open %svol.%d !", ID.c_str(), PatchVol);
+                    menu->errmes("Can't open %svol.%d!", ID.c_str(), PatchVol);
                 else
-                    menu->errmes("Can't open vol.%d !", PatchVol);
+                    menu->errmes("Can't open vol.%d!", PatchVol);
                 return 1;
             }
         }
@@ -765,7 +765,7 @@ int Game::DeleteResource(int ResType, int ResNum)
 
     if (isV3) {
         if (dirsize < 8) {
-            menu->errmes("Error: %s file invalid!", dirname.c_str());
+            menu->errmes("Error reading '%s': file invalid!", dirname.c_str());
             fclose(dirf);
             return 1;
         }
@@ -774,14 +774,14 @@ int Game::DeleteResource(int ResType, int ResNum)
         fread(&msbyte, 1, 1, dirf);
         off = (msbyte << 8) | lsbyte;
         if (dirsize < off + ResNum * 3 + 2) {
-            menu->errmes("Error: %s file invalid!", dirname.c_str());
+            menu->errmes("Error reading '%s': file invalid!", dirname.c_str());
             fclose(dirf);
             return 1;
         }
         fseek(dirf, off + ResNum * 3, SEEK_SET);
     } else {
         if (dirsize < ResNum * 3 + 2) {
-            menu->errmes("Error: %s file invalid!", dirname.c_str());
+            menu->errmes("Error reading '%s': file invalid!", dirname.c_str());
             fclose(dirf);
             return 1;
         }
@@ -840,7 +840,7 @@ int Game::RebuildVOLfiles()
     VolFileNum = 0;
     sprintf(tmp, "%s/%s.%d.new", dir.c_str(), volname, VolFileNum);
     if ((fptr = fopen(tmp, "wb")) == NULL) {
-        menu->errmes("Error creating file %s ! ", tmp);
+        menu->errmes("Error creating file '%s'!", tmp);
         progress.cancel();
         return 1;
     }
@@ -848,7 +848,7 @@ int Game::RebuildVOLfiles()
     if (isV3) {
         sprintf(tmp, "%s/%sdir.new", dir.c_str(), ID.c_str());
         if ((dirf = fopen(tmp, "wb")) == NULL) {
-            menu->errmes("Error creating file %s ! ", tmp);
+            menu->errmes("Error creating file '%s'!", tmp);
             progress.cancel();
             return 1;
         }
@@ -874,7 +874,7 @@ int Game::RebuildVOLfiles()
         if (!isV3) {
             sprintf(tmp, "%s/%sdir.new", dir.c_str(), ResTypeAbbrv[ResType]);
             if ((dirf = fopen(tmp, "wb")) == NULL) {
-                menu->errmes("Error creating file %s !", tmp);
+                menu->errmes("Error creating file '%s'!", tmp);
                 progress.cancel();
                 return 1;
             }
@@ -893,7 +893,7 @@ int Game::RebuildVOLfiles()
                 continue;
             }
             if (ReadResource(ResType, ResNum)) {
-                menu->errmes("Error saving %s.%d !", ResTypeAbbrv[ResType], ResNum);
+                menu->errmes("Error saving '%s.%03d'!", ResTypeAbbrv[ResType], ResNum);
                 progress.cancel();
                 return 1;
             }
@@ -903,7 +903,7 @@ int Game::RebuildVOLfiles()
                 VolFileNum++;
                 sprintf(tmp, "%s/%s.%d.new", dir.c_str(), volname, VolFileNum);
                 if ((fptr = fopen(tmp, "wb")) == NULL) {
-                    menu->errmes("Error creating file %s !", tmp);
+                    menu->errmes("Error creating file '%s'!", tmp);
                     progress.cancel();
                     return 1;
                 }
@@ -1040,7 +1040,7 @@ static byte *decode_string(byte *buffer, unsigned int code)
         *buffer++ = append_character[code];
         code = prefix_code[code];
         if (i++ >= 4000) {
-            menu->errmes("Fatal error during code expansion !");
+            menu->errmes("Fatal error during code expansion!");
             return NULL;
         }
     }
@@ -1200,7 +1200,7 @@ int Game::ReadV3Resource(char ResourceType1_c, int ResourceID1)
     sprintf(tmp, "%s/%s", dir.c_str(), ResourceInfo[ResourceType1][ResourceID1].Filename);
     FILE *fptr = fopen(tmp, "rb");
     if (fptr == NULL) {
-        menu->errmes("Error reading file %s/%s", dir.c_str(), ResourceInfo[ResourceType1][ResourceID1].Filename);
+        menu->errmes("Error reading file '%s/%s'.", dir.c_str(), ResourceInfo[ResourceType1][ResourceID1].Filename);
         return 1;
     }
 
@@ -1208,14 +1208,14 @@ int Game::ReadV3Resource(char ResourceType1_c, int ResourceID1)
     fstat(fileno(fptr), &buf);
     int size = buf.st_size;
     if (ResourceInfo[ResourceType1][ResourceID1].Loc > size) {
-        menu->errmes("Error: %s: Specified resource location is past end of file", ResourceInfo[ResourceType1][ResourceID1].Filename);
+        menu->errmes("Error reading '%s': Specified resource location is past end of file.", ResourceInfo[ResourceType1][ResourceID1].Filename);
         return 1;
     }
     fseek(fptr, ResourceInfo[ResourceType1][ResourceID1].Loc, SEEK_SET);
     fread(&msbyte, 1, 1, fptr);
     fread(&lsbyte, 1, 1, fptr);
     if (!(msbyte == 0x12 && lsbyte == 0x34)) {
-        menu->errmes("Error: %s: Resource signature not found", ResourceInfo[ResourceType1][ResourceID1].Filename);
+        menu->errmes("Error reading '%s': Resource signature not found.", ResourceInfo[ResourceType1][ResourceID1].Filename);
         return 1;
     }
     fread(&VolNumByte, 1, 1, fptr);
@@ -1339,8 +1339,7 @@ int Game::RecompileAll()
             } else { //source file not found - reading from the game
                 err = logic.decode(ResNum);
                 if (err) {
-                    sprintf(tmp, "logic.%d", ResNum);
-                    menu->errmes(tmp, "Errors:\n%s", logic.ErrorList.c_str());
+                    menu->errmes("Errors in logic.%03d:\n%s", ResNum, logic.ErrorList.c_str());
                     continue;
                 }
                 InputLines.clear();
@@ -1358,8 +1357,7 @@ int Game::RecompileAll()
                 game->AddResource(LOGIC, ResNum);
             else {
                 if (logic.ErrorList != "") {
-                    sprintf(tmp1, "logic.%d", ResNum);
-                    menu->errmes(tmp1, "Errors:\n%s", logic.ErrorList.c_str());
+                    menu->errmes("Errors in logic.%03d:\n%s", ResNum, logic.ErrorList.c_str());
                 }
             }
             progress.setValue(step++);
@@ -1369,7 +1367,7 @@ int Game::RecompileAll()
     }
 
     progress.setValue(steps);
-    QMessageBox::information(menu, "AGI studio", "Recompilation is complete !");
+    QMessageBox::information(menu, "AGI studio", "Recompilation is complete!");
 
     return 0;
 }

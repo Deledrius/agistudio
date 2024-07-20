@@ -375,7 +375,7 @@ int LogEdit::open(int ResNum)
         if (!err)
             textEditor->setText(logic->OutputText.c_str());
         else
-            menu->errmes(QString("logic.%1 Errors:\n%2").arg(QString::number(ResNum), 3, '0').arg(logic->ErrorList.c_str()).toStdString().c_str());
+            menu->errmes("Errors in logic.%03d:\n%s", ResNum, logic->ErrorList.c_str());
 
         setNewTitle(QString("logic.%1").arg(QString::number(ResNum), 3, '0'));
         LogicNum = ResNum;

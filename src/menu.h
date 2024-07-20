@@ -63,7 +63,6 @@ public:
     explicit Menu(QWidget *parent = 0, const char *name = 0);
     ResourcesWin *resources_win;
     void showStatusMessage(const QString &msg);
-    void errmes(const char *, const char *, ...);
     void errmes(const char *, ...);
     void warnmes(const char *, ...);
 

@@ -429,7 +429,7 @@ void WordsEdit::new_file()
 void WordsEdit::save(const QString &fname)
 {
     if (wordlist->NumGroups == 0) {
-        menu->errmes("Wordsedit", "Error: Could not save the file as there are no word groups.");
+        menu->errmes("Error: Could not save the file as there are no word groups.");
         return;
     }
     if (!wordlist->save(fname.toStdString()))
