@@ -27,7 +27,8 @@
  */
 
 
-#include <sys/stat.h>
+#include <filesystem>
+#include <fstream>
 
 #include <QtMultimedia/QAudioOutput>
 #include <QProgressDialog>
@@ -261,16 +262,14 @@ void play_sound(const std::string &filename)
         return;
     }
 
-    FILE *fptr = fopen(filename.c_str(), "rb");
-    if (fptr == NULL) {
+    auto res_stream = std::ifstream(filename, std::ios::binary);
+    if (!res_stream.is_open()) {
         menu->errmes("Can't open file '%s'!", filename.c_str());
         return;
     }
-    struct stat buf;
-    fstat(fileno(fptr), &buf);
-    ResourceData.Size = buf.st_size;
-    fread(ResourceData.Data, ResourceData.Size, 1, fptr);
-    fclose(fptr);
+    ResourceData.Size = std::filesystem::file_size(filename);
+    res_stream.read(reinterpret_cast<char *>(ResourceData.Data), ResourceData.Size);
+    res_stream.close();
 
     play_song(ResourceData.Data, ResourceData.Size);
 

@@ -21,11 +21,8 @@
  */
 
 
-#ifndef _WIN32
-#include <unistd.h>
-#endif
+#include <filesystem>
 #include <string>
-#include <sys/stat.h>
 
 #include "game.h"
 #include "object.h"
@@ -34,7 +31,9 @@
 
 //****************************************************
 //list of inventory objects
-ObjList::ObjList() {}
+ObjList::ObjList() :
+    MaxScreenObjects(), RoomNum()
+{ }
 
 //****************************************************
 bool ObjList::GetItems()
@@ -87,9 +86,7 @@ int ObjList::read(const std::string &filename, bool FileIsEncrypted)
         return 1;
     }
 
-    struct stat buf;
-    fstat(fileno(fptr), &buf);
-    int size = buf.st_size;
+    int size = std::filesystem::file_size(filename);
     if (size > MaxResourceSize) {
         menu->errmes("Error:  File '%s' is too big (>%d bytes).", filename.c_str(), MaxResourceSize);
         return 1;
