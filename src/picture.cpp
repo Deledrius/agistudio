@@ -823,7 +823,7 @@ void Picture::refill(actionListIter pos_fill_start, actionListIter pos_fill_end,
             if (col_pic != col_pic_orig) {
                 if (draw_pic_new) {
                     if (picDrawEnabled_orig) {
-                        addCode(0xf0);
+                        addCode(SetPicColor);
                         addCode(col_pic_orig);
                     } else {
                         if (col_pic != 0x15)
@@ -837,7 +837,7 @@ void Picture::refill(actionListIter pos_fill_start, actionListIter pos_fill_end,
             if (col_pri != col_pri_orig) {
                 if (draw_pri_new) {
                     if (priDrawEnabled_orig) {
-                        addCode(0xf2);
+                        addCode(SetPriColor);
                         addCode(col_pri_orig);
                     } else {
                         if (col_pri != 0x4)
@@ -1177,28 +1177,22 @@ void Picture::choose_color(int button, int color)
     if (button == M_LEFT) {
         add_pic = true;
         if (color == -1) { //off
-            //      addCode(0xF1);
-            code_pic = 0xF1;
+            code_pic = EnablePriority;
             picDrawEnabled = false;
         } else {
             picColour = color;
-            //      addCode(0xF0);
-            //addCode(picColour);
-            code_pic = 0xF0;
+            code_pic = SetPicColor;
             col_pic = picColour;
             picDrawEnabled = true;
         }
     } else {
         add_pri = true;
         if (color == -1) { //off
-            //      addCode(0xF3);
-            code_pri = 0xF3;
+            code_pri = EnableVisual;
             priDrawEnabled = false;
         } else {
             priColour = color;
-            //addCode(0xF2);
-            //addCode(priColour);
-            code_pri = 0xF2;
+            code_pri = SetPriColor;
             col_pri = priColour;
             priDrawEnabled = true;
         }
@@ -1269,13 +1263,13 @@ int Picture::button_action(int newX, int newY)
     if (!(tool == T_FILL && !okToFill(newX >> 1, newY))) {
         if (add_pic) {
             addCode(code_pic);
-            if (code_pic == 0xf0)
+            if (code_pic == SetPicColor)
                 addCode(col_pic);
             add_pic = false;
         }
         if (add_pri) {
             addCode(code_pri);
-            if (code_pri == 0xf2)
+            if (code_pri == SetPriColor)
                 addCode(col_pri);
             add_pri = false;
         }
@@ -1287,7 +1281,7 @@ int Picture::button_action(int newX, int newY)
                 case 0:
                     break;
                 case 1:
-                    addCode(0xF6);
+                    addCode(AbsoluteLine);
                     addCode(clickX >> 1);
                     addCode(clickY);
                     ret = 1;
@@ -1314,7 +1308,7 @@ int Picture::button_action(int newX, int newY)
                     clickY = newY;
                     break;
                 case 1:
-                    addCode(0xF7);
+                    addCode(RelativeLine);
                     addCode(clickX >> 1);
                     addCode(clickY);
                     [[fallthrough]];
@@ -1351,13 +1345,13 @@ int Picture::button_action(int newX, int newY)
                     if (abs(dX) > abs(dY)) {   /* X or Y corner */
                         dY = 0;
                         stepClicks++;
-                        addCode(0xF5);
+                        addCode(XCorner);
                         addCode(clickX >> 1);
                         addCode(clickY);
                         addCode((clickX >> 1) + dX);
                     } else {
                         dX = 0;
-                        addCode(0xF4);
+                        addCode(YCorner);
                         addCode(clickX >> 1);
                         addCode(clickY);
                         addCode((clickY) + dY);
@@ -1407,7 +1401,7 @@ int Picture::button_action(int newX, int newY)
 
             agiFill(newX >> 1, newY);
             if (firstClick) {
-                addCode(0xF8);
+                addCode(Fill);
                 firstClick = false;
             }
             addCode(newX >> 1);
@@ -1416,9 +1410,9 @@ int Picture::button_action(int newX, int newY)
             break;
         case T_BRUSH:
             if (numClicks == 0) {
-                addCode(0xF9);
+                addCode(SetPattern);
                 addPatCode();
-                addCode(0xFA);
+                addCode(Brush);
             }
             numClicks++;
 
