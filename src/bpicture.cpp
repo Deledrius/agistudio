@@ -480,8 +480,9 @@ void BPicture::plotPattern(byte x, byte y)
             if (patCode & 0x10)   /* Square */
                 plotPatternPoint();
             else { /* Circle */
-                if ((circles[patCode & 7][circlePos >> 3] >> (7 - (circlePos & 7))) & 1)
+                if ((circles[patCode & 7][circlePos >> 3] >> (7 - (circlePos & 7))) & 1) {
                     plotPatternPoint();
+                }
                 circlePos++;
             }
         }
