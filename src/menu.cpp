@@ -313,7 +313,7 @@ void Menu::close_game()
     if (window_list)
         window_list->hide();
     disable_game_actions();
-    game->isOpen = false;
+    game->close();
 }
 
 //**********************************************
