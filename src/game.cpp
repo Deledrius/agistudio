@@ -22,18 +22,11 @@
  *
  */
 
-#include <sys/stat.h>
 
-#ifdef _WIN32
-#include <io.h>
-#include <direct.h>
-#include <Windows.h>
-#include <ShlObj.h>
-#else
-#include <glob.h>
-#endif
+#include <fstream>
 
 #include <QDir>
+#include <QFile>
 #include <QMessageBox>
 #include <QProgressDialog>
 #include <QSettings>
@@ -47,7 +40,7 @@
 
 const char *ResTypeName[4] =  {"logic", "picture", "view", "sound"};
 const char *ResTypeAbbrv[4] = {"log", "pic", "view", "snd"};
-static const char *files[5] = {"vol.0", "viewdir", "logdir", "snddir", "picdir"};
+static const auto files =     {"VOL.0", "VIEWDIR", "LOGDIR", "SNDDIR", "PICDIR"};
 Game *game;
 
 static TResource CompressedResource;
@@ -76,7 +69,7 @@ TResource ResourceData;
  to do it...) */
 
 //*******************************************
-Game::Game()
+Game::Game() : AGIVersionNumber(0), ResourceInfo(), isOpen(false), isV3(false)
 {
     ResourceData.Data = (byte *)malloc(MaxResourceSize);
 
@@ -86,77 +79,77 @@ Game::Game()
 }
 
 //*******************************************
+// Open the game found in 'gamepath'.
 int Game::open(const std::string &gamepath)
 {
     byte DirData[3080];
     int CurResType, CurResNum, NumDirEntries;
     long DirSize = -1, DirOffset = -1;
     byte byte1, byte2, byte3;
-    FILE *fptr;
+    bool ErrorOccured = false;
 
     dir = gamepath;
-
-    ID = FindAGIV3GameID(dir);  // 'V2' if not found
-    if (ID.length() == 0)
-        return 1;
-
-    isV3 = (ID != "V2");
-    bool ErrorOccured = false;
 
     for (CurResType = 0; CurResType <= 3; CurResType++) {
         for (CurResNum = 0; CurResNum <= 255; CurResNum++)
             ResourceInfo[CurResType][CurResNum].Exists = false;
     }
 
+    ID = FindAGIV3GameID(dir);
+    if (ID.empty())
+        return 1;
+
+    isV3 = (ID != "V2");
     if (!isV3) {
-        //for V2 game: open logdir, picdir, viewdir, snddir
+        // For v2 game: open 'logdir', 'picdir', 'viewdir', 'snddir'
+
         for (CurResType = 0; CurResType <= 3; CurResType++) {
-            std::string DIRFilename = dir + "/" + ResTypeAbbrv[CurResType] + "dir";
-            fptr = fopen(DIRFilename.c_str(), "rb");
-            if (fptr == NULL) {
-                menu->errmes("Error: can't open '%s'!", DIRFilename.c_str());
+            auto dir_filename = std::filesystem::path(dir) / (std::string(ResTypeAbbrv[CurResType]) + "DIR");
+            auto dir_stream = std::ifstream(dir_filename, std::ios::binary);
+
+            if (!dir_stream.is_open()) {
+                menu->errmes("Error: can't open '%s'!", dir_filename.string().c_str());
                 ErrorOccured = true;
                 break;
             } else {
-                struct stat buf;
-                fstat(fileno(fptr), &buf);
-                int size = buf.st_size;
+                int size = std::filesystem::file_size(dir_filename);
                 if (size >  768) {
-                    menu->errmes("Error: '%s' is too big (should not be mode than 768 bytes)!", DIRFilename.c_str());
+                    menu->errmes("Error: '%s' is too big (should not be more than 768 bytes)!", dir_filename.string().c_str());
                     ErrorOccured = true;
                     break;
-                } else {   //read resource info
-                    fread(DirData, size, 1, fptr);
+                } else {
+                    // Read resource info
+                    dir_stream.read(reinterpret_cast<char *>(DirData), size);
+
                     for (CurResNum = 0; CurResNum <= size / 3 - 1; CurResNum++) {
                         byte1 = DirData[CurResNum * 3];
                         byte2 = DirData[CurResNum * 3 + 1];
                         byte3 = DirData[CurResNum * 3 + 2];
                         if (!(byte1 == 0xff && byte2 == 0xff && byte3 == 0xff)) {
                             ResourceInfo[CurResType][CurResNum].Loc = (byte1 % 16) * 0x10000 + byte2 * 0x100 + byte3;
-                            sprintf(ResourceInfo[CurResType][CurResNum].Filename, "vol.%d", byte1 / 16);
+                            sprintf(ResourceInfo[CurResType][CurResNum].Filename, "VOL.%d", byte1 / 16);
                             ResourceInfo[CurResType][CurResNum].Exists = true;
                         }
                     }
                 }
-                fclose(fptr);
+                dir_stream.close();
             }
         }
-    } else { //V3 game: open [GAME_ID]dir (e.g. grdir, mhdir)
-        std::string DIRFilename = dir + "/" + ID + "dir";
-        fptr = fopen(DIRFilename.c_str(), "rb");
-        if (fptr == NULL) {
-            menu->errmes("Error: can't open '%s'!", DIRFilename.c_str());
+    } else {
+        // For v3 game: open [GAME_ID]dir (e.g. grdir, mhdir)
+        auto dir_filename = std::filesystem::path(dir) / (ID + "DIR");
+        auto dir_stream = std::ifstream(dir_filename, std::ios::binary);
+        if (!dir_stream.is_open()) {
+            menu->errmes("Error: can't open '%s'!", dir_filename.string().c_str());
             ErrorOccured = true;
         } else {
-            struct stat buf;
-            fstat(fileno(fptr), &buf);
-            int size = buf.st_size;
+            int size = std::filesystem::file_size(dir_filename);
             if (size > 3080) {
-                menu->errmes("Error: '%s' is too big (should not be mode than 3080 bytes)!", DIRFilename.c_str());
+                menu->errmes("Error: '%s' is too big (should not be more than 3080 bytes)!", dir_filename.string().c_str());
                 ErrorOccured = true;
             } else {
-                fread(DirData, size, 1, fptr);
-                //read resource info
+                // Read resource info
+                dir_stream.read(reinterpret_cast<char *>(DirData), size);
                 for (CurResType = 0; CurResType <= 3; CurResType++) {
                     if (!ErrorOccured) {
                         switch (CurResType) {
@@ -182,7 +175,7 @@ int Game::open(const std::string &gamepath)
                             ErrorOccured = true;
                             break;
                         } else if (DirOffset + DirSize > size) {
-                            menu->errmes("Error: Directory is beyond end of '%s' file!", DIRFilename.c_str());
+                            menu->errmes("Error: Directory is beyond end of '%s' file!", dir_filename.string().c_str());
                             ErrorOccured = true;
                             break;
                         } else {
@@ -197,7 +190,7 @@ int Game::open(const std::string &gamepath)
                                     byte3 = DirData[DirOffset + CurResNum * 3 + 2];
                                     if (!(byte1 == 0xff && byte2 == 0xff && byte3 == 0xff)) {
                                         ResourceInfo[CurResType][CurResNum].Loc = (byte1 % 16) * 0x10000 + byte2 * 0x100 + byte3;
-                                        sprintf(ResourceInfo[CurResType][CurResNum].Filename, "%svol.%d", ID.c_str(), byte1 / 16);
+                                        sprintf(ResourceInfo[CurResType][CurResNum].Filename, "%sVOL.%d", ID.c_str(), byte1 / 16);
                                         ResourceInfo[CurResType][CurResNum].Exists = true;
                                     }
                                 }
@@ -206,7 +199,7 @@ int Game::open(const std::string &gamepath)
                     }
                 }
             }
-            fclose(fptr);
+            dir_stream.close();
         }
     }
 
@@ -222,130 +215,69 @@ int Game::open(const std::string &gamepath)
 }
 
 //*******************************************
-int Game::from_template(const std::string &name)
-//create a new game (in 'name' directory) from template
+// Close current game
+int Game::close()
 {
-    int i;
-    char *ptr;
-    struct stat buf;
-    char *cfilename;
+    isOpen = false;
+    return 0;
+}
 
-    dir = name;
+//*******************************************
+// Create a new game (in 'path' folder) from template
+int Game::from_template(const std::string &path)
+{
+    dir = path;
     make_source_dir();
+    auto template_dir = game->settings->value("TemplateDir").toString().toStdString();
 
     // Check if template directory contains *dir files and vol.0
-    for (i = 0; i < 5; i++) {
-        sprintf(tmp, "%s/%s", game->settings->value("TemplateDir").toString().toStdString().c_str(), files[i]);
-        if (stat(tmp, &buf)) {
-            menu->errmes("AGI Studio error", "Can't read %s in template directory %s!", files[i], game->settings->value("TemplateDir").toString().toStdString().c_str());
+    for (const auto &file : files) {
+        auto template_file = std::filesystem::path(template_dir) / file;
+        if (!std::filesystem::exists(template_file)) {
+            menu->errmes("Can't read '%s' in template directory '%s'!", file, template_dir.c_str());
             return 1;
         }
     }
 
-    sprintf(tmp, "%s/*", game->settings->value("TemplateDir").toString().toStdString().c_str());
-#ifdef _WIN32
-    struct _finddata_t c_file;
-    long hFile;
-    if ((hFile = _findfirst(tmp, &c_file)) != -1L)
-        do {
-            auto tmp2 = QDir::cleanPath(game->settings->value("TemplateDir").toString() + "/" + c_file.name);
-            cfilename = (char *)malloc(tmp2.length());
-            strcpy(cfilename, tmp2.toStdString().c_str());
-#else
-    glob_t globbuf;
-    glob(tmp, 0, NULL, &globbuf);
-    for (i = 0; i < (int)globbuf.gl_pathc; i++) { //copy template game files
-        cfilename = globbuf.gl_pathv[i];
-#endif
-            ptr = strrchr(cfilename, '/');
-            if (ptr) {
-                if (!strcmp(ptr, "/src"))
-                    continue;
-                if (!strcmp(ptr, "/."))
-                    continue;
-                if (!strcmp(ptr, "/.."))
-                    continue;
-                sprintf(tmp, "%s%s", name.c_str(), ptr);
-            } else {
-                if (!strcmp(cfilename, "/src"))
-                    continue;
-                if (!strcmp(cfilename, "/."))
-                    continue;
-                if (!strcmp(cfilename, "/.."))
-                    continue;
-                sprintf(tmp, "%s/%s", name.c_str(), cfilename);
-            }
-            if (!QFile::copy(cfilename, tmp))
-                return 1;
-#ifdef _WIN32
+    // Copy all template files to the new game location
+    for (const auto &entry : std::filesystem::directory_iterator(template_dir)) {
+        if (entry.is_regular_file()) {
+            auto newfile = std::filesystem::path(path) / entry.path().filename();
+            std::filesystem::copy_file(entry, newfile, std::filesystem::copy_options::overwrite_existing);
         }
-        while (_findnext(hFile, &c_file) == 0);
-    _findclose(hFile);
-#else
-        }
-    globfree(&globbuf);
-#endif
+    }
 
-    sprintf(tmp, "%s/src/*", game->settings->value("TemplateDir").toString().toStdString().c_str());
-#ifdef _WIN32
-    if ((hFile = _findfirst(tmp, &c_file)) != -1L)
-        do
-        {
-            auto tmp2 = QDir::cleanPath(game->settings->value("TemplateDir").toString() + "/src/" + c_file.name);
-            cfilename = (char *)malloc(tmp2.length());
-            strcpy(cfilename, tmp2.toStdString().c_str());
-#else
-    glob(tmp, 0, NULL, &globbuf);
-    for (i = 0; i < (int)globbuf.gl_pathc; i++) //copy template src subdirectory
-    {
-        cfilename = globbuf.gl_pathv[i];
-#endif
-            ptr = strrchr(cfilename, '/');
-            if (ptr) {
-                if (!strcmp(ptr, "/."))
-                    continue;
-                if (!strcmp(ptr, "/.."))
-                    continue;
-                sprintf(tmp, "%s%s", srcdir.c_str(), ptr);
-            } else {
-                if (!strcmp(cfilename, "/."))
-                    continue;
-                if (!strcmp(cfilename, "/.."))
-                    continue;
-                sprintf(tmp, "%s/%s", srcdir.c_str(), cfilename);
-            }
-            if (!QFile::copy(cfilename, tmp))
-                return 1;
-#ifdef _WIN32
+    // Copy all logic source files to the new game location
+    std::error_code ec; // Prevents directory_iterator from throwing exceptions for an empty folder
+    auto template_src_path = std::filesystem::path(template_dir) / "src";
+    for (const auto &entry : std::filesystem::directory_iterator(template_src_path, ec)) {
+        if (entry.is_regular_file()) {
+            auto newfile = std::filesystem::path(srcdir) / entry.path().filename();
+            std::filesystem::copy_file(entry, newfile, std::filesystem::copy_options::overwrite_existing);
         }
-        while (_findnext(hFile, &c_file) == 0);
-    _findclose(hFile);
-#else
-        }
-    globfree(&globbuf);
-#endif
+    }
 
-    return open(name);
+    return open(path);
 }
 
 //*******************************************
+// Create directory for game sources (extracting logic, etc.).
 void Game::make_source_dir()
-// Create directory for sources (extracting logic, etc.)
 {
     if (game->settings->value("UseRelativeSrcDir").toBool())
         srcdir = dir + "/" + game->settings->value("RelativeSrcDir").toString().toStdString();  // srcdir is inside the game directory
     else
         srcdir = game->settings->value("AbsoluteSrcDir").toString().toStdString();              // srcdir can be anywhere
 
-    QDir newdir;
-    bool ret = newdir.mkpath(srcdir.c_str());
-    if (ret == false)
-        menu->errmes("Can't create the source directory %s!\nLogic text files will not be saved.", srcdir.c_str());
+    if (!std::filesystem::exists(srcdir)) {
+        if (std::filesystem::create_directory(srcdir) == false)
+            menu->errmes("Can't create the source directory '%s'!\nLogic text files will not be saved.", srcdir.c_str());
+    }
 }
 
 //*******************************************
-int Game::newgame(const std::string &name)
-//create an empty game in 'name' directory
+// Creates a new empty game in folder "path".
+int Game::newgame(const std::string &path)
 {
     static byte BlankObjectFile[8] = {0x42, 0x76, 0x79, 0x70, 0x20, 0x44, 0x4A, 0x72};
     static byte BlankWordsFile [72] = {
@@ -355,59 +287,51 @@ int Game::newgame(const std::string &name)
         0x00, 0x00, 0x00, 0x00, 0x00, 0x9E, 0x00, 0x00, 0x01, 0x11, 0x06, 0x08, 0x10, 0x0D, 0x9B, 0x00,
         0x01, 0x00, 0x0D, 0x10, 0x93, 0x27, 0x0F, 0x00
     };
+    dir = path;
 
-    static const char *files[5] = {"vol.0", "viewdir", "logdir", "snddir", "picdir"};
-    FILE *fptr;
-    int i, j;
+    for (const auto &file : files)
+        std::ofstream { std::filesystem::path(path) / file, std::ios::binary | std::ios::trunc };
 
-    dir = name;
+    auto objfile = std::ofstream(std::filesystem::path(path) / "OBJECT", std::ios::binary | std::ios::trunc);
+    objfile.write(reinterpret_cast<const char *>(BlankObjectFile), sizeof(BlankObjectFile));
+    objfile.close();
 
-    for (i = 0; i < 5; i++) {
-        sprintf(tmp, "%s/%s", name.c_str(), files[i]);
-        fptr = fopen(tmp, "wb"); //create empty game files
-        if (fptr == NULL) {
-            menu->errmes("Can't create file %s !", files[i]);
-            return 1;
-        }
-        fclose(fptr);
-    }
-    sprintf(tmp, "%s/object", dir.c_str());
-    fptr = fopen(tmp, "wb");
-    fwrite(BlankObjectFile, 8, 1, fptr);
-    fclose(fptr);
-    sprintf(tmp, "%s/words.tok", dir.c_str());
-    fptr = fopen(tmp, "wb");
-    fwrite(BlankWordsFile, 72, 1, fptr);
-    fclose(fptr);
+    auto wordsfile = std::ofstream(std::filesystem::path(path) / "WORDS.TOK", std::ios::binary | std::ios::trunc);
+    wordsfile.write(reinterpret_cast<const char *>(BlankWordsFile), sizeof(BlankWordsFile));
+    wordsfile.close();
+
     make_source_dir();
 
     isOpen = true;
     isV3 = false;
     ID = "";
     AGIVersionNumber = 2917000;
-    for (int _i = 0; _i <= 3; _i++) {
-        for (j = 0; j <= 255; j++)
-            ResourceInfo[_i][j].Exists = false;
+
+    for (int i = 0; i <= 3; i++) {
+        for (int j = 0; j <= 255; j++)
+            ResourceInfo[i][j].Exists = false;
     }
     menu->showStatusMessage(dir.c_str());
     return 0;
 }
 
 //*******************************************
+// Compare the filename prefix (if any) for vol.0 and dir;
+// If they exist and are the same, it is a v3 game.
+// Returns v3 game id, or 'V2' if a v3 Game is not found.
 std::string Game::FindAGIV3GameID(const std::string &gamepath) const
-// Compare the filename prefix (if any) for vol.0 and dir; If they exist and are the same,
-// it is a V3 game.
 {
     std::string ID1 = "V2";
     std::string dirString = "";
     std::string volString = "";
 
     for (const auto &entry : std::filesystem::directory_iterator(gamepath)) {
+        const auto &filename = entry.path().filename().string();
         if (entry.is_regular_file()) {
-            if (dirString.empty() && entry.path().filename().string().ends_with("DIR"))
-                dirString = entry.path().filename().string().substr(0, 3);
-            else if (volString.empty() && entry.path().filename().string().ends_with("VOL.0"))
-                volString = entry.path().filename().string().substr(0, 3);
+            if (dirString.empty() && (filename.ends_with("DIR") || filename.ends_with("dir")))
+                dirString = filename.substr(0, 3);
+            else if (volString.empty() && (filename.ends_with("VOL.0") || filename.ends_with("vol.0")))
+                volString = filename.substr(0, 3);
         }
     }
 
@@ -424,24 +348,24 @@ long Game::GetAGIVersionNumber(void) const
     byte VerLen;
     bool ISVerNum;
     long VerNum;
-    std::string InFileName = dir + "/agidata.ovl";
     char VersionNumBuffer[] = "A_CDE_GHI";
     int ret = 2917000;
+
     // This is what we use if we can't find the version number.
     // Version 2.917 is the most common interpreter and
     // the one that all the "new" AGI games should be based on.
 
     ResourceData.Size = 0;
-    FILE *fptr = fopen(InFileName.c_str(), "rb");
-    if (fptr != NULL) {
-        struct stat buf;
-        fstat(fileno(fptr), &buf);
-        int size = buf.st_size;
+    auto data_file = std::filesystem::path(dir) / "AGIDATA.OVL";
+    auto data_stream = std::ifstream(data_file, std::ios::binary);
+    if (data_stream.is_open()) {
+        int size = std::filesystem::file_size(data_file);
+
         if (size < MaxResourceSize) {
             ResourceData.Size = size;
-            fread(ResourceData.Data, ResourceData.Size, 1, fptr);
+            data_stream.read(reinterpret_cast<char *>(ResourceData.Data), ResourceData.Size);
         }
-        fclose(fptr);
+        data_stream.close();
     }
 
     if (ResourceData.Size > 0) {
@@ -491,104 +415,100 @@ long Game::GetAGIVersionNumber(void) const
 }
 
 //***************************************
-int Game::GetResourceSize(char ResType_c, int ResNum)
+int Game::GetResourceSize(int ResType, int ResNum) const
 {
-    byte lsbyte, msbyte;
-    int ResType = ResType_c;
+    unsigned char lsbyte, msbyte;
 
     if (ResourceInfo[ResType][ResNum].Exists) {
-        sprintf(tmp, "%s/%s", dir.c_str(), ResourceInfo[ResType][ResNum].Filename);
-        FILE *fptr = fopen(tmp, "rb");
-        if (fptr != NULL) {
-            struct stat buf;
-            fstat(fileno(fptr), &buf);
-            int size = buf.st_size;
+        const auto res_file = std::filesystem::path(dir) / ResourceInfo[ResType][ResNum].Filename;
+
+        auto res_stream = std::ifstream(res_file, std::ios::binary);
+        if (res_stream.is_open()) {
+            int size = std::filesystem::file_size(res_file);
+
             if (size >= ResourceInfo[ResType][ResNum].Loc + 5) {
-                fseek(fptr, ResourceInfo[ResType][ResNum].Loc, SEEK_SET);
-                fread(&lsbyte, 1, 1, fptr);
-                fread(&msbyte, 1, 1, fptr);
+                res_stream.seekg(ResourceInfo[ResType][ResNum].Loc);
+                res_stream.read(reinterpret_cast<char *>(&lsbyte), 1);
+                res_stream.read(reinterpret_cast<char *>(&msbyte), 1);
+
                 if (lsbyte == 0x12 && msbyte == 0x34) {
-                    fread(&lsbyte, 1, 1, fptr);
-                    fread(&lsbyte, 1, 1, fptr);
-                    fread(&msbyte, 1, 1, fptr);
+                    res_stream.read(reinterpret_cast<char *>(&lsbyte), 1);
+                    res_stream.read(reinterpret_cast<char *>(&lsbyte), 1);
+                    res_stream.read(reinterpret_cast<char *>(&msbyte), 1);
                     return (msbyte * 256 + lsbyte);
                 }
             }
-            fclose(fptr);
+            res_stream.close();
         }
     }
     return -1;
 }
 
 //***************************************
-int Game::ReadResource(char ResType_c, int ResNum)
-//read a resource number ResNum from the vol file
+// Reads resource 'ResNum' from the VOL file.
+int Game::ReadResource(int ResType, int ResNum)
 {
-    byte msbyte, lsbyte;
-    int ResType = (int)ResType_c;
+    unsigned char msbyte, lsbyte;
 
     if (isV3)
         return ReadV3Resource(ResType, ResNum);
 
-    sprintf(tmp, "%s/%s", dir.c_str(), ResourceInfo[ResType][ResNum].Filename);
-    FILE *fptr = fopen(tmp, "rb");
-    if (fptr == NULL) {
+    const auto res_file = std::filesystem::path(dir) / ResourceInfo[ResType][ResNum].Filename;
+    auto res_stream = std::ifstream(res_file, std::ios::binary);
+    if (!res_stream.is_open()) {
         menu->errmes("Error reading file '%s/%s'!", dir.c_str(), ResourceInfo[ResType][ResNum].Filename);
         return 1;
     }
 
-    struct stat buf;
-    fstat(fileno(fptr), &buf);
-    int size = buf.st_size;
+    int size = std::filesystem::file_size(res_file);
     if (ResourceInfo[ResType][ResNum].Loc > size) {
         menu->errmes("Error reading '%s': Specified resource location is past end of file.", ResourceInfo[ResType][ResNum].Filename);
         return 1;
     }
 
-    fseek(fptr, ResourceInfo[ResType][ResNum].Loc, SEEK_SET);
-    fread(&msbyte, 1, 1, fptr);
-    fread(&lsbyte, 1, 1, fptr);
-    if (!(msbyte == 0x12 && lsbyte == 0x34)) {
+    res_stream.seekg(ResourceInfo[ResType][ResNum].Loc);
+    res_stream.read(reinterpret_cast<char *>(&lsbyte), 1);
+    res_stream.read(reinterpret_cast<char *>(&msbyte), 1);
+    if (!(lsbyte == 0x12 && msbyte == 0x34)) {
         menu->errmes("Error reading '%s': Resource signature not found.", ResourceInfo[ResType][ResNum].Filename);
         return 1;
     }
 
-    fseek(fptr, ResourceInfo[ResType][ResNum].Loc + 3, SEEK_SET);
-    fread(&lsbyte, 1, 1, fptr);
-    fread(&msbyte, 1, 1, fptr);
+    res_stream.seekg(ResourceInfo[ResType][ResNum].Loc + 3);
+    res_stream.read(reinterpret_cast<char *>(&lsbyte), 1);
+    res_stream.read(reinterpret_cast<char *>(&msbyte), 1);
     ResourceData.Size = msbyte * 256 + lsbyte;
-
     if (ResourceData.Size == 0) {
         menu->errmes("Error reading '%s': Resource size 0!", ResourceInfo[ResType][ResNum].Filename);
         return 1;
     }
+    res_stream.read(reinterpret_cast<char *>(ResourceData.Data), ResourceData.Size);
+    res_stream.close();
 
-    fread(ResourceData.Data, ResourceData.Size, 1, fptr);
-    fclose(fptr);
     return 0;
 }
 
 //***************************************
-FILE *Game::OpenPatchVol(int PatchVol, int *filesize) const
+std::unique_ptr<std::fstream> Game::OpenPatchVol(int PatchVol, int *filesize) const
 {
-    FILE *fptr;
-
+    std::string patch_filename;
     if (isV3)
-        sprintf(tmp, "%s/%svol.%d", dir.c_str(), ID.c_str(), PatchVol);
+        patch_filename = ID + "vol." + std::to_string(PatchVol);
     else
-        sprintf(tmp, "%s/vol.%d", dir.c_str(), PatchVol);
-    fptr = fopen(tmp, "a+b");
-    if (fptr == NULL)
-        return NULL;
-    struct stat buf;
-    fstat(fileno(fptr), &buf);
-    *filesize = buf.st_size;
-    return fptr;
+        patch_filename = "vol." + std::to_string(PatchVol);
+    const auto patch_path = std::filesystem::path(dir) / patch_filename;
+
+    auto patch_stream = std::make_unique<std::fstream>(patch_path, std::ios::in | std::ios::out | std::ios::binary);
+    if (!patch_stream->is_open())
+        return nullptr;
+
+    *filesize = std::filesystem::file_size(patch_path);
+    return patch_stream;
 }
 
 //***********************************************
-static int RewriteDirFile(FILE *dir, int dirsize)
-//used for V3 games
+// Rewrite DIR files in v3 games.
+static int RewriteDirFile(std::fstream *dirstream, int dirsize)
 {
     byte DirData[4][768];
     int CurResType;
@@ -596,11 +516,11 @@ static int RewriteDirFile(FILE *dir, int dirsize)
     int Offset[4], Size[4];
     byte OffsetArray[8];
 
-    fseek(dir, 0, SEEK_SET);
+    dirstream->seekp(0);
     for (CurResType = 3; CurResType >= 0; CurResType--) {
-        fseek(dir, CurResType * 2, SEEK_SET);
-        fread(&lsbyte, 1, 1, dir);
-        fread(&msbyte, 1, 1, dir);
+        dirstream->seekp(CurResType * 2);
+        dirstream->read(reinterpret_cast<char *>(&lsbyte), 1);
+        dirstream->read(reinterpret_cast<char *>(&msbyte), 1);
         Offset[CurResType] = (msbyte << 8) | lsbyte;
         if (CurResType == 3)
             Size[CurResType] = dirsize - Offset[CurResType];
@@ -608,15 +528,15 @@ static int RewriteDirFile(FILE *dir, int dirsize)
             Size[CurResType] = Offset[CurResType + 1] - Offset[CurResType];
         if (Offset[CurResType] > dirsize || Size[CurResType] > 768 || Offset[CurResType] + Size[CurResType] > dirsize) {
             menu->errmes("DIR file is invalid.");
-            fclose(dir);
+            dirstream->close();
             return 1;
         }
 
     }
     for (CurResType = 0; CurResType <= 3; CurResType++) {
-        fseek(dir, Offset[CurResType], SEEK_SET);
+        dirstream->seekp(Offset[CurResType]);
         memset(DirData[CurResType], 0xff, 768);
-        fread(DirData[CurResType], Size[CurResType], 1, dir);
+        dirstream->read(reinterpret_cast<char *>(DirData[CurResType]), Size[CurResType]);
     }
 
     OffsetArray[0] = 8;
@@ -628,63 +548,63 @@ static int RewriteDirFile(FILE *dir, int dirsize)
         OffsetArray[CurResType * 2] = Offset[CurResType] % 256;
         OffsetArray[CurResType * 2 + 1] = Offset[CurResType] / 256;
     }
-    fseek(dir, 0, SEEK_SET);
-    fwrite(OffsetArray, 8, 1, dir);
+    dirstream->seekp(0);
+    dirstream->write(reinterpret_cast<char *>(OffsetArray), 8);
     for (CurResType = 0; CurResType <= 3; CurResType++)
-        fwrite(DirData[CurResType], 768, 1, dir);
-    fflush(dir);
+        dirstream->write(reinterpret_cast<char *>(DirData[CurResType]), 768);
+    dirstream->flush();
 
     return 0;
 }
 
 //***********************************************
-FILE *Game::OpenDirUpdate(int *dirsize, int ResType)
+std::unique_ptr<std::fstream> Game::OpenDirUpdate(int *dirsize, int ResType)
 {
-    FILE *fptr;
-
+    std::string dir_filename;
     if (isV3)
-        dirname = dir + "/" + ID + "dir";
+        dir_filename = (ID + "dir");
     else
-        dirname = dir + "/" + ResTypeAbbrv[ResType] + "dir";
+        dir_filename = (std::string(ResTypeAbbrv[ResType]) + "dir");
+    const auto dir_path = std::filesystem::path(dir) / dir_filename;
 
-    fptr = fopen(dirname.c_str(), "r+b");
-    if (fptr == NULL) {
-        menu->errmes("Error writing file '%s'!", dirname.c_str());
-        return NULL;
+    dirname = dir_path.string();
+    auto dir_stream = std::make_unique<std::fstream>(dir_path, std::ios::in | std::ios::out | std::ios::binary);
+    if (!dir_stream->is_open()) {
+        menu->errmes("Error writing file '%s': %s!", dirname.c_str());
+        return nullptr;
     }
-    struct stat buf;
-    fstat(fileno(fptr), &buf);
-    *dirsize = buf.st_size;
-    return fptr;
+
+    *dirsize = std::filesystem::file_size(dir_path);
+    return dir_stream;
 }
 
 //***********************************************
 int Game::AddResource(int ResType, int ResNum)
 {
-    FILE *fptr, *dirf;
+    std::unique_ptr<std::fstream> file_stream, dir_stream;
     int filesize, dirsize;
     int PatchVol;
     byte ResHeader[7], DirByte[3];
     int off;
     byte lsbyte, msbyte;
 
-    if ((dirf = OpenDirUpdate(&dirsize, ResType)) == NULL)
+    if ((dir_stream = OpenDirUpdate(&dirsize, ResType)) == nullptr)
         return 1;
 
     PatchVol = 0;
-    fptr = OpenPatchVol(PatchVol, &filesize); //open vol.0
-    if (fptr == NULL) {
+    file_stream = OpenPatchVol(PatchVol, &filesize); //open vol.0
+    if (file_stream == nullptr) {
         menu->errmes("Can't open vol.%d!", PatchVol);
         return 1;
     }
 
     do {
         if (filesize + ResourceData.Size > 1048000) {
-//current volume is too big (to fit a diskette) - create the next one
-            fclose(fptr);
+            // Current volume is too big (to fit a diskette) - create the next one...
+            file_stream.reset();
             PatchVol++;
-            fptr = OpenPatchVol(PatchVol, &filesize);
-            if (fptr == NULL) {
+            file_stream = OpenPatchVol(PatchVol, &filesize);
+            if (file_stream == nullptr) {
                 if (isV3)
                     menu->errmes("Can't open %svol.%d!", ID.c_str(), PatchVol);
                 else
@@ -696,22 +616,22 @@ int Game::AddResource(int ResType, int ResNum)
 
     //write the resource to the patch volume and update the DIR file
     if (isV3) {
-        if (RewriteDirFile(dirf, dirsize)) {
-            fclose(dirf);
-            fclose(fptr);
+        if (RewriteDirFile(dir_stream.get(), dirsize)) {
+            dir_stream.reset();
+            file_stream.reset();
             return 1;
         }
     } else {
         if (ResNum * 3 > dirsize) {
             DirByte[1] = 0xff;
-            fseek(dirf, dirsize, SEEK_SET);
+            dir_stream->seekp(dirsize);
             do {
-                fwrite(&DirByte[1], 1, 1, dirf);
-            } while (ftell(dirf) != ResNum * 3);
+                dir_stream->write(reinterpret_cast<char *>(&DirByte[1]), 1);
+            } while (dir_stream->tellp() != ResNum * 3);
         }
     }
-    fseek(fptr, filesize, SEEK_SET);
-    off = ftell(fptr);
+    file_stream->seekp(filesize);
+    off = file_stream->tellp();
     DirByte[0] = PatchVol * 0x10 + off / 0x10000;
     DirByte[1] = (off % 0x10000) / 0x100;
     DirByte[2] = off % 0x100;
@@ -731,23 +651,23 @@ int Game::AddResource(int ResType, int ResNum)
         ResHeader[n++] = ResourceData.Size % 256;  // no compression so compressed size
         ResHeader[n++] = ResourceData.Size / 256;  // and uncompressed size are the same
     }
-    fwrite(ResHeader, n, 1, fptr);
-    fwrite(ResourceData.Data, ResourceData.Size, 1, fptr);
+    file_stream->write(reinterpret_cast<char *>(ResHeader), n);
+    file_stream->write(reinterpret_cast<char *>(ResourceData.Data), ResourceData.Size);
 
     if (isV3) {
-        fseek(dirf, ResType * 2, SEEK_SET);
-        fread(&lsbyte, 1, 1, dirf);
-        fread(&msbyte, 1, 1, dirf);
+        dir_stream->seekp(ResType * 2);
+        dir_stream->write(reinterpret_cast<char *>(&lsbyte), 1);
+        dir_stream->write(reinterpret_cast<char *>(&msbyte), 1);
         off = (msbyte << 8) | lsbyte;
-        fseek(dirf, off + ResNum * 3, SEEK_SET);
-        fwrite(DirByte, 3, 1, dirf);
-        fclose(dirf);
+        dir_stream->seekp(off + ResNum * 3);
+        dir_stream->write(reinterpret_cast<char *>(DirByte), 3);
+        dir_stream.reset();
     } else {
-        fseek(dirf, ResNum * 3, SEEK_SET);
-        fwrite(DirByte, 3, 1, dirf);
-        fclose(dirf);
+        dir_stream->seekp(ResNum * 3);
+        dir_stream->write(reinterpret_cast<char *>(DirByte), 3);
+        dir_stream.reset();
     }
-    fflush(fptr);
+    file_stream->flush();
 
     return 0;
 }
@@ -755,44 +675,40 @@ int Game::AddResource(int ResType, int ResNum)
 //************************************************
 int Game::DeleteResource(int ResType, int ResNum)
 {
-    FILE *dirf;
+    std::unique_ptr<std::fstream> dir_stream;
     int dirsize;
-    byte lsbyte, msbyte;
-    int off;
 
-    if ((dirf = OpenDirUpdate(&dirsize, ResType)) == NULL)
+    if ((dir_stream = OpenDirUpdate(&dirsize, ResType)) == nullptr)
         return 1;
 
     if (isV3) {
+        uint8_t lsbyte, msbyte;
+
         if (dirsize < 8) {
             menu->errmes("Error reading '%s': file invalid!", dirname.c_str());
-            fclose(dirf);
             return 1;
         }
-        fseek(dirf, ResType * 2, SEEK_SET);
-        fread(&lsbyte, 1, 1, dirf);
-        fread(&msbyte, 1, 1, dirf);
-        off = (msbyte << 8) | lsbyte;
+        dir_stream->seekp(ResType * 2);
+        dir_stream->read(reinterpret_cast<char *>(&lsbyte), 1);
+        dir_stream->read(reinterpret_cast<char *>(&msbyte), 1);
+        int off = (msbyte << 8) | lsbyte;
         if (dirsize < off + ResNum * 3 + 2) {
             menu->errmes("Error reading '%s': file invalid!", dirname.c_str());
-            fclose(dirf);
             return 1;
         }
-        fseek(dirf, off + ResNum * 3, SEEK_SET);
+        dir_stream->seekp(off + ResNum * 3);
     } else {
         if (dirsize < ResNum * 3 + 2) {
             menu->errmes("Error reading '%s': file invalid!", dirname.c_str());
-            fclose(dirf);
             return 1;
         }
-        fseek(dirf, ResNum * 3, SEEK_SET);
+        dir_stream->seekp(ResNum * 3);
     }
-    byte b = 0xff;
-    fwrite(&b, 1, 1, dirf);
-    fwrite(&b, 1, 1, dirf);
-    fwrite(&b, 1, 1, dirf);
+    const char b = '\xff';
+    dir_stream->write(&b, 1);
+    dir_stream->write(&b, 1);
+    dir_stream->write(&b, 1);
     ResourceInfo[ResType][ResNum].Exists = false;
-    fclose(dirf);
 
     return 0;
 }
@@ -802,24 +718,19 @@ int Game::RebuildVOLfiles()
 {
     int step = 0, steps = 0;
     int ResType, ResNum, VolFileNum;
+    std::ofstream vol_stream, dir_stream;
     byte b = 0xff, byte1, byte2, byte3;
-    FILE *dirf = NULL, *fptr;
     byte ResHeader[7];
     long off;
 #define MaxVOLFileSize  1023*1024
     TResourceInfo NewResourceInfo[4][256];
     int ResourceNum[4];
     bool cancel = false;
-    char tmp1[1024];
     int DirOffset[4];
-#ifdef _WIN32
-    struct _finddata_t c_file;
-    long hFile;
-#endif
-    char volname[8] = "vol";
+    std::string volname = "vol";
 
     if (isV3)
-        sprintf(volname, "%svol", ID.c_str());
+        volname = ID + "vol";
 
     for (ResType = 0; ResType <= 3; ResType++) {
         ResourceNum[ResType] = 0;
@@ -838,17 +749,19 @@ int Game::RebuildVOLfiles()
     ResHeader[1] = 0x34;
 
     VolFileNum = 0;
-    sprintf(tmp, "%s/%s.%d.new", dir.c_str(), volname, VolFileNum);
-    if ((fptr = fopen(tmp, "wb")) == NULL) {
-        menu->errmes("Error creating file '%s'!", tmp);
+    auto vol_path = std::filesystem::path(dir) / (volname + "." + std::to_string(VolFileNum) + ".new");
+    vol_stream = std::ofstream(vol_path, std::ios::binary | std::ios::trunc);
+    if (!vol_stream.is_open()) {
+        menu->errmes("Error creating file '%s'!", vol_path.string().c_str());
         progress.cancel();
         return 1;
     }
 
     if (isV3) {
-        sprintf(tmp, "%s/%sdir.new", dir.c_str(), ID.c_str());
-        if ((dirf = fopen(tmp, "wb")) == NULL) {
-            menu->errmes("Error creating file '%s'!", tmp);
+        auto dir_path = std::filesystem::path(dir) / (ID + "dir.new");
+        dir_stream = std::ofstream(dir_path, std::ios::binary | std::ios::trunc);
+        if (!dir_stream.is_open()) {
+            menu->errmes("Error creating file '%s'!", dir_path.string().c_str());
             progress.cancel();
             return 1;
         }
@@ -856,35 +769,36 @@ int Game::RebuildVOLfiles()
             DirOffset[ResType] = 8 + ResType * 0x300;
             byte1 = DirOffset[ResType] % 0x100;
             byte2 = DirOffset[ResType] / 0x100;
-            fwrite(&byte1, 1, 1, dirf);
-            fwrite(&byte2, 1, 1, dirf);
+            dir_stream.write(reinterpret_cast<char *>(&byte1), 1);
+            dir_stream.write(reinterpret_cast<char *>(&byte2), 1);
         }
         for (ResType = 0; ResType <= 3; ResType++) {
             for (ResNum = 0; ResNum < 256; ResNum++) {
-                fwrite(&b, 1, 1, dirf);
-                fwrite(&b, 1, 1, dirf);
-                fwrite(&b, 1, 1, dirf);
+                dir_stream.write(reinterpret_cast<char *>(&b), 1);
+                dir_stream.write(reinterpret_cast<char *>(&b), 1);
+                dir_stream.write(reinterpret_cast<char *>(&b), 1);
             }
         }
-        fflush(dirf);
-        fseek(dirf, 0, SEEK_SET);
+        dir_stream.flush();
+        dir_stream.seekp(0);
     }
 
     for (ResType = 0; ResType <= 3; ResType++) {
         if (!isV3) {
-            sprintf(tmp, "%s/%sdir.new", dir.c_str(), ResTypeAbbrv[ResType]);
-            if ((dirf = fopen(tmp, "wb")) == NULL) {
-                menu->errmes("Error creating file '%s'!", tmp);
+            auto dir_path = std::filesystem::path(dir) / (std::string(ResTypeAbbrv[ResType]) + "dir.new");
+            dir_stream = std::ofstream(dir_path, std::ios::binary | std::ios::trunc);
+            if (!dir_stream.is_open()) {
+                menu->errmes("Error creating file '%s'!", dir_path.string().c_str());
                 progress.cancel();
                 return 1;
             }
             for (ResNum = 0; ResNum < ResourceNum[ResType]; ResNum++) {
-                fwrite(&b, 1, 1, dirf);
-                fwrite(&b, 1, 1, dirf);
-                fwrite(&b, 1, 1, dirf);
+                dir_stream.write(reinterpret_cast<char *>(&b), 1);
+                dir_stream.write(reinterpret_cast<char *>(&b), 1);
+                dir_stream.write(reinterpret_cast<char *>(&b), 1);
             }
-            fflush(dirf);
-            fseek(dirf, 0, SEEK_SET);
+            dir_stream.flush();
+            dir_stream.seekp(0);
         }
 
         for (ResNum = 0; ResNum < 256; ResNum++) {
@@ -897,21 +811,22 @@ int Game::RebuildVOLfiles()
                 progress.cancel();
                 return 1;
             }
-            off = ftell(fptr);
+            off = vol_stream.tellp();
             if (off + ResourceData.Size + 5 > MaxVOLFileSize) {
-                fclose(fptr);
+                vol_stream.close();
                 VolFileNum++;
-                sprintf(tmp, "%s/%s.%d.new", dir.c_str(), volname, VolFileNum);
-                if ((fptr = fopen(tmp, "wb")) == NULL) {
-                    menu->errmes("Error creating file '%s'!", tmp);
+                auto vol_path = std::filesystem::path(dir) / (volname + "." + std::to_string(VolFileNum) + ".new");
+                vol_stream = std::ofstream(vol_path, std::ios::binary | std::ios::trunc);
+                if (!vol_stream.is_open()) {
+                    menu->errmes("Error creating file '%s'!", vol_path.string().c_str());
                     progress.cancel();
                     return 1;
                 }
-                off = ftell(fptr);
+                off = vol_stream.tellp();
             }
             NewResourceInfo[ResType][ResNum].Exists = true;
             NewResourceInfo[ResType][ResNum].Loc = off;
-            sprintf(NewResourceInfo[ResType][ResNum].Filename, "%s.%d", volname, VolFileNum);
+            sprintf(NewResourceInfo[ResType][ResNum].Filename, "%s.%d", volname.c_str(), VolFileNum);
             byte1 = VolFileNum * 0x10 + off / 0x10000;
             byte2 = (off % 0x10000) / 0x100;
             byte3 = off % 0x100;
@@ -921,18 +836,18 @@ int Game::RebuildVOLfiles()
             if (isV3) {
                 ResHeader[5] = ResourceData.Size % 256;
                 ResHeader[6] = ResourceData.Size / 256;
-                fwrite(ResHeader, 7, 1, fptr);
+                vol_stream.write(reinterpret_cast<char *>(ResHeader), 7);
             } else
-                fwrite(ResHeader, 5, 1, fptr);
+                vol_stream.write(reinterpret_cast<char *>(ResHeader), 5);
 
-            fwrite(ResourceData.Data, ResourceData.Size, 1, fptr);
+            vol_stream.write(reinterpret_cast<char *>(ResourceData.Data), ResourceData.Size);
             if (isV3)
-                fseek(dirf, DirOffset[ResType] + ResNum * 3, SEEK_SET);
+                dir_stream.seekp(DirOffset[ResType] + ResNum * 3);
             else
-                fseek(dirf, ResNum * 3, SEEK_SET);
-            fwrite(&byte1, 1, 1, dirf);
-            fwrite(&byte2, 1, 1, dirf);
-            fwrite(&byte3, 1, 1, dirf);
+                dir_stream.seekp(ResNum * 3);
+            dir_stream.write(reinterpret_cast<char *>(&byte1), 1);
+            dir_stream.write(reinterpret_cast<char *>(&byte2), 1);
+            dir_stream.write(reinterpret_cast<char *>(&byte3), 1);
             progress.setValue(step++);
             if (progress.wasCanceled()) {
                 cancel = true;
@@ -940,7 +855,7 @@ int Game::RebuildVOLfiles()
             }
         }
         if (!isV3)
-            fclose(dirf);
+            dir_stream.close();
 
         if (progress.wasCanceled()) {
             cancel = true;
@@ -949,48 +864,46 @@ int Game::RebuildVOLfiles()
     }
     progress.setValue(steps);
 
-    fclose(fptr);
+    vol_stream.close();
     if (isV3)
-        fclose(dirf);
-
+        dir_stream.close();
 
     if (cancel)
         return 1;
 
     //cleanup temporary files
     if (isV3) {
-        sprintf(tmp, "%s/%sdir.new", dir.c_str(), ID.c_str());
-        sprintf(tmp1, "%s/%sdir", dir.c_str(), ID.c_str());
-        rename(tmp, tmp1);
+        auto oldname = std::filesystem::path(dir) / (ID + "dir.new");
+        auto newname = std::filesystem::path(dir) / (ID + "dir");
+        std::filesystem::rename(oldname, newname);
     } else {
-        for (ResType = 0; ResType <= 3; ResType++) {
-            sprintf(tmp, "%s/%sdir.new", dir.c_str(), ResTypeAbbrv[ResType]);
-            sprintf(tmp1, "%s/%sdir", dir.c_str(), ResTypeAbbrv[ResType]);
-            rename(tmp, tmp1);
+        for (const std::string &res_abbr : ResTypeAbbrv) {
+            auto oldname = std::filesystem::path(dir) / (res_abbr + "dir.new");
+            auto newname = std::filesystem::path(dir) / (res_abbr + "dir");
+            std::filesystem::rename(oldname, newname);
         }
     }
 
     QDir d(dir.c_str());
-
     // Delete old VOLs...
-    QStringList list = d.entryList(QStringList() << QString(volname) + ".?;;" << QString(volname) + ".??");
-    for (QStringList::Iterator it = list.begin(); it != list.end(); ++it)
-        d.remove(*it);
+    QStringList list = d.entryList(QStringList() << QString(volname.c_str()) + ".?" << QString(volname.c_str()) + ".??");
+    for (const auto &oldvol : list)
+        d.remove(oldvol);
 
     // ...and replace them with the new ones:
-    list = d.entryList(QStringList() << QString(volname) + ".*.new");
-    for (QStringList::Iterator it = list.begin(); it != list.end(); ++it) {
-        QString new_name = *it;
+    list = d.entryList(QStringList() << QString(volname.c_str()) + ".*.new");
+    for (const auto &newvol : list) {
+        QString new_name = newvol;
         new_name.replace(".new", "");
-        d.rename(*it, new_name);
+        d.rename(newvol, new_name);
     }
     memcpy(ResourceInfo, NewResourceInfo, sizeof(ResourceInfo));
-    QMessageBox::information(menu, "AGI studio", "Rebuilding is complete !");
+    QMessageBox::information(menu, "AGI studio", "Rebuilding is complete!");
     return 0;
 }
 
 //***********************************************
-//V3 decompression code from QT AGI Utilities
+// v3 decompression code from Qt AGI Utilities
 
 static void initLZW()
 {
@@ -1033,15 +946,13 @@ static int setBITS(int value)
 ***************************************************************************/
 static byte *decode_string(byte *buffer, unsigned int code)
 {
-    int i;
-
-    i = 0;
+    int i = 0;
     while (code > 255) {
         *buffer++ = append_character[code];
         code = prefix_code[code];
         if (i++ >= 4000) {
             menu->errmes("Fatal error during code expansion!");
-            return NULL;
+            return nullptr;
         }
     }
     *buffer = code;
@@ -1187,46 +1098,43 @@ static void DecompressPicture(byte *picBuf, byte *outBuf, int picLen, int *outLe
 //***********************************************
 int Game::ReadV3Resource(char ResourceType1_c, int ResourceID1)
 {
-
     byte msbyte, lsbyte;
     bool ResourceIsPicture;
     byte VolNumByte;
     int ResourceType1 = (int)ResourceType1_c;
 
-    if (CompressedResource.Data == NULL)
+    if (CompressedResource.Data == nullptr)
         CompressedResource.Data = (byte *)malloc(MaxResourceSize);
 
-
-    sprintf(tmp, "%s/%s", dir.c_str(), ResourceInfo[ResourceType1][ResourceID1].Filename);
-    FILE *fptr = fopen(tmp, "rb");
-    if (fptr == NULL) {
-        menu->errmes("Error reading file '%s/%s'.", dir.c_str(), ResourceInfo[ResourceType1][ResourceID1].Filename);
+    auto resource_path = std::filesystem::path(dir) / ResourceInfo[ResourceType1][ResourceID1].Filename;
+    auto resource_stream = std::ifstream(resource_path, std::ios::binary);
+    if (!resource_stream.is_open()) {
+        menu->errmes("Error reading file '%s'.", resource_path.string().c_str());
         return 1;
     }
 
-    struct stat buf;
-    fstat(fileno(fptr), &buf);
-    int size = buf.st_size;
+    int size = std::filesystem::file_size(resource_path);
     if (ResourceInfo[ResourceType1][ResourceID1].Loc > size) {
         menu->errmes("Error reading '%s': Specified resource location is past end of file.", ResourceInfo[ResourceType1][ResourceID1].Filename);
         return 1;
     }
-    fseek(fptr, ResourceInfo[ResourceType1][ResourceID1].Loc, SEEK_SET);
-    fread(&msbyte, 1, 1, fptr);
-    fread(&lsbyte, 1, 1, fptr);
-    if (!(msbyte == 0x12 && lsbyte == 0x34)) {
+    resource_stream.seekg(ResourceInfo[ResourceType1][ResourceID1].Loc);
+    resource_stream.read(reinterpret_cast<char *>(&lsbyte), 1);
+    resource_stream.read(reinterpret_cast<char *>(&msbyte), 1);
+    if (!(lsbyte == 0x12 && msbyte == 0x34)) {
         menu->errmes("Error reading '%s': Resource signature not found.", ResourceInfo[ResourceType1][ResourceID1].Filename);
         return 1;
     }
-    fread(&VolNumByte, 1, 1, fptr);
+
+    resource_stream.read(reinterpret_cast<char *>(&VolNumByte), 1);
     ResourceIsPicture = ((VolNumByte & 0x80) == 0x80);
-    fread(&lsbyte, 1, 1, fptr);
-    fread(&msbyte, 1, 1, fptr);
+    resource_stream.read(reinterpret_cast<char *>(&lsbyte), 1);
+    resource_stream.read(reinterpret_cast<char *>(&msbyte), 1);
     ResourceData.Size = msbyte * 256 + lsbyte;
-    fread(&lsbyte, 1, 1, fptr);
-    fread(&msbyte, 1, 1, fptr);
+    resource_stream.read(reinterpret_cast<char *>(&lsbyte), 1);
+    resource_stream.read(reinterpret_cast<char *>(&msbyte), 1);
     CompressedResource.Size = msbyte * 256 + lsbyte;
-    fread(CompressedResource.Data, CompressedResource.Size, 1, fptr);
+    resource_stream.read(reinterpret_cast<char *>(CompressedResource.Data), CompressedResource.Size);
 
     if (ResourceIsPicture)
         DecompressPicture(CompressedResource.Data, ResourceData.Data, CompressedResource.Size, &ResourceData.Size);
@@ -1282,9 +1190,7 @@ void Game::reset_settings(void)
 int Game::RecompileAll()
 {
     int i, ResNum, err;
-    FILE *fptr;
     Logic logic;
-    char tmp1[16], *ptr;
     extern QStringList InputLines;
 
     for (i = 0; i < MAXWIN; i++) {
@@ -1299,7 +1205,6 @@ int Game::RecompileAll()
                 winlist[i].w.l->statusBar()->showMessage("");
             }
         }
-
     }
 
     int step = 0, steps = 0;
@@ -1308,34 +1213,30 @@ int Game::RecompileAll()
             steps++;
     }
 
-
     QProgressDialog progress("Recompiling all logics...", "Cancel", 0, 100, nullptr);
     progress.setMinimumDuration(0);
 
     for (ResNum = 0; ResNum < 256; ResNum++) {
         if (game->ResourceInfo[LOGIC][ResNum].Exists) {
-            //look for the source file first
-            sprintf(tmp, "%s/logic.%03d", game->srcdir.c_str(), ResNum);
-            fptr = fopen(tmp, "rb");
-            if (fptr == NULL) {
-                sprintf(tmp, "%s/logic.%d", game->srcdir.c_str(), ResNum);
-                fptr = fopen(tmp, "rb");
-            }
-            if (fptr == NULL) {
-                sprintf(tmp, "%s/logic%d.txt", game->srcdir.c_str(), ResNum);
-                fptr = fopen(tmp, "rb");
-            }
-            if (fptr != NULL) {
-                InputLines.clear();
-                while (fgets(tmp, MAX_TMP, fptr) != NULL) {
-                    if ((ptr = strchr(tmp, 0x0a)))
-                        * ptr = 0;
-                    if ((ptr = strchr(tmp, 0x0d)))
-                        * ptr = 0;
-                    //strcat(tmp,"\n");
-                    InputLines.append(tmp);
+
+            // Look for a source file first
+            std::ifstream logic_stream;
+            for (const auto &filename_fmt : {
+                        "logic.%03d", "logic.%d", "logic%d.txt"
+                    }) {
+                auto logic_path = std::filesystem::path(game->srcdir) / QString::asprintf(filename_fmt, ResNum).toStdString();
+                if (std::filesystem::exists(logic_path)) {
+                    logic_stream = std::ifstream(logic_path);
+                    break;
                 }
-                fclose(fptr);
+            }
+
+            if (logic_stream.is_open()) {
+                InputLines.clear();
+                std::string newline;
+                while (std::getline(logic_stream, newline))
+                    InputLines.append(newline.c_str());
+                logic_stream.close();
             } else { //source file not found - reading from the game
                 err = logic.decode(ResNum);
                 if (err) {
@@ -1356,9 +1257,8 @@ int Game::RecompileAll()
             if (!err)
                 game->AddResource(LOGIC, ResNum);
             else {
-                if (logic.ErrorList != "") {
+                if (!logic.ErrorList.empty())
                     menu->errmes("Errors in logic.%03d:\n%s", ResNum, logic.ErrorList.c_str());
-                }
             }
             progress.setValue(step++);
             if (progress.wasCanceled())

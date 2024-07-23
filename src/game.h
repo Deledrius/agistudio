@@ -23,6 +23,7 @@
 
 
 #include <string>
+#include <iosfwd>
 
 
 typedef unsigned char byte;
@@ -51,13 +52,10 @@ public:
     int newgame(const std::string &name);
     int from_template(const std::string &name);
     void reset_settings();
-    int close()
-    {
-        return 0;
-    }
+    int close();
     void make_source_dir();
-    int GetResourceSize(char ResType, int ResNum);
-    int ReadResource(char ResourceType, int ResourceID);
+    int GetResourceSize(int ResType, int ResNum) const;
+    int ReadResource(int ResourceType, int ResourceID);
     int AddResource(int ResType, int ResNum);
     int DeleteResource(int ResType, int ResNum);
     int RebuildVOLfiles();
@@ -82,8 +80,8 @@ private:
     std::string FindAGIV3GameID(const std::string &gamepath) const;
     long GetAGIVersionNumber(void) const;
     int ReadV3Resource(char ResourceType, int ResourceID);
-    FILE *OpenPatchVol(int PatchVol, int *filesize) const;
-    FILE *OpenDirUpdate(int *dirsize, int ResType);
+    std::unique_ptr<std::fstream> OpenPatchVol(int PatchVol, int *filesize) const;
+    std::unique_ptr<std::fstream> OpenDirUpdate(int *dirsize, int ResType);
 };
 
 extern Game *game;
