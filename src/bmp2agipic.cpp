@@ -27,6 +27,7 @@
 #include <QByteArray>
 
 #include "bmp2agipic.h"
+#include "picture.h"
 
 
 static const int AGI_WIDTH = 160;
@@ -71,8 +72,6 @@ struct CoordColor {
 // Quantize given image to EGA palette and reshape to AGI native AGI_WIDTHxAGI_HEIGHT
 void QuantizeAGI(const QImage &img, AGIPic &out)
 {
-#define SQUARE(x) ((x)*(x))
-
     assert(img.width() == AGI_WIDTH || img.width() == AGI_WIDTH * 2);
     assert(img.height() >= AGI_HEIGHT);
 
@@ -84,9 +83,9 @@ void QuantizeAGI(const QImage &img, AGIPic &out)
             for (int c = 0; c < N_COLORS; ++c) {
                 QColor pix(img.pixel(x, y));
                 float err = sqrtf(
-                                SQUARE(ega[c].redF() - pix.redF()) +
-                                SQUARE(ega[c].greenF() - pix.greenF()) +
-                                SQUARE(ega[c].blueF() - pix.blueF()));
+                                std::pow(ega[c].redF() - pix.redF(), 2) +
+                                std::pow(ega[c].greenF() - pix.greenF(), 2) +
+                                std::pow(ega[c].blueF() - pix.blueF(), 2));
                 if (selErr < 0.f || err < selErr) {
                     sel = c;
                     selErr = err;
@@ -318,7 +317,7 @@ void oneChannelToAGIPicture(const QImage &chan, QByteArray *res, bool isPri)
     QuantizeAGI(chan, pic);
 
     // We're doing one channel at a time, disable the other one first
-    *res += char(isPri ? 0xF1 : 0xF3);
+    *res += char(isPri ? EnablePriority : EnableVisual);
 
     // Clear the default color, no sense in filling/drawing with it:
     unsigned default_color = isPri ? 4 : 15; // 4=red for pri, 15=white for visual
@@ -350,9 +349,9 @@ void oneChannelToAGIPicture(const QImage &chan, QByteArray *res, bool isPri)
         i--;
         if (curColor != c.c) {
             curColor = c.c;
-            *res += char(isPri ? 0xF2 : 0xF0);   // Change color command
+            *res += char(isPri ? SetPriColor : SetPicColor);   // Change color command
             *res += char(c.c);   // Color index
-            *res += char(0xF8);   // Flood fill command
+            *res += char(Fill);   // Flood fill command
         }
         assert(curColor != COLOR_NONE);   // i.e: flood fill command written
         *res += char(c.x);
@@ -362,7 +361,7 @@ void oneChannelToAGIPicture(const QImage &chan, QByteArray *res, bool isPri)
 }
 
 
-// Converts bitmaps (pic and pri) into an AGI "picture" resrouce.
+// Converts bitmaps (pic and pri) into an AGI "picture" resource.
 // Returns NULL if success, or error message otherwise.
 const char *bitmapToAGIPicture(const QImage &pic, const QImage &pri, QByteArray *res)
 {
@@ -374,14 +373,14 @@ const char *bitmapToAGIPicture(const QImage &pic, const QImage &pri, QByteArray 
             return ("Priority bitmap size must be 160x168 or 320x168.");
 
     // Set brush once at the beginning
-    *res += char(0xF9);   // Change pen size & style
-    *res += char(0x00);   // solid single pixel
+    *res += char(SetPattern);   // Change pen size & style
+    *res += char(0x00);         // solid single pixel
 
     oneChannelToAGIPicture(pic, res, false);
     if (!pri.isNull())
         oneChannelToAGIPicture(pri, res, true);
 
-    *res += char(0xFF);   // eof marker
+    *res += char(DrawEnd);   // eof marker
 
     return NULL;
 }
