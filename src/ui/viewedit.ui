@@ -640,7 +640,7 @@
     <addaction name="actionInsertAfterLoop"/>
     <addaction name="actionAppendLoop"/>
     <addaction name="actionDeleteLoop"/>
-    <addaction name="actionClear"/>
+    <addaction name="actionClearLoop"/>
    </widget>
    <widget class="QMenu" name="menu_Cel">
     <property name="title">
@@ -780,7 +780,7 @@
     <string>&amp;Delete</string>
    </property>
   </action>
-  <action name="actionClear">
+  <action name="actionClearLoop">
    <property name="text">
     <string>&amp;Clear</string>
    </property>
