@@ -150,17 +150,17 @@ void ResourcesWin::select_resource(int k)
         return;
     switch (selected) {
         case LOGIC:
-            winlist[n].w.l = new LogEdit(nullptr, nullptr, n);
+            winlist[n].w.l = new LogEdit(nullptr, nullptr, n, this);
             winlist[n].type = LOGIC;
             winlist[n].w.l->open(i);
             break;
         case PICTURE:
-            winlist[n].w.p = new PicEdit(nullptr, nullptr, n);
+            winlist[n].w.p = new PicEdit(nullptr, nullptr, n, this);
             winlist[n].type = PICTURE;
             winlist[n].w.p->open(i);
             break;
         case VIEW:
-            winlist[n].w.v = new ViewEdit(nullptr, nullptr, n);
+            winlist[n].w.v = new ViewEdit(nullptr, nullptr, n, this);
             winlist[n].type = VIEW;
             winlist[n].w.v->open(i);
             break;
