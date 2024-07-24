@@ -93,7 +93,7 @@ ViewEdit::ViewEdit(QWidget *parent, const char *name, int win_num, ResourcesWin 
     connect(actionInsertAfterLoop, &QAction::triggered, this, &ViewEdit::insert_loop_after);
     connect(actionAppendLoop, &QAction::triggered, this, &ViewEdit::append_loop);
     connect(actionDeleteLoop, &QAction::triggered, this, &ViewEdit::delete_loop);
-    connect(actionClear, &QAction::triggered, this, &ViewEdit::clear_loop);
+    connect(actionClearLoop, &QAction::triggered, this, &ViewEdit::clear_loop);
 
     connect(actionNextCel, &QAction::triggered, this, &ViewEdit::next_cel);
     connect(actionPreviousCel, &QAction::triggered, this, &ViewEdit::previous_cel);
