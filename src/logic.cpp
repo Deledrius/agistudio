@@ -26,6 +26,5 @@ Logic::Logic()
 {
     wordlist = new WordList();
     objlist = new ObjList();
-    maxcol = 80;
     OutputText = "";
 }

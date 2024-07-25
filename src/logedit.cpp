@@ -181,7 +181,7 @@ private:
 //***********************************************
 LogEdit::LogEdit(QWidget *parent, const char *name, int win_num, ResourcesWin *res, bool readonly)
     : QMainWindow(parent), findedit(nullptr), roomgen(nullptr), winnum(win_num), resources_win(res),
-      changed(false), filename(), LogicNum(0), maxcol(0)
+      changed(false), filename(), LogicNum(0)
 {
     setupUi(this);
 
@@ -215,6 +215,7 @@ LogEdit::LogEdit(QWidget *parent, const char *name, int win_num, ResourcesWin *r
         connect(actionFind, &QAction::triggered, this, &LogEdit::find_cb);
         connect(actionFindNext, &QAction::triggered, this, &LogEdit::find_again);
         connect(actionGotoLine, &QAction::triggered, this, &LogEdit::goto_cb);
+        connect(actionWrapLongLines, &QAction::triggered, this, &LogEdit::wrap_lines);
 
         connect(actionCompile, &QAction::triggered, this, &LogEdit::compile_logic);
         connect(actionCompileAll, &QAction::triggered, this, &LogEdit::compile_all_logic);
@@ -229,7 +230,6 @@ LogEdit::LogEdit(QWidget *parent, const char *name, int win_num, ResourcesWin *r
         connect(textEditor, &QTextEdit::cursorPositionChanged, this, &LogEdit::update_line_num);
     }
 
-    getmaxcol();
     hide();
 }
 
@@ -306,7 +306,6 @@ void LogEdit::closeEvent(QCloseEvent *e)
 //***********************************************
 int LogEdit::open()
 {
-    getmaxcol();
     LogicNum = -1;
     show();
     changed = true;
@@ -317,8 +316,6 @@ int LogEdit::open()
 //***********************************************
 int LogEdit::open(const std::string &filepath)
 {
-    getmaxcol();
-
     QFile file(filepath.c_str());
     if (file.open(QIODeviceBase::ReadOnly)) {
         filename = filepath;
@@ -352,8 +349,6 @@ int LogEdit::open(const std::string &filepath)
 int LogEdit::open(int ResNum)
 {
     int err = 0;
-    getmaxcol();
-    logic->maxcol = maxcol;
 
     // Look for a valid source file first
     QStringList test_paths = {
@@ -660,6 +655,15 @@ void LogEdit::goto_cb()
 }
 
 //***********************************************
+void LogEdit::wrap_lines()
+{
+    if (actionWrapLongLines->isChecked())
+        textEditor->setLineWrapMode(QTextEdit::WidgetWidth);
+    else
+        textEditor->setLineWrapMode(QTextEdit::NoWrap);
+}
+
+//***********************************************
 void LogEdit::find_cb()
 {
     if (findedit == nullptr)
@@ -675,21 +679,6 @@ void LogEdit::find_again()
         find_cb();
     else
         findedit->find_next_cb();
-}
-
-//***********************************************
-void LogEdit::getmaxcol()
-// Get maximum number of columns on screen (approx.)
-// (for formatting the 'print' messages)
-{
-    QFontMetrics f = fontMetrics();
-    maxcol = textEditor->width() / f.horizontalAdvance('a');
-}
-
-//***********************************************
-void LogEdit::resizeEvent(QResizeEvent *)
-{
-    getmaxcol();
 }
 
 //***********************************************
@@ -753,6 +742,7 @@ TextEdit::TextEdit(QWidget *parent, const char *name, int win_num)
     connect(actionClear, &QAction::triggered, this, &TextEdit::clear_all);
     connect(actionFind, &QAction::triggered, this, &TextEdit::find_cb);
     connect(actionFindNext, &QAction::triggered, this, &TextEdit::find_again);
+    connect(actionWrapLongLines, &QAction::triggered, this, &TextEdit::wrap_lines);
 }
 
 //***********************************************
@@ -942,6 +932,15 @@ void TextEdit::find_again()
         find_cb();
     else
         findedit->find_next_cb();
+}
+
+//***********************************************
+void TextEdit::wrap_lines()
+{
+    if (actionWrapLongLines->isChecked())
+        textEditor->setLineWrapMode(QTextEdit::WidgetWidth);
+    else
+        textEditor->setLineWrapMode(QTextEdit::NoWrap);
 }
 
 //***********************************************

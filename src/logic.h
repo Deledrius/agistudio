@@ -45,7 +45,6 @@ public:
     ObjList *objlist;
     std::string OutputText;     //result of the decoding
     std::string ErrorList;      //compilation error messages
-    unsigned int maxcol;        //max number of columns in window - used in formatting 'print' strings
     int compile();
     int decode(int resnum);
 

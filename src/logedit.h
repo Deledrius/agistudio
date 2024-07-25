@@ -75,7 +75,6 @@ public:
     Logic *logic;
     LogicSyntaxHL *syntax_hl;
     std::string filename;
-    unsigned int maxcol;
     int open();
     int open(int ResNum);
 public slots:
@@ -95,6 +94,7 @@ public slots:
     void context_help();
     void command_help();
     void update_line_num();
+    void wrap_lines();
 protected:
     int LogicNum;
     int winnum;
@@ -103,8 +103,6 @@ protected:
     void save(const std::string &filename);
     void deinit();
     void delete_file(int num);
-    void getmaxcol();
-    void resizeEvent(QResizeEvent *);
     void closeEvent(QCloseEvent *e);
     void showEvent(QShowEvent *);
     void hideEvent(QHideEvent *);
@@ -130,6 +128,7 @@ public slots:
     void save_as();
     void find_cb();
     void find_again();
+    void wrap_lines();
 protected:
     std::string OutputText;
     int winnum;
