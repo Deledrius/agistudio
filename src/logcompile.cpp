@@ -488,7 +488,7 @@ void Logic::NextLine()
     int NumLines = EditLines.count();
 
     CurLine++;
-    if (CurLine > NumLines) {
+    if (CurLine >= NumLines) {
         FinishedReading = true;
         return;
     }

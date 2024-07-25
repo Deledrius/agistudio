@@ -58,6 +58,8 @@
     <addaction name="actionFindNext"/>
     <addaction name="separator"/>
     <addaction name="actionGotoLine"/>
+    <addaction name="separator"/>
+    <addaction name="actionWrapLongLines"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -217,6 +219,14 @@
   <action name="actionNewScript">
    <property name="text">
     <string>Read from File...</string>
+   </property>
+  </action>
+  <action name="actionWrapLongLines">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Wrap Long Lines</string>
    </property>
   </action>
  </widget>

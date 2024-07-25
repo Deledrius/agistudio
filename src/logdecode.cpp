@@ -266,7 +266,6 @@ int Logic::FindLabels(void)
 //***************************************************
 void Logic::AddArg(byte Arg, byte ArgType)
 {
-    int NumCharsToDisplay;
     std::string ThisMessage;
     if (ShowArgTypes) {
         switch (ArgType) {
@@ -274,30 +273,8 @@ void Logic::AddArg(byte Arg, byte ArgType)
                 if (MessageExists[Arg]) {
                     std::string ThisMessage = Messages[Arg];
                     do {
-                        if (ThisMessage.length() + ThisLine.length() > maxcol) {
-                            NumCharsToDisplay = maxcol - ThisLine.length();
-                            do {
-                                NumCharsToDisplay--;
-                            } while (!(NumCharsToDisplay <= 0 || ThisMessage[NumCharsToDisplay] == ' '));
-                            if (NumCharsToDisplay <= 0)
-                                NumCharsToDisplay = maxcol - ThisLine.length();
-                            if (NumCharsToDisplay <= 0)
-                                NumCharsToDisplay = ThisMessage.length();
-                            ThisLine += "\"" + ThisMessage.substr(0, NumCharsToDisplay) + "\"";
-                            if (NumCharsToDisplay < (int)ThisMessage.length()) {
-                                ThisMessage = ThisMessage.substr(NumCharsToDisplay + 1);
-                                OutputText.append(ThisLine + "\n");
-                            } else {
-                                ThisMessage = "";
-                                OutputText.append(ThisLine);
-                            }
-                            if (ArgsStart >= maxcol - 20)
-                                ArgsStart = maxcol - 20;
-                            ThisLine = QString(" ").repeated(ArgsStart).toStdString();
-                        } else {
-                            ThisLine +=  "\"" + ThisMessage +  "\"" ;
-                            ThisMessage = "";
-                        }
+                        ThisLine +=  "\"" + ThisMessage +  "\"" ;
+                        ThisMessage = "";
                     } while (ThisMessage.length() > 0);
                 } else if (ShowNonExistingValues)
                     ThisLine += ArgTypePrefix[atMsg] + std::to_string(Arg);
