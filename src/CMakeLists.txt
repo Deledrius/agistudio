@@ -119,7 +119,8 @@ qt_add_resources(RCC_SOURCES ${AGIStudio_UIRESOURCES})
 # Create a group for the template project files
 set(AGIStudio_TEMPLATEFILES 
 	../template/logdir ../template/object ../template/picdir ../template/snddir ../template/viewdir ../template/vol.0 ../template/words.tok )
-source_group("Template Files" FILES ${AGIStudio_TEMPLATEFILES})
+file(GLOB AGIStudio_TEMPLATESRCFILES ../template/src/*.txt)
+source_group("Template Files" FILES ${AGIStudio_TEMPLATEFILES} ${AGIStudio_TEMPLATESRCFILES})
 
 # Create a group for the help files
 file(GLOB AGIStudio_HELPFILES ../help/*.html ../help/*.css ../help/*.png)
@@ -127,9 +128,11 @@ source_group("Help Files" FILES ${AGIStudio_HELPFILES})
 
 if (APPLE)
     set_source_files_properties(${AGIStudio_TEMPLATEFILES} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources/template")
+    set_source_files_properties(${AGIStudio_TEMPLATESRCFILES} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources/template/src")
     set_source_files_properties(${AGIStudio_HELPFILES} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources/help")
 else ()
     install(FILES ${AGIStudio_TEMPLATEFILES} DESTINATION ${CMAKE_INSTALL_BINDIR}/template)
+    install(FILES ${AGIStudio_TEMPLATESRCFILES} DESTINATION ${CMAKE_INSTALL_BINDIR}/template/src)
     install(FILES ${AGIStudio_HELPFILES} DESTINATION ${CMAKE_INSTALL_BINDIR}/help)
 endif()
 
@@ -141,7 +144,7 @@ source_group("UI Files" FILES ${AGIStudio_UI})
 
 add_executable(AGIStudio WIN32 MACOSX_BUNDLE
                ${AGIStudio_HEADERS} ${AGIStudio_SOURCES} ${AGIStudio_RESOURCES} ${AGIStudio_UI} ${RCC_SOURCES}
-               ${AGIStudio_TEMPLATEFILES} ${AGIStudio_HELPFILES})
+               ${AGIStudio_TEMPLATEFILES} ${AGIStudio_TEMPLATESRCFILES} ${AGIStudio_HELPFILES})
 
 target_link_libraries(AGIStudio PRIVATE Qt6::Core Qt6::Widgets Qt6::Multimedia)
 
