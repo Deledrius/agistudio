@@ -682,7 +682,7 @@ void Logic::ReadArgs(bool CommandIsIf, byte CmdNum)
                 ShowError(CurLine, "Invalid word number for argument " + std::to_string(NumSaidArgs) + " (must be 0-65535).");
                 SaidArgs[NumSaidArgs] = 0;
             }
-            if ((LinePos < LineLength) & (LowerCaseLine[LinePos] == ',')) {
+            if ((LinePos < LineLength) && (LowerCaseLine[LinePos] == ',')) {
                 if (NumSaidArgs > MaxSaidArgs) {
                     ShowError(CurLine, "Too many arguments for said command.");
                     FinishedReadingSaidArgs = true;
