@@ -529,7 +529,6 @@ void PreviewView::update()
 
     int w = view->loops[view->CurLoop].cels[view->CurCel].width;
     int h = view->loops[view->CurLoop].cels[view->CurCel].height;
-    bool mirror = (view->loops[view->CurLoop].mirror != -1);
     byte *data = view->loops[view->CurLoop].cels[view->CurCel].data;
 
     if (cur_w != w || cur_h != h) {
@@ -540,16 +539,9 @@ void PreviewView::update()
 
     QPainter p(&pixmap);
 
-    if (mirror) {
-        for (y = 0; y < h; y++) {
-            for (x = 0; x < w * 2; x += 2)
-                p.fillRect(x * pixsize, y * pixsize, pixsize * 2, pixsize, egacolor[data[y * w * 2 + w * 2 - 2 - x]]);
-        }
-    } else {
-        for (y = 0; y < h; y++) {
-            for (x = 0; x < w * 2; x += 2)
-                p.fillRect(x * pixsize, y * pixsize, pixsize * 2, pixsize, egacolor[data[y * w * 2 + x]]);
-        }
+    for (y = 0; y < h; y++) {
+        for (x = 0; x < w * 2; x += 2)
+            p.fillRect(x * pixsize, y * pixsize, pixsize * 2, pixsize, egacolor[data[y * w * 2 + x]]);
     }
     repaint();
 }
