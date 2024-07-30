@@ -43,12 +43,11 @@
 
 //*****************************************
 Preview::Preview(QWidget *parent, const char  *name, ResourcesWin *res):
-    QStackedWidget(parent)
+    QStackedWidget(parent), animate(nullptr), resources_win(res)
 {
     setWindowTitle("Preview");
     make_egacolors();
 
-    resources_win = res;
     // Logic
     w_logic = new QWidget(this);
     w_logic->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -96,7 +95,7 @@ Preview::Preview(QWidget *parent, const char  *name, ResourcesWin *res):
     pbox->addWidget(p_picture);
     pbox->addSpacing(5);
 
-    QHBoxLayout *pbox1 = new QHBoxLayout(w_picture);
+    QHBoxLayout *pbox1 = new QHBoxLayout();
     pbox1->setAlignment(Qt::AlignLeft);
     QGroupBox *ptype = new QGroupBox(w_picture);
     visual = new QRadioButton(tr("Visual"), ptype);
@@ -111,7 +110,7 @@ Preview::Preview(QWidget *parent, const char  *name, ResourcesWin *res):
     connect(visual, SIGNAL(clicked()), SLOT(change_mode()));
     connect(priority, SIGNAL(clicked()), SLOT(change_mode()));
 
-    QBoxLayout *pbox2 =  new QHBoxLayout(w_picture);
+    QBoxLayout *pbox2 =  new QHBoxLayout();
     pbox->addLayout(pbox2);
     QPushButton *pedit = new QPushButton("Edit", w_picture);
     pedit->setMaximumWidth(100);
@@ -137,7 +136,7 @@ Preview::Preview(QWidget *parent, const char  *name, ResourcesWin *res):
     vbox->layout()->setContentsMargins(0, 0, 0, 0);
 
     int maxrow1 = 3, maxcol1 = 5;
-    QGridLayout *grid1 = new QGridLayout(w_view);
+    QGridLayout *grid1 = new QGridLayout();
     vbox->addLayout(grid1);
 
     int i;
@@ -242,8 +241,6 @@ Preview::Preview(QWidget *parent, const char  *name, ResourcesWin *res):
     addWidget(w_view);
     addWidget(w_sound);
     addWidget(w_logic);
-
-    animate = nullptr;
 }
 
 //*****************************************
