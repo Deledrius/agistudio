@@ -22,6 +22,7 @@
 
 
 #include <algorithm>
+#include <fstream>
 
 #include <QColor>
 #include <QFileInfo>
@@ -40,7 +41,12 @@ static int picColour0, priColour0;
 //*********************************************************
 Picture::Picture() :
     brushSize(1), brushTexture(), brushShape(), picPos(picCodes.begin()),
-    bg_on(false)
+    bg_on(false), add_pic(), add_pri(), bgpix(), buf(), clickX(), clickY(),
+    code_pic(), code_pri(), curcol(), curp(), dX(), dY(), drawing_mode(),
+    firstClick(), newp(), numClicks(), patCode(), patNum(), picColour(),
+    picDrawEnabled(), picture(), pptr(), priColour(), priDrawEnabled(),
+    priority(), refill_pic(), refill_pri(), refill_x(), refill_y(),
+    rpos(), spos(), stepClicks(), tool()
 { }
 
 //*********************************************************
@@ -600,16 +606,16 @@ void Picture::load(byte *picdata, int picsize)
 //*************************************************
 int Picture::open(const std::string &filename)
 {
-    FILE *fptr = fopen(filename.c_str(), "rb");
+    std::ifstream pic_stream(filename, std::ios::binary);
 
-    if (fptr == NULL) {
+    if (!pic_stream.is_open()) {
         menu->errmes("Can't open file '%s'!", filename.c_str());
         return 1;
     }
 
-    ResourceData.Size = QFileInfo(filename.c_str()).size();
-    fread(ResourceData.Data, ResourceData.Size, 1, fptr);
-    fclose(fptr);
+    ResourceData.Size = std::filesystem::file_size(filename);
+    pic_stream.read(reinterpret_cast<char *>(ResourceData.Data), ResourceData.Size);
+    pic_stream.close();
 
     load(ResourceData.Data, ResourceData.Size);
     refill_pic = refill_pri = false;
@@ -641,15 +647,15 @@ int Picture::save(int ResNum)
 //*************************************************
 int Picture::save(const std::string &filename)
 {
-    FILE *fptr = fopen(filename.c_str(), "wb");
+    std::ofstream pic_stream(filename, std::ios::binary | std::ios::trunc);
 
-    if (fptr == NULL) {
+    if (!pic_stream.is_open()) {
         menu->errmes("Can't open file '%s'!", filename.c_str());
         return 1;
     }
     save();
-    fwrite(ResourceData.Data, ResourceData.Size, 1, fptr);
-    fclose(fptr);
+    pic_stream.write(reinterpret_cast<char *>(ResourceData.Data), ResourceData.Size);
+    pic_stream.close();
     return 0;
 }
 
