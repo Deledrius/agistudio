@@ -22,45 +22,46 @@
 #define WORDS_H
 
 
+#include <map>
 #include <string>
+#include <vector>
 
 #include <QStringList>
 
-
-typedef struct {
-    QStringList Words;
-    int GroupNum;
-} TWordGroup;
-
-#define MaxGroupNum 65535
-#define MaxWordGroups 10000
 
 class WordList
 {
 public:
     WordList();
-    TWordGroup WordGroup[MaxWordGroups];
-    int NumGroups;
-    char WhatToDoWithExistingWords;
+
     void clear();
-    int read(const std::string &filename);
-    int save(const std::string &filename);
-    int add_group(int num);
-    int delete_group(int num);
-    int delete_word(const std::string &word, int SelectedGroup);
-    int change_number(int oldnum, int newnum);
-    int GetWordGroupIndex(int GroupNum) const;
-    int GetNew_GroupIndex(int GroupNum) const;
-    void merge(const WordList &w);
-    int GroupIndexOfWord(const std::string &word) const;
-    bool OKToReplaceWord(const std::string &TheWord, int OldGroupNum, int NewGroupNum);
-    bool InsertWordGroup(int GroupNum);
+    int  read(const std::string &filename);
+    int  save(const std::string &filename);
+    int  add_group(int num);
+    void delete_group(int num);
+    int  add_word(const std::string &word, int SelectedGroup);
+    int  delete_word(const std::string &word, int SelectedGroup);
+    int  change_number(int oldnum, int newnum);
+
+    size_t GetNumWordGroups() const;
+    size_t GetTotalWordCount() const;
+    int  GetWordGroupNumberByIndex(size_t) const;
+    int  GroupNumOfWord(const std::string &word) const;
     bool GroupExists(int GroupNum) const;
+    const std::vector<uint16_t> GetWordGroupNumbers() const;
+    const std::vector<std::string> GetGroupWords(int) const;
+
+    enum ReplaceMode {
+        Ask,
+        Always,
+        Never
+    };
+    void merge(const WordList &w);
+    bool OKToReplaceWord(const std::string &TheWord, int OldGroupNum, int NewGroupNum, ReplaceMode &WhatToDoWithExistingWords);
+
+protected:
+    std::map <uint16_t, std::vector<std::string>> WordGroup;
 };
 
-
-#define AskUser       0
-#define AlwaysReplace 1
-#define NeverReplace  2
 
 #endif

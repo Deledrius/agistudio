@@ -459,7 +459,7 @@ void Logic::AddSpecialIFSyntaxCommand(void)
 //***************************************************
 void Logic::ReadIfs(void)
 {
-    int ThisWordGroupIndex, ThisWordGroupNum;
+    int ThisWordGroupNum;
 
     FirstCommand = true;
     OROn = false;
@@ -515,8 +515,7 @@ void Logic::ReadIfs(void)
                     NumSaidArgs = ReadByte();
                     for (CurArg = 1; CurArg <= NumSaidArgs; CurArg++) {
                         ThisWordGroupNum = ReadLSMSWord();
-                        ThisWordGroupIndex = wordlist->GetWordGroupIndex(ThisWordGroupNum);
-                        if (ThisWordGroupIndex < 0) {
+                        if (!wordlist->GroupExists(ThisWordGroupNum)) {
                             if (ShowNonExistingValues)
                                 ThisLine += std::to_string(ThisWordGroupNum);
                             else {
@@ -526,7 +525,7 @@ void Logic::ReadIfs(void)
                                 break;
                             }
                         } else {
-                            ThisLine += '"' + wordlist->WordGroup[ThisWordGroupIndex].Words.at(0).toStdString() + '"';
+                            ThisLine += '"' + wordlist->GetGroupWords(ThisWordGroupNum).at(0) + '"';
                             if (CurArg < NumSaidArgs)
                                 ThisLine += ',';
                         }

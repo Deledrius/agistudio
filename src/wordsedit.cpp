@@ -33,7 +33,7 @@
 WordsEdit::WordsEdit(QWidget *parent, const char *name, int win_num, ResourcesWin *res)
     : QMainWindow(parent), winnum(win_num), resources_win(res),
       wordsfind(nullptr), wordlist(new WordList), changed(false), resource_filename(),
-      SelectedGroup(0), FindLastGroup(-1), FindLastWord(-1)
+      FindLastGroup(-1), FindLastWord(-1)
 {
     setupUi(this);
 
@@ -57,7 +57,7 @@ WordsEdit::WordsEdit(QWidget *parent, const char *name, int win_num, ResourcesWi
     connect(actionCountWords, &QAction::triggered, this, &WordsEdit::count_words_cb);
 
     // Event signal handlers
-    connect(listGroup, &QListWidget::itemSelectionChanged, this, qOverload<>(&WordsEdit::select_group));
+    connect(listGroups, &QListWidget::itemSelectionChanged, this, qOverload<>(&WordsEdit::select_group));
     connect(listWords, &QListWidget::itemSelectionChanged, this, &WordsEdit::select_word);
 
     // Button signal handlers
@@ -128,26 +128,27 @@ void WordsEdit::closeEvent(QCloseEvent *e)
 //********************************************************
 void WordsEdit::update_all()
 {
-    listGroup->clear();
+    listGroups->clear();
     listWords->clear();
-    QString entry;
 
-    if (wordlist->NumGroups > 0) {
-        for (int i = 0; i < wordlist->NumGroups; i++) {
-            entry = QString("%1. ").arg(wordlist->WordGroup[i].GroupNum);
-            for (int k = 0; k < wordlist->WordGroup[i].Words.count(); k++) {
-                if (k > 0)
-                    entry += " | ";
-                entry += wordlist->WordGroup[i].Words.at(k);
-            }
-            listGroup->insertItem(i, entry);
+    for (const auto &group_num : wordlist->GetWordGroupNumbers()) {
+        auto entry = QString("%1. ").arg(group_num);
+
+        for (bool isFirst(true); const auto &word : wordlist->GetGroupWords(group_num)) {
+            if (!isFirst)
+                entry += " | ";
+            entry += word.c_str();
+            isFirst = false;
         }
+
+        listGroups->insertItem(listGroups->count(), entry);
     }
+
     show();
     changed = false;
 
-    if (listGroup->count() > 0)
-        listGroup->setCurrentRow(0);
+    if (listGroups->count() > 0)
+        listGroups->setCurrentRow(0);
 
     if (listWords->count() > 0)
         listWords->setCurrentRow(0);
@@ -157,7 +158,7 @@ void WordsEdit::update_all()
 void WordsEdit::open(const QString &fname)
 {
     if (wordlist->read(fname.toStdString()))
-        return ;
+        return;
     resource_filename = fname;
     update_all();
 }
@@ -180,21 +181,22 @@ void WordsEdit::add_group_cb(void)
     if ((i = wordlist->add_group(num)) == -1)
         return;
 
-    listGroup->insertItem(i, QString("%1. ").arg(QString::number(num)));
-    listGroup->setCurrentRow(i);
+    listGroups->insertItem(i, QString("%1. ").arg(QString::number(num)));
+    listGroups->setCurrentRow(i);
     changed = true;
 }
 
 //********************************************************
 void WordsEdit::delete_group_cb(void)
 {
-    int rm = listGroup->currentRow();
+    int rm = listGroups->currentRow();
     if (rm != -1) {
-        wordlist->delete_group(rm);
-        auto item = listGroup->takeItem(rm);
+        auto group_num = wordlist->GetWordGroupNumberByIndex(rm);
+        wordlist->delete_group(group_num);
+        auto item = listGroups->takeItem(rm);
         delete item;
-        if (wordlist->NumGroups > 0) {
-            listGroup->setCurrentRow(rm);
+        if (wordlist->GetNumWordGroups() > 0) {
+            listGroups->setCurrentRow(rm);
             select_group(rm);
         } else
             listWords->clear();
@@ -203,37 +205,40 @@ void WordsEdit::delete_group_cb(void)
 }
 
 //********************************************************
-const QString WordsEdit::format_group(int curgroup) const
+const QString WordsEdit::format_group(int curgroupidx) const
 {
-    QString group_words = QString("%1. ").arg(wordlist->WordGroup[curgroup].GroupNum);
+    auto group_num = wordlist->GetWordGroupNumberByIndex(curgroupidx);
+    auto group_words = QString("%1. ").arg(group_num);
 
-    for (qsizetype i = 0; i < wordlist->WordGroup[curgroup].Words.count(); i++) {
-        if (i > 0)
+    for (bool isFirst(true); const auto &word : wordlist->GetGroupWords(group_num)) {
+        if (!isFirst)
             group_words += " | ";
-        group_words += wordlist->WordGroup[curgroup].Words.at(i);
+        group_words += word.c_str();
+        isFirst = false;
     }
 
     return group_words;
 }
 
 //********************************************************
-void WordsEdit::update_group(int curgroup)
+void WordsEdit::update_group(int curgroupidx)
 {
-    auto item = listGroup->item(curgroup);
-    item->setText(format_group(curgroup));
-    listGroup->editItem(item);
+    auto item = listGroups->item(curgroupidx);
+    item->setText(format_group(curgroupidx));
+    listGroups->editItem(item);
 }
 
 //********************************************************
 void WordsEdit::delete_word_cb(void)
 {
     QString str = lineWord->text();
-    int k = wordlist->delete_word(str.toStdString(), SelectedGroup);
+    auto group_num = wordlist->GetWordGroupNumberByIndex(listGroups->currentRow());
+    int k = wordlist->delete_word(str.toStdString(), group_num);
     if (k != -1) {
         lineWord->clear();
         auto item = listWords->takeItem(k);
         delete item;
-        update_group(SelectedGroup);
+        update_group(listGroups->currentRow());
         select_word();
         changed = true;
         return;
@@ -249,13 +254,13 @@ void WordsEdit::change_group_number_cb(void)
         return;
 
     int i;
-    int currentgroup = listGroup->currentRow();
+    int currentgroup = listGroups->currentRow();
     if ((i = wordlist->change_number(currentgroup, num)) == -1)
         return;
 
-    auto item = listGroup->takeItem(currentgroup);
+    auto item = listGroups->takeItem(currentgroup);
     delete item;
-    listGroup->insertItem(i, "");
+    listGroups->insertItem(i, "");
     update_group(i);
     changed = true;
 }
@@ -272,9 +277,10 @@ void WordsEdit::find_cb(void)
 //********************************************************
 int WordsEdit::find_down(const QString &word)
 {
-    for (int i = FindLastGroup; i < wordlist->NumGroups; i++) {
-        for (int k = FindLastWord; k < wordlist->WordGroup[i].Words.count(); k++) {
-            if (!QString::compare(wordlist->WordGroup[i].Words.at(k), word)) {
+    for (auto i = FindLastGroup; i < wordlist->GetNumWordGroups(); i++) {
+        auto group_num = wordlist->GetWordGroupNumberByIndex(i);
+        for (auto k = FindLastWord; k < wordlist->GetGroupWords(group_num).size(); k++) {
+            if (!QString::compare(wordlist->GetGroupWords(group_num).at(k).c_str(), word)) {
                 FindLastWord = k;
                 FindLastGroup = i;
                 return 1;
@@ -282,24 +288,27 @@ int WordsEdit::find_down(const QString &word)
         }
         FindLastWord = 0;
     }
-    FindLastGroup = wordlist->NumGroups - 1;
-    FindLastWord = wordlist->WordGroup[FindLastGroup].Words.count() - 1;
+    FindLastGroup = wordlist->GetNumWordGroups() - 1;
+    auto group_num = wordlist->GetWordGroupNumberByIndex(FindLastGroup);
+    FindLastWord = wordlist->GetGroupWords(group_num).size() - 1;
     return 0;
 }
 
 //********************************************************
 int WordsEdit::find_up(const QString &word)
 {
-    for (int i = FindLastGroup; i >= 0; i--) {
-        for (int k = FindLastWord; k >= 0; k--) {
-            if (!QString::compare(wordlist->WordGroup[i].Words.at(k), word)) {
+    for (auto i = FindLastGroup; i >= 0; i--) {
+        auto group_num = wordlist->GetWordGroupNumberByIndex(i);
+        for (auto k = FindLastWord; k >= 0; k--) {
+            if (!QString::compare(wordlist->GetGroupWords(group_num).at(k).c_str(), word)) {
                 FindLastWord = k;
                 FindLastGroup = i;
                 return 1;
             }
         }
+        group_num = wordlist->GetWordGroupNumberByIndex(i - 1);
         if (i > 0)
-            FindLastWord = wordlist->WordGroup[i - 1].Words.count() - 1;
+            FindLastWord = wordlist->GetGroupWords(group_num).size() - 1;
     }
     FindLastWord = 0;
     FindLastGroup = 0;
@@ -309,23 +318,22 @@ int WordsEdit::find_up(const QString &word)
 //********************************************************
 void WordsEdit::select_group()
 {
-    listGroup->currentRow();
-    if (listGroup->selectedItems().isEmpty())
+    listGroups->currentRow();
+    if (listGroups->selectedItems().isEmpty())
         listWords->clear();
     else
-        select_group(listGroup->currentRow());
+        select_group(listGroups->currentRow());
 }
 
 //********************************************************
-void WordsEdit::select_group(int num)
+void WordsEdit::select_group(int groupidx)
 {
-    labelWord->setText(QString("Word Group #%1").arg(QString::number(wordlist->WordGroup[num].GroupNum)));
-
-    SelectedGroup = num;
+    int group_num = wordlist->GetWordGroupNumberByIndex(groupidx);
+    labelWord->setText(QString("Word Group #%1").arg(QString::number(group_num)));
 
     listWords->clear();
-    for (qsizetype k = 0; k < wordlist->WordGroup[num].Words.count(); k++)
-        listWords->insertItem(k, wordlist->WordGroup[num].Words.at(k));
+    for (const auto &word : wordlist->GetGroupWords(group_num))
+        listWords->insertItem(listWords->count(), word.c_str());
     pushButtonRemoveWord->setEnabled(false);
     lineWord->clear();
     lineWord->setEnabled(false);
@@ -336,7 +344,8 @@ void WordsEdit::select_group(int num)
 void WordsEdit::select_word()
 {
     if (!listWords->selectedItems().isEmpty()) {
-        lineWord->setText(wordlist->WordGroup[SelectedGroup].Words.at(listWords->currentRow()));
+        auto group_num = wordlist->GetWordGroupNumberByIndex(listGroups->currentRow());
+        lineWord->setText(wordlist->GetGroupWords(group_num).at(listWords->currentRow()).c_str());
         pushButtonRemoveWord->setEnabled(true);
     }
 }
@@ -344,7 +353,7 @@ void WordsEdit::select_word()
 //********************************************************
 void WordsEdit::add_word_cb(void)
 {
-    lineWord ->setEnabled(true);
+    lineWord->setEnabled(true);
     lineWord->setText("new word");
     lineWord->selectAll();
     lineWord->setFocus();
@@ -357,17 +366,19 @@ void WordsEdit::do_add_word(void)
 
     FindLastWord = 0;
     FindLastGroup = 0;
-    int curgroup = listGroup->currentRow();
+    int curgroup_index = listGroups->currentRow();
+    auto group_num = wordlist->GetWordGroupNumberByIndex(listGroups->currentRow());
     if (find_down(word)) {
-        auto prompt = tr("This word already exists (in group %1).\nDo you wish to remove this occurance and add it to this group?").arg(wordlist->WordGroup[FindLastGroup].GroupNum);
+        group_num = wordlist->GetWordGroupNumberByIndex(FindLastGroup);
+        auto prompt = tr("This word already exists (in group %1).\nDo you wish to remove this occurance and add it to this group?").arg(group_num);
 
         switch (QMessageBox::warning(this, tr("Remove duplicate word?"),
                                      prompt,
                                      QMessageBox::Yes | QMessageBox::No,
                                      QMessageBox::No)) {
             case QMessageBox::Yes:
-                wordlist->WordGroup[FindLastGroup].Words.removeAt(FindLastWord);
-                update_group(FindLastGroup);
+                wordlist->delete_word(word.toStdString(), group_num);
+                update_group(static_cast<int>(FindLastGroup));
                 changed = true;
                 break;
             default:
@@ -375,25 +386,22 @@ void WordsEdit::do_add_word(void)
         }
     }
 
-    wordlist->WordGroup[curgroup].Words.append(word);
-    wordlist->WordGroup[curgroup].Words.sort();
+    wordlist->add_word(word.toStdString(), group_num);
     changed = true;
-    select_group(curgroup);
-    update_group(curgroup);
+    select_group(curgroup_index);
+    update_group(curgroup_index);
 }
 
 //********************************************************
 void WordsEdit::count_groups_cb(void)
 {
-    QMessageBox::information(this, tr("AGI studio"), tr("There are %1 word groups.").arg(QString::number(wordlist->NumGroups)));
+    QMessageBox::information(this, tr("AGI studio"), tr("There are %1 word groups.").arg(QString::number(wordlist->GetNumWordGroups())));
 }
 
 //********************************************************
 void WordsEdit::count_words_cb(void)
 {
-    int n = 0;
-    for (int i = 0; i < wordlist->NumGroups; i++)
-        n += wordlist->WordGroup[i].Words.count();
+    size_t n = wordlist->GetTotalWordCount();
     QMessageBox::information(this, tr("AGI studio"), tr("There are %1 words.").arg(QString::number(n)));
 }
 
@@ -417,10 +425,10 @@ void WordsEdit::save_as_file()
 void WordsEdit::new_file()
 {
     wordlist->clear();
-    listGroup->clear();
+    listGroups->clear();
     listWords->clear();
     for (int i = 0; i < 3; i++)
-        listGroup->insertItem(listGroup->count(), format_group(i));
+        listGroups->insertItem(listGroups->count(), format_group(i));
     resource_filename = "";
     update_all();
 }
@@ -428,7 +436,7 @@ void WordsEdit::new_file()
 //********************************************************
 void WordsEdit::save(const QString &fname)
 {
-    if (wordlist->NumGroups == 0) {
+    if (wordlist->GetNumWordGroups() == 0) {
         menu->errmes("Error: Could not save the file as there are no word groups.");
         return;
     }
@@ -478,10 +486,11 @@ int WordsFind::find_down(QString *word)
 {
     bool sub = radioButtonMatchSubstr->isChecked();
 
-    for (int i = FindLastGroup; i < wordlist->NumGroups; i++) {
-        for (int k = FindLastWord; k < wordlist->WordGroup[i].Words.count(); k++) {
-            if ((sub && wordlist->WordGroup[i].Words.at(k).contains(*word)) ||
-                    !QString::compare(wordlist->WordGroup[i].Words.at(k), *word)) {
+    for (auto i = FindLastGroup; i < wordlist->GetNumWordGroups(); i++) {
+        auto group_num = wordlist->GetWordGroupNumberByIndex(i);
+        for (auto k = FindLastWord; k < wordlist->GetGroupWords(group_num).size(); k++) {
+            if ((sub && QString(wordlist->GetGroupWords(group_num).at(k).c_str()).contains(*word)) ||
+                    !QString::compare(wordlist->GetGroupWords(group_num).at(k).c_str(), *word)) {
                 FindLastWord = k;
                 FindLastGroup = i;
                 return 1;
@@ -489,8 +498,9 @@ int WordsFind::find_down(QString *word)
         }
         FindLastWord = 0;
     }
-    FindLastGroup = wordlist->NumGroups - 1;
-    FindLastWord = wordlist->WordGroup[FindLastGroup].Words.count() - 1;
+    FindLastGroup = wordlist->GetNumWordGroups() - 1;
+    auto group_num = wordlist->GetWordGroupNumberByIndex(FindLastGroup);
+    FindLastWord = wordlist->GetGroupWords(group_num).size() - 1;
     return 0;
 }
 
@@ -499,17 +509,19 @@ int WordsFind::find_up(QString *word)
 {
     bool sub = radioButtonMatchSubstr->isChecked();
 
-    for (int i = FindLastGroup; i >= 0; i--) {
-        for (int k = FindLastWord; k >= 0; k--) {
-            if ((sub && wordlist->WordGroup[i].Words.at(k).contains(*word)) ||
-                    !QString::compare(wordlist->WordGroup[i].Words.at(k), *word)) {
+    for (auto i = FindLastGroup; i >= 0; i--) {
+        auto group_num = wordlist->GetWordGroupNumberByIndex(i);
+        for (auto k = FindLastWord; k >= 0; k--) {
+            if ((sub && QString(wordlist->GetGroupWords(group_num).at(k).c_str()).contains(*word)) ||
+                    !QString::compare(wordlist->GetGroupWords(group_num).at(k).c_str(), *word)) {
                 FindLastWord = k;
                 FindLastGroup = i;
                 return 1;
             }
         }
+        group_num = wordlist->GetWordGroupNumberByIndex(i - 1);
         if (i > 0)
-            FindLastWord = wordlist->WordGroup[i - 1].Words.count() - 1;
+            FindLastWord = wordlist->GetGroupWords(group_num).size() - 1;
     }
     FindLastWord = 0;
     FindLastGroup = 0;
@@ -527,8 +539,8 @@ void WordsFind::find_first()
             FindLastGroup = 0;
             FindLastWord = 0;
         } else {
-            if (wordsedit->listGroup->currentRow() != -1)
-                FindLastGroup = wordsedit->listGroup->currentRow();
+            if (wordsedit->listGroups->currentRow() != -1)
+                FindLastGroup = wordsedit->listGroups->currentRow();
             else
                 FindLastGroup = 0;
             if (wordsedit->listWords->currentRow() != -1)
@@ -539,24 +551,27 @@ void WordsFind::find_first()
         ret = find_down(&word);
     } else {
         if (radioButtonFromStart->isChecked()) {
-            FindLastGroup = wordlist->NumGroups - 1;
-            FindLastWord = wordlist->WordGroup[FindLastGroup].Words.count() - 1;
+            FindLastGroup = wordlist->GetNumWordGroups() - 1;
+            auto group_num = wordlist->GetWordGroupNumberByIndex(FindLastGroup);
+            FindLastWord = wordlist->GetGroupWords(group_num).size() - 1;
         } else {
-            if (wordsedit->listGroup->currentRow() != -1)
-                FindLastGroup = wordsedit->listGroup->currentRow();
+            if (wordsedit->listGroups->currentRow() != -1)
+                FindLastGroup = wordsedit->listGroups->currentRow();
             else
-                FindLastGroup = wordlist->NumGroups - 1;
+                FindLastGroup = wordlist->GetNumWordGroups() - 1;
+
+            auto group_num = wordlist->GetWordGroupNumberByIndex(FindLastGroup);
             if (wordsedit->listWords->currentRow() != -1)
                 FindLastWord = wordsedit->listWords->currentRow();
             else
-                FindLastWord = wordlist->WordGroup[FindLastGroup].Words.count() - 1;
+                FindLastWord = wordlist->GetGroupWords(group_num).size() - 1;
         }
         ret = find_up(&word);
     }
 
     if (ret) {
-        wordsedit->listGroup->setCurrentRow(FindLastGroup);
-        wordsedit->listWords->setCurrentRow(FindLastWord);
+        wordsedit->listGroups->setCurrentRow(static_cast<int>(FindLastGroup));
+        wordsedit->listWords->setCurrentRow(static_cast<int>(FindLastWord));
     } else
         statusBar()->showMessage(tr("Search term '%1' not found!").arg(word));
 }
@@ -575,8 +590,9 @@ void WordsFind::find_next_cb()
     }
 
     if (radioButtonDirDown->isChecked()) {
-        if (FindLastWord + 1 >= wordlist->WordGroup[FindLastGroup].Words.count()) {
-            if (FindLastGroup + 1 >= wordlist->NumGroups) {
+        auto group_num = wordlist->GetWordGroupNumberByIndex(FindLastGroup);
+        if (FindLastWord + 1 >= wordlist->GetGroupWords(group_num).size()) {
+            if (FindLastGroup + 1 >= wordlist->GetNumWordGroups()) {
                 statusBar()->showMessage(tr("Search term '%1' not found!").arg(word));
                 return ;
             } else {
@@ -593,7 +609,8 @@ void WordsFind::find_next_cb()
                 return;
             } else {
                 FindLastGroup--;
-                FindLastWord = wordlist->WordGroup[FindLastGroup].Words.count() - 1;
+                auto group_num = wordlist->GetWordGroupNumberByIndex(FindLastGroup);
+                FindLastWord = wordlist->GetGroupWords(group_num).size() - 1;
             }
         } else
             FindLastWord--;
@@ -601,8 +618,8 @@ void WordsFind::find_next_cb()
     }
 
     if (ret) {
-        wordsedit->listGroup->setCurrentRow(FindLastGroup);
-        wordsedit->listWords->setCurrentRow(FindLastWord);
+        wordsedit->listGroups->setCurrentRow(static_cast<int>(FindLastGroup));
+        wordsedit->listWords->setCurrentRow(static_cast<int>(FindLastWord));
     } else
         statusBar()->showMessage(tr("Search term '%1' not found!").arg(word));
 }
