@@ -1,4 +1,7 @@
-QT AGI Studio, release 1.3.0
+QT AGI Studio
+=============
+
+Latest release: 1.3.0
 
 About
 =====
