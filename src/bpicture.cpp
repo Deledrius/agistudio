@@ -30,7 +30,10 @@ BPicture *ppicture;
 //"bytemap" picture for preview - it is not going to be edited,
 //so there is no need for the linked list and other things from the Picture class
 
-BPicture::BPicture()
+BPicture::BPicture() :
+    picture(), priority(), buf(), rpos(), spos(), picDrawEnabled(), priDrawEnabled(),
+    picColour(), priColour(), patCode(), patNum()
+    
 {
     picture = (byte **)malloc(MAX_H * sizeof(byte *));
     priority = (byte **)malloc(MAX_H * sizeof(byte *));

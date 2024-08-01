@@ -683,7 +683,6 @@ void Picture::refill(actionListIter pos_fill_start, actionListIter pos_fill_end,
     actionListIter pos, picPos0, temp_pic, temp_pri;
     int col_pic_orig, col_pri_orig, col_pic_new, col_pri_new;
     bool picDrawEnabled_orig, priDrawEnabled_orig;
-    bool picDrawEnabled_new, priDrawEnabled_new;
     bool draw_pic_orig, draw_pri_orig, draw_pic_new, draw_pri_new;
 
     picDrawEnabled_orig = priDrawEnabled_orig = false;
@@ -791,7 +790,6 @@ void Picture::refill(actionListIter pos_fill_start, actionListIter pos_fill_end,
     }
 
     pos = pos_fill_end;
-    picDrawEnabled_new = priDrawEnabled_new = false;
     col_pic_new = col_pri_new = -1;
     draw_pic_new = draw_pri_new = false;
     if (pos != picCodes.end()) {
@@ -799,14 +797,12 @@ void Picture::refill(actionListIter pos_fill_start, actionListIter pos_fill_end,
             switch (*pos) {
                 case SetPicColor:
                     col_pic_new = *std::next(pos);
-                    picDrawEnabled_new = true;
                     break;
                 case EnablePriority:
                     col_pic_new = -2;
                     break;
                 case SetPriColor:
                     col_pri_new = *std::next(pos);
-                    priDrawEnabled_new = true;
                     break;
                 case EnableVisual:
                     col_pri_new = -2;

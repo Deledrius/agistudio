@@ -69,7 +69,7 @@ TResource ResourceData;
  to do it...) */
 
 //*******************************************
-Game::Game() : AGIVersionNumber(0), ResourceInfo(), isOpen(false), isV3(false)
+Game::Game() : ResourceInfo(), AGIVersionNumber(0), isOpen(false), isV3(false)
 {
     ResourceData.Data = (byte *)malloc(MaxResourceSize);
 

@@ -358,7 +358,7 @@ void ViewEdit::save_to_game()
     if (ViewNum != -1) {
         view->save(ViewNum);
         if (resources_win) {
-            if (resources_win->preview == NULL)
+            if (resources_win->preview == nullptr)
                 resources_win->preview = new Preview();
             resources_win->preview->open(ViewNum, VIEW);
         }
@@ -634,7 +634,6 @@ void ViewEdit::change_mirror(int i)
                 if (view->loops[j].mirror1 == view->CurLoop)
                     view->loops[j].mirror1 = -1;
             }
-
 
             if (view->loops[k].mirror != -1)
                 view->unsetMirror(k);
