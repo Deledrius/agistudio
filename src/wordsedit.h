@@ -74,11 +74,10 @@ protected:
     WordsFind *wordsfind;
     bool changed;
     QString resource_filename;
-    int FindLastGroup, FindLastWord;
-    int SelectedGroup;
+    size_t FindLastGroup, FindLastWord;
     int find_down(const QString &word);
     int find_up(const QString &word);
-    const QString format_group(int curgroup) const;
+    const QString format_group(int) const;
     void closeEvent(QCloseEvent *e);
     void showEvent(QShowEvent *);
     void hideEvent(QHideEvent *);
@@ -98,7 +97,7 @@ protected:
     void find_next_cb();
     WordsEdit *wordsedit;
     WordList *wordlist;
-    int FindLastGroup, FindLastWord;
+    size_t FindLastGroup, FindLastWord;
     int find_down(QString *word);
     int find_up(QString *word);
     void find_first();

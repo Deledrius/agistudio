@@ -657,20 +657,11 @@ void Logic::ReadArgs(bool CommandIsIf, byte CmdNum)
                 if (ErrorOccured)
                     ShowError(CurLine, "\" required at end of word.");
                 else {
-                    //find word group number
-                    bool found = false;
-                    for (int k = 0; k < wordlist->NumGroups; k++) {
-                        for (int i = 0; i < wordlist->WordGroup[k].Words.count(); i++) {
-                            if (wordlist->WordGroup[k].Words.at(i).toStdString() == ThisWord) {
-                                ArgValue = wordlist->WordGroup[k].GroupNum;
-                                found = true;
-                                break;
-                            }
-                        }
-                        if (found)
-                            break;
-                    }
-                    if (!found) {
+                    // Find word group number
+                    int groupnum = wordlist->GroupNumOfWord(ThisWord);
+                    if (groupnum != -1)
+                        ArgValue = groupnum;
+                    else {
                         ShowError(CurLine, "Unknown word " + ThisWord + ".");
                         return;
                     }
