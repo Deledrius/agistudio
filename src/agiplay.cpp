@@ -121,7 +121,7 @@ void mix_channels(uint16_t num_samples)
     int32_t c, b, m, i, p;
 
     /* Size is in 16-bit samples */
-    memset(buffer, 0, num_samples << 1);
+    memset(buffer, 0, static_cast<size_t>(num_samples) << 1);
 
     /* Now build the sound for each channel */
     for (c = 0; c < (NUM_CHANNELS - 1); c++) {

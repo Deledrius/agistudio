@@ -22,9 +22,15 @@
 #include "logic.h"
 
 
-Logic::Logic()
+Logic::Logic() :
+    wordlist(new WordList()), objlist(new ObjList())
+{ }
+
+Logic::~Logic()
 {
-    wordlist = new WordList();
-    objlist = new ObjList();
-    OutputText = "";
+    if (wordlist)
+        delete wordlist;
+
+    if (objlist)
+        delete objlist;
 }

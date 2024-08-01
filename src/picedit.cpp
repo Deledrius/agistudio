@@ -79,14 +79,14 @@ static const char *colname[] = {
 
 //***************************************
 PicEdit::PicEdit(QWidget *parent, const char *name, int win_num, ResourcesWin *res)
-    : QMainWindow(parent), PicNum(-1), winnum(win_num), resources_win(res),
-      closing(false), changed(false), viewdata(nullptr), pri_mode(0)
+    : QMainWindow(parent), resources_win(res), PicNum(-1), winnum(win_num),
+      canvas(nullptr), palette(nullptr), viewdata(nullptr), picture(new Picture()), pricolor(nullptr),
+      changed(false), closing(false), hiding(false), showing(false), pri_mode(0)
 {
     setupUi(this);
 
     setAttribute(Qt::WA_DeleteOnClose);
 
-    picture = new Picture();
     palette = new Palette1(this, nullptr, this);
     toolColumnLayout->replaceWidget(PaletteWidget, palette);
 
@@ -146,12 +146,12 @@ PicEdit::PicEdit(QWidget *parent, const char *name, int win_num, ResourcesWin *r
 
     // Set up our custom canvas
     if (game->settings->value("PictureEditorStyle").toInt() == P_TWO) {
-        canvas = new PCanvas(nullptr, 0, this);
+        canvas = new PCanvas(nullptr, nullptr, this);
         canvas->setMinimumSize(canvas->pixsize * MAX_W + canvas->x0 + 10, canvas->pixsize * MAX_HH + canvas->y0 + 10);
         canvas->resize(canvas->pixsize * MAX_W + canvas->x0, canvas->pixsize * MAX_HH + canvas->x0);
 
     } else {
-        canvas = new PCanvas(this, 0, this);
+        canvas = new PCanvas(this, nullptr, this);
         canvas->setMinimumSize(canvas->pixsize * MAX_W + canvas->x0 + 10, canvas->pixsize * MAX_HH + canvas->y0 + 10);
         canvas->resize(canvas->pixsize * MAX_W + canvas->x0, canvas->pixsize * MAX_HH + canvas->x0);
         canvas->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -730,7 +730,6 @@ void PCanvas::setPixsize(int s)
 void PCanvas::mousePressEvent(QMouseEvent *event)
 {
     int x = event->pos().x(), y = event->pos().y();
-    int xx = x, yy = y;
 
     x -= x0;
     y -= y0;
@@ -764,7 +763,6 @@ void PCanvas::mousePressEvent(QMouseEvent *event)
 void PCanvas::mouseMoveEvent(QMouseEvent *event)
 {
     int x = event->pos().x(), y = event->pos().y();
-    int xx = x, yy = y;
 
     x -= x0;
     y -= y0;
@@ -793,7 +791,7 @@ void PCanvas::mouseMoveEvent(QMouseEvent *event)
         int pri = y / 12 + 1;
         auto msg = picedit->statusbar->findChild<QLabel *>();
         msg->setText(QString("X=%1  Y=%2  Pri=%3").arg(x / 2).arg(y).arg(pri));
-        auto pal = picedit->pricolor->palette();
+        QPalette pal = picedit->pricolor->palette();
         pal.setColor(QPalette::Window, egacolor[pri + 1]);
         picedit->pricolor->setPalette(pal);
     }
@@ -1110,14 +1108,10 @@ void Palette1::paintEvent(QPaintEvent *)
 //*****************************************
 void Palette1::mousePressEvent(QMouseEvent *event)
 {
-    int w, h, x, y, dx, dy, i;
+    int x, y, dx, dy, i;
 
-    w = this->width();
-    h = this->height();
-    dx = w / 9;
-    dy = h / 2;
-    w = dx * 9;
-    h = dy * 2;
+    dx = this->width() / 9;
+    dy = this->height() / 2;
 
     x = event->pos().x() / dx;
     y = event->pos().y() / dy;

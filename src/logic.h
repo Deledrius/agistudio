@@ -41,6 +41,7 @@ class Logic
 {
 public:
     Logic();
+    ~Logic();
     WordList *wordlist;
     ObjList *objlist;
     std::string OutputText;     //result of the decoding

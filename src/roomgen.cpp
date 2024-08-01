@@ -40,7 +40,7 @@ static const char *dirs[4] = {"left", "right", "bottom", "horizon"};
 
 //***********************************************
 RoomGen::RoomGen(QWidget *parent, const char *name)
-    : QDialog(parent)
+    : QDialog(parent), en(), hn(), ln(), pn(), rn(), xn(), yn()
 {
     int i;
     setWindowTitle("AGI Base Logic Generator");
@@ -64,7 +64,6 @@ RoomGen::RoomGen(QWidget *parent, const char *name)
 
     QLabel *lpic = new QLabel("Picture Number:", this);
     gtxt->addWidget(lpic);
-    lpic = lpic;
     pnum = new QLineEdit(this);
     gtxt->addWidget(pnum);
     pnum->setFixedWidth(40);
@@ -207,7 +206,6 @@ RoomGen::RoomGen(QWidget *parent, const char *name)
         col++;
     }
 
-    col = 0;
     QPushButton *edge_adv = new QPushButton("Advanced", edge_control_b);
     connect(edge_adv, SIGNAL(clicked()), SLOT(edge_advanced_cb()));
     edge_control->addWidget(edge_adv, row, 0, 1, 2, Qt::AlignCenter);
