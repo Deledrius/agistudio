@@ -120,6 +120,8 @@ ViewEdit::ViewEdit(QWidget *parent, const char *name, int win_num, ResourcesWin 
     connect(pushButtonWidthRight, &QPushButton::clicked, this, &ViewEdit::inc_width);
     connect(pushButtonHeightLeft, &QPushButton::clicked, this, &ViewEdit::dec_height);
     connect(pushButtonHeightRight, &QPushButton::clicked, this, &ViewEdit::inc_height);
+    connect(lineEditHeight, &QLineEdit::editingFinished, this, &ViewEdit::change_width_height);
+    connect(lineEditWidth, &QLineEdit::editingFinished, this, &ViewEdit::change_width_height);
 
     connect(checkBoxDescription, &QPushButton::clicked, this, &ViewEdit::is_descriptor_cb);
     connect(pushButtonEditDesc, &QPushButton::clicked, this, &ViewEdit::show_description);
