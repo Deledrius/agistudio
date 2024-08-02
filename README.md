@@ -1,4 +1,4 @@
-QT AGI Studio
+Qt AGI Studio
 =============
 
 Latest release: 1.3.0
@@ -7,7 +7,7 @@ About
 =====
 
 AGI (Adventure Game Interpreter) is the adventure game engine used by
-Sierra On-Line(tm) to create some of their early games. QT AGI Studio
+Sierra On-Line(tm) to create some of their early games. Qt AGI Studio
 (formerly known as Linux AGI Studio) is a program which allows you to
 view, create and edit AGI games. Basically, it is an enhanced port of
 the Windows AGI Studio developed by Peter Kelly.
@@ -20,8 +20,8 @@ library support.
 Availability
 ============
 
-QT AGI Studio is available at https://github.com/Deledrius/agistudio/
-The project is licensed under the GPL, GNU General Public License.
+Qt AGI Studio is available at https://github.com/Deledrius/agistudio/
+The project is licensed under the GPL (GNU General Public License).
 See LICENSE for details.
 
 
@@ -32,7 +32,7 @@ Linux:   GNU make, g++, cmake, X Window System, Qt library
 OS X:    GNU make or XCode, g++ or clang, cmake, Qt library
 Windows: MinGW or Visual Studio, cmake, Qt library
 
-The program is now being developed with Qt version 5.
+The program is now being developed with Qt version 6.
 
 NAGI, Sarien or ScummVM AGI interpreter is recommended to run games.
 ScummVM is available at https://www.scummvm.org/
@@ -40,8 +40,7 @@ Sarien is at https://sourceforge.net/projects/sarien/
 NAGI is at http://www.agidev.com/projects/nagi/
 Sarien is more focused on portability and NAGI on compatibility
 with Sierra's original AGI interpreter. Both are free.
-ScummVM is actively developed, but does not integrate well
-with QT AGI studio.
+ScummVM is actively developed and is widely cross-platform.
 
 
 Building
@@ -56,7 +55,7 @@ or XCode project, etc. appropriate for your platform:
 
 If you don't have CMake, you can download it at https://cmake.org/
 
-CMake will detect that Qt5 is installed.
+CMake will detect that Qt6 is installed.
 
 
 Installation and setup
@@ -68,7 +67,7 @@ use the help and an example game template, copy them to any convenient place
 and specify the appropriate paths in the "Settings" menu when you'll run
 agistudio.
 
-AGI studio has its own help viewer, but you can also view the help with
+Qt AGI Studio has its own help viewer, but you can also view the help with
 any HTML browser.
 
 
@@ -88,7 +87,10 @@ Credits
  * Claudio Matsuoka <claudio@helllabs.org> - sound support
  * Peter Kelly <pmk@post.com> - the original Windows version
  * Lance Ewing <lance.e@ihug.co.nz> - the original (DOS) Picedit
- * Joseph Davies <joseph.davies@zero-factorial.com> - Qt5 Port, current maintainer
+ * Joseph Davies <joseph.davies@zero-factorial.com> - Qt6 Port, current maintainer
+
+Additional fixes provided by:
+  Mikael Agren, Chris Cromer, Michael Hansen, Mike Rombout.
 
 
 Feedback
@@ -97,4 +99,4 @@ Feedback
 Please visit project website at https://github.com/Deledrius/agistudio/ to
 submit bug reports, comments, suggestions, etc.
 
-Hope you'll have as much fun using it as we've had developing it :-)
+Hope you'll have as much fun using it as we've had developing it! :-)
