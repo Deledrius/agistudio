@@ -152,7 +152,6 @@ install(TARGETS AGIStudio
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
         BUNDLE DESTINATION .)
 
-#add_dependencies(AGIStudio AGIStudio-Help)
 
 # Deployment configuration
 set(CPACK_COMPONENT_AGISTUDIO_DISPLAY_NAME "AGIStudio")
