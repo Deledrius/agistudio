@@ -46,6 +46,7 @@ jobs:
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
+      if: startsWith(github.ref, 'refs/tags/v')
       with:
         name: AGIStudio-${{matrix.os}}-${{github.sha}}
         path: ${{runner.workspace}}/install/
