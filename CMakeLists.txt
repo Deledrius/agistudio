@@ -29,21 +29,31 @@ SET(CPACK_PACKAGE_DESCRIPTION_FILE "${PROJECT_SOURCE_DIR}/README.md")
 set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION_FULL})
 set(CPACK_PACKAGE_INSTALL_DIRECTORY "AGIStudio")
 set(CPACK_PACKAGE_EXECUTABLES "AGIStudio;AGI Studio")
+set(CPACK_PACKAGE_CONTACT "Joseph Davies")
 
+# Windows-specific package information
 set(CPACK_NSIS_EXECUTABLES_DIRECTORY ${CMAKE_INSTALL_BINDIR})
 set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
 set(CPACK_NSIS_IGNORE_LICENSE_PAGE ON)
 set(CPACK_NSIS_COMPRESSOR "LZMA")
 
+# macOS-specific package information
 set(CPACK_BUNDLE_NAME "AGIStudio")
 set(CPACK_BUNDLE_ICON "${PROJECT_SOURCE_DIR}/src/AGIStudio.icns")
 set(CPACK_BUNDLE_PLIST "${PROJECT_SOURCE_DIR}/src/Info.plist")
 set(CPACK_DMG_FORMAT "UDBZ")
 
+# Linux-specific package information
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "qt6-base")
+
+# Set preferred package generator for each platform
 if (APPLE)
-    set(CPACK_BINARY_BUNDLE ON)
-    set(CPACK_BINARY_STGZ  OFF)
-    set(CPACK_BINARY_TGZ   OFF)
+	set(CPACK_GENERATOR "DragNDrop")
+elseif (WIN32)
+	set(CPACK_GENERATOR "NSIS")
+else()
+	set(CPACK_GENERATOR "DEB")
 endif ()
+
 
 include(CPack)
