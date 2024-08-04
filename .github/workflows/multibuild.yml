@@ -36,7 +36,7 @@ jobs:
       # Run cmake's configuration from inside the source tree, allowing
       # the versioning scripts to find the git history.
       working-directory: ${{github.workspace}}
-      run: cmake -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_INSTALL_PREFIX="${{runner.workspace}}/install" -S "${{github.workspace}}" -B "${{runner.workspace}}/build"
+      run: cmake -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_INSTALL_PREFIX="${{runner.workspace}}/install" -DCPACK_PACKAGE_DIRECTORY="${{runner.workspace}}/package" -S "${{github.workspace}}" -B "${{runner.workspace}}/build"
 
     - name: Build
       shell: bash
@@ -46,7 +46,7 @@ jobs:
     - name: Create Package
       shell: bash
       working-directory: ${{runner.workspace}}/build
-      run: cpack -B ../package
+      run: cmake --build . --config $BUILD_TYPE --target package
       
       # Upload artifacts for publishing if this is a versioned tag.
     - name: Upload artifact
