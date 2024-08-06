@@ -1,7 +1,7 @@
 Qt AGI Studio
 =============
 
-Latest release: 1.3.0
+Latest release: 1.4.00
 
 About
 =====

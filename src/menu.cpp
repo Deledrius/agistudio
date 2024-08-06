@@ -676,6 +676,7 @@ About::About(QWidget *parent, const char *name)
         "<b>Authors:</b><br>"
         "Helen Zommer (helen@cc.huji.ac.il)<br>"
         "Jarno Elonen (elonen@iki.fi)<br>"
+        "Joseph Davies (joseph.davies@zero-factorial.com)<br>"
         "<br>"
         "<b>and also:</b><br>"
         "Peter Kelly (pmk@post.com)<br>"
