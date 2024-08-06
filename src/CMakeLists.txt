@@ -31,45 +31,6 @@ set(AGIStudio_HEADERS
     bmp2agipic.h
 )
 
-set(AGIStudio_RESOURCES
-    icon1.ico
-    agistudio.rc
-    app_icon.xpm
-    left.xpm
-    left2_x.xpm
-    right1.xpm
-    toolbar_close.xpm
-    toolbar_run.xpm
-    zoom_minus.xpm
-    back.xpm
-    left_x.xpm
-    leftarrow_x.xpm
-    right1_x.xpm
-    toolbar_logedit.xpm
-    toolbar_textedit.xpm
-    zoom_minus_x.xpm
-    downarrow_x.xpm
-    left1.xpm
-    logo.xpm
-    right2.xpm
-    toolbar_objedit.xpm
-    toolbar_viewedit.xpm
-    zoom_plus.xpm
-    forward.xpm
-    left1_x.xpm
-    right.xpm
-    right2_x.xpm
-    toolbar_open.xpm
-    toolbar_wordsedit.xpm
-    zoom_plus_x.xpm
-    home.xpm
-    left2.xpm
-    right_x.xpm
-    rightarrow_x.xpm
-    toolbar_picedit.xpm
-    uparrow_x.xpm
-)
-
 set(AGIStudio_SOURCES
     agicommands.cpp
     agiplay.cpp
@@ -99,21 +60,11 @@ set(AGIStudio_SOURCES
     bmp2agipic.cpp
 )
 
-set(AGIStudio_UI
-    ui/mainmenu.ui
-    ui/objedit.ui
-    ui/options.ui
-    ui/picedit.ui
-    ui/resources.ui
-    ui/textedit.ui
-    ui/viewedit.ui
-    ui/wordsedit.ui
-    ui/wordsfind.ui
-)
+# Load Resource definitions
+add_subdirectory(resources)
 
-set(AGIStudio_UIRESOURCES
-    ui/agistudio.qrc
-)
+# Load UI definitions
+add_subdirectory(ui)
 qt_add_resources(RCC_SOURCES ${AGIStudio_UIRESOURCES})
 
 # Create a group for the template project files
