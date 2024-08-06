@@ -40,8 +40,8 @@ set(CPACK_NSIS_COMPRESSOR "LZMA")
 
 # macOS-specific package information
 set(CPACK_BUNDLE_NAME "AGIStudio")
-set(CPACK_BUNDLE_ICON "${PROJECT_SOURCE_DIR}/src/AGIStudio.icns")
-set(CPACK_BUNDLE_PLIST "${PROJECT_SOURCE_DIR}/src/Info.plist")
+set(CPACK_BUNDLE_ICON "${PROJECT_SOURCE_DIR}/src/resources/AGIStudio.icns")
+set(CPACK_BUNDLE_PLIST "${PROJECT_SOURCE_DIR}/src/resources/Info.plist")
 set(CPACK_DMG_FORMAT "UDBZ")
 
 # Linux-specific package information

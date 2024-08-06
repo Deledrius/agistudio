@@ -9,7 +9,7 @@
 	<key>CFBundleGetInfoString</key>
 	<string>AGI Studio 1.4.0</string>
 	<key>CFBundleIconFile</key>
-	<string>AGIStudio</string>
+	<string>AGIStudio.icns</string>
 	<key>CFBundleIdentifier</key>
 	<string>com.zero-factorial.agistudio</string>
 	<key>CFBundleInfoDictionaryVersion</key>
