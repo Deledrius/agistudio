@@ -10,6 +10,7 @@ project(AGIStudio
 		DESCRIPTION "Editor for Sierra AGI games"
 		HOMEPAGE_URL https://deledrius.github.io/agistudio/)
 message(STATUS "Project version: " ${PROJECT_VERSION_FULL})
+add_compile_definitions(BUILD_VERSION="${PROJECT_VERSION_FULL}")
 
 set(CMAKE_CXX_STANDARD 20)
 if(WIN32)

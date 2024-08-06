@@ -669,9 +669,9 @@ About::About(QWidget *parent, const char *name)
 
     QTextEdit *about = new QTextEdit(this);
     about->setReadOnly(true);
-    about->setText(
-        "<center><b>Qt AGI studio v. 1.3.0</b><br>"
-        "http://agistudio.sourceforge.net/<br>"
+    QString about_text =
+        "<center><b>Qt AGI studio v.%1</b><br>"
+        "https://github.com/Deledrius/agistudio<br>"
         "<br>"
         "<b>Authors:</b><br>"
         "Helen Zommer (helen@cc.huji.ac.il)<br>"
@@ -689,7 +689,8 @@ About::About(QWidget *parent, const char *name)
         "redistribute it and/or modify it under "
         "the terms of the GNU General Public "
         "License, version 2 or later, as published "
-        "by the Free Software Foundation.");
+        "by the Free Software Foundation.";
+    about->setText(about_text.arg(BUILD_VERSION));
     all->addWidget(about);
 
     QPushButton *ok = new QPushButton(this);
