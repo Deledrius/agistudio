@@ -39,3 +39,8 @@ set(AGIStudio_RESOURCES
     
     PARENT_SCOPE
 )
+
+set(AGIStudio_APPLE_RESOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/AGIStudio.icns
+)
+set_source_files_properties(${AGIStudio_APPLE_RESOURCES} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
