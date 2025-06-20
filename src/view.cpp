@@ -21,6 +21,7 @@
 
 
 #include <filesystem>
+#include <fstream>
 
 #include "game.h"
 #include "menu.h"
@@ -46,17 +47,16 @@ void View::init()
 //*************************************************
 int View::open(const std::string &filename)
 {
-    FILE *fptr = fopen(filename.c_str(), "rb");
-    if (fptr == nullptr) {
+    auto view_stream = std::ifstream(filename, std::ios::binary);
+    if (!view_stream.is_open()) {
         menu->errmes("Can't open file '%s'!", filename.c_str());
         return 1;
     }
-
     ResourceData.Size = std::filesystem::file_size(filename);
-    fread(ResourceData.Data, ResourceData.Size, 1, fptr);
-    fclose(fptr);
-
+    view_stream.read(reinterpret_cast<char *>(ResourceData.Data), ResourceData.Size);
+    view_stream.close();
     init();
+
     return 0;
 }
 
@@ -214,15 +214,15 @@ void View::LoadCel(int loopno, int celno)
 //*************************************************
 int View::save(const std::string &filename)
 {
-    FILE *fptr = fopen(filename.c_str(), "wb");
-
-    if (fptr == nullptr) {
+    auto view_stream = std::ofstream(filename, std::ios::binary);
+    if (!view_stream.is_open()) {
         menu->errmes("Can't open file '%s'!", filename.c_str());
         return 1;
     }
     save();
-    fwrite(ResourceData.Data, ResourceData.Size, 1, fptr);
-    fclose(fptr);
+    view_stream.write(reinterpret_cast<char *>(ResourceData.Data), ResourceData.Size);
+    view_stream.close();
+
     return 0;
 }
 

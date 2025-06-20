@@ -22,6 +22,7 @@
 
 
 #include <filesystem>
+#include <fstream>
 #include <string>
 
 #include "game.h"
@@ -80,8 +81,8 @@ void ObjList::XORData()
 //****************************************************
 int ObjList::read(const std::string &filename, bool FileIsEncrypted)
 {
-    FILE *fptr = fopen(filename.c_str(), "rb");
-    if (fptr == NULL) {
+    auto object_stream = std::ifstream(filename, std::ios::binary);
+    if (!object_stream.is_open()) {
         menu->errmes("Error opening file '%s'.", filename.c_str());
         return 1;
     }
@@ -94,8 +95,8 @@ int ObjList::read(const std::string &filename, bool FileIsEncrypted)
 
     ItemNames.clear();
     ResourceData.Size = size;
-    fread(ResourceData.Data, ResourceData.Size, 1, fptr);
-    fclose(fptr);
+    object_stream.read(reinterpret_cast<char *>(ResourceData.Data), ResourceData.Size);
+    object_stream.close();
     if (FileIsEncrypted)
         XORData();
     if (!GetItems()) {
@@ -119,8 +120,7 @@ int ObjList::save(const std::string &filename, bool FileIsEncrypted)
 {
     byte lsbyte, msbyte;
     int ItemNamesStart, ObjectFilePos;
-    int CurrentItem, CurrentChar;
-    FILE *fptr;
+    size_t CurrentItem, CurrentChar;
 
     ResourceData.Size = ItemNames.count() * 3 + 5;
     //3 bytes for each index entry, 3 bytes for header, 2 for '?' object
@@ -153,7 +153,7 @@ int ObjList::save(const std::string &filename, bool FileIsEncrypted)
             ResourceData.Data[CurrentItem * 3] = lsbyte;;
             ResourceData.Data[CurrentItem * 3 + 1] = msbyte;
             ResourceData.Data[CurrentItem * 3 + 2] = RoomNum[CurrentItem - 1];
-            for (CurrentChar = 0; CurrentChar < (int)ItemNames.at(CurrentItem - 1).length(); CurrentChar++) {
+            for (CurrentChar = 0; CurrentChar < ItemNames.at(CurrentItem - 1).length(); CurrentChar++) {
                 ResourceData.Data[ObjectFilePos] = ItemNames.at(CurrentItem - 1)[CurrentChar].toLatin1();
                 ObjectFilePos++;
             }
@@ -161,16 +161,16 @@ int ObjList::save(const std::string &filename, bool FileIsEncrypted)
             ObjectFilePos++;
         }
     }//end create data
-    fptr = fopen(filename.c_str(), "wb");
-    if (fptr == NULL) {
+    auto object_stream = std::ofstream(filename, std::ios::binary);
+    if (!object_stream.is_open()) {
         menu->errmes("Error opening file '%s'!", filename.c_str());
         return 1;
     }
     if (FileIsEncrypted)
         XORData();
 
-    fwrite(ResourceData.Data, ResourceData.Size, 1, fptr);
-    fclose(fptr);
+    object_stream.write(reinterpret_cast<char *>(ResourceData.Data), ResourceData.Size);
+    object_stream.close();
     return 0;
 }
 

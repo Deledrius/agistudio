@@ -92,7 +92,7 @@ int WordList::GetWordGroupNumberByIndex(size_t n) const
 const std::vector<std::string> WordList::GetGroupWords(int groupnum) const
 {
     if (WordGroup.contains(groupnum)) {
-        const auto words = WordGroup.at(groupnum);
+        const auto &words = WordGroup.at(groupnum);
         return words;
     }
 
