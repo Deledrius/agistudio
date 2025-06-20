@@ -66,8 +66,7 @@ if ((controller(menu_quit) ||
 
 if (input_recieved && 
     !input_parsed) { 
-  print("You are dead! You can only restore, restart, quit the game"
-        " or view your inventory.");
+  print("You are dead! You can only restore, restart, quit the game or view your inventory.");
 }
 
 return();
